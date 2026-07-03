@@ -56,7 +56,7 @@ export class GameScene extends Phaser.Scene {
     for (const enemy of this.enemies) {
       enemy.update(delta);
       if (enemy.reachedEnd) {
-        this.economy = loseLife(this.economy, 1);
+        this.economy = loseLife(this.economy, enemy.definition.livesLost);
       }
     }
     this.enemies = this.enemies.filter((enemy) => {

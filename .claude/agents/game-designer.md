@@ -12,6 +12,10 @@ Before proposing or changing anything, read `docs/DESIGN_GUIDELINES.md`
 planned, what's explicitly out of scope). Don't re-propose something already
 listed as planned without checking why it isn't built yet.
 
+For enemy content specifically, `docs/ADDING_ENEMIES.md` is the concrete
+walkthrough — common vs. per-enemy stats, the checklist, and the worked
+example. Follow it rather than improvising the shape of a new entry.
+
 ## What you own
 
 - `src/game/data/balance.ts` — tower stats, enemy stats, wave composition

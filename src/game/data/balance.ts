@@ -48,19 +48,67 @@ export const TOWER_DEFINITIONS: Record<TowerId, TowerDefinition> = {
 
 export type EnemyId = 'grunt' | 'runner' | 'brute';
 
+/**
+ * Per-enemy stats — every enemy type has its own value for each of these.
+ * See docs/ADDING_ENEMIES.md before adding a new type.
+ */
 export interface EnemyDefinition {
   id: EnemyId;
   name: string;
+  /** Movement speed along the path, in px/sec. */
   speed: number;
   maxHp: number;
+  /** Gold awarded to the player on kill. */
   reward: number;
+  /** Player lives lost if this enemy reaches the end of the path. */
+  livesLost: number;
+  /** Body tint, 0xRRGGBB. */
   color: number;
 }
 
+/**
+ * Rendering constants shared by every enemy type, regardless of stats.
+ * Change these to restyle all enemies uniformly; per-type appearance is
+ * limited to `color` on EnemyDefinition (see docs/DESIGN_GUIDELINES.md).
+ */
+export const ENEMY_VISUALS = {
+  bodyRadius: 12,
+  hpBarWidth: 24,
+  hpBarHeight: 4,
+  hpBarOffsetY: -20,
+  hpBarBackgroundColor: 0x000000,
+  hpBarBackgroundAlpha: 0.5,
+  hpBarFillColor: 0x22c55e,
+} as const;
+
 export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
-  grunt: { id: 'grunt', name: 'Grunt', speed: 60, maxHp: 40, reward: 5, color: 0xef4444 },
-  runner: { id: 'runner', name: 'Runner', speed: 110, maxHp: 20, reward: 4, color: 0xeab308 },
-  brute: { id: 'brute', name: 'Brute', speed: 40, maxHp: 150, reward: 15, color: 0x7c3aed },
+  grunt: {
+    id: 'grunt',
+    name: 'Grunt',
+    speed: 60,
+    maxHp: 40,
+    reward: 5,
+    livesLost: 1,
+    color: 0xef4444,
+  },
+  runner: {
+    id: 'runner',
+    name: 'Runner',
+    speed: 110,
+    maxHp: 20,
+    reward: 4,
+    livesLost: 1,
+    color: 0xeab308,
+  },
+  brute: {
+    id: 'brute',
+    name: 'Brute',
+    speed: 40,
+    maxHp: 150,
+    reward: 15,
+    livesLost: 1,
+    color: 0x7c3aed,
+  },
 };
 
 export const WAVES: WaveDefinition[] = [

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import type { EnemyDefinition } from '../data/balance';
+import { ENEMY_VISUALS, type EnemyDefinition } from '../data/balance';
 import type { Vector2 } from '../core/types';
 
 export class Enemy extends Phaser.GameObjects.Container {
@@ -19,9 +19,24 @@ export class Enemy extends Phaser.GameObjects.Container {
     this.hp = definition.maxHp;
     this.path = path;
 
-    const body = scene.add.circle(0, 0, 12, definition.color);
-    const hpBarBg = scene.add.rectangle(0, -20, 24, 4, 0x000000, 0.5);
-    this.hpBarFill = scene.add.rectangle(-12, -20, 24, 4, 0x22c55e).setOrigin(0, 0.5);
+    const body = scene.add.circle(0, 0, ENEMY_VISUALS.bodyRadius, definition.color);
+    const hpBarBg = scene.add.rectangle(
+      0,
+      ENEMY_VISUALS.hpBarOffsetY,
+      ENEMY_VISUALS.hpBarWidth,
+      ENEMY_VISUALS.hpBarHeight,
+      ENEMY_VISUALS.hpBarBackgroundColor,
+      ENEMY_VISUALS.hpBarBackgroundAlpha,
+    );
+    this.hpBarFill = scene.add
+      .rectangle(
+        -ENEMY_VISUALS.hpBarWidth / 2,
+        ENEMY_VISUALS.hpBarOffsetY,
+        ENEMY_VISUALS.hpBarWidth,
+        ENEMY_VISUALS.hpBarHeight,
+        ENEMY_VISUALS.hpBarFillColor,
+      )
+      .setOrigin(0, 0.5);
 
     this.add([body, hpBarBg, this.hpBarFill]);
     scene.add.existing(this);
@@ -34,7 +49,7 @@ export class Enemy extends Phaser.GameObjects.Container {
   takeDamage(amount: number): void {
     this.hp = Math.max(0, this.hp - amount);
     const pct = this.hp / this.definition.maxHp;
-    this.hpBarFill.width = 24 * pct;
+    this.hpBarFill.width = ENEMY_VISUALS.hpBarWidth * pct;
   }
 
   update(dtMs: number): void {

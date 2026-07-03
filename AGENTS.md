@@ -23,6 +23,9 @@ over React Native.
   scope. Check before proposing something that might already be
   planned/rejected.
 - `docs/TESTING.md` — what belongs in unit vs. component vs. e2e tests
+- `docs/ADDING_ENEMIES.md` — worked, step-by-step guide for adding a new
+  enemy type: which stats are common vs. per-enemy, which files to touch,
+  when a stats-only data edit is enough vs. when it needs real code
 
 ## Commands
 
