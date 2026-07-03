@@ -214,6 +214,41 @@ Troll Farm Overseer (elite).
 (stealth-aura elite — hides others in smoke until killed), Tikbalang
 (scrambles targeting — design TBD).
 
+## The villains — who you actually defeat
+
+"Boss" means three different things, and only two are true enemies:
+
+1. **Rival bosses (meme heroes)** — recruitment duels. They test Eden and
+   join after defeat. Not villains; they're the roster.
+2. **Arc bosses — the actual enemy.** Commanders of the machine's two
+   arms, one per campaign arc, each a *behavior personified* (never a
+   person). Defeating one cleanses that arc for good.
+3. **Finale bosses** — the machine's apex, gated at campaign's end.
+
+### Arc boss roster (behavior → mechanic)
+
+| Act / arc | Boss | Arm | Kind | Signature mechanic |
+|---|---|---|---|---|
+| 1 — Barangay | **The Overseer** | Troll | Ranged summoner | Runs a shuttered-internet-café troll farm; endlessly summons Bot swarmlings — killing the boss silences the bots |
+| 2 — LGU | **Kuno the Peddler** | Troll | Ranged | Wholesale fake-news peddler ("kuno" = *allegedly*); scatters **fake gold pickups that subtract** when collected — teaches players to distrust freebies |
+| 3 — Province | **Manananggal Matriarch** | Corrupted folk | Melee splitter | Splits into two half-bosses; **both must die within a window or she reforms at full HP** |
+| Agency: transport | **The Fixer King** | Corruption | Melee rusher | Dashes in bursts between queue gates; spawns Fixer runners; armored in Red Tape stacks |
+| Agency: public works | **The Ghost Engineer** | Corruption | Ranged stealth | Master of ghost projects — repeatedly turns invisible and erects **ghost walls that block your projectiles** until revealed by truth units |
+| Agency: social welfare | **Ghost Payroll** | Corruption | Summoner | Spawns endless ghost-beneficiary stealthers; the honest workers you're saving point them out (scripted reveals) |
+| Agency: customs | **Smuggler Admiral** | Corruption | Melee | Massive gold thief — drains your economy while alive; killing him returns everything with interest |
+| Corruption apex | **The Dynasty** | Corruption | 3-phase | Kill it and a relative takes over: Gen 1 melee bruiser → Gen 2 ranged schemer → Gen 3 hybrid heir, each phase angrier |
+| **Finale** | **The Algorithm** | The machine itself | Colossus | The recommendation-engine god both arms feed. **Adapts mid-fight — shifts its resistances**, forcing the full alliance's type diversity; the final exam of everything the player learned |
+
+All arc bosses obey the standing rules: hard-CC immune, telegraphed
+weaknesses on their enemy card, melee/ranged behavior per
+`docs/WORLD_AND_HEROES.md` boss rules, and *never* a depiction of a real
+person. The Dynasty and The Algorithm are never recruitable.
+
+Thematic through-line: fake news peddlers are the *front*; the corruption
+they protect is the *body*; The Algorithm — the system that profits from
+both — is the *head*. Eden's alliance defeats the head only when every
+voice has been gathered.
+
 ## Unlock flow — two recruitment paths, one per roster tier
 
 Defeat-to-recruit is **not discarded** — it's scoped to the tier where it
