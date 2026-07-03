@@ -108,18 +108,25 @@ are `balance.ts` data.
 Enemies reuse the **chassis × skin** engine (`docs/PROGRESSION.md`):
 behavior defined once per chassis, anomalies as skins.
 
-### Minion anomalies
+### Minion anomalies — the bestiary
 
-| Anomaly | Chassis | Behavior → mechanic |
-|---|---|---|
-| Troll Bot | Swarmling | Fake-news spam in packs |
-| Fixer | Runner | Rushes paperwork past you |
-| Ghost Employee | Stealther | Invisible until revealed by truth heroes (Auditor/Journalist) |
-| Kickback Courier | Runner | **Steals gold** as it walks; kill before it exits to recover with interest |
-| Red Tape | Brute | Stacking paperwork armor (earth/shred counters); slows gold income while alive |
-| Epal Tarp | Elite | Billboard mini-boss; morale aura buffs nearby anomalies |
-| Fake News Blimp | Flyer | Immune to earth, weak to wind |
-| The Overpriced | Shieldbearer | Hugely inflated HP bar; an audit pops the padding |
+Each anomaly is a **monster whose body telegraphs its mechanic**. The
+design rule for every entry: a player who has never read a tooltip should
+guess what it does from its silhouette and animation. (And per the
+binding content rules: any face, poster, or name on a monster is
+fictional and generic — e.g. the Epal's candidate face is an invented
+grinning politician, never a real one.)
+
+| Anomaly | Chassis | Monster form | Behavior → mechanic |
+|---|---|---|---|
+| **Troll Bot** | Swarmling | Gremlin with a cracked phone for a head, blue-glow face, keyboard-claw fingers; chitters in speech bubbles | Fake-news spam in packs |
+| **Fixer** | Runner | Many-armed scuttler sheathed in rush-stamped folders, a lanyard of too many IDs, grease-slick trail | Darts in bursts, rushing paperwork past you |
+| **Ghost Employee** | Stealther | Translucent barong-clad office specter, blank ID on a lanyard, clutching a bundy time card — only its floating pay envelope is fully solid | Invisible until revealed by truth heroes (Auditor/Journalist) |
+| **Kickback Courier** | Runner | Hunched imp lugging a bulging duffel that leaks coins; **visibly fattens as it steals** | Steals gold as it walks; kill it before it exits to recover with interest |
+| **Red Tape** | Brute | Mummy wrapped in red ribbon and "RECEIVED" tape; **each armor layer is a visible wrap that shreds off** as armor breaks | Stacking paperwork armor (earth/shred counters); slows gold income while alive |
+| **Epal** | Elite | Hulking mobster whose real face is hidden behind a smiling **fictional candidate's tarpaulin face**, sash and rosette; the poster smile never changes, even when it roars; the tarp tears as it takes damage | Elite minion; "name recall" morale aura buffs nearby anomalies |
+| **Fake News Blimp** | Flyer | Tabloid-skinned balloon beast with a megaphone snout, raining screaming-headline leaflets | Flying: immune to earth, weak to wind |
+| **The Overpriced** | Shieldbearer | Parade-balloon creature puffed to bursting, wearing a price tag with too many zeros; **an audit pops it, deflating it to a scrawny true form** | Hugely inflated HP bar; audit removes the padding |
 
 (Corrupted folk creatures — manananggal splitter, tiyanak bait, kapre
 smoke — remain available as regional skin variants of the same chassis.)
