@@ -30,6 +30,12 @@ type-specific special case anywhere outside `src/game/data/balance.ts`, stop
 entity/scene code. Flag it to the game-designer agent if the data model
 doesn't support it yet.
 
+When a new enemy needs actual behavior (armor, flying, shields, split-on-
+death — not just a new stat combination), `docs/ADDING_ENEMIES.md`'s "when
+you need more than data" section has the concrete pattern for where each
+kind of behavior belongs (`EnemyDefinition` field vs. `Enemy.ts` vs.
+`Targeting.ts`) and requires unit tests for anything landing in `core/`.
+
 ## Before finishing
 
 1. `npm run typecheck`

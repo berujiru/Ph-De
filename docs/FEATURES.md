@@ -21,8 +21,16 @@ built" vs. "what's planned," not the commit history.
 
 ## Near-term (fleshes out the core loop)
 
-- [ ] **Frost tower slow effect** — currently a reskinned weak damage tower;
-      needs an actual slow-on-hit (temporary speed multiplier on `Enemy`)
+- [ ] **Damage types & ailments, phases 1–2** — full design in
+      `docs/DAMAGE_AND_AILMENTS.md` (10 damage types, 12 ailments with
+      per-ailment proc rules, decided 2026-07-03). Phase 1 is neutral
+      plumbing (`damageType` on towers, `resistances` on enemies,
+      `core/Damage.ts`); phase 2 ships the first riders: Slow (subsumes the
+      old "Frost tower slow effect" item), Burn + Flame tower, Stun + Storm
+      tower, and `core/Ailments.ts`
+- [ ] **Enemy info card** — tap an enemy (or wave-preview row) to see stats,
+      weaknesses, resistances, and ailment immunities; required by phase 3
+      of the damage-type system at the latest
 - [ ] **Tower upgrades** — spend gold to increase an existing tower's
       damage/range/fire rate instead of only placing new towers
 - [ ] **Tower sell** — refund a portion of cost, free the build slot
@@ -44,9 +52,14 @@ built" vs. "what's planned," not the commit history.
       the enemy path, with validation that a path to the goal always exists
 - [ ] **More targeting strategies** — closest, strongest, weakest, selectable
       per tower
-- [ ] **Enemy special abilities** — armor (flat damage reduction), shields
-      (must be broken before HP damage applies), flying (some towers can't
-      target), split-on-death
+- [ ] **Damage types & ailments, phases 3–4** — water/Wet synergies, then
+      wind/earth/holy/dark and the remaining ailments (poison, bleed, rot,
+      sleep, curse, knockback, armor shred), each arriving with its carrier
+      tower and a matching enemy — see `docs/DAMAGE_AND_AILMENTS.md`
+- [ ] **Enemy special abilities** — armor and flying are specified in
+      `docs/DAMAGE_AND_AILMENTS.md` (data model: `armor`, `tags`); shields
+      (must be broken before HP damage applies) and split-on-death remain
+      to be designed
 - [ ] **Boss waves**
 - [ ] **Persistent meta-progression** — unlock towers/levels across sessions,
       local storage first, then account-based sync

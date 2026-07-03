@@ -32,7 +32,8 @@ in `src/game/data/*.ts` as plain data, not scattered through scene/entity
 code. Adding a new tower or enemy type should mean adding one entry to a
 `Record`, not touching `GameScene.ts`. If you find yourself writing
 `if (towerId === 'cannon')` branches in scene/entity code, that's a sign the
-behavior belongs in data (a field on `TowerDefinition`) instead.
+behavior belongs in data (a field on `TowerDefinition`) instead. See
+`docs/ADDING_ENEMIES.md` for the applied, step-by-step version of this rule.
 
 ## Pure logic vs. Phaser glue
 
