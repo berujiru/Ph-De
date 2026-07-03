@@ -30,10 +30,15 @@ over React Native.
   (jobs, per-ailment proc rules, enemy info card, data model, rollout
   phases). Read before implementing or extending anything combat-related
 - `docs/WORLD_AND_HEROES.md` — setting (defend the Philippines), story
-  (Eden's alliance), hero/squad/drop systems, domain structure, hero
-  bosses, and the **binding character-design rules** (parody archetypes,
-  never real-person likenesses/audio). Read before creating or touching any
-  character, story, or meta-game content
+  (Eden's alliance), two-tier roster (dignified citizens + comedic memes),
+  hero/squad/drop systems, enemy factions and minion chassis, hero bosses,
+  and the **binding character-design rules** (communal archetypes only —
+  never real persons, officials, or parties). Read before creating or
+  touching any character, story, or enemy content
+- `docs/PROGRESSION.md` — campaign ladder (barangay → LGU → national
+  agencies), reusable stage/wave/chassis content engine, per-run Hope
+  currency and the Sari-Sari Store, squad-building rules (every hero
+  attacks). Read before touching campaign, economy, or meta-game systems
 
 ## Commands
 

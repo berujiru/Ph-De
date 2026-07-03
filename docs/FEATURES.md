@@ -67,6 +67,10 @@ built" vs. "what's planned," not the commit history.
       are hero path-walkers with skills that pressure the barrier — player
       units can never be hit) and depends on the level registry and enemy
       info card
+- [ ] **Campaign & economy systems** — institutional-ladder campaign
+      (barangay → LGU → national agencies), reusable stage
+      templates/skins/wave budgets, per-run Hope currency + Sari-Sari
+      Store, hybrid support heroes. Full design in `docs/PROGRESSION.md`
 - [ ] **Persistent meta-progression** — unlock heroes/levels across sessions,
       local storage first, then account-based sync
 - [ ] **Pause / speed-up controls** (1x/2x/3x) — common QoL for the genre once

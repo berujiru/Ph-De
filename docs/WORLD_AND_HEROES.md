@@ -25,17 +25,24 @@ Numbers below are starting values for tuning; the rules are the design.
 ## Premise
 
 Eden, an ordinary concerned citizen, watches an invasion no one else takes
-seriously: a faceless **misinformation empire** — troll-bot swarms,
-scam-text goblins, fake-news blimps, deepfake mimics, engagement-farming
-warlords — marching across the archipelago. She sets out to form an
-alliance of the nation's beloved "heroes": larger-than-life showbiz and
-meme archetypes, sugar-coated and glorious. Each has been deceived by the
-invaders' fake news (or is simply too proud to follow a nobody), so each
-first stands against her: *"beat me on my home turf and I'll believe you."*
-Defeat them, wake them up, and they join the alliance.
+seriously: one machine with **two arms** marching across the archipelago.
+The **Troll arm** — troll-bot swarms, scam-text goblins, fake-news blimps,
+deepfake mimics — spreads the lies; the **Corruption arm** — ghost
+projects, red tape, kickback couriers, dynasties — is what the lies
+protect. Eden sets out to form an alliance: beloved meme heroes and
+ordinary citizen workers, one voice becoming many, cleansing the country
+from her own barangay street up through the halls of national agencies
+(campaign structure in `docs/PROGRESSION.md`).
 
-Satire stays aimed at the faceless machine, never at real individuals or
-groups — that's both the comedic tone and the legal posture.
+Two framing rules, both binding:
+
+- **Fight the sin, never the sinner.** Corruption enemies personify
+  *behaviors* (Ghost Project, Red Tape, The Dynasty), never real persons,
+  parties, or officials — libel is criminal in the Philippines, and the
+  satire is sharper aimed at the behavior anyway.
+- **Institutions are victims, not villains.** Agencies get *cleansed*, not
+  destroyed; their honest workers cheer the player on and join as
+  sidekicks. Government isn't the enemy — the infestation is.
 
 ## Field roster
 
@@ -126,6 +133,52 @@ Player units are untouchable (locked rule above), so bosses pressure the
 
 Bombardment interval/damage, arrival damage, and skill cooldowns are all
 `balance.ts` data.
+
+## Enemy factions & minion chassis
+
+Enemies are built for reuse (see `docs/PROGRESSION.md`): a small set of
+**chassis** define stats/behavior once; **faction skins** re-dress them
+per act and arc. Adding an act's worth of enemies should mostly mean new
+skins, not new code.
+
+### Basic chassis (behavior archetypes)
+
+| Chassis | Behavior | Exists today as |
+|---|---|---|
+| Grunt | Baseline walker | `grunt` |
+| Runner | Fast, fragile | `runner` |
+| Brute | Slow tank | `brute` |
+| Swarmling | Very weak, arrives in packs | (planned — `ADDING_ENEMIES.md` example) |
+| Shieldbearer | Shield must break before HP | (planned) |
+| Flyer | Immune to `earth`, weak to `wind` | (planned) |
+| Healer | Heals nearby minions | (planned) |
+| Drummer | Speeds nearby minions | (planned) |
+| Splitter | Splits on death | (planned) |
+| Stealther | Invisible until revealed | (planned) |
+| Elite | Mini-boss, aura, guaranteed drop | (planned) |
+
+### Faction skins
+
+**Troll arm (misinformation):** Troll (grunt), Bot (swarmling), Fake News
+Blimp (flyer), Influencer-for-Hire (drummer), Deepfake Mimic (stealther),
+Troll Farm Overseer (elite).
+
+**Corruption arm (behaviors personified — never persons):**
+
+| Enemy | Chassis | The behavior → the mechanic |
+|---|---|---|
+| Fixer | Runner | Rushes paperwork past you |
+| Red Tape | Brute | Layers of paperwork armor (stacking armor; `earth`/shred counters); slows your gold income while alive |
+| Ghost Project | Stealther | Ghost bridges/dikes — untargetable until revealed by truth units (Auditor, Journalist, Resibo) |
+| The Overpriced | Shieldbearer | Hugely inflated HP bar; an audit hit pops the padding to reveal true HP |
+| Kickback Courier | Runner | Steals gold as it walks; kill it before it exits to recover with interest |
+| Epal Tarp | Elite | Billboard mini-boss; morale aura buffs nearby enemies |
+| The Dynasty | Boss | Phase boss — kill it and a relative takes over (three generations, three phases) |
+
+**Corrupted folk creatures (public-domain mythology):** Manananggal
+(splitter), Tiyanak (bait/stealth — clickbait made flesh), Kapre
+(stealth-aura elite — hides others in smoke until killed), Tikbalang
+(scrambles targeting — design TBD).
 
 ## Unlock flow
 
@@ -218,6 +271,24 @@ as an asset swap — no engineering. Build parody-first, license-later.
 
 Before commercial release, have a PH entertainment/IP lawyer review the
 roster. This doc is design guidance, not legal advice.
+
+## The two-tier roster
+
+The roster has two tiers with different tone rules:
+
+- **Citizen heroes — dignified tier, played completely straight.** Ordinary
+  Filipino workers whose everyday labor becomes heroism: Teacher, Nurse,
+  OFW, Jeepney Driver, Journalist, Auditor, Farmer, Fisherfolk, Student.
+  Warm, heroic portrayals; **zero comedy at their expense** — these are
+  the "unmockable" characters, and they carry the story's heart ("from a
+  single voice to many"). Their kits are hybrid attacker/supports — see
+  the support-hero table and the "every hero attacks" rule in
+  `docs/PROGRESSION.md`.
+- **Meme heroes — comedy tier.** Communal-culture characters below;
+  comedy is welcome here because the subject is shared culture, never a
+  person and never the dignified tier.
+
+Eden belongs to the citizen tier — the first voice.
 
 ## Provisional roster (communal meme archetypes)
 
