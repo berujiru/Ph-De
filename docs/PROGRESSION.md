@@ -128,6 +128,41 @@ split: *defeat earns allies; Hope buys support.* Real-money IAP, when it
 comes, maps to cosmetics (and possibly Hope top-ups — decide later, but
 never hero access).
 
+## The goal layer — what players actually pursue
+
+Currency and unlocks are **fuel, not destinations** — "cleanse → points →
+heroes → cleanse" is circular and won't retain anyone by itself. Players
+need visible destinations at every distance. Each of these serves a
+different player motivation, and the game needs all of them:
+
+| Distance | Destination | Motivation served |
+|---|---|---|
+| This session | **Clear the stage; then 3-star it** — stars for no-leak, no Bayanihan Act used, speed/wave thresholds (exact criteria tunable). Stars gate optional bonus stages | Mastery |
+| This week | **Finish the current arc** — every arc shows a progress meter (4/5 stages); almost-done bars pull harder than fresh ones | Completion |
+| Teased ahead | **Recruit *that* hero** — locked heroes appear as silhouettes with place hints ("someone in Cebu…"), and rival duels are literally playable previews of the unit you'll earn | Collection |
+| Campaign | **The golden map** — every cleansed region turns gold on the home-screen archipelago; the map IS the progress bar. Endgame: the full alliance vs. The Algorithm | Narrative + completion |
+| Infinite | **Leaderboards** (endless siege, weekly Balita rankings), **mastery caps**, **festival-exclusive cosmetics** on the real PH calendar | Status + expression |
+| Emotional | **The fantasy itself**: *"I united the Philippines against the lies."* The crowd behind the barrier visibly grows across the campaign; citizens thank Eden by name; the finale is won by everyone you gathered | Meaning — this is the game's differentiator; no generic TD can offer it |
+
+Supporting systems for the goal layer:
+
+- **Stage star ratings** (1–3) with star-gated bonus content — the
+  cheapest replayability multiplier in the genre.
+- **The Truth Codex** — a collection book: every enemy type defeated adds
+  a "lie debunked" entry (its mechanic + a one-line satirical debrief);
+  every hero recruited adds a bio; every Act, a chronicle page.
+  Completionists get a second full progression track for free, and the
+  codex doubles as the game's soft media-literacy message.
+- **Streaks**: Balita daily streak with growing (but capped, never
+  punishing) bonuses.
+- **First-clear vs. repeat rewards** already split in `StageDefinition` —
+  first-clears are the big hits; repeats stay worthwhile via mastery.
+
+Design rule: at any moment, the player should be able to answer "what am
+I working toward *right now*, *this week*, and *overall*" — session goal,
+arc meter, golden map. If a screen can't answer one of those, it's
+missing a progress affordance.
+
 ## Session → mid → long loops
 
 - **Session (3–5 min)**: kills → Voices (drop meter) → deploy heroes →
