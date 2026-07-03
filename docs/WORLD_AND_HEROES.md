@@ -125,16 +125,14 @@ adding new ones: an enhancement must either *change how a hero plays*
 (behaviors, infusions) or *change what the player watches* (instants,
 meta) — flat stat sticks are filler and stay rare.
 
-### Field layout — portrait barrier defense (recommended, pending owner confirmation)
+### Field layout — portrait barrier defense (confirmed)
 
 Enemies descend from the top along a path template toward the **Barrier
 spanning the bottom**; the squad stands on **fixed pedestals behind the
 Barrier**, firing projectiles over it. A hero's `range` = how far
 up-screen they reach; "melee" workers are short-range wall-guards with
 the heaviest hits. Portrait, one-handed, thumb-friendly; sessions 3–5
-minutes. The current landscape winding-path prototype remains the test
-bed until this is confirmed — waves, economy, targeting, and damage
-systems are layout-agnostic.
+minutes.
 
 ## The heroes — workers with skills
 

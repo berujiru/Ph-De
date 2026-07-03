@@ -200,7 +200,7 @@ Guardrails:
 ## Proposed and pending owner confirmation
 
 - **Portrait barrier-defense field layout** (enemies descend to a bottom
-  barrier; heroes on fixed pedestals behind it) — recommended, detailed
+  barrier; heroes on fixed pedestals behind it) — **Locked and confirmed**. Detailed
   in `WORLD_AND_HEROES.md`
 - ~~In-battle upgrade tiers~~ — superseded (2026-07-03): the owner
   restored and refined the drop system. **Locked**: kills roll drops —

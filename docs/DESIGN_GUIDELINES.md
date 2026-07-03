@@ -65,16 +65,8 @@ Rules:
 
 ## Game design patterns (tower defense conventions this project follows)
 
-- **Fixed path, fixed build slots** for the base prototype (not free-grid
-  placement with dynamic pathfinding). This is a deliberate, common TD
-  pattern (see Bloons TD, early Kingdom Rush) that avoids the complexity of
-  live pathfinding recalculation and "can the enemy still reach the goal"
-  validation. Free placement is a tracked future feature, not an oversight.
-- **"First" targeting by default**: towers target the enemy furthest along
-  the path within range (`src/game/core/Targeting.ts`). This is the
-  genre-standard default because it minimizes leaked damage — other
-  strategies (closest, strongest, weakest) are future per-tower options, not
-  a replacement for this default.
+- **Portrait Barrier Defense Layout**: The game uses a vertical portrait layout. Enemies spawn at the top and move downwards (swarming or along specific straight/fanning paths) toward the "People Power Shield" at the bottom. Heroes stand on fixed pedestals behind the shield and fire upwards. This replaces the old winding/snaking path layout.
+- **"First" targeting by default**: towers target the enemy furthest down the screen (closest to the barrier) within range (`src/game/core/Targeting.ts`). This is the genre-standard default because it minimizes leaked damage — other strategies (closest, strongest, weakest) are future per-tower options, not a replacement for this default.
 - **Data-driven balance**: all tower/enemy/wave numbers live in
   `src/game/data/balance.ts`, not scattered magic numbers. This is a design
   guideline as much as a code guideline — balancing the game should mean
