@@ -164,9 +164,11 @@ missing a progress affordance.
 
 ## Session → mid → long loops
 
-- **Session (3–5 min)**: squad deploys at wave 1 → kills earn gold
-  (mid-battle hero upgrades) and Voices (Act charge) → clear waves →
-  Hope payout.
+- **Session (3–5 min)**: Eden deploys at wave 1 → kills roll drops
+  (heroes until the squad is full, then enhancements), earn gold
+  (rerolls / instant summons), and fill Voices (Act charge) → clear
+  waves → Hope payout. Enhancements reset each battle; mastery is the
+  permanent track.
 - **Mid**: Hope purchases + hero unlocks compound into new squad options;
   the next arc opens.
 - **Long**: complete the alliance and the ladder → the finale unlocks →
@@ -191,19 +193,22 @@ Guardrails:
   squad lacks damage or lacks coverage vs. the stage's telegraphed enemy
   types (reuses enemy-card data).
 - Eden is always deployed and always deals real damage — the guaranteed
-  floor. Support-leaning squads compensate through in-battle upgrade
-  tiers (gold flows faster with economy passives, buying higher tiers
-  sooner) — a legitimate playstyle, not a trap.
+  floor. Support-leaning squads compensate through drops (economy
+  passives buy more rerolls and instant summons, and enhancement mods
+  multiply harder on a wide squad) — a legitimate playstyle, not a trap.
 
 ## Proposed and pending owner confirmation
 
 - **Portrait barrier-defense field layout** (enemies descend to a bottom
   barrier; heroes on fixed pedestals behind it) — recommended, detailed
   in `WORLD_AND_HEROES.md`
-- **In-battle upgrade economy replacing kill-drops**: full squad deploys
-  at wave 1; kills fund mid-battle hero upgrade tiers (Lv1→Lv3). Proposed
-  as the simple replacement after volunteers were removed — the earlier
-  kill-drop hero-arrival system is retired unless the owner wants it back
+- ~~In-battle upgrade tiers~~ — superseded (2026-07-03): the owner
+  restored and refined the drop system. **Locked**: kills roll drops —
+  heroes while squad slots remain (guaranteed first drop, pity cadence),
+  then enhancements only (damage/AoE mods, split/bounce projectiles,
+  infusions…); no dead drops; gold is the RNG control valve (rerolls,
+  instant summons). Full rules in `WORLD_AND_HEROES.md` "Drops &
+  enhancements"
 - **Ang Sistema** as the finale (horde-convergence gauntlet, The Dynasty
   at its heart) — replaces the trashed "Algorithm" machine finale
 - **Heroes never sold for real money** as a binding monetization rule

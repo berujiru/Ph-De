@@ -48,23 +48,82 @@ section and `docs/PROGRESSION.md` agency conditions):
 1. **Pre-battle**: read the stage's enemy cards (telegraphed weaknesses)
    and pick a squad — Eden + 4 workers whose damage types counter the
    stage. Choose one **Bayanihan Act** (barrier ultimate).
-2. **Deploy**: the full squad takes the field from wave 1 on fixed
-   positions. Lineup order matters — adjacent heroes buff each other
-   (**Bayanihan adjacency**).
+2. **Deploy**: Eden takes the field at wave 1. The other four arrive via
+   **hero drops** (below). Lineup order matters — adjacent heroes buff
+   each other (**Bayanihan adjacency**).
 3. **Fight**: enemies walk the path toward the Barrier. Heroes attack
    automatically (targeting per `core/Targeting.ts`); each hero also has
    a **skill** — manually triggered, on cooldown, with a voiced bark and
    cut-in.
-4. **Grow mid-battle**: kills earn **gold**; gold buys **hero upgrade
-   tiers during the battle** (Lv1→Lv2→Lv3: stronger attack, wider range,
-   upgraded skill). Upgrade order is the in-battle strategy. This
-   replaces both the volunteer economy and the earlier kill-drop
-   arrival system — kills still convert directly into visible power.
-5. **Rally**: kills also fill the **Voices meter**, which charges the
+4. **Drops**: kills roll for drops — first **heroes**, then
+   **enhancements** once the squad is full. See "Drops & enhancements"
+   for the RNG rules.
+5. **Gold is the control valve**: kills also earn gold; spend it to
+   **reroll an offered enhancement** or **summon your next hero
+   immediately** (escalating cost) instead of waiting on the RNG. Free
+   stuff comes from luck; control costs gold.
+6. **Rally**: kills also fill the **Voices meter**, which charges the
    equipped Bayanihan Act (People Power pushback, Batingaw stun, Baha ng
-   Tulong barrier heal, Boses ng Bayan attack-speed surge…). Fire it at
-   the right moment.
-6. **Win/lose**: clear all waves before the Barrier falls.
+   Tulong barrier heal…). Fire it at the right moment.
+7. **Win/lose**: clear all waves before the Barrier falls. Enhancements
+   are per-battle only — permanent growth is mastery
+   (`docs/PROGRESSION.md`).
+
+## Drops & enhancements
+
+### RNG rules (the dropper is a state machine, not a slot machine)
+
+1. **Hero drops are finite** — slots are limited, so the pool obeys the
+   field: while undeployed squad members remain, hero drops are heavily
+   weighted (the first drop of a battle is *always* a hero; a pity
+   counter guarantees another at most every N kills). The moment all
+   five stand on the field, **hero drops leave the table entirely**.
+2. **No dead drops** — an enhancement that can't apply (stack cap
+   reached, no eligible hero) is excluded from the roll before it
+   happens.
+3. **Pity everywhere** — every kill without a drop raises the next
+   drop's chance; elite/boss kills guarantee one.
+4. **Rarity scales with waves** — later waves weight toward rarer
+   enhancements, so late-battle drops stay exciting.
+5. **Deterministic under the hood** — seeded RNG in a pure `core/Drops.ts`
+   state machine, unit-tested like `WaveManager`; all weights, pity
+   increments, and caps are `balance.ts` data.
+
+Enhancements land as tappable pickups where the enemy died (auto-collect
+after a few seconds — tap for juice, never punished for missing it).
+Targeted enhancements are applied to a hero the player picks; global
+ones apply instantly.
+
+### Enhancement catalog (initial set)
+
+| Category | Enhancement | Effect |
+|---|---|---|
+| Stat mods | Damage Up | +% attack damage (stacks, capped) |
+| | Attack Speed Up | +% fire rate |
+| | Range Up | +reach up-screen |
+| | AoE Up | +splash radius (splash heroes only) |
+| Projectile behaviors | **Split Shot** | Projectile splits into two on hit (max 1 stack) |
+| | **Bounce** | Projectile ricochets to a nearby enemy (up to 3 bounces) |
+| | Pierce | Projectile passes through the first enemy |
+| | Multishot | +1 projectile per volley |
+| Elemental / ailment | Potency Up | Stronger rider (burn dmg, slow %, curse amp…) |
+| | Proc Up | Higher ailment application chance |
+| | **Infusion** | Adds a second damage type at 30% power — live type-matrix play |
+| Skill mods | Cooldown Down | −% skill cooldown |
+| | **Skill Echo** | Skill casts a second time at 50% power |
+| Combat riders | Executioner | Bonus damage to low-HP enemies (finish leakers) |
+| | Giant Slayer | Bonus vs elites/bosses (capped % max HP) |
+| | **Chain Reaction** | Killed enemies explode for a % of their HP — horde clear |
+| Squad / meta | Bayanihan Amp | Adjacency bonuses +% |
+| | Voice Amp | Kills charge the Act +% faster |
+| | Lucky | Future drop chance/rarity up (a drop that improves drops) |
+| Instants (global) | Barrier Patch | Immediate barrier heal |
+| | Salu-Salo Crumbs | Immediate gold burst |
+
+Stack caps, weights, and rarity tiers per enhancement are data. Rule for
+adding new ones: an enhancement must either *change how a hero plays*
+(behaviors, infusions) or *change what the player watches* (instants,
+meta) — flat stat sticks are filler and stay rare.
 
 ### Field layout — portrait barrier defense (recommended, pending owner confirmation)
 
@@ -97,7 +156,7 @@ squad math stays healthy in 5 slots). Damage types per
 | **Sorbetero** | Dirty-ice-cream vendor | Frost | Ice scoop shots — **Slow** | Skill: Deep freeze scoop — Freeze chance on Wet enemies |
 | **Grill Vendor** | Street BBQ vendor | Fire | Ember skewers — **Burn** | Skill: Ihaw Rain — burn cone across a lane |
 | **OFW** | Overseas worker | Physical | Balikbayan-box lob (splash) | Passive: remittance — steady bonus gold trickle |
-| **Student** | Working student | Physical | Slingshot | Passive: **grows** — upgrade tiers cost less and stack higher for them |
+| **Student** | Working student | Physical | Slingshot | Passive: **grows** — enhancement drops apply to the Student at increased potency |
 | **Whistleblower** | The one who spoke up (late unlock) | Dark | Dossier throw — **Curse** | Skill: Exposé — mass curse, everything takes amplified damage |
 
 All 10 damage types have a carrier. Kits, numbers, and skill cooldowns
@@ -214,10 +273,20 @@ interface HeroDefinition {
   damageType: DamageType;
   attackKind: 'melee' | 'ranged';   // wall-guard vs long reach
   range: number;
-  upgradeTiers: HeroTierDefinition[]; // in-battle Lv1..Lv3 costs/stats
-  skill: HeroSkillDefinition;         // cooldown, effect, cut-in, bark
+  skill: HeroSkillDefinition;        // cooldown, effect, cut-in, bark
   passive?: HeroPassiveDefinition;
   voiceLines: VoiceLineRef[];
+  // enhancements attach at runtime (per-battle), not on the definition
+}
+
+interface EnhancementDefinition {
+  id: EnhancementId;
+  category: 'stat' | 'projectile' | 'elemental' | 'skill' | 'combat'
+          | 'squad' | 'instant';
+  rarity: 'common' | 'rare' | 'epic';
+  target: 'chosenHero' | 'global';
+  maxStacks: number;
+  effect: EnhancementEffect;        // discriminated union per category
 }
 
 interface AnomalyDefinition {          // extends the enemy chassis system
