@@ -26,6 +26,9 @@ over React Native.
 - `docs/ADDING_ENEMIES.md` — worked, step-by-step guide for adding a new
   enemy type: which stats are common vs. per-enemy, which files to touch,
   when a stats-only data edit is enough vs. when it needs real code
+- `docs/DAMAGE_AND_AILMENTS.md` — design spec for damage types and ailments
+  (jobs, per-ailment proc rules, enemy info card, data model, rollout
+  phases). Read before implementing or extending anything combat-related
 
 ## Commands
 
