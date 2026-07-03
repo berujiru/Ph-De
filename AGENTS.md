@@ -29,6 +29,11 @@ over React Native.
 - `docs/DAMAGE_AND_AILMENTS.md` — design spec for damage types and ailments
   (jobs, per-ailment proc rules, enemy info card, data model, rollout
   phases). Read before implementing or extending anything combat-related
+- `docs/WORLD_AND_HEROES.md` — setting (defend the Philippines), story
+  (Eden's alliance), hero/squad/drop systems, domain structure, hero
+  bosses, and the **binding character-design rules** (parody archetypes,
+  never real-person likenesses/audio). Read before creating or touching any
+  character, story, or meta-game content
 
 ## Commands
 

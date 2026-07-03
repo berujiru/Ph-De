@@ -21,6 +21,12 @@ tower/enemy identities), `docs/DAMAGE_AND_AILMENTS.md` is the locked design
 spec — per-ailment proc rules, type jobs, and rollout phases. Propose
 changes to it explicitly rather than deviating from it in balance data.
 
+For characters, story, heroes, domains, and meta-game systems,
+`docs/WORLD_AND_HEROES.md` is the locked spec. Its character-design rules
+(parody archetypes only — never a specific real person's likeness, name,
+recorded audio, or imitated voice) are binding for every character you
+create, with no exceptions without explicit project-owner sign-off.
+
 ## What you own
 
 - `src/game/data/balance.ts` — tower stats, enemy stats, wave composition
