@@ -56,6 +56,40 @@ Two framing rules, both binding:
   reflavored (sling brigade, barricade cannon, water-bucket line). Bought
   with gold, multi-placeable, the coverage backbone.
 
+### Field layout — portrait barrier defense (recommended, pending owner confirmation)
+
+Proposed pivot from the prototype's landscape winding-path layout to a
+**portrait, phone-native** layout:
+
+- **Enemies descend from the top** of the screen along a path template
+  (straight lanes, S-curves, forks) toward the **Barrier spanning the
+  bottom** — barrier HP is the lives counter, now literally visible as
+  the thing being defended.
+- **Heroes stand behind the Barrier** on fixed pedestals (Eden center,
+  4 ally positions). All heroes attack with projectiles over the wall —
+  a hero's `range` is how far up-screen they reach. "Melee" heroes
+  become short-range heavy hitters who punish enemies at the wall face;
+  long-range heroes hit earlier but softer.
+- **Volunteers keep the classic TD layer**: gold-bought, placed in build
+  slots alongside the descending path.
+- **Bayanihan lineup adjacency**: neighboring heroes on the pedestal row
+  buff each other, so *the order you arrange Eden and her allies*
+  matters — the adjacency mechanic reborn with zero extra UI.
+- Ranged bosses bombarding the barrier from partway down (already
+  spec'd) becomes even more natural in this layout.
+
+Why recommended: sessions are one-handed portrait (heroes sit under the
+thumbs), the layout is proven (PvZ/castle-defense lineage), and this
+game's strategy already lives in squad selection, drop timing, type
+matchups, and skill usage rather than free tile placement. The winding-
+path prototype remains fully useful — waves, economy, targeting, and
+damage systems are layout-agnostic; the pivot is orientation + slot
+arrangement, cheapest to do now before combat plumbing lands.
+
+Consequence if confirmed: Jeepney Driver's "route" passive becomes a
+chosen lane/path-segment boost; `docs/DESIGN_GUIDELINES.md` layout
+section and `level.ts` templates get updated to portrait.
+
 ### Two-track battle economy
 
 | Resource | Source | Spends on |
@@ -180,16 +214,51 @@ Troll Farm Overseer (elite).
 (stealth-aura elite — hides others in smoke until killed), Tikbalang
 (scrambles targeting — design TBD).
 
-## Unlock flow
+## Unlock flow — two recruitment paths, one per roster tier
 
-- **Defeat = join.** Beat the domain's boss hero → recruitment scene →
-  hero joins the roster. One hero per domain; the spine of progression.
-- **Meme sidekicks** (minor units) unlock via side objectives (no-leak
-  clear, mono-type clear, etc.).
-- **Mastery**: replaying a joined hero's domain against remixed waves
-  upgrades that hero (ties into the tower-upgrade roadmap item).
+Defeat-to-recruit is **not discarded** — it's scoped to the tier where it
+makes sense:
+
+- **Meme heroes: defeat = join.** They're proud, or deceived by the
+  empire's fake news — each tests Eden on their home turf ("beat me and
+  I'll believe you"). Beat the domain boss → recruitment scene → they
+  join with the exact kit they fought with. The boss-fight-as-kit-tutorial
+  loop stays fully intact for this tier.
+- **Citizen heroes: inspired = join.** You don't beat up a nurse to
+  recruit her. Citizen heroes join because Eden's movement *earns* them:
+  complete the barangay act and the Teacher joins; cleanse an agency arc
+  and its honest Auditor joins; hit story milestones and the OFW sends
+  word. Their "boss moment" is a story beat, not a duel.
+- **Corruption bosses (The Dynasty, etc.) are never recruitable** — sins
+  aren't allies; they're cleansed.
+- **Sidekicks** unlock via side objectives or Hope at the Sari-Sari Store
+  (`docs/PROGRESSION.md`).
+- **Mastery**: replaying a hero's domain/arc against remixed waves
+  upgrades that hero.
 - Unlock state persists via the meta-progression system
   (`docs/FEATURES.md`: local storage first).
+
+## Bayanihan Acts — selectable barrier skills
+
+The Barrier itself has a skill slot (one at first; a second unlocks late
+in the campaign). Before battle, the player equips one **Bayanihan Act**
+from those unlocked — the community's collective move, charged by Voices
+(kills) during battle and fired manually. Many effects, one system:
+
+| Act | Effect |
+|---|---|
+| **People Power** | The crowd surges — mass knockback down the path |
+| **Batingaw** | The church bell tolls — mass stun (bosses resist per CC rules) |
+| **Baha ng Tulong** | Flood of aid — large barrier heal |
+| **Boses ng Bayan** | All heroes gain attack speed for a duration |
+| **Salu-Salo** | Community feast — instant gold windfall |
+| **Piyesta** | Rally surge — instantly fills the Voice/drop meter |
+
+Acts unlock via campaign milestones and the Sari-Sari Store. Charge
+rates, effect numbers, and unlock placement are `balance.ts` data. This
+system subsumes the earlier "People Power comeback ultimate" proposal —
+People Power is simply the first Act the player gets, in Act 1 of the
+campaign, where it's also the story's thesis.
 
 ## Character design rules — the legal lane
 

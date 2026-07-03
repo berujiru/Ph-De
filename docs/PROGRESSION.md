@@ -38,12 +38,26 @@ signature corruption *behavior* (never persons — see the binding rules in
 - **Customs arc** — Kickback Courier waves (gold thieves), smuggled-crate
   splitters
 
-**Agency naming — owner decision pending**: real acronyms (LTO, DSWD,
-DPWH — maximally resonant, higher blowback risk) vs. legible
-fictionalizations ("Land Transpo Office", "Bureau of Plates and Queues" —
-recommended). Either way the frame is mandatory: the agency is a *victim
-being cleansed*, its honest workers are allies and post-arc sidekick
-unlocks, and the enemy is always the Corruption infestation.
+**Agency naming — resolved (2026-07-03)**: real agency names (LTO, DSWD,
+DPWH) are acceptable *because of the game's frame* — the player helps the
+agency, never fights it. Institutions aren't persons for libel purposes,
+and a positive portrayal of the institution with corruption as an external
+infestation is standard protected fiction. Binding conditions:
+
+1. **Never use official seals, logos, or uniform insignia** — government
+   insignia have separate legal protection; invent in-game visual
+   identities.
+2. **No real officials or lookalikes**, ever (same rule as celebrities).
+3. **The agency is always portrayed as honorable** — its honest workers
+   cheer the player on, join as sidekicks, and thank Eden on arc
+   completion. The infestation is the enemy; the institution is the
+   patient.
+4. Ship an in-game disclaimer (fictional story; agencies depicted
+   respectfully in a fictionalized form).
+5. A PH lawyer pass on the final agency list before store release.
+
+Legible fictionalizations remain the zero-risk fallback if any single
+agency arc drifts toward sharper satire than the frame above.
 
 The gauntlet is the long-tail content pipeline: every agency (and later,
 every region variant of an agency) is a new arc built entirely from
@@ -157,13 +171,16 @@ Guardrails:
 ## Proposed and pending owner confirmation
 
 Carried from design discussions, not yet locked:
-- **Bayanihan adjacency bonus** (units buff each other when placed
-  together) as a core mechanic
-- **People Power comeback ultimate** (once per battle at critical
-  barrier: crowd surge, mass push-back)
+- **Portrait barrier-defense field layout** (enemies descend to a bottom
+  barrier; heroes on fixed pedestals behind it) — recommended, detailed
+  in `WORLD_AND_HEROES.md`
 - **The Algorithm + The Dynasty** as the finale bosses, gated on
   completing the alliance
 - **Heroes never sold** as a binding monetization rule (recommended
   strongly above)
-- Agency naming: real acronyms vs. legible fictionalizations
-  (fictionalization recommended)
+
+Resolved this session: Bayanihan/People Power → the selectable
+**Bayanihan Acts** barrier-skill system (`WORLD_AND_HEROES.md`); agency
+naming → real names allowed under the binding help-the-agency conditions
+above; recruitment → defeat-to-recruit kept for meme heroes,
+inspired-to-join for citizen heroes.
