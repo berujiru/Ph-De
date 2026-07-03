@@ -1,0 +1,32 @@
+:root {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --border: #475569;
+  --text-primary: #f8fafc;
+  --text-muted: #94a3b8;
+  --gold: #facc15;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --accent: #38bdf8;
+
+  color-scheme: dark;
+  font: 16px/1.4 system-ui, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-primary);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+}
+
+#root {
+  min-height: 100svh;
+}
