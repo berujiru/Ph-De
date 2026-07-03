@@ -39,8 +39,10 @@ npm run cap:add:android    # generate android/ (needs Android Studio/SDK)
 - [`docs/FEATURES.md`](docs/FEATURES.md) — roadmap / what's built vs. planned
 - [`docs/TESTING.md`](docs/TESTING.md) — testing strategy
 
-Project-specific Claude Code guidance (and subagents in `.claude/agents/`)
-lives in [`CLAUDE.md`](CLAUDE.md).
+Guidance for AI coding agents lives in [`AGENTS.md`](AGENTS.md) (canonical,
+tool-agnostic); [`CLAUDE.md`](CLAUDE.md) and [`GEMINI.md`](GEMINI.md) are
+thin pointers to it plus any tool-specific notes (e.g. Claude Code's
+subagents in `.claude/agents/`).
 
 ## Building for mobile
 
