@@ -19,8 +19,10 @@ implemented.
 1. **Every damage type must have a distinct job.** If a proposed type would
    play the same as an existing one, it's a color, not a type — don't add it.
 2. **Every type needs a carrier.** A damage type ships only alongside at
-   least one tower that deals it and at least one enemy that resists or is
-   weak to it. No orphan types in data.
+   least one hero that deals it and at least one enemy that resists or is
+   weak to it. No orphan types in data. (Carriers were "towers" in the
+   original draft; heroes are the only damage dealers now — see
+   `docs/WORLD_AND_HEROES.md` for the type-to-hero mapping.)
 3. **Hard crowd control always has an immunity window.** Stun, Freeze,
    Sleep, and Knockback stop or reverse path progress, which is equivalent
    to free DPS. Every proc grants the enemy temporary immunity to that

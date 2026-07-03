@@ -24,18 +24,18 @@ built" vs. "what's planned," not the commit history.
 - [ ] **Damage types & ailments, phases 1–2** — full design in
       `docs/DAMAGE_AND_AILMENTS.md` (10 damage types, 12 ailments with
       per-ailment proc rules, decided 2026-07-03). Phase 1 is neutral
-      plumbing (`damageType` on towers, `resistances` on enemies,
-      `core/Damage.ts`); phase 2 ships the first riders: Slow (subsumes the
-      old "Frost tower slow effect" item), Burn + Flame tower, Stun + Storm
-      tower, and `core/Ailments.ts`
+      plumbing (`damageType` on units, `resistances` on enemies,
+      `core/Damage.ts`); phase 2 ships the first riders (Slow, Burn, Stun)
+      and `core/Ailments.ts`. Carriers are heroes per
+      `docs/WORLD_AND_HEROES.md` (Sorbetero, Grill Vendor, Journalist)
 - [ ] **Enemy info card** — tap an enemy (or wave-preview row) to see stats,
       weaknesses, resistances, and ailment immunities; required by phase 3
       of the damage-type system at the latest
-- [ ] **Tower upgrades** — spend gold to increase an existing tower's
-      damage/range/fire rate instead of only placing new towers
-- [ ] **Tower sell** — refund a portion of cost, free the build slot
-- [ ] **Range indicator on tap/hold** (touch) and hover (desktop) for placed
-      towers, per `docs/DESIGN_GUIDELINES.md`
+- [ ] **In-battle hero upgrades** — kills earn gold; gold buys per-battle
+      hero tiers (Lv1→Lv3), the core session economy per
+      `docs/PROGRESSION.md` (replaces tower placement/upgrade/sell)
+- [ ] **Range indicator on tap/hold** (touch) and hover (desktop) for
+      deployed heroes, per `docs/DESIGN_GUIDELINES.md`
 - [ ] **Wave preview** — show upcoming wave composition before the player
       commits to Start Wave
 - [ ] **Sound effects & music** — currently silent
@@ -47,26 +47,22 @@ built" vs. "what's planned," not the commit history.
 
 - [ ] **Multiple levels** — `src/game/data/level.ts` currently hardcodes one
       path/slot layout; needs a level registry + level-select screen
-- [ ] **Free-grid tower placement with pathfinding** — replace fixed build
-      slots with a real grid + A* (or similar) so towers can block/reshape
-      the enemy path, with validation that a path to the goal always exists
 - [ ] **More targeting strategies** — closest, strongest, weakest, selectable
-      per tower
+      per hero
 - [ ] **Damage types & ailments, phases 3–4** — water/Wet synergies, then
       wind/earth/holy/dark and the remaining ailments (poison, bleed, rot,
       sleep, curse, knockback, armor shred), each arriving with its carrier
-      tower and a matching enemy — see `docs/DAMAGE_AND_AILMENTS.md`
+      hero and a matching enemy — see `docs/DAMAGE_AND_AILMENTS.md`
 - [ ] **Enemy special abilities** — armor and flying are specified in
       `docs/DAMAGE_AND_AILMENTS.md` (data model: `armor`, `tags`); shields
       (must be broken before HP damage applies) and split-on-death remain
       to be designed
-- [ ] **World & hero system** — Eden + 4 ally slots, unique hero units
-      unlocked by defeating them as domain bosses, kill-drop deployment
-      with pity system, archipelago campaign map. Full design in
-      `docs/WORLD_AND_HEROES.md`; supersedes generic "boss waves" (bosses
-      are hero path-walkers with skills that pressure the barrier — player
-      units can never be hit) and depends on the level registry and enemy
-      info card
+- [ ] **World & hero system** — Eden + 4 ally slots, worker heroes with
+      skills (no volunteers, no meme tier), horde of bad-governance
+      anomaly enemies with issue-named bosses, inspiration-based
+      recruitment, Bayanihan Acts, archipelago campaign map. Full design
+      in `docs/WORLD_AND_HEROES.md`; bosses are anomaly path-walkers that
+      pressure the barrier — player units can never be hit
 - [ ] **Campaign & economy systems** — institutional-ladder campaign
       (barangay → LGU → national agencies), reusable stage
       templates/skins/wave budgets, per-run Hope currency + Sari-Sari
@@ -79,7 +75,7 @@ built" vs. "what's planned," not the commit history.
 ## Later (native/platform features — why we chose Capacitor)
 
 - [ ] Generate `ios/`/`android/` native projects, real app icons/splash
-- [ ] Haptic feedback on tower placement / enemy kill (`@capacitor/haptics`)
+- [ ] Haptic feedback on hero skills / enemy kills (`@capacitor/haptics`)
 - [ ] Push notifications for re-engagement (`@capacitor/push-notifications`)
 - [ ] In-app purchases for cosmetics/currency
 - [ ] Cloud save sync

@@ -21,7 +21,7 @@ Eden's movement grows through the same ladder every Filipino knows:
 | 2 | **Bayan / LGU** | Public market, transport terminal, city hall | The movement is town-sized; first big corruption cells |
 | 3 | **Province** | Provincial road, port, capitol | Regional alliance; folk-creature corruption peaks |
 | 4+ | **National gauntlet** | One government agency per arc | Cleanse agencies one by one; each arc has a unique gimmick + boss |
-| Finale | **Capital Core** | The empire's heart | The Algorithm + The Dynasty, defended by every voice gathered |
+| Finale | **Ang Sistema** *(proposed)* | Horde convergence gauntlet | Every defeated anomaly returns at once, The Dynasty at the horde's heart — fought with the full alliance |
 
 ### The national agency gauntlet
 
@@ -64,13 +64,14 @@ every region variant of an agency) is a new arc built entirely from
 reusable parts. The archipelago map stays the campaign's face — regions
 turn **golden** as their arcs complete: *"Buong Pilipinas, protektado."*
 
-### Hero domains live inside the ladder
+### Recruitment lives inside the ladder
 
-Hero recruitment stages (defeat → join, per `WORLD_AND_HEROES.md`) are
-placed *along* the ladder where they fit thematically — Toktok at the
-Act 1 plaza, the Jeepney Driver at the Act 2 terminal, the Auditor in the
-first agency arc — so the roster grows at the journey's pace instead of
-living on a separate map layer.
+Heroes join by **inspiration at story milestones** placed along the
+ladder (per `WORLD_AND_HEROES.md`) — save the barangay and the Teacher
+joins, the Jeepney Driver signs on at the Act 2 terminal, the honest
+Auditor after the first agency cleanse — so the roster grows at the
+journey's pace. Heroes not tied to a milestone unlock at the Sari-Sari
+Store with Hope, in player-chosen order.
 
 ## Reusable content engine
 
@@ -116,17 +117,15 @@ shop — data-driven catalog):
 
 | Purchase | Notes |
 |---|---|
-| **Sidekick unlocks** | Support cast (Jeepney Barker, Taho Vendor, honest agency workers…) — Hope-purchasable |
-| **Hero mastery upgrades** | Per-hero stat/skill tiers, alongside domain-replay mastery |
-| **Volunteer upgrades** | Permanent tier-ups for the gold-bought volunteer units |
+| **Hero unlocks** | Workers not tied to a story milestone — unlockable in player-chosen order |
+| **Hero mastery upgrades** | Permanent per-hero stat/skill tiers, alongside arc-replay mastery |
+| **Bayanihan Acts** | Additional barrier ultimates beyond milestone unlocks |
 | **Cosmetics** | Festival costumes, map skins, voice-line packs |
 
-**Binding rule (proposed, pending owner confirmation): signature heroes
-are never sold** — not for Hope, not for real money. Story heroes join
-only by being defeated in their domain. Two acquisition tracks, clean
-split: *defeat earns allies; Hope buys support.* Real-money IAP, when it
-comes, maps to cosmetics (and possibly Hope top-ups — decide later, but
-never hero access).
+**Binding rule (proposed, pending owner confirmation): heroes are never
+sold for real money.** They're earned — by story milestone or by Hope,
+both in-game only. Real-money IAP, when it comes, maps to cosmetics (and
+possibly Hope top-ups — decide later, but never exclusive hero access).
 
 ## The goal layer — what players actually pursue
 
@@ -139,7 +138,7 @@ different player motivation, and the game needs all of them:
 |---|---|---|
 | This session | **Clear the stage; then 3-star it** — stars for no-leak, no Bayanihan Act used, speed/wave thresholds (exact criteria tunable). Stars gate optional bonus stages | Mastery |
 | This week | **Finish the current arc** — every arc shows a progress meter (4/5 stages); almost-done bars pull harder than fresh ones | Completion |
-| Teased ahead | **Recruit *that* hero** — locked heroes appear as silhouettes with place hints ("someone in Cebu…"), and rival duels are literally playable previews of the unit you'll earn | Collection |
+| Teased ahead | **Recruit *that* hero** — locked heroes appear as silhouettes with hints ("a nurse in Cebu is waiting for the movement to reach her…") | Collection |
 | Campaign | **The golden map** — every cleansed region turns gold on the home-screen archipelago; the map IS the progress bar. Endgame: the full alliance vs. The Algorithm | Narrative + completion |
 | Infinite | **Leaderboards** (endless siege, weekly Balita rankings), **mastery caps**, **festival-exclusive cosmetics** on the real PH calendar | Status + expression |
 | Emotional | **The fantasy itself**: *"I united the Philippines against the lies."* The crowd behind the barrier visibly grows across the campaign; citizens thank Eden by name; the finale is won by everyone you gathered | Meaning — this is the game's differentiator; no generic TD can offer it |
@@ -165,8 +164,9 @@ missing a progress affordance.
 
 ## Session → mid → long loops
 
-- **Session (3–5 min)**: kills → Voices (drop meter) → deploy heroes →
-  clear waves → Hope payout.
+- **Session (3–5 min)**: squad deploys at wave 1 → kills earn gold
+  (mid-battle hero upgrades) and Voices (Act charge) → clear waves →
+  Hope payout.
 - **Mid**: Hope purchases + hero unlocks compound into new squad options;
   the next arc opens.
 - **Long**: complete the alliance and the ladder → the finale unlocks →
@@ -180,42 +180,37 @@ missing a progress affordance.
 
 **Every hero attacks. No hero is pure support.** With Eden + 4 slots, a
 zero-damage unit creates degenerate squad math and a new-player trap
-("all supports, can't kill anything"). Instead, worker heroes are
-hybrids: a real (if modest, ~50–60% of a DPS hero) basic attack, with
-their *identity* carried by a passive/skill:
-
-| Hero | Basic attack | Support identity |
-|---|---|---|
-| Nurse | Syringe darts | Skill: **regenerates the Barrier** — the only "healing" that exists, since units can't be hit |
-| OFW | Thrown balikbayan-box goods | Passive: steady bonus gold (remittance trickle) |
-| Jeepney Driver | Horn blast | Passive: his **route** — a drawn corridor; allies along it get faster attack + drops arrive faster along the route (corridor aura, not circle aura) |
-| Teacher | Chalk throw | Passive: **marks** enemies — marked take bonus damage from everyone |
-| Farmer | Scythe sweep | Passive: kills near him yield bonus gold/Voices (harvest) |
-| Fisherfolk | Net throw | The attack *is* the support: damage + group slow |
-| Auditor | Stamp slam (true dmg vs corruption) | Reveals ghosts, pops inflated HP bars |
-| Journalist | Camera flash | Damage + reveal; aura exposes stealth |
+("all supports, can't kill anything"). Worker heroes are hybrids: a real
+(if modest, ~50–60% of a DPS worker) basic attack, with their *identity*
+carried by a passive/skill. The full roster with attacks, types, and
+skills lives in `docs/WORLD_AND_HEROES.md` — that table is the single
+source of truth.
 
 Guardrails:
 - Squad-power hint at squad select: soft warning (never a block) if the
   squad lacks damage or lacks coverage vs. the stage's telegraphed enemy
   types (reuses enemy-card data).
-- Volunteers (gold-bought, always available) are the DPS floor — an
-  all-support squad leaning on upgraded volunteers is a legitimate
-  economy playstyle, not a bug, once volunteer upgrades exist.
+- Eden is always deployed and always deals real damage — the guaranteed
+  floor. Support-leaning squads compensate through in-battle upgrade
+  tiers (gold flows faster with economy passives, buying higher tiers
+  sooner) — a legitimate playstyle, not a trap.
 
 ## Proposed and pending owner confirmation
 
-Carried from design discussions, not yet locked:
 - **Portrait barrier-defense field layout** (enemies descend to a bottom
   barrier; heroes on fixed pedestals behind it) — recommended, detailed
   in `WORLD_AND_HEROES.md`
-- **The Algorithm + The Dynasty** as the finale bosses, gated on
-  completing the alliance
-- **Heroes never sold** as a binding monetization rule (recommended
-  strongly above)
+- **In-battle upgrade economy replacing kill-drops**: full squad deploys
+  at wave 1; kills fund mid-battle hero upgrade tiers (Lv1→Lv3). Proposed
+  as the simple replacement after volunteers were removed — the earlier
+  kill-drop hero-arrival system is retired unless the owner wants it back
+- **Ang Sistema** as the finale (horde-convergence gauntlet, The Dynasty
+  at its heart) — replaces the trashed "Algorithm" machine finale
+- **Heroes never sold for real money** as a binding monetization rule
+  (recommended strongly above)
 
-Resolved this session: Bayanihan/People Power → the selectable
-**Bayanihan Acts** barrier-skill system (`WORLD_AND_HEROES.md`); agency
-naming → real names allowed under the binding help-the-agency conditions
-above; recruitment → defeat-to-recruit kept for meme heroes,
-inspired-to-join for citizen heroes.
+Resolved: heroes = citizen workers only (meme tier removed); no
+volunteer units; enemies = horde of bad-governance anomalies with bosses
+named after real issue categories; recruitment = inspiration milestones
++ Hope unlocks; Bayanihan Acts as the barrier-skill system; agency
+naming = real names under the binding help-the-agency conditions above.

@@ -1,424 +1,201 @@
 # World, Story & Hero System
 
-Design spec for the game's setting, characters, and meta-game systems.
-Decisions locked with the project owner (2026-07-03):
+Design spec for the game's setting, characters, and battle systems.
+Simplified per owner decisions (2026-07-03, superseding the earlier
+meme-hero/two-arm-machine design):
 
-- The base being defended is **the Barrier of the Philippines** — the
-  nation's shield. "Lives" in the prototype = barrier integrity.
-- Damage dealers are not generic towers but **heroes** — original
-  characters built from **communal Filipino meme culture** (see the
-  character-design rules below; this is a legal lane, not a style choice).
-- **Heroes cannot be hit.** They only deal damage. Enemies attack exactly
-  one thing: the barrier. There is no unit durability/KO system.
-- **Eden**, a concerned citizen, is the protagonist and permanent field
-  leader. She has **4 ally slots** beside her. Leader-swap is a future
-  feature.
-- Heroes are **unique units** (one instance on the field), unlocked by
-  defeating them, and deployed mid-battle via a **kill-drop system**.
-- Hero bosses are **path-walkers** (melee or ranged) that advance on the
-  barrier alongside their minions and **cast their skills** while
-  advancing. Their skills affect their own side or the barrier — never
-  the player's units directly.
+- The base defended is **the Barrier of the Philippines**. "Lives" =
+  barrier integrity.
+- **Heroes are citizen workers only** — the meme-hero tier is removed.
+  Every hero is an ordinary Filipino worker with a real job, a real
+  attack, and a signature skill.
+- **There are no volunteer/generic towers.** The only units are Eden and
+  her squad.
+- **Player units can never be hit.** Enemies attack exactly one thing:
+  the Barrier.
+- **The enemy is a horde, not an empire.** There is no boss machine and
+  no mastermind — each minion and boss is a **bad-governance anomaly
+  personified** (ghost projects, kickbacks, red tape…). Cleansing the
+  country of the horde *is* the campaign.
+- **Eden + 4 ally slots**; heroes are unique (one instance each).
+- Bosses are named after **real categories of PH governance anomalies**
+  (Ghost Flood Control, Pork Barrel, Vote Buying…) — issues, never
+  persons.
 
-Numbers below are starting values for tuning; the rules are the design.
+Numbers are tuning placeholders; rules are the design.
 
 ## Premise
 
-Eden, an ordinary concerned citizen, watches an invasion no one else takes
-seriously: one machine with **two arms** marching across the archipelago.
-The **Troll arm** — troll-bot swarms, scam-text goblins, fake-news blimps,
-deepfake mimics — spreads the lies; the **Corruption arm** — ghost
-projects, red tape, kickback couriers, dynasties — is what the lies
-protect. Eden sets out to form an alliance: beloved meme heroes and
-ordinary citizen workers, one voice becoming many, cleansing the country
-from her own barangay street up through the halls of national agencies
-(campaign structure in `docs/PROGRESSION.md`).
+Anomalies of bad governance have taken monstrous form and march on the
+Barrier of the Philippines — ghost projects shamble half-built, kickbacks
+scurry off with the people's gold, red tape shields the rest. Eden, one
+concerned citizen, gathers no chosen ones and no celebrities: she gathers
+**workers** — a nurse, a teacher, a jeepney driver, an auditor — because
+the people who hold the country up every ordinary day are the ones who
+can hold the Barrier now. From a single voice to many.
 
-Two framing rules, both binding:
+Framing rules, binding (full legal detail in the character-design
+section and `docs/PROGRESSION.md` agency conditions):
 
-- **Fight the sin, never the sinner.** Corruption enemies personify
-  *behaviors* (Ghost Project, Red Tape, The Dynasty), never real persons,
-  parties, or officials — libel is criminal in the Philippines, and the
-  satire is sharper aimed at the behavior anyway.
-- **Institutions are victims, not villains.** Agencies get *cleansed*, not
-  destroyed; their honest workers cheer the player on and join as
-  sidekicks. Government isn't the enemy — the infestation is.
+- **Fight the anomaly, never a person.** Enemies personify *behaviors
+  and scandals as categories* — no real officials, parties, contractors,
+  or lookalikes, ever.
+- **Institutions are victims, not villains.** Agencies get cleansed;
+  their honest workers cheer the player on and join the roster.
 
-## Field roster
+## The battle (core loop)
 
-- **Eden** — always deployed, the leader unit. Baseline physical kit,
-  modest stats, always available: she (plus generic volunteers) must be a
-  viable floor for every battle, so hero drops are accelerants, never hard
-  requirements. Future: swap the leader slot for another unlocked hero.
-- **4 ally slots** — filled during battle by heroes arriving via drops
-  (below). A hero is unique: one instance on the field, ever.
-- **Volunteers** — the existing archer/cannon/frost prototype towers,
-  reflavored (sling brigade, barricade cannon, water-bucket line). Bought
-  with gold, multi-placeable, the coverage backbone.
+1. **Pre-battle**: read the stage's enemy cards (telegraphed weaknesses)
+   and pick a squad — Eden + 4 workers whose damage types counter the
+   stage. Choose one **Bayanihan Act** (barrier ultimate).
+2. **Deploy**: the full squad takes the field from wave 1 on fixed
+   positions. Lineup order matters — adjacent heroes buff each other
+   (**Bayanihan adjacency**).
+3. **Fight**: enemies walk the path toward the Barrier. Heroes attack
+   automatically (targeting per `core/Targeting.ts`); each hero also has
+   a **skill** — manually triggered, on cooldown, with a voiced bark and
+   cut-in.
+4. **Grow mid-battle**: kills earn **gold**; gold buys **hero upgrade
+   tiers during the battle** (Lv1→Lv2→Lv3: stronger attack, wider range,
+   upgraded skill). Upgrade order is the in-battle strategy. This
+   replaces both the volunteer economy and the earlier kill-drop
+   arrival system — kills still convert directly into visible power.
+5. **Rally**: kills also fill the **Voices meter**, which charges the
+   equipped Bayanihan Act (People Power pushback, Batingaw stun, Baha ng
+   Tulong barrier heal, Boses ng Bayan attack-speed surge…). Fire it at
+   the right moment.
+6. **Win/lose**: clear all waves before the Barrier falls.
 
 ### Field layout — portrait barrier defense (recommended, pending owner confirmation)
 
-Proposed pivot from the prototype's landscape winding-path layout to a
-**portrait, phone-native** layout:
+Enemies descend from the top along a path template toward the **Barrier
+spanning the bottom**; the squad stands on **fixed pedestals behind the
+Barrier**, firing projectiles over it. A hero's `range` = how far
+up-screen they reach; "melee" workers are short-range wall-guards with
+the heaviest hits. Portrait, one-handed, thumb-friendly; sessions 3–5
+minutes. The current landscape winding-path prototype remains the test
+bed until this is confirmed — waves, economy, targeting, and damage
+systems are layout-agnostic.
 
-- **Enemies descend from the top** of the screen along a path template
-  (straight lanes, S-curves, forks) toward the **Barrier spanning the
-  bottom** — barrier HP is the lives counter, now literally visible as
-  the thing being defended.
-- **Heroes stand behind the Barrier** on fixed pedestals (Eden center,
-  4 ally positions). All heroes attack with projectiles over the wall —
-  a hero's `range` is how far up-screen they reach. "Melee" heroes
-  become short-range heavy hitters who punish enemies at the wall face;
-  long-range heroes hit earlier but softer.
-- **Volunteers keep the classic TD layer**: gold-bought, placed in build
-  slots alongside the descending path.
-- **Bayanihan lineup adjacency**: neighboring heroes on the pedestal row
-  buff each other, so *the order you arrange Eden and her allies*
-  matters — the adjacency mechanic reborn with zero extra UI.
-- Ranged bosses bombarding the barrier from partway down (already
-  spec'd) becomes even more natural in this layout.
+## The heroes — workers with skills
 
-Why recommended: sessions are one-handed portrait (heroes sit under the
-thumbs), the layout is proven (PvZ/castle-defense lineage), and this
-game's strategy already lives in squad selection, drop timing, type
-matchups, and skill usage rather than free tile placement. The winding-
-path prototype remains fully useful — waves, economy, targeting, and
-damage systems are layout-agnostic; the pivot is orientation + slot
-arrangement, cheapest to do now before combat plumbing lands.
+All heroes follow the **every-hero-attacks** rule (no pure supports; a
+support-leaning worker still deals ~50–60% of a DPS worker's damage —
+squad math stays healthy in 5 slots). Damage types per
+`docs/DAMAGE_AND_AILMENTS.md`; every type's carrier is a hero now.
 
-Consequence if confirmed: Jeepney Driver's "route" passive becomes a
-chosen lane/path-segment boost; `docs/DESIGN_GUIDELINES.md` layout
-section and `level.ts` templates get updated to portrait.
-
-### Two-track battle economy
-
-| Resource | Source | Spends on |
-|---|---|---|
-| Gold | Passive trickle + kills (as today) | Volunteers, upgrades, Eden's abilities |
-| Hero drops | Enemy kills (chance-based) | Deploying squad heroes into ally slots |
-
-## Hero deployment: the drop / rally system
-
-1. Before battle the player picks a **squad of 4** from their unlocked
-   roster (plus Eden, who is automatic). Domain enemy cards telegraph
-   weaknesses (see `docs/DAMAGE_AND_AILMENTS.md`), so squad selection is
-   the strategic layer: bring the types this domain fears.
-2. Enemy kills have a chance to produce a **drop**. A drop makes one squad
-   hero available; the player places them in an open ally slot (placement
-   is a choice, timing is luck).
-3. **"Adjusts accordingly" — bad-luck protection**, all data-driven:
-   - Every kill without a drop increases the next drop's chance
-     (pity increment).
-   - Heroes not yet dropped this battle are weighted up.
-   - Elite/boss kills guarantee a drop.
-   - Early waves carry a slightly boosted rate so squads come online
-     before pressure peaks.
-4. A visible **rally meter** on the HUD shows drop buildup — progress must
-   read as "almost there!", never "the game is ignoring me."
-
-Implementation home: `src/game/core/Drops.ts` — deterministic, seeded-RNG
-state machine advanced by kill events, same testable pattern as
-`WaveManager`. All knobs (base rate, pity increment, early-wave boost,
-elite guarantees) in `balance.ts`.
-
-## Domains & campaign map
-
-The campaign map is the **Philippine archipelago** (Luzon → Visayas →
-Mindanao arc). Each hero rules a **domain**:
-
-```
-DomainDefinition:
-  region       — position on the archipelago map
-  level        — path layout + build slots, regionally themed
-  waves        — hand-authored; minion roster themed to the hero
-  minions      — enemies with resistances matching the hero's element
-  bossHero     — the hero as a boss (see below)
-  unlock       — the hero's playable HeroDefinition
-```
-
-2–3 domains are open at any time. The damage-type matrix creates a
-*recommended* order (the hero you just unlocked counters a neighboring
-domain) without forcing one — any order is beatable, smart order is
-smoother.
-
-## Hero bosses
-
-A domain's final wave is its hero, fighting with **the exact kit the
-player will receive** — the boss fight is the tutorial for the unit.
-
-Player units are untouchable (locked rule above), so bosses pressure the
-**barrier**, and melee vs. ranged is about *how*:
-
-- Bosses **walk the path** toward the barrier alongside minion waves.
-- **Melee bosses**: high HP; damage the barrier only on arrival, but hit
-  it hard. The threat is a slow, huge health bar grinding forward.
-- **Ranged bosses**: begin **bombarding the barrier from partway down the
-  path** once within their attack range of the path's end — chip damage
-  on an interval while they advance. The threat is a timer: every second
-  they're alive near the end, the barrier bleeds. Burst them down.
-- Bosses **cast their signature skills** on cooldown while walking — the
-  same skills the hero grants when unlocked, expressed on their own side:
-  buff or heal minions, summon reinforcements mid-path, shield
-  themselves, or slam the barrier. Boss skills never damage or disable
-  the player's units.
-- Per `docs/DAMAGE_AND_AILMENTS.md`: bosses are immune to hard CC
-  (stun/freeze/sleep/knockback) and carry telegraphed
-  resistances/weaknesses on their enemy card.
-
-Bombardment interval/damage, arrival damage, and skill cooldowns are all
-`balance.ts` data.
-
-## Enemy factions & minion chassis
-
-Enemies are built for reuse (see `docs/PROGRESSION.md`): a small set of
-**chassis** define stats/behavior once; **faction skins** re-dress them
-per act and arc. Adding an act's worth of enemies should mostly mean new
-skins, not new code.
-
-### Basic chassis (behavior archetypes)
-
-| Chassis | Behavior | Exists today as |
-|---|---|---|
-| Grunt | Baseline walker | `grunt` |
-| Runner | Fast, fragile | `runner` |
-| Brute | Slow tank | `brute` |
-| Swarmling | Very weak, arrives in packs | (planned — `ADDING_ENEMIES.md` example) |
-| Shieldbearer | Shield must break before HP | (planned) |
-| Flyer | Immune to `earth`, weak to `wind` | (planned) |
-| Healer | Heals nearby minions | (planned) |
-| Drummer | Speeds nearby minions | (planned) |
-| Splitter | Splits on death | (planned) |
-| Stealther | Invisible until revealed | (planned) |
-| Elite | Mini-boss, aura, guaranteed drop | (planned) |
-
-### Faction skins
-
-**Troll arm (misinformation):** Troll (grunt), Bot (swarmling), Fake News
-Blimp (flyer), Influencer-for-Hire (drummer), Deepfake Mimic (stealther),
-Troll Farm Overseer (elite).
-
-**Corruption arm (behaviors personified — never persons):**
-
-| Enemy | Chassis | The behavior → the mechanic |
-|---|---|---|
-| Fixer | Runner | Rushes paperwork past you |
-| Red Tape | Brute | Layers of paperwork armor (stacking armor; `earth`/shred counters); slows your gold income while alive |
-| Ghost Project | Stealther | Ghost bridges/dikes — untargetable until revealed by truth units (Auditor, Journalist, Resibo) |
-| The Overpriced | Shieldbearer | Hugely inflated HP bar; an audit hit pops the padding to reveal true HP |
-| Kickback Courier | Runner | Steals gold as it walks; kill it before it exits to recover with interest |
-| Epal Tarp | Elite | Billboard mini-boss; morale aura buffs nearby enemies |
-| The Dynasty | Boss | Phase boss — kill it and a relative takes over (three generations, three phases) |
-
-**Corrupted folk creatures (public-domain mythology):** Manananggal
-(splitter), Tiyanak (bait/stealth — clickbait made flesh), Kapre
-(stealth-aura elite — hides others in smoke until killed), Tikbalang
-(scrambles targeting — design TBD).
-
-## The villains — who you actually defeat
-
-"Boss" means three different things, and only two are true enemies:
-
-1. **Rival bosses (meme heroes)** — recruitment duels. They test Eden and
-   join after defeat. Not villains; they're the roster.
-2. **Arc bosses — the actual enemy.** Commanders of the machine's two
-   arms, one per campaign arc, each a *behavior personified* (never a
-   person). Defeating one cleanses that arc for good.
-3. **Finale bosses** — the machine's apex, gated at campaign's end.
-
-### Arc boss roster (behavior → mechanic)
-
-| Act / arc | Boss | Arm | Kind | Signature mechanic |
+| Hero | Worker | Type | Attack | Signature skill / passive |
 |---|---|---|---|---|
-| 1 — Barangay | **The Overseer** | Troll | Ranged summoner | Runs a shuttered-internet-café troll farm; endlessly summons Bot swarmlings — killing the boss silences the bots |
-| 2 — LGU | **Kuno the Peddler** | Troll | Ranged | Wholesale fake-news peddler ("kuno" = *allegedly*); scatters **fake gold pickups that subtract** when collected — teaches players to distrust freebies |
-| 3 — Province | **Manananggal Matriarch** | Corrupted folk | Melee splitter | Splits into two half-bosses; **both must die within a window or she reforms at full HP** |
-| Agency: transport | **The Fixer King** | Corruption | Melee rusher | Dashes in bursts between queue gates; spawns Fixer runners; armored in Red Tape stacks |
-| Agency: public works | **The Ghost Engineer** | Corruption | Ranged stealth | Master of ghost projects — repeatedly turns invisible and erects **ghost walls that block your projectiles** until revealed by truth units |
-| Agency: social welfare | **Ghost Payroll** | Corruption | Summoner | Spawns endless ghost-beneficiary stealthers; the honest workers you're saving point them out (scripted reveals) |
-| Agency: customs | **Smuggler Admiral** | Corruption | Melee | Massive gold thief — drains your economy while alive; killing him returns everything with interest |
-| Corruption apex | **The Dynasty** | Corruption | 3-phase | Kill it and a relative takes over: Gen 1 melee bruiser → Gen 2 ranged schemer → Gen 3 hybrid heir, each phase angrier |
-| **Finale** | **The Algorithm** | The machine itself | Colossus | The recommendation-engine god both arms feed. **Adapts mid-fight — shifts its resistances**, forcing the full alliance's type diversity; the final exam of everything the player learned |
+| **Eden** | Community organizer (protagonist, permanent leader) | Physical | Rallying sling | Skill: Rally — brief squad-wide buff. Passive: adjacency bonuses she anchors |
+| **Auditor** | Government auditor (honest insider) | Magic | Stamp slam — **ignores armor** | Reveals ghosts; pops inflated HP padding ("audited!") |
+| **Journalist** | Field reporter | Lightning | Camera-flash burst | Reveal aura; skill: Breaking News — chain-lightning + stun chance |
+| **Nurse** | Public health nurse | Holy | Syringe darts | Skill: **Barrier regeneration** — the only healing in the game |
+| **Teacher** | Public school teacher | Physical | Chalk throw | Passive: **marks** enemies — marked take bonus damage from everyone |
+| **Fisherfolk** | Fisher | Water | Net throw — damage + group slow + **Wet** | Skill: Lambat — wide net, mass Wet setup |
+| **Farmer** | Rice farmer | Earth | Scythe sweep (splash) | Armor shred; passive: harvest — kills nearby yield bonus gold |
+| **Jeepney Driver** | Driver | Wind | Horn blast — knockback | Passive: his **route** — a lane/path corridor where allies attack faster |
+| **Sorbetero** | Dirty-ice-cream vendor | Frost | Ice scoop shots — **Slow** | Skill: Deep freeze scoop — Freeze chance on Wet enemies |
+| **Grill Vendor** | Street BBQ vendor | Fire | Ember skewers — **Burn** | Skill: Ihaw Rain — burn cone across a lane |
+| **OFW** | Overseas worker | Physical | Balikbayan-box lob (splash) | Passive: remittance — steady bonus gold trickle |
+| **Student** | Working student | Physical | Slingshot | Passive: **grows** — upgrade tiers cost less and stack higher for them |
+| **Whistleblower** | The one who spoke up (late unlock) | Dark | Dossier throw — **Curse** | Skill: Exposé — mass curse, everything takes amplified damage |
 
-All arc bosses obey the standing rules: hard-CC immune, telegraphed
-weaknesses on their enemy card, melee/ranged behavior per
-`docs/WORLD_AND_HEROES.md` boss rules, and *never* a depiction of a real
-person. The Dynasty and The Algorithm are never recruitable.
+All 10 damage types have a carrier. Kits, numbers, and skill cooldowns
+are `balance.ts` data.
 
-Thematic through-line: fake news peddlers are the *front*; the corruption
-they protect is the *body*; The Algorithm — the system that profits from
-both — is the *head*. Eden's alliance defeats the head only when every
-voice has been gathered.
+## The horde — anomalies of bad governance
 
-## Unlock flow — two recruitment paths, one per roster tier
+Enemies reuse the **chassis × skin** engine (`docs/PROGRESSION.md`):
+behavior defined once per chassis, anomalies as skins.
 
-Defeat-to-recruit is **not discarded** — it's scoped to the tier where it
-makes sense:
+### Minion anomalies
 
-- **Meme heroes: defeat = join.** They're proud, or deceived by the
-  empire's fake news — each tests Eden on their home turf ("beat me and
-  I'll believe you"). Beat the domain boss → recruitment scene → they
-  join with the exact kit they fought with. The boss-fight-as-kit-tutorial
-  loop stays fully intact for this tier.
-- **Citizen heroes: inspired = join.** You don't beat up a nurse to
-  recruit her. Citizen heroes join because Eden's movement *earns* them:
-  complete the barangay act and the Teacher joins; cleanse an agency arc
-  and its honest Auditor joins; hit story milestones and the OFW sends
-  word. Their "boss moment" is a story beat, not a duel.
-- **Corruption bosses (The Dynasty, etc.) are never recruitable** — sins
-  aren't allies; they're cleansed.
-- **Sidekicks** unlock via side objectives or Hope at the Sari-Sari Store
-  (`docs/PROGRESSION.md`).
-- **Mastery**: replaying a hero's domain/arc against remixed waves
-  upgrades that hero.
-- Unlock state persists via the meta-progression system
-  (`docs/FEATURES.md`: local storage first).
+| Anomaly | Chassis | Behavior → mechanic |
+|---|---|---|
+| Troll Bot | Swarmling | Fake-news spam in packs |
+| Fixer | Runner | Rushes paperwork past you |
+| Ghost Employee | Stealther | Invisible until revealed by truth heroes (Auditor/Journalist) |
+| Kickback Courier | Runner | **Steals gold** as it walks; kill before it exits to recover with interest |
+| Red Tape | Brute | Stacking paperwork armor (earth/shred counters); slows gold income while alive |
+| Epal Tarp | Elite | Billboard mini-boss; morale aura buffs nearby anomalies |
+| Fake News Blimp | Flyer | Immune to earth, weak to wind |
+| The Overpriced | Shieldbearer | Hugely inflated HP bar; an audit pops the padding |
+
+(Corrupted folk creatures — manananggal splitter, tiyanak bait, kapre
+smoke — remain available as regional skin variants of the same chassis.)
+
+### Boss anomalies — named after the real issues
+
+Each campaign arc's boss is its **flagship anomaly**, named after a
+recognizable category of PH governance scandal (the category, never a
+person or case participant):
+
+| Boss | The anomaly | Kind | Signature mechanic |
+|---|---|---|---|
+| **Troll Farm** | Paid disinformation | Ranged summoner | Endless Troll Bot swarms until the farm falls |
+| **Ghost Flood Control** | Ghost flood-control projects | Ranged stealth | **Floods the path in surges** — enemies ride the water faster; itself a ghost, untargetable until revealed |
+| **Pork Barrel** | Discretionary-fund abuse | Melee tank | Bloated hog of funds — **devours gold pickups on the field**, growing tougher with each one eaten |
+| **Vote Buying** | Election money | Ranged | Scatters **fake gold that subtracts when collected** — distrust the freebies |
+| **Nepotism** | Appointed relatives | Summoner | Continuously surrounds itself with respawning appointee Shieldbearers — kill the source |
+| **Wang-Wang** | VIP entitlement | Melee rusher | Convoy sirens: speed aura, escorts rush the Barrier in bursts |
+| **Budget Insertion** | Midnight insertions | Stealth elite | Massive HP smuggled quietly down a side lane — catch it before it slips through |
+| **Smuggling** | Customs leakage | Melee | Drains your economy while alive; killing it returns everything with interest |
+| **The Dynasty** | Political dynasties | 3-phase apex | Kill it and a relative takes over — bruiser → schemer → heir, three generations |
+| **Ang Sistema** *(finale — proposed)* | The system that lets them all thrive | Horde convergence | Not a creature — the final gauntlet: **every defeated anomaly returns at once**, with The Dynasty at the horde's heart. The full alliance and every unlocked Act against everything you've already beaten |
+
+Boss rules unchanged: path-walkers, melee hit the Barrier on arrival /
+ranged bombard from partway, hard-CC immune, telegraphed weaknesses,
+skills only affect their own side or the Barrier.
+
+## Recruitment — inspiration only
+
+Defeat-to-recruit retired along with the meme tier. The roster grows two
+ways:
+
+- **Story milestones (free)**: save the barangay → the Teacher joins;
+  cleanse an agency arc → its honest worker (Auditor, and future agency
+  heroes) joins. Recruitment scenes are story beats.
+- **Sari-Sari Store (Hope)**: some workers answer the call when the
+  movement can support them — unlockable in player-chosen order with the
+  per-run currency (`docs/PROGRESSION.md`). Earned in-game only; heroes
+  are never sold for real money (rule pending owner confirmation).
+
+Corruption anomalies are never recruitable. Mastery: replaying cleansed
+arcs against remixed waves upgrades heroes permanently.
 
 ## Bayanihan Acts — selectable barrier skills
 
-The Barrier itself has a skill slot (one at first; a second unlocks late
-in the campaign). Before battle, the player equips one **Bayanihan Act**
-from those unlocked — the community's collective move, charged by Voices
-(kills) during battle and fired manually. Many effects, one system:
+The Barrier has a skill slot (a second unlocks late-campaign). Equip one
+Act pre-battle; it charges from Voices (kills) and fires manually:
 
 | Act | Effect |
 |---|---|
-| **People Power** | The crowd surges — mass knockback down the path |
-| **Batingaw** | The church bell tolls — mass stun (bosses resist per CC rules) |
-| **Baha ng Tulong** | Flood of aid — large barrier heal |
-| **Boses ng Bayan** | All heroes gain attack speed for a duration |
-| **Salu-Salo** | Community feast — instant gold windfall |
-| **Piyesta** | Rally surge — instantly fills the Voice/drop meter |
+| **People Power** | Crowd surge — mass knockback down the path |
+| **Batingaw** | Church bell tolls — mass stun (bosses resist) |
+| **Baha ng Tulong** | Flood of aid — large Barrier heal |
+| **Boses ng Bayan** | All heroes gain attack speed |
+| **Salu-Salo** | Community feast — gold windfall |
+| **Piyesta** | Voices surge — next Act charges much faster |
 
-Acts unlock via campaign milestones and the Sari-Sari Store. Charge
-rates, effect numbers, and unlock placement are `balance.ts` data. This
-system subsumes the earlier "People Power comeback ultimate" proposal —
-People Power is simply the first Act the player gets, in Act 1 of the
-campaign, where it's also the story's thesis.
+Acts unlock via campaign milestones and the Store. People Power is the
+first, earned in Act 1 — it's the story's thesis.
 
-## Character design rules — the legal lane
+## Character & content rules (binding)
 
-This section is binding for all character content. Real celebrities'
-names, photographs, recorded audio, and unmistakable likenesses are
-**not** used without a license. Short clip length does not make audio
-safe; illustration does not make a likeness safe; parody framing does not
-make merchandising safe. Risk concentrates exactly when the game succeeds
-(visibility) and monetizes (IAP) — and app stores act on complaints
-without a court.
-
-### The identifiability dial
-
-The test for every character, visual and vocal: *would a Filipino player
-say "that IS [specific person]" or "that reminds me of characters like
-[archetype]"?* The first is exposure; the second is the safe lane.
-
-**Visuals** — capture the archetype's silhouette, not one person's face:
-
-- ✅ Era, fashion style, body language, comedic energy, hair *style*
-- ✅ **Composite characters**: blend traits from 2–3+ references of the
-  same archetype so no single individual is "the" source
-- ❌ Face structure, signature look, or styling that points to exactly one
-  real person — drawn art included; identifiability is the test, not the
-  medium
-
-**Voice** — capture the register, not the voice:
-
-- ✅ Original catchphrases in the same comedic *genre* (bubbly showbiz
-  hype, gossip-whisper, action-star gravel), performed by voice actors
-- ✅ Few-second skill barks, chants, victory lines — original writing
-- ❌ Real recorded clips (copyright of the network/studio + performer
-  rights)
-- ❌ Directing a VA to imitate a specific person's voice — deliberate
-  sound-alikes of distinctive voices are exactly what courts have
-  punished. Direct the *archetype* ("energetic showbiz hype-woman"),
-  never the *person*.
-
-Worked example: the "Go go go!" energy → **Gogogirl**, a bubbly showbiz
-commander whose skill cut-in flashes her portrait while she chants an
-original rally line ("Sige sige sige, GO!") that buffs ally attack speed.
-Same laugh, zero exposure. Meme archetypes with no single source person
-(Marites the gossip, Sana Ol, budots, jeepney culture) are fully safe.
-
-### Memes and viral lines (the roster's foundation)
-
-The roster is built from **communal PH internet/street culture** rather
-than celebrity parodies — richer material and legally cleaner. The test
-for any meme or line: ***does this belong to everyone, or to someone?***
-
-- ✅ **Communal memes and slang** — no single owner: Marites, sana all,
-  edi wow, charot, awit, lodi/petmalu, dasurv, resibo culture, budots,
-  "walang pasok" rain-day hopes, videoke culture, jeepney "bayad po,"
-  the taho vendor's call, the flying tsinelas. These are folk culture;
-  use freely.
-- ✅ **Viral lines that have become generic slang** — if a phrase has
-  detached from its originator and everyone says it, an original
-  character can say it too. Short phrases aren't copyrightable; lines
-  are the safest asset class *when spoken by an original character*.
-- ⚠️ **Lines still owned by an identifiable influencer** — if the
-  audience hears the line and pictures one specific living person, treat
-  it exactly like a celebrity catchphrase: don't pair it with a
-  character that resembles them (the line + lookalike + name-alike combo
-  is what creates an identifiable persona). Either wait for the phrase
-  to go generic, or write an original line in the same spirit.
-- ❌ **Influencer personas** — a TikTok/YouTube comedian is a real
-  person with the same publicity rights as a TV star. "Internet famous"
-  is not a legal category difference.
-- Songs are copyrighted even when the meme is the *performance* (e.g.
-  videoke "My Way" culture): reference the culture, commission original
-  soundalike-free music.
-
-### Built to license later
-
-All character assets are **data**, not code: `HeroDefinition` references
-sprite sheets, skill cut-in art, and `voiceLines[]` by asset path. If a
-real celebrity deal is ever struck, their licensed face and voice drop in
-as an asset swap — no engineering. Build parody-first, license-later.
-
-Before commercial release, have a PH entertainment/IP lawyer review the
-roster. This doc is design guidance, not legal advice.
-
-## The two-tier roster
-
-The roster has two tiers with different tone rules:
-
-- **Citizen heroes — dignified tier, played completely straight.** Ordinary
-  Filipino workers whose everyday labor becomes heroism: Teacher, Nurse,
-  OFW, Jeepney Driver, Journalist, Auditor, Farmer, Fisherfolk, Student.
-  Warm, heroic portrayals; **zero comedy at their expense** — these are
-  the "unmockable" characters, and they carry the story's heart ("from a
-  single voice to many"). Their kits are hybrid attacker/supports — see
-  the support-hero table and the "every hero attacks" rule in
-  `docs/PROGRESSION.md`.
-- **Meme heroes — comedy tier.** Communal-culture characters below;
-  comedy is welcome here because the subject is shared culture, never a
-  person and never the dignified tier.
-
-Eden belongs to the citizen tier — the first voice.
-
-## Provisional roster (communal meme archetypes)
-
-Names/kits are placeholders to be developed per the rules above — every
-entry sourced from communal culture, none from an identifiable person.
-Each hero's element obeys `docs/DAMAGE_AND_AILMENTS.md` design rules
-(distinct job, carrier pairing).
-
-| Hero | Communal source | Type | Kit identity |
-|---|---|---|---|
-| Eden | Concerned citizen (protagonist) | Physical | Leader; modest all-rounder, rally abilities |
-| Lola Tsinelas | The flying-slipper discipline grandma | Physical | Ranged sniper — highest single-target DPS, never misses |
-| Resibo | Receipts/"may resibo ako" culture | Magic | Truth pierces all defenses — ignores armor (thematic match: magic's anti-armor job) |
-| Marites | Neighborhood gossip | Dark | Curse aura — "spreads the tea," everything cursed takes more damage |
-| Manang Dasal | Prayer-warrior auntie (warm, never mocking) | Holy | Anti-undead radiance, blessing buff |
-| Toktok | Budots street dancer | Frost | Slow — enemies can't help stopping to watch |
-| Mang Ihaw | Street BBQ grill master | Fire | Burn cone — "isaw for everyone" |
-| DiliVery | Delivery-rider folk hero | Wind | Knockback — "your order has been returned to sender" |
-| Apo Baket | Mountain albularyo (folk healer) | Earth | Splash + armor shred |
-| Sana Ol | "Sana all" longing poster | Water | Wet applier, the enabler every squad wants |
-
-**Meme sidekicks** (side-objective unlocks, support kits): the **Jeepney
-Barker** ("bayad po!" — collects extra gold from kills along his lane),
-the **Taho Vendor** (morning-call rally that speeds up drop buildup), the
-**Videoke King** (original power ballad, brief sonic stun — original
-music only, never a real song).
+- **No real persons**: no officials, celebrities, influencers,
+  contractors, or lookalikes — visually, vocally, or by name. Anomalies
+  are categories; heroes are archetypes of professions.
+- **Workers are portrayed with warmth and dignity** — they're the
+  heroes; comedy never comes at their expense. (Humor lives in enemy
+  satire and hero personality, not mockery.)
+- **Voice lines**: original writing performed by voice actors; no real
+  recorded clips; no directed imitations of specific people. Short skill
+  barks and chants are encouraged — they're original.
+- **Agencies**: real names allowed under the binding help-the-agency
+  conditions in `docs/PROGRESSION.md` (no seals/logos, institution
+  always honorable, disclaimer, lawyer pass pre-release).
+- All character assets (sprites, cut-ins, `voiceLines[]`) are **data**
+  on definitions — swappable without code changes.
 
 ## Data model (target shape)
 
@@ -426,43 +203,45 @@ music only, never a real song).
 interface HeroDefinition {
   id: HeroId;
   name: string;
-  archetype: string;            // design-bible reference, not shipped UI
+  profession: string;
   damageType: DamageType;
-  attackKind: 'melee' | 'ranged';
-  deployCost?: number;          // if drops alone don't gate deployment
-  skill: HeroSkillDefinition;   // cooldown, effect, cut-in art ref
-  voiceLines: VoiceLineRef[];   // asset paths — swappable, see above
-  bossProfile: BossDefinition;  // stats/skills when fought as a domain boss
+  attackKind: 'melee' | 'ranged';   // wall-guard vs long reach
+  range: number;
+  upgradeTiers: HeroTierDefinition[]; // in-battle Lv1..Lv3 costs/stats
+  skill: HeroSkillDefinition;         // cooldown, effect, cut-in, bark
+  passive?: HeroPassiveDefinition;
+  voiceLines: VoiceLineRef[];
+}
+
+interface AnomalyDefinition {          // extends the enemy chassis system
+  id: AnomalyId;
+  chassis: ChassisId;
+  resistances?: Partial<Record<DamageType, number>>;
+  armor?: number;
+  tags?: EnemyTag[];
 }
 
 interface BossDefinition {
   maxHp: number;
   speed: number;
   attackKind: 'melee' | 'ranged';
-  // melee: barrierDamage applied on arrival
-  // ranged: bombardDamage + bombardIntervalMs, active once within
-  //         bombardRange of the path's end
+  // melee: barrierDamage on arrival
+  // ranged: bombardDamage + bombardIntervalMs within bombardRange of the end
   resistances: Partial<Record<DamageType, number>>;
-  skills: BossSkillDefinition[]; // own-side buffs/heals/summons/shields
-                                 // or barrier slams — never target units
-  // hard-CC immunity is implied for all bosses (DAMAGE_AND_AILMENTS.md)
+  skills: BossSkillDefinition[];  // own-side/barrier only, never units
 }
 ```
 
-`DropTable` config and boss barrier-attack tuning live in `balance.ts`.
-
 ## Rollout dependencies
 
-This system builds on, in order:
+1. Damage/ailment phases 1–2 (`docs/DAMAGE_AND_AILMENTS.md`) — heroes
+   are the type carriers now.
+2. Portrait layout confirmation → `level.ts` templates + pedestal row.
+3. In-battle upgrade economy (`core/` module, unit-tested) — replaces
+   the tower-placement economy.
+4. Enemy info card — squad selection depends on it.
+5. Meta-progression (persistent unlocks, Hope, mastery).
 
-1. Damage/ailment phases 1–2 (`docs/DAMAGE_AND_AILMENTS.md`) — heroes are
-   typed damage dealers; bosses need resistances.
-2. Multiple levels / level registry (`docs/FEATURES.md`) — domains are
-   levels.
-3. Enemy info card — squad selection depends on telegraphed weaknesses.
-4. Meta-progression (persistent unlocks) — required for the roster to
-   mean anything across sessions.
-
-The current prototype's towers remain valid throughout: they become
-volunteers with a reskin, and Eden's kit can start as a reskinned archer.
-Nothing already built is discarded.
+The existing prototype's three towers serve as hero stand-ins for
+testing until real hero kits land; its waves/economy/targeting code
+carries forward unchanged.
