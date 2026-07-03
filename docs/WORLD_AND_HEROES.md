@@ -143,24 +143,26 @@ support-leaning worker still deals ~50–60% of a DPS worker's damage —
 squad math stays healthy in 5 slots). Damage types per
 `docs/DAMAGE_AND_AILMENTS.md`; every type's carrier is a hero now.
 
-| Hero | Worker | Type | Attack | Signature skill / passive |
-|---|---|---|---|---|
-| **Eden** | Community organizer (protagonist, permanent leader) | Physical | Rallying sling | Skill: Rally — brief squad-wide buff. Passive: adjacency bonuses she anchors |
-| **Auditor** | Government auditor (honest insider) | Magic | Stamp slam — **ignores armor** | Reveals ghosts; pops inflated HP padding ("audited!") |
-| **Journalist** | Field reporter | Lightning | Camera-flash burst | Reveal aura; skill: Breaking News — chain-lightning + stun chance |
-| **Nurse** | Public health nurse | Holy | Syringe darts | Skill: **Barrier regeneration** — the only healing in the game |
-| **Teacher** | Public school teacher | Physical | Chalk throw | Passive: **marks** enemies — marked take bonus damage from everyone |
-| **Fisherfolk** | Fisher | Water | Net throw — damage + group slow + **Wet** | Skill: Lambat — wide net, mass Wet setup |
-| **Farmer** | Rice farmer | Earth | Scythe sweep (splash) | Armor shred; passive: harvest — kills nearby yield bonus gold |
-| **Jeepney Driver** | Driver | Wind | Horn blast — knockback | Passive: his **route** — a lane/path corridor where allies attack faster |
-| **Sorbetero** | Dirty-ice-cream vendor | Frost | Ice scoop shots — **Slow** | Skill: Deep freeze scoop — Freeze chance on Wet enemies |
-| **Grill Vendor** | Street BBQ vendor | Fire | Ember skewers — **Burn** | Skill: Ihaw Rain — burn cone across a lane |
-| **OFW** | Overseas worker | Physical | Balikbayan-box lob (splash) | Passive: remittance — steady bonus gold trickle |
-| **Student** | Working student | Physical | Slingshot | Passive: **grows** — enhancement drops apply to the Student at increased potency |
-| **Whistleblower** | The one who spoke up (late unlock) | Dark | Dossier throw — **Curse** | Skill: Exposé — mass curse, everything takes amplified damage |
+| Hero | Worker | Type | Kind | Attack | Signature skill / passive | Joins via |
+|---|---|---|---|---|---|---|
+| **Eden** | Community organizer (protagonist, permanent leader) | Physical | Ranged | Rallying sling | Skill: Rally — brief squad-wide buff. Passive: adjacency bonuses she anchors | Start of game |
+| **Teacher** | Public school teacher | Physical | Ranged | Chalk throw | Passive: **marks** enemies — marked take bonus damage from everyone | Act 1 milestone (save the barangay) |
+| **Student** | Working student | Physical | Ranged | Slingshot | Passive: **grows** — enhancement drops apply at increased potency | Sari-Sari (Hope, early) |
+| **Jeepney Driver** | Driver | Wind | Melee (wall-guard) | Horn blast — knockback | Passive: his **route** — a lane corridor where allies attack faster | Act 2 milestone (the terminal) |
+| **Fisherfolk** | Fisher | Water | Ranged (mid) | Net throw — damage + group slow + **Wet** | Skill: Lambat — wide net, mass Wet setup | Sari-Sari (Hope) |
+| **Farmer** | Rice farmer | Earth | Melee (wall-guard) | Scythe sweep (splash) | Armor shred; passive: harvest — kills nearby yield bonus gold | Sari-Sari (Hope) |
+| **Sorbetero** | Dirty-ice-cream vendor | Frost | Ranged | Ice scoop shots — **Slow** | Skill: Deep freeze scoop — Freeze chance on Wet enemies | Sari-Sari (Hope) |
+| **Grill Vendor** | Street BBQ vendor | Fire | Melee (short cone) | Ember skewers — **Burn** | Skill: Ihaw Rain — burn cone across a lane | Sari-Sari (Hope) |
+| **Nurse** | Public health nurse | Holy | Ranged | Syringe darts | Skill: **Barrier regeneration** — the only healing in the game | Act 3 milestone (provincial health crisis) |
+| **OFW** | Overseas worker | Physical | Ranged (long lob) | Balikbayan-box lob (splash) | Passive: remittance — steady bonus gold trickle | Sari-Sari (Hope) |
+| **Auditor** | Government auditor (honest insider) | Magic | Melee (wall-guard) | Stamp slam — **ignores armor** | Reveals ghosts; pops inflated HP padding ("audited!") | First agency arc milestone |
+| **Journalist** | Field reporter | Lightning | Ranged | Camera-flash burst | Reveal aura; skill: Breaking News — chain-lightning + stun chance | Second agency arc milestone |
+| **Whistleblower** | The one who spoke up | Dark | Ranged (mid) | Dossier throw — **Curse** | Skill: Exposé — mass curse, everything takes amplified damage | Pre-finale milestone |
 
-All 10 damage types have a carrier. Kits, numbers, and skill cooldowns
-are `balance.ts` data.
+All 10 damage types have a carrier; 7 heroes join via story milestones,
+6 via Hope in player-chosen order. Kits, numbers, and skill cooldowns
+are `balance.ts` data (the **hero balance sheet** — actual numbers — is
+authored when implementation starts, tuned against the build).
 
 ## The horde — anomalies of bad governance
 
@@ -176,16 +178,20 @@ binding content rules: any face, poster, or name on a monster is
 fictional and generic — e.g. the Epal's candidate face is an invented
 grinning politician, never a real one.)
 
-| Anomaly | Chassis | Monster form | Behavior → mechanic |
-|---|---|---|---|
-| **Troll Bot** | Swarmling | Gremlin with a cracked phone for a head, blue-glow face, keyboard-claw fingers; chitters in speech bubbles | Fake-news spam in packs |
-| **Fixer** | Runner | Many-armed scuttler sheathed in rush-stamped folders, a lanyard of too many IDs, grease-slick trail | Darts in bursts, rushing paperwork past you |
-| **Ghost Employee** | Stealther | Translucent barong-clad office specter, blank ID on a lanyard, clutching a bundy time card — only its floating pay envelope is fully solid | Invisible until revealed by truth heroes (Auditor/Journalist) |
-| **Kickback Courier** | Runner | Hunched imp lugging a bulging duffel that leaks coins; **visibly fattens as it steals** | Steals gold as it walks; kill it before it exits to recover with interest |
-| **Red Tape** | Brute | Mummy wrapped in red ribbon and "RECEIVED" tape; **each armor layer is a visible wrap that shreds off** as armor breaks | Stacking paperwork armor (earth/shred counters); slows gold income while alive |
-| **Epal** | Elite | Hulking mobster whose real face is hidden behind a smiling **fictional candidate's tarpaulin face**, sash and rosette; the poster smile never changes, even when it roars; the tarp tears as it takes damage | Elite minion; "name recall" morale aura buffs nearby anomalies |
-| **Fake News Blimp** | Flyer | Tabloid-skinned balloon beast with a megaphone snout, raining screaming-headline leaflets | Flying: immune to earth, weak to wind |
-| **The Overpriced** | Shieldbearer | Parade-balloon creature puffed to bursting, wearing a price tag with too many zeros; **an audit pops it, deflating it to a scrawny true form** | Hugely inflated HP bar; audit removes the padding |
+| Anomaly | Chassis | Monster form | Behavior → mechanic | Weak to / resists |
+|---|---|---|---|---|
+| **Troll Bot** | Swarmling | Gremlin with a cracked phone for a head, blue-glow face, keyboard-claw fingers; chitters in speech bubbles | Fake-news spam in packs | Weak: fire (burn spreads through the pack) · Resists: dark |
+| **Fixer** | Runner | Many-armed scuttler sheathed in rush-stamped folders, a lanyard of too many IDs, grease-slick trail | Darts in bursts, rushing paperwork past you | Weak: frost (speed is its whole trick) · Resists: wind (low, slippery) |
+| **Ghost Employee** | Stealther | Translucent barong-clad office specter, blank ID on a lanyard, clutching a bundy time card — only its floating pay envelope is fully solid | Invisible until revealed by truth heroes (Auditor/Journalist) | Weak: holy (spectral) · Resists: physical (incorporeal) |
+| **Kickback Courier** | Runner | Hunched imp lugging a bulging duffel that leaks coins; **visibly fattens as it steals** | Steals gold as it walks; kill it before it exits to recover with interest | Weak: lightning (caught in the flash) · Resists: physical (slippery) |
+| **Red Tape** | Brute | Mummy wrapped in red ribbon and "RECEIVED" tape; **each armor layer is a visible wrap that shreds off** as armor breaks | Stacking paperwork armor (earth/shred counters); slows gold income while alive | Weak: earth (shred), fire (paper burns) · Resists: water (laminated) |
+| **Epal** | Elite | Hulking mobster whose real face is hidden behind a smiling **fictional candidate's tarpaulin face**, sash and rosette; the poster smile never changes, even when it roars; the tarp tears as it takes damage | Elite minion; "name recall" morale aura buffs nearby anomalies | Weak: wind (tarps rip in the wind) · Resists: physical (thick hide) |
+| **Fake News Blimp** | Flyer | Tabloid-skinned balloon beast with a megaphone snout, raining screaming-headline leaflets | Flying: immune to earth, weak to wind | Weak: wind, lightning · Immune: earth |
+| **The Overpriced** | Shieldbearer | Parade-balloon creature puffed to bursting, wearing a price tag with too many zeros; **an audit pops it, deflating it to a scrawny true form** | Hugely inflated HP bar; audit removes the padding | Weak: magic (truth pierces the padding) · Resists: physical (absorbed by padding) |
+
+Exact multipliers are `balance.ts` data; this column is the design
+intent the enemy info card telegraphs. Boss resistances get the same
+treatment in their balance pass.
 
 (Corrupted folk creatures — manananggal splitter, tiyanak bait, kapre
 smoke — remain available as regional skin variants of the same chassis.)

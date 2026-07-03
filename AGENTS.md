@@ -39,6 +39,9 @@ over React Native.
   agencies), reusable stage/wave/chassis content engine, per-run Hope
   currency and the Sari-Sari Store, squad-building rules (every hero
   attacks). Read before touching campaign, economy, or meta-game systems
+- `docs/DESIGN_CHECKLIST.md` — audit of what's mapped vs. missing across
+  all specs, including open owner decisions. Check it before starting
+  design or implementation work; update it when items move columns
 
 ## Commands
 
