@@ -3,17 +3,22 @@
 Design spec for the game's setting, characters, and meta-game systems.
 Decisions locked with the project owner (2026-07-03):
 
-- The base being defended is **the Philippines**.
-- Damage dealers are not generic towers but **heroes** — original parody
-  characters inspired by Filipino celebrity/meme archetypes (see the
+- The base being defended is **the Barrier of the Philippines** — the
+  nation's shield. "Lives" in the prototype = barrier integrity.
+- Damage dealers are not generic towers but **heroes** — original
+  characters built from **communal Filipino meme culture** (see the
   character-design rules below; this is a legal lane, not a style choice).
+- **Heroes cannot be hit.** They only deal damage. Enemies attack exactly
+  one thing: the barrier. There is no unit durability/KO system.
 - **Eden**, a concerned citizen, is the protagonist and permanent field
   leader. She has **4 ally slots** beside her. Leader-swap is a future
   feature.
 - Heroes are **unique units** (one instance on the field), unlocked by
   defeating them, and deployed mid-battle via a **kill-drop system**.
 - Hero bosses are **path-walkers** (melee or ranged) that advance on the
-  base alongside their minions and **cast their skills** while advancing.
+  barrier alongside their minions and **cast their skills** while
+  advancing. Their skills affect their own side or the barrier — never
+  the player's units directly.
 
 Numbers below are starting values for tuning; the rules are the design.
 
@@ -100,25 +105,27 @@ smoother.
 A domain's final wave is its hero, fighting with **the exact kit the
 player will receive** — the boss fight is the tutorial for the unit.
 
-- Bosses **walk the path** toward the base alongside minion waves.
-- **Melee bosses**: high HP, must close distance; strike deployed units
-  they pass.
-- **Ranged bosses**: attack deployed units from distance while advancing.
+Player units are untouchable (locked rule above), so bosses pressure the
+**barrier**, and melee vs. ranged is about *how*:
+
+- Bosses **walk the path** toward the barrier alongside minion waves.
+- **Melee bosses**: high HP; damage the barrier only on arrival, but hit
+  it hard. The threat is a slow, huge health bar grinding forward.
+- **Ranged bosses**: begin **bombarding the barrier from partway down the
+  path** once within their attack range of the path's end — chip damage
+  on an interval while they advance. The threat is a timer: every second
+  they're alive near the end, the barrier bleeds. Burst them down.
 - Bosses **cast their signature skills** on cooldown while walking — the
-  same skills the hero will have when unlocked (buff minions, AoE stun
-  your units, burn a lane, etc.).
+  same skills the hero grants when unlocked, expressed on their own side:
+  buff or heal minions, summon reinforcements mid-path, shield
+  themselves, or slam the barrier. Boss skills never damage or disable
+  the player's units.
 - Per `docs/DAMAGE_AND_AILMENTS.md`: bosses are immune to hard CC
   (stun/freeze/sleep/knockback) and carry telegraphed
   resistances/weaknesses on their enemy card.
 
-### Consequence: unit durability
-
-Bosses attacking units means deployed units can be hit. Rule: **units are
-knocked out, never destroyed** — a unit that takes a boss hit/skill is
-KO'd for a recovery timer (or until re-rallied), then returns at its post.
-A boss push should feel dangerous without permanently deleting the
-player's setup. Volunteers may be cheaper to KO, heroes sturdier. Timers
-and thresholds are `balance.ts` data.
+Bombardment interval/damage, arrival damage, and skill cooldowns are all
+`balance.ts` data.
 
 ## Unlock flow
 
@@ -174,6 +181,34 @@ original rally line ("Sige sige sige, GO!") that buffs ally attack speed.
 Same laugh, zero exposure. Meme archetypes with no single source person
 (Marites the gossip, Sana Ol, budots, jeepney culture) are fully safe.
 
+### Memes and viral lines (the roster's foundation)
+
+The roster is built from **communal PH internet/street culture** rather
+than celebrity parodies — richer material and legally cleaner. The test
+for any meme or line: ***does this belong to everyone, or to someone?***
+
+- ✅ **Communal memes and slang** — no single owner: Marites, sana all,
+  edi wow, charot, awit, lodi/petmalu, dasurv, resibo culture, budots,
+  "walang pasok" rain-day hopes, videoke culture, jeepney "bayad po,"
+  the taho vendor's call, the flying tsinelas. These are folk culture;
+  use freely.
+- ✅ **Viral lines that have become generic slang** — if a phrase has
+  detached from its originator and everyone says it, an original
+  character can say it too. Short phrases aren't copyrightable; lines
+  are the safest asset class *when spoken by an original character*.
+- ⚠️ **Lines still owned by an identifiable influencer** — if the
+  audience hears the line and pictures one specific living person, treat
+  it exactly like a celebrity catchphrase: don't pair it with a
+  character that resembles them (the line + lookalike + name-alike combo
+  is what creates an identifiable persona). Either wait for the phrase
+  to go generic, or write an original line in the same spirit.
+- ❌ **Influencer personas** — a TikTok/YouTube comedian is a real
+  person with the same publicity rights as a TV star. "Internet famous"
+  is not a legal category difference.
+- Songs are copyrighted even when the meme is the *performance* (e.g.
+  videoke "My Way" culture): reference the culture, commission original
+  soundalike-free music.
+
 ### Built to license later
 
 All character assets are **data**, not code: `HeroDefinition` references
@@ -184,24 +219,31 @@ as an asset swap — no engineering. Build parody-first, license-later.
 Before commercial release, have a PH entertainment/IP lawyer review the
 roster. This doc is design guidance, not legal advice.
 
-## Provisional roster (parody archetypes)
+## Provisional roster (communal meme archetypes)
 
-Names/kits are placeholders to be developed per the rules above; each
-hero's element obeys `docs/DAMAGE_AND_AILMENTS.md` design rules (distinct
-job, carrier pairing).
+Names/kits are placeholders to be developed per the rules above — every
+entry sourced from communal culture, none from an identifiable person.
+Each hero's element obeys `docs/DAMAGE_AND_AILMENTS.md` design rules
+(distinct job, carrier pairing).
 
-| Hero | Archetype | Type | Kit identity |
+| Hero | Communal source | Type | Kit identity |
 |---|---|---|---|
 | Eden | Concerned citizen (protagonist) | Physical | Leader; modest all-rounder, rally abilities |
-| Kamao | Boxer-turned-politician | Physical | Highest single-target DPS |
-| Gogogirl | Bubbly showbiz commander | Lightning | Attack-speed chant, burst |
-| Marites | Neighborhood gossip (meme) | Dark | Curse aura — "spreads the tea" |
-| Reyna | Pageant queen | Holy | Anti-undead beam, confidence buff |
-| Toktok | Dance-craze street kid | Frost | Slow — enemies stop to watch |
-| Bossing | Teleserye action star | Fire | Burn cone, unwatched explosions |
-| DiliVery | Delivery-rider folk hero | Wind | Knockback — "return to sender" |
-| Apo Baket | Terraces mystic grandmother | Earth | Splash + armor shred |
-| Sana Ol | Lovestruck streamer | Water | Wet applier, squad enabler |
+| Lola Tsinelas | The flying-slipper discipline grandma | Physical | Ranged sniper — highest single-target DPS, never misses |
+| Resibo | Receipts/"may resibo ako" culture | Magic | Truth pierces all defenses — ignores armor (thematic match: magic's anti-armor job) |
+| Marites | Neighborhood gossip | Dark | Curse aura — "spreads the tea," everything cursed takes more damage |
+| Manang Dasal | Prayer-warrior auntie (warm, never mocking) | Holy | Anti-undead radiance, blessing buff |
+| Toktok | Budots street dancer | Frost | Slow — enemies can't help stopping to watch |
+| Mang Ihaw | Street BBQ grill master | Fire | Burn cone — "isaw for everyone" |
+| DiliVery | Delivery-rider folk hero | Wind | Knockback — "your order has been returned to sender" |
+| Apo Baket | Mountain albularyo (folk healer) | Earth | Splash + armor shred |
+| Sana Ol | "Sana all" longing poster | Water | Wet applier, the enabler every squad wants |
+
+**Meme sidekicks** (side-objective unlocks, support kits): the **Jeepney
+Barker** ("bayad po!" — collects extra gold from kills along his lane),
+the **Taho Vendor** (morning-call rally that speeds up drop buildup), the
+**Videoke King** (original power ballad, brief sonic stun — original
+music only, never a real song).
 
 ## Data model (target shape)
 
@@ -222,13 +264,17 @@ interface BossDefinition {
   maxHp: number;
   speed: number;
   attackKind: 'melee' | 'ranged';
+  // melee: barrierDamage applied on arrival
+  // ranged: bombardDamage + bombardIntervalMs, active once within
+  //         bombardRange of the path's end
   resistances: Partial<Record<DamageType, number>>;
-  skills: BossSkillDefinition[]; // cast on cooldown while walking
+  skills: BossSkillDefinition[]; // own-side buffs/heals/summons/shields
+                                 // or barrier slams — never target units
   // hard-CC immunity is implied for all bosses (DAMAGE_AND_AILMENTS.md)
 }
 ```
 
-`DropTable` config and KO/recovery tuning live in `balance.ts`.
+`DropTable` config and boss barrier-attack tuning live in `balance.ts`.
 
 ## Rollout dependencies
 
@@ -239,8 +285,7 @@ This system builds on, in order:
 2. Multiple levels / level registry (`docs/FEATURES.md`) — domains are
    levels.
 3. Enemy info card — squad selection depends on telegraphed weaknesses.
-4. Unit durability (KO/recovery) — required before the first boss ships.
-5. Meta-progression (persistent unlocks) — required for the roster to
+4. Meta-progression (persistent unlocks) — required for the roster to
    mean anything across sessions.
 
 The current prototype's towers remain valid throughout: they become

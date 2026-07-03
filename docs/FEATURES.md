@@ -64,8 +64,9 @@ built" vs. "what's planned," not the commit history.
       unlocked by defeating them as domain bosses, kill-drop deployment
       with pity system, archipelago campaign map. Full design in
       `docs/WORLD_AND_HEROES.md`; supersedes generic "boss waves" (bosses
-      are hero path-walkers with skills) and depends on the level
-      registry, enemy info card, and unit durability (KO/recovery)
+      are hero path-walkers with skills that pressure the barrier — player
+      units can never be hit) and depends on the level registry and enemy
+      info card
 - [ ] **Persistent meta-progression** — unlock heroes/levels across sessions,
       local storage first, then account-based sync
 - [ ] **Pause / speed-up controls** (1x/2x/3x) — common QoL for the genre once
