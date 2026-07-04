@@ -1,5 +1,5 @@
-export type EnemyId = 'grunt' | 'runner' | 'brute';
-export type HeroId = 'eden' | 'teacher' | 'student' | 'jeepney_driver' | 'fisherfolk' | 'street_sweeper' | 'taho_vendor' | 'nurse' | 'construction_worker' | 'call_center_agent' | 'security_guard' | 'farmer' | 'fishball_vendor' | 'sales_lady' | 'sorbetes_vendor' | 'electrician' | 'baker' | 'traffic_enforcer' | 'plumber' | 'delivery_rider';
+export type EnemyId = 'grunt' | 'runner' | 'brute' | 'sandbox_target';
+export type HeroId = 'eden' | 'teacher' | 'student' | 'jeepney_driver' | 'fisherfolk' | 'street_sweeper' | 'taho_vendor' | 'nurse' | 'construction_worker' | 'call_center_agent' | 'security_guard' | 'farmer' | 'fishball_vendor' | 'sales_lady' | 'sorbetes_vendor' | 'electrician' | 'baker' | 'traffic_enforcer' | 'plumber' | 'delivery_rider' | 'sandbox_projectile' | 'sandbox_melee_cleave' | 'sandbox_beam' | 'sandbox_lobbed' | 'sandbox_pierce' | 'sandbox_chain' | 'sandbox_trap' | 'sandbox_vortex' | 'sandbox_linear_wave' | 'sandbox_summoner' | 'sandbox_boomerang';
 
 /**
  * Per-enemy stats — every enemy type has its own value for each of these.
@@ -67,10 +67,25 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     attackRateMs: 2500,
     color: 0x7c3aed,
   },
+  sandbox_target: {
+    id: 'sandbox_target',
+    name: 'Punching Bag',
+    speed: 0,
+    maxHp: 999999,
+    reward: 0,
+    damage: 0,
+    attackRateMs: 999999,
+    color: 0x475569,
+  },
 };
 
 export const STARTING_GOLD = 150;
 export const STARTING_LIVES = 20;
+
+export const BARRICADE_DEFAULTS = {
+  maxHp: 500,
+  width: 30,
+};
 
 export interface HeroDefinition {
   id: HeroId;
@@ -161,7 +176,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackStyle: 'vortex',
     range: 200,
     damage: 10,
-    attackRateMs: 2000,
+    attackRateMs: 4000,
     color: 0x0ea5e9,
     signatureSkill: { name: 'Lambat', description: 'Wide net, mass Wet setup causing Slow.' },
     projectileColor: 0x7dd3fc,
@@ -175,7 +190,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackStyle: 'linear-wave',
     range: 50,
     damage: 20,
-    attackRateMs: 1500,
+    attackRateMs: 2500,
     color: 0xa8a29e,
     signatureSkill: { name: 'Dustpan Toss', description: 'Tosses a dustpan of debris to blind/stun enemies.' },
   },
@@ -216,7 +231,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackStyle: 'summoner',
     range: 100,
     damage: 15,
-    attackRateMs: 2500,
+    attackRateMs: 5000,
     color: 0xd97706,
     signatureSkill: { name: 'Yero Barricade', description: 'Drops corrugated iron in front of barrier.' },
   },
@@ -240,7 +255,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'melee',
     attackStyle: 'melee-cleave',
-    range: 60,
+    range: 200,
     damage: 22,
     attackRateMs: 1300,
     color: 0x1e3a8a,
@@ -253,7 +268,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Earth',
     attackKind: 'melee',
     attackStyle: 'melee-cleave',
-    range: 70,
+    range: 200,
     damage: 18,
     attackRateMs: 1600,
     color: 0x15803d,
@@ -267,12 +282,23 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackKind: 'ranged',
     attackStyle: 'pierce',
     range: 200,
-    damage: 12,
-    attackRateMs: 1100,
-    color: 0xf97316,
-    signatureSkill: { name: 'Tuhog Master', description: 'Throws a giant skewer that pierces all enemies in a line.' },
-    projectileColor: 0xfcd34d,
+    damage: 15,
+    attackRateMs: 1400,
+    color: 0xf43f5e,
+    signatureSkill: { name: 'Express Lane', description: 'Attacks pierce all enemies in a line.' },
+    projectileColor: 0xfca5a5,
   },
+  sandbox_projectile: { id: 'sandbox_projectile', name: 'Test: Projectile', profession: 'Tester', damageType: 'Physical', attackKind: 'ranged', attackStyle: 'projectile', range: 500, damage: 20, attackRateMs: 1000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
+  sandbox_melee_cleave: { id: 'sandbox_melee_cleave', name: 'Test: Melee Cleave', profession: 'Tester', damageType: 'Physical', attackKind: 'melee', attackStyle: 'melee-cleave', range: 200, damage: 20, attackRateMs: 1000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
+  sandbox_beam: { id: 'sandbox_beam', name: 'Test: Beam', profession: 'Tester', damageType: 'Physical', attackKind: 'ranged', attackStyle: 'beam', range: 500, damage: 20, attackRateMs: 3000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
+  sandbox_lobbed: { id: 'sandbox_lobbed', name: 'Test: Lobbed', profession: 'Tester', damageType: 'Physical', attackKind: 'ranged', attackStyle: 'lobbed', range: 500, damage: 20, attackRateMs: 1000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
+  sandbox_pierce: { id: 'sandbox_pierce', name: 'Test: Pierce', profession: 'Tester', damageType: 'Physical', attackKind: 'ranged', attackStyle: 'pierce', range: 500, damage: 20, attackRateMs: 1000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
+  sandbox_chain: { id: 'sandbox_chain', name: 'Test: Chain', profession: 'Tester', damageType: 'Physical', attackKind: 'ranged', attackStyle: 'chain', range: 500, damage: 20, attackRateMs: 1000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
+  sandbox_trap: { id: 'sandbox_trap', name: 'Test: Trap', profession: 'Tester', damageType: 'Physical', attackKind: 'ranged', attackStyle: 'trap', range: 500, damage: 20, attackRateMs: 3000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
+  sandbox_vortex: { id: 'sandbox_vortex', name: 'Test: Vortex', profession: 'Tester', damageType: 'Physical', attackKind: 'ranged', attackStyle: 'vortex', range: 500, damage: 20, attackRateMs: 4000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
+  sandbox_linear_wave: { id: 'sandbox_linear_wave', name: 'Test: Linear Wave', profession: 'Tester', damageType: 'Physical', attackKind: 'ranged', attackStyle: 'linear-wave', range: 500, damage: 20, attackRateMs: 2500, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
+  sandbox_summoner: { id: 'sandbox_summoner', name: 'Test: Summoner', profession: 'Tester', damageType: 'Physical', attackKind: 'ranged', attackStyle: 'summoner', range: 500, damage: 20, attackRateMs: 5000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
+  sandbox_boomerang: { id: 'sandbox_boomerang', name: 'Test: Boomerang', profession: 'Tester', damageType: 'Physical', attackKind: 'ranged', attackStyle: 'boomerang', range: 500, damage: 20, attackRateMs: 1000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
   sales_lady: {
     id: 'sales_lady',
     name: 'Sales Lady',
@@ -295,7 +321,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackStyle: 'trap',
     range: 150,
     damage: 10,
-    attackRateMs: 2000,
+    attackRateMs: 3000,
     color: 0xf472b6,
     signatureSkill: { name: 'Kalembang', description: 'Rings bell to shatter frozen enemies.' },
   },
@@ -334,7 +360,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackStyle: 'vortex',
     range: 150,
     damage: 8,
-    attackRateMs: 2200,
+    attackRateMs: 4000,
     color: 0x475569,
     signatureSkill: { name: 'Counterflow', description: 'Forces enemies to walk backwards briefly.' },
   },
@@ -347,7 +373,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackStyle: 'linear-wave',
     range: 200,
     damage: 12,
-    attackRateMs: 1800,
+    attackRateMs: 2500,
     color: 0x2563eb,
     signatureSkill: { name: 'Water Interruption', description: 'Consumes Wet stacks on enemies for burst damage.' },
   },

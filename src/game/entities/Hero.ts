@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import type { Enemy } from './Enemy';
 import type { HeroDefinition } from '../data/balance';
+import { GAME_HEIGHT } from '../data/level';
 
 export class Hero extends Phaser.GameObjects.Container {
   public id: string;
@@ -20,6 +21,10 @@ export class Hero extends Phaser.GameObjects.Container {
 
   private bodyShape: Phaser.GameObjects.Rectangle;
   private skillHighlight: Phaser.GameObjects.Text;
+  private attackBarBg: Phaser.GameObjects.Rectangle;
+  private attackBarFill: Phaser.GameObjects.Rectangle;
+  private skillBarBg: Phaser.GameObjects.Rectangle;
+  private skillBarFill: Phaser.GameObjects.Rectangle;
 
   constructor(scene: Phaser.Scene, x: number, y: number, def: HeroDefinition, rangeX: number, onAttack: (hero: Hero, target: Enemy) => void) {
     super(scene, x, y);
@@ -44,19 +49,34 @@ export class Hero extends Phaser.GameObjects.Container {
     this.bodyShape = scene.add.rectangle(0, 0, 30, 40, def.color);
     this.add(this.bodyShape);
     
-    const nameLabel = scene.add.text(0, 25, `${def.name}\n[${def.attackStyle}]`, { 
+    const labelText = `${def.name}\nAtk: ${def.attackStyle}\nSkill: ${def.signatureSkill.name}`;
+    const nameLabel = scene.add.text(0, 25, labelText, { 
       fontSize: '10px', 
       color: '#ffffff', 
-      align: 'center' 
+      align: 'center',
+      wordWrap: { width: 90, useAdvancedWrap: true }
     }).setOrigin(0.5, 0);
     this.add(nameLabel);
     
-    this.skillHighlight = scene.add.text(0, -35, '★ SKILL', { fontSize: '12px', color: '#facc15', fontStyle: 'bold' }).setOrigin(0.5);
+    this.skillHighlight = scene.add.text(0, -45, '★ SKILL', { fontSize: '12px', color: '#facc15', fontStyle: 'bold' }).setOrigin(0.5);
     this.skillHighlight.setVisible(false);
     this.add(this.skillHighlight);
 
+    // Cooldown bars
+    this.attackBarBg = scene.add.rectangle(0, -25, 30, 4, 0x000000);
+    this.add(this.attackBarBg);
+    this.attackBarFill = scene.add.rectangle(-15, -25, 30, 4, 0x00ff00);
+    this.attackBarFill.setOrigin(0, 0.5);
+    this.add(this.attackBarFill);
+
+    this.skillBarBg = scene.add.rectangle(0, -32, 30, 4, 0x000000);
+    this.add(this.skillBarBg);
+    this.skillBarFill = scene.add.rectangle(-15, -32, 30, 4, 0xffff00);
+    this.skillBarFill.setOrigin(0, 0.5);
+    this.add(this.skillBarFill);
+
     // Make interactive
-    this.setSize(30, 40);
+    this.setSize(40, 60);
     this.setInteractive({ useHandCursor: true });
     this.on('pointerdown', () => {
       this.useSkill();
@@ -66,16 +86,10 @@ export class Hero extends Phaser.GameObjects.Container {
   }
 
   update(delta: number, enemies: Enemy[]) {
-    // Marching
-    if (this.x < this.rangeX) {
-      this.x += this.speed * (delta / 1000);
-    } else {
-      this.x = this.rangeX;
-    }
 
     // Auto-attack
-    this.attackCooldown -= delta;
-    if (this.attackCooldown <= 0) {
+    this.attackCooldown = Math.max(0, this.attackCooldown - delta);
+    if (this.attackCooldown === 0) {
       // Find lowest-X enemy (closest to barrier)
       let target: Enemy | null = null;
       let minEnemyX = 9999;
@@ -98,12 +112,20 @@ export class Hero extends Phaser.GameObjects.Container {
     if (!this.isSkillReady) {
       this.currentSkillCooldown -= delta;
       if (this.currentSkillCooldown <= 0) {
+        this.currentSkillCooldown = 0;
         this.isSkillReady = true;
         this.skillHighlight.setVisible(true);
         // Simple pulsing animation
         this.scene.tweens.add({ targets: this.skillHighlight, scale: 1.2, yoyo: true, repeat: -1, duration: 500 });
       }
     }
+
+    // Update visuals
+    const attackProgress = Math.max(0, 1 - (this.attackCooldown / this.attackRateMs));
+    this.attackBarFill.scaleX = attackProgress;
+    
+    const skillProgress = Math.max(0, 1 - (this.currentSkillCooldown / this.skillCooldownMs));
+    this.skillBarFill.scaleX = skillProgress;
   }
 
   useSkill() {

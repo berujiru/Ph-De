@@ -6,11 +6,12 @@ import { CampaignMap } from './ui/mockups/CampaignMap';
 import { SariSariStore } from './ui/mockups/SariSariStore';
 import { LoadingScreen } from './ui/mockups/LoadingScreen';
 import { InventoryScreen } from './ui/mockups/InventoryScreen';
+import { SandboxHUD } from './ui/mockups/SandboxHUD';
 import { uiToGameEvents } from './game/core/GameEvents';
 import './App.css';
 
 function App() {
-  const [currentView, setCurrentView] = useState<'loading' | 'main' | 'campaign' | 'battle' | 'store' | 'inventory'>('loading');
+  const [currentView, setCurrentView] = useState<'loading' | 'main' | 'campaign' | 'battle' | 'sandbox' | 'store' | 'inventory'>('loading');
 
   const handlePlay = () => {
     setCurrentView('campaign');
@@ -20,6 +21,11 @@ function App() {
     setCurrentView('battle');
     // Start game systems
     uiToGameEvents.emit('restart', undefined);
+  };
+
+  const handleStartSandbox = () => {
+    setCurrentView('sandbox');
+    uiToGameEvents.emit('restart', { mode: 'sandbox' });
   };
 
   return (
@@ -43,12 +49,17 @@ function App() {
       {currentView === 'campaign' && (
         <CampaignMap 
           onBack={() => setCurrentView('main')} 
-          onStartBattle={handleStartBattle} 
+          onStartBattle={handleStartBattle}
+          onStartSandbox={handleStartSandbox}
         />
       )}
       
       {currentView === 'battle' && (
         <BattleHUD onReturnToMenu={() => setCurrentView('main')} />
+      )}
+      
+      {currentView === 'sandbox' && (
+        <SandboxHUD onReturnToMenu={() => setCurrentView('campaign')} />
       )}
       
       {currentView === 'store' && (

@@ -25,18 +25,30 @@ export class Enemy extends Phaser.GameObjects.Container {
     this.add([this.hpBarBg, this.hpBarFill]);
 
     scene.add.existing(this);
+
+    if (definition.id === 'sandbox_target') {
+      this.setSize(30, 30);
+      this.setInteractive({ draggable: true });
+      this.on('drag', (_pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
+        this.x = dragX;
+        this.y = dragY;
+      });
+      
+      const dragLabel = scene.add.text(0, 15, 'DRAG ME', { fontSize: '10px', color: '#ffffff' }).setOrigin(0.5);
+      this.add(dragLabel);
+    }
   }
 
   takeDamage(amount: number) {
     if (this.isDead) return;
     this.hp -= amount;
-    this.scene.sound.play('sfx-enemy-hit');
+    try { this.scene.sound.play('sfx-enemy-hit'); } catch (e) {}
     const pct = Math.max(0, this.hp / this.definition.maxHp);
     this.hpBarFill.scaleX = pct;
     
     if (this.hp <= 0) {
       this.isDead = true;
-      this.scene.sound.play('sfx-enemy-die');
+      try { this.scene.sound.play('sfx-enemy-die'); } catch (e) {}
       this.hpBarBg.setVisible(false);
       this.hpBarFill.setVisible(false);
       

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { theme } from '../theme';
 import { gameToUiEvents, uiToGameEvents, type GameStateSnapshot, type DropOption } from '../../game/core/GameEvents';
+import { HERO_DEFINITIONS } from '../../game/data/balance';
 
 interface BattleHUDProps {
   onReturnToMenu: () => void;
@@ -20,6 +21,7 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
     status: 'playing',
   });
   const [dropOptions, setDropOptions] = useState<DropOption[]>([]);
+  const [selectedHero, setSelectedHero] = useState<string>('');
 
   useEffect(() => {
     const unsubState = gameToUiEvents.on('stateChanged', (newState: GameStateSnapshot) => {
@@ -45,7 +47,7 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
   };
 
   const handleDebugSpawn = () => {
-    uiToGameEvents.emit('debugSpawn', undefined);
+    uiToGameEvents.emit('debugSpawn', { heroId: selectedHero || undefined });
   };
 
   const handleSelectDrop = (dropId: string) => {
@@ -137,17 +139,35 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
             }} title="Fast Forward">⏩</button>
           </div>
 
-          <button onClick={() => { handleDebugSpawn(); playBtnSound(); }} style={{
+          <div style={{ display: 'flex', gap: '5px' }}>
+            <select 
+              value={selectedHero} 
+              onChange={(e) => setSelectedHero(e.target.value)}
+              style={{
+                padding: '8px',
+                backgroundColor: theme.colors.surface,
+                color: '#fff',
+                border: `1px solid ${theme.colors.border}`,
+                borderRadius: '6px'
+              }}
+            >
+              <option value="">-- Random Hero --</option>
+              {Object.entries(HERO_DEFINITIONS).map(([id, def]) => (
+                <option key={id} value={id}>{def.name} ({def.attackStyle})</option>
+              ))}
+            </select>
+            <button onClick={() => { handleDebugSpawn(); playBtnSound(); }} style={{
             padding: '8px 16px',
             backgroundColor: theme.colors.accent,
             color: '#fff',
             border: 'none',
             borderRadius: '6px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-          }}>
-            Debug Spawn
-          </button>
+              cursor: 'pointer',
+              fontWeight: 'bold',
+            }}>
+              Spawn
+            </button>
+          </div>
 
           <button onClick={() => { handleSurrender(); playBtnSound(); }} style={{
             padding: '8px 16px',

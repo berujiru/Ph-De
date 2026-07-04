@@ -3,9 +3,10 @@ import { theme } from '../theme';
 interface CampaignMapProps {
   onBack: () => void;
   onStartBattle: () => void;
+  onStartSandbox: () => void;
 }
 
-export function CampaignMap({ onBack, onStartBattle }: CampaignMapProps) {
+export function CampaignMap({ onBack, onStartBattle, onStartSandbox }: CampaignMapProps) {
   // Mock data for campaign progress
   const highestClearedAct = 0; // The user has cleared 0 stages so far
   
@@ -45,6 +46,34 @@ export function CampaignMap({ onBack, onStartBattle }: CampaignMapProps) {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '600px', margin: '0 auto', width: '100%' }}>
+        {/* Sandbox Entry */}
+        <div style={{
+          backgroundColor: 'rgba(56, 189, 248, 0.1)',
+          border: `2px dashed ${theme.colors.accent}`,
+          borderRadius: '12px',
+          padding: '20px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <div>
+            <h3 style={{ margin: '0 0 5px 0', fontSize: '20px', color: theme.colors.accent }}>🧪 Attack Sandbox</h3>
+            <p style={{ margin: 0, fontSize: '14px', color: theme.colors.textMuted }}>Isolated environment for testing mechanics.</p>
+          </div>
+          <button onClick={onStartSandbox} style={{
+            padding: '12px 24px',
+            backgroundColor: theme.colors.accent,
+            color: '#fff',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '16px',
+            boxShadow: '0 4px 0 #0284c7',
+          }}>
+            ENTER SANDBOX
+          </button>
+        </div>
         {acts.map((act) => {
           const isUnlocked = highestClearedAct >= act.requirement;
           const isNext = highestClearedAct === act.requirement;

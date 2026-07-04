@@ -49,9 +49,10 @@ export interface UiToGameEvents extends Record<string, unknown> {
   startWave: undefined;
   setSpeed: { speed: number };
   surrender: undefined;
-  restart: undefined;
+  restart: { mode?: 'sandbox' } | undefined;
   selectDrop: { dropId: string };
-  debugSpawn: undefined;
+  debugSpawn: { heroId?: string };
+  spawnSandboxTarget: undefined;
   playSound: { key: string };
 }
 

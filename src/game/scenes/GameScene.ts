@@ -5,7 +5,7 @@ import { Enemy } from '../entities/Enemy';
 import { Summon } from '../entities/Summon';
 import { Attack, ProjectileAttack, MeleeCleaveAttack, VortexAttack, BoomerangAttack, ChainAttack, SummonAttack, BeamAttack, LobbedAttack, LinearWaveAttack, TrapAttack } from '../entities/Attacks';
 import { gameToUiEvents, uiToGameEvents, type GameStateSnapshot, type DropOption } from '../core/GameEvents';
-import { ENEMY_DEFINITIONS, HERO_DEFINITIONS, type HeroId } from '../data/balance';
+import { ENEMY_DEFINITIONS, HERO_DEFINITIONS, BARRICADE_DEFAULTS, type HeroId } from '../data/balance';
 import { GAME_WIDTH, GAME_HEIGHT } from '../data/level';
 
 export class GameScene extends Phaser.Scene {
@@ -27,20 +27,22 @@ export class GameScene extends Phaser.Scene {
   private gameSpeed = 1; // User speed control (0 = stop, 1 = normal, 2 = fast)
   private status: 'playing' | 'won' | 'lost' = 'playing';
   private lastSnapshot = '';
+  private isSandbox = false;
+  private sandboxRespawnTimer = 0;
 
   constructor() {
     super('GameScene');
   }
 
   preload() {
-    this.load.audio('sfx-btn-press', 'assets/sounds/btn-press.mp3');
-    this.load.audio('sfx-victory', 'assets/sounds/victory.mp3');
-    this.load.audio('sfx-defeat', 'assets/sounds/defeat.mp3');
-    this.load.audio('sfx-shoot', 'assets/sounds/shoot.mp3');
-    this.load.audio('sfx-enemy-hit', 'assets/sounds/enemy-hit.mp3');
-    this.load.audio('sfx-enemy-die', 'assets/sounds/enemy-die.mp3');
-    this.load.audio('sfx-barrier-hit', 'assets/sounds/barrier-hit.mp3');
-    this.load.audio('sfx-barrier-break', 'assets/sounds/barrier-break.mp3');
+    // this.load.audio('sfx-btn-press', 'assets/sounds/btn-press.mp3');
+    // this.load.audio('sfx-victory', 'assets/sounds/victory.mp3');
+    // this.load.audio('sfx-defeat', 'assets/sounds/defeat.mp3');
+    // this.load.audio('sfx-shoot', 'assets/sounds/shoot.mp3');
+    // this.load.audio('sfx-enemy-hit', 'assets/sounds/enemy-hit.mp3');
+    // this.load.audio('sfx-enemy-die', 'assets/sounds/enemy-die.mp3');
+    // this.load.audio('sfx-barrier-hit', 'assets/sounds/barrier-hit.mp3');
+    // this.load.audio('sfx-barrier-break', 'assets/sounds/barrier-break.mp3');
   }
 
   create(): void {
@@ -54,6 +56,7 @@ export class GameScene extends Phaser.Scene {
       unsubSurrender();
       unsubRestart();
       unsubDebugSpawn();
+      unsubSpawnSandboxTarget();
       unsubPlaySound();
     };
 
@@ -82,25 +85,37 @@ export class GameScene extends Phaser.Scene {
       this.emitState(true);
     });
 
-    const unsubRestart = uiToGameEvents.on('restart', () => {
+    const unsubRestart = uiToGameEvents.on('restart', (data: any) => {
       if (!this.sys) return;
+      this.isSandbox = data?.mode === 'sandbox';
       this.resetGame();
     });
 
-    const unsubDebugSpawn = uiToGameEvents.on('debugSpawn', () => {
+    const unsubDebugSpawn = uiToGameEvents.on('debugSpawn', ({ heroId } = {}) => {
       if (!this.sys) return;
-      const availableIds = Object.keys(HERO_DEFINITIONS).filter(
-        id => !this.heroes.some(h => h.id === id)
-      ) as HeroId[];
-      if (availableIds.length > 0) {
-        const randomId = Phaser.Math.RND.pick(availableIds);
-        this.spawnHero(randomId);
+      
+      // Clear existing heroes for clean testing
+      this.heroes.forEach(h => h.destroy());
+      this.heroes = [];
+
+      if (heroId) {
+        this.spawnHero(heroId as HeroId);
+      } else {
+        const availableIds = Object.keys(HERO_DEFINITIONS) as HeroId[];
+        if (availableIds.length > 0) {
+          const randomId = Phaser.Math.RND.pick(availableIds);
+          this.spawnHero(randomId);
+        }
       }
+    });
+
+    const unsubSpawnSandboxTarget = uiToGameEvents.on('spawnSandboxTarget', () => {
+      this.spawnSandboxTarget();
     });
 
     const unsubPlaySound = uiToGameEvents.on('playSound', ({ key }) => {
       if (!this.sys) return;
-      this.sound.play(key);
+      try { this.sound.play(key); } catch(e) {}
     });
 
     // Clean up on both shutdown (restart) AND destroy (game.destroy / React unmount)
@@ -139,8 +154,8 @@ export class GameScene extends Phaser.Scene {
     this.spawnTimer = 2000;
     this.lastSnapshot = '';
 
-    // Create the Barrier at x=200
-    this.barrier = new Barrier(this, 200, GAME_HEIGHT / 2, 20, GAME_HEIGHT, 100);
+    // Create the Barrier at x=120
+    this.barrier = new Barrier(this, 120, GAME_HEIGHT / 2, BARRICADE_DEFAULTS.width, GAME_HEIGHT, BARRICADE_DEFAULTS.maxHp);
 
     // Initial fixed hero (Eden)
     this.spawnHero('eden');
@@ -159,7 +174,15 @@ export class GameScene extends Phaser.Scene {
       this.emitState();
     }
 
-    if (this.waveActive) {
+    if (this.isSandbox) {
+      if (this.enemies.length === 0) {
+        this.sandboxRespawnTimer += delta;
+        if (this.sandboxRespawnTimer > 2000) {
+          this.spawnSandboxTarget();
+          this.sandboxRespawnTimer = 0;
+        }
+      }
+    } else if (this.waveActive) {
       if (this.enemiesToSpawn > 0) {
         this.spawnTimer -= delta;
         if (this.spawnTimer <= 0) {
@@ -173,7 +196,9 @@ export class GameScene extends Phaser.Scene {
           this.enemiesToSpawn = this.currentWave * 5;
           this.spawnTimer = 3000; // wait 3s before next wave starts
         } else {
-          if (this.status !== 'won') this.sound.play('sfx-victory');
+          if (this.status !== 'won') {
+            try { this.sound.play('sfx-victory'); } catch (e) {}
+          }
           this.status = 'won';
         }
       }
@@ -211,8 +236,10 @@ export class GameScene extends Phaser.Scene {
     });
 
     // Game over conditions
-    if (this.barrier.isDead) {
-      if (this.status !== 'lost') this.sound.play('sfx-defeat');
+    if (this.barrier.isDead && !this.isSandbox) {
+      if (this.status !== 'lost') {
+        try { this.sound.play('sfx-defeat'); } catch (e) {}
+      }
       this.status = 'lost';
     }
 
@@ -225,6 +252,13 @@ export class GameScene extends Phaser.Scene {
     this.enemies.push(enemy);
   }
 
+  public spawnSandboxTarget() {
+    if (!this.sys) return;
+    const y = 300 + (Math.random() - 0.5) * 100;
+    const dummy = new Enemy(this, 700, y, ENEMY_DEFINITIONS['sandbox_target']);
+    this.enemies.push(dummy);
+  }
+
   private spawnHero(id: HeroId) {
     const y = GAME_HEIGHT / 2 + (this.heroes.length * 60) - 60;
     const def = HERO_DEFINITIONS[id];
@@ -233,7 +267,7 @@ export class GameScene extends Phaser.Scene {
       const color = h.definition.projectileColor || h.definition.color;
       
       if (h.definition.attackStyle === 'melee-cleave') {
-        attack = new MeleeCleaveAttack(this, h.x, h.y, target, h.damage, color);
+        attack = new MeleeCleaveAttack(this, h.x, h.y, target, h.damage, h.range, color);
       } else if (h.definition.attackStyle === 'vortex') {
         attack = new VortexAttack(this, h.x, h.y, target, h.damage, color);
       } else if (h.definition.attackStyle === 'boomerang') {
@@ -251,8 +285,9 @@ export class GameScene extends Phaser.Scene {
       } else if (h.definition.attackStyle === 'trap') {
         attack = new TrapAttack(this, h.x, h.y, target, h.damage, color);
       } else {
-        // Fallback to projectile
-        attack = new ProjectileAttack(this, h.x, h.y, target, h.damage, color);
+        // Fallback to projectile (or pierce)
+        const mods = h.definition.attackStyle === 'pierce' ? { bonusPierce: 2 } : undefined;
+        attack = new ProjectileAttack(this, h.x, h.y, target, h.damage, color, mods);
       }
       
       this.attacks.push(attack);
@@ -261,6 +296,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   private addVoices(amount: number) {
+    if (this.isSandbox) return;
+    
     this.voicesCount += amount;
     if (this.voicesCount >= this.maxVoicesCount) {
       this.voicesCount = 0;

@@ -24,7 +24,7 @@ export abstract class Attack extends Phaser.GameObjects.GameObject {
       bonusChain: modifiers?.bonusChain || 0,
     };
     scene.add.existing(this);
-    scene.sound.play('sfx-shoot');
+    try { scene.sound.play('sfx-shoot'); } catch(e) {}
   }
 
   public upgrade(newMods: Partial<AttackModifiers>) {
@@ -124,15 +124,17 @@ export class MeleeCleaveAttack extends Attack {
   private visual: Phaser.GameObjects.Arc;
   private lifeTimeMs = 150;
   private ageMs = 0;
+  private maxRadius: number;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
+  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy, damage: number, range: number, color: number, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'MeleeCleaveAttack', damage, modifiers);
-    const radius = 60 + this.modifiers.bonusRadius;
+    this.maxRadius = range + this.modifiers.bonusRadius;
     const dx = target.x - x;
     const dy = target.y - y;
     const angleRad = Math.atan2(dy, dx);
     const angleDeg = Phaser.Math.RadToDeg(angleRad);
-    this.visual = scene.add.arc(x, y, radius, angleDeg - 45, angleDeg + 45, false, color, 0.4);
+    // Start small and expand
+    this.visual = scene.add.arc(x, y, 10, angleDeg - 45, angleDeg + 45, false, color, 0.8);
     
     const enemies = (scene as any).enemies as Enemy[];
     if (enemies) {
@@ -141,7 +143,7 @@ export class MeleeCleaveAttack extends Attack {
           const edx = enemy.x - x;
           const edy = enemy.y - y;
           const distSq = edx * edx + edy * edy;
-          if (distSq <= radius * radius) {
+          if (distSq <= this.maxRadius * this.maxRadius) {
             const eAngle = Math.atan2(edy, edx);
             let diff = eAngle - angleRad;
             while (diff < -Math.PI) diff += Math.PI * 2;
@@ -158,7 +160,9 @@ export class MeleeCleaveAttack extends Attack {
   update(time: number, delta: number) {
     if (this.isDead) return;
     this.ageMs += delta;
-    this.visual.setAlpha(0.4 * (1 - this.ageMs / this.lifeTimeMs));
+    const progress = Math.min(1, this.ageMs / this.lifeTimeMs);
+    this.visual.setRadius(10 + (this.maxRadius - 10) * progress);
+    this.visual.setAlpha(0.8 * (1 - progress));
     if (this.ageMs >= this.lifeTimeMs) {
       this.isDead = true;
       this.visual.destroy();
@@ -176,7 +180,7 @@ export class VortexAttack extends Attack {
   
   constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'VortexAttack', damage, modifiers);
-    const radius = 80 + this.modifiers.bonusRadius;
+    const radius = 100 + this.modifiers.bonusRadius;
     // Spawn at target location so it traps enemies there
     this.visual = scene.add.circle(target.x, target.y, radius, color, 0.3);
   }
@@ -187,7 +191,7 @@ export class VortexAttack extends Attack {
     this.timeSinceLastTick += delta;
     
     this.visual.setAlpha(0.3 + 0.1 * Math.sin(this.ageMs / 100));
-    const radius = 80 + this.modifiers.bonusRadius;
+    const radius = 100 + this.modifiers.bonusRadius;
     
     const enemies = (this.scene as any).enemies as Enemy[];
     if (enemies) {
@@ -199,8 +203,8 @@ export class VortexAttack extends Attack {
         
         if (distSq <= radius * radius) {
           // Pull enemy
-          enemy.x += dx * 0.02;
-          enemy.y += dy * 0.02;
+          enemy.x += dx * 0.05;
+          enemy.y += dy * 0.05;
           
           if (this.timeSinceLastTick >= this.tickRateMs) {
             enemy.takeDamage(this.totalDamage * 0.5);
@@ -224,25 +228,26 @@ export class VortexAttack extends Attack {
 export class BoomerangAttack extends Attack {
   private speed = 400;
   private visual: Phaser.GameObjects.Arc;
-  private state: 'outward' | 'returning' = 'outward';
+  private flightState: 'outward' | 'returning' = 'outward';
   private startX: number;
   private startY: number;
   private targetX: number;
   private targetY: number;
-  private hero: any;
+  private hero: import('./Hero').Hero;
   private hitEnemiesOutward = new Set<Enemy>();
   private hitEnemiesReturning = new Set<Enemy>();
   
-  constructor(scene: Phaser.Scene, hero: any, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
+  constructor(scene: Phaser.Scene, hero: import('./Hero').Hero, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'BoomerangAttack', damage, modifiers);
     this.hero = hero;
+    this.visual = scene.add.circle(hero.x, hero.y, 8 + this.modifiers.bonusRadius, color);
+    
     this.startX = hero.x;
     this.startY = hero.y;
-    this.visual = scene.add.circle(this.startX, this.startY, 8, color);
     
-    const range = hero.range + this.modifiers.bonusRadius;
-    const dx = target.x - this.startX;
-    const dy = target.y - this.startY;
+    const range = hero.range;
+    const dx = target.x - hero.x;
+    const dy = target.y - hero.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
     
     if (dist > 0) {
@@ -258,16 +263,16 @@ export class BoomerangAttack extends Attack {
     if (this.isDead) return;
     const dt = delta / 1000;
     
-    const destX = this.state === 'outward' ? this.targetX : this.hero.x;
-    const destY = this.state === 'outward' ? this.targetY : this.hero.y;
+    const destX = this.flightState === 'outward' ? this.targetX : this.hero.x;
+    const destY = this.flightState === 'outward' ? this.targetY : this.hero.y;
     
     const dx = destX - this.visual.x;
     const dy = destY - this.visual.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
     
     if (dist < 10) {
-      if (this.state === 'outward') {
-        this.state = 'returning';
+      if (this.flightState === 'outward') {
+        this.flightState = 'returning';
       } else {
         this.die();
         return;
@@ -281,7 +286,7 @@ export class BoomerangAttack extends Attack {
     if (enemies) {
       for (const enemy of enemies) {
         if (enemy.isDead) continue;
-        const hitSet = this.state === 'outward' ? this.hitEnemiesOutward : this.hitEnemiesReturning;
+        const hitSet = this.flightState === 'outward' ? this.hitEnemiesOutward : this.hitEnemiesReturning;
         if (!hitSet.has(enemy)) {
           const edx = enemy.x - this.visual.x;
           const edy = enemy.y - this.visual.y;
@@ -313,7 +318,7 @@ export class ChainAttack extends Attack {
     let currentX = startX;
     let currentY = startY;
     
-    const maxJumps = 1 + this.modifiers.bonusChain;
+    const maxJumps = 3 + this.modifiers.bonusChain;
     let jumps = 0;
     const hitEnemies = new Set<Enemy>();
     const enemies = (scene as any).enemies as Enemy[];
@@ -422,8 +427,6 @@ export class BeamAttack extends Attack {
           const edy = enemy.y - projY;
           if (edx * edx + edy * edy < 400) {
             enemy.takeDamage(this.totalDamage);
-            hitCount++;
-            if (hitCount >= maxHits) break;
           }
         }
       }
@@ -514,7 +517,9 @@ export class LinearWaveAttack extends Attack {
   
   constructor(scene: Phaser.Scene, x: number, y: number, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'LinearWaveAttack', damage, modifiers);
-    this.visual = scene.add.rectangle(x, y, 20 + this.modifiers.bonusRadius, 200, color, 0.6);
+    const waveWidth = 40;
+    const waveHeight = 150 + this.modifiers.bonusRadius * 2;
+    this.visual = scene.add.rectangle(x, y, waveWidth, waveHeight, color, 0.6);
   }
   
   update(time: number, delta: number) {
@@ -556,7 +561,7 @@ export class TrapAttack extends Attack {
     if (this.isDead) return;
     
     const triggerRadius = 20;
-    const explosionRadius = 60 + this.modifiers.bonusRadius;
+    const explosionRadius = 80 + this.modifiers.bonusRadius;
     
     const enemies = (this.scene as any).enemies as Enemy[];
     if (enemies) {
