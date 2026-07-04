@@ -1,5 +1,3 @@
-import type { TowerId } from '../data/balance';
-
 type Listener<T> = (payload: T) => void;
 
 /** Minimal typed pub/sub used to bridge the Phaser game and the React UI. */
@@ -23,22 +21,36 @@ export class TypedEmitter<Events extends Record<string, unknown>> {
 }
 
 export interface GameStateSnapshot {
-  gold: number;
-  lives: number;
-  waveNumber: number;
-  totalWaves: number;
+  barrierHp: number;
+  maxBarrierHp: number;
+  voicesCount: number;
+  maxVoicesCount: number;
   waveActive: boolean;
+  currentWave: number;
+  totalWaves: number;
+  isPaused: boolean;
+  gameSpeed: number;
   status: 'playing' | 'won' | 'lost';
+}
+
+export interface DropOption {
+  id: string;
+  title: string;
+  description: string;
+  type: 'spawn' | 'damage' | 'speed';
 }
 
 export interface GameToUiEvents extends Record<string, unknown> {
   stateChanged: GameStateSnapshot;
+  voicesFull: { options: DropOption[] };
 }
 
 export interface UiToGameEvents extends Record<string, unknown> {
-  selectTowerType: TowerId | null;
   startWave: undefined;
+  setSpeed: { speed: number };
+  surrender: undefined;
   restart: undefined;
+  selectDrop: { dropId: string };
 }
 
 /** Emits game -> UI (React listens). */

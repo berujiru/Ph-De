@@ -1,85 +1,74 @@
 import Phaser from 'phaser';
-import { ENEMY_VISUALS, type EnemyDefinition } from '../data/balance';
-import type { Vector2 } from '../core/types';
+import type { EnemyDefinition } from '../data/balance';
+import type { Barrier } from './Barrier';
 
 export class Enemy extends Phaser.GameObjects.Container {
-  readonly definition: EnemyDefinition;
-  hp: number;
-  distanceTraveled = 0;
-  reachedEnd = false;
+  public definition: EnemyDefinition;
+  public hp: number;
+  private bodyShape: Phaser.GameObjects.Arc;
+  private hpBarBg: Phaser.GameObjects.Rectangle;
+  private hpBarFill: Phaser.GameObjects.Rectangle;
+  public isDead = false;
+  private attackCooldown = 0;
 
-  private readonly path: readonly Vector2[];
-  private segmentIndex = 0;
-  private readonly hpBarFill: Phaser.GameObjects.Rectangle;
-
-  constructor(scene: Phaser.Scene, definition: EnemyDefinition, path: readonly Vector2[]) {
-    const start = path[0];
-    super(scene, start.x, start.y);
+  constructor(scene: Phaser.Scene, x: number, y: number, definition: EnemyDefinition) {
+    super(scene, x, y);
     this.definition = definition;
     this.hp = definition.maxHp;
-    this.path = path;
 
-    const body = scene.add.circle(0, 0, ENEMY_VISUALS.bodyRadius, definition.color);
-    const hpBarBg = scene.add.rectangle(
-      0,
-      ENEMY_VISUALS.hpBarOffsetY,
-      ENEMY_VISUALS.hpBarWidth,
-      ENEMY_VISUALS.hpBarHeight,
-      ENEMY_VISUALS.hpBarBackgroundColor,
-      ENEMY_VISUALS.hpBarBackgroundAlpha,
-    );
-    this.hpBarFill = scene.add
-      .rectangle(
-        -ENEMY_VISUALS.hpBarWidth / 2,
-        ENEMY_VISUALS.hpBarOffsetY,
-        ENEMY_VISUALS.hpBarWidth,
-        ENEMY_VISUALS.hpBarHeight,
-        ENEMY_VISUALS.hpBarFillColor,
-      )
-      .setOrigin(0, 0.5);
+    this.bodyShape = scene.add.circle(0, 0, 15, definition.color);
+    this.add(this.bodyShape);
 
-    this.add([body, hpBarBg, this.hpBarFill]);
+    this.hpBarBg = scene.add.rectangle(0, -25, 30, 6, 0x000000, 0.5);
+    this.hpBarFill = scene.add.rectangle(0, -25, 30, 6, 0x22c55e);
+    this.add([this.hpBarBg, this.hpBarFill]);
+
     scene.add.existing(this);
   }
 
-  get isDead(): boolean {
-    return this.hp <= 0;
-  }
+  takeDamage(amount: number) {
+    this.hp -= amount;
+    const pct = Math.max(0, this.hp / this.definition.maxHp);
+    this.hpBarFill.scaleX = pct;
 
-  takeDamage(amount: number): void {
-    this.hp = Math.max(0, this.hp - amount);
-    const pct = this.hp / this.definition.maxHp;
-    this.hpBarFill.width = ENEMY_VISUALS.hpBarWidth * pct;
-  }
-
-  update(dtMs: number): void {
-    if (this.reachedEnd || this.isDead) return;
-
-    let remaining = (this.definition.speed * dtMs) / 1000;
-    while (remaining > 0 && this.segmentIndex < this.path.length - 1) {
-      const from = this.path[this.segmentIndex];
-      const to = this.path[this.segmentIndex + 1];
-      const dx = to.x - from.x;
-      const dy = to.y - from.y;
-      const segmentLength = Math.hypot(dx, dy);
-      const traveledInSegment = Phaser.Math.Distance.Between(from.x, from.y, this.x, this.y);
-      const segmentRemaining = segmentLength - traveledInSegment;
-
-      if (remaining < segmentRemaining) {
-        const t = (traveledInSegment + remaining) / segmentLength;
-        this.setPosition(from.x + dx * t, from.y + dy * t);
-        this.distanceTraveled += remaining;
-        remaining = 0;
-      } else {
-        this.setPosition(to.x, to.y);
-        this.distanceTraveled += segmentRemaining;
-        remaining -= segmentRemaining;
-        this.segmentIndex += 1;
-      }
+    if (this.hp <= 0 && !this.isDead) {
+      this.isDead = true;
+      this.hpBarBg.setVisible(false);
+      this.hpBarFill.setVisible(false);
+      
+      // Death animation
+      this.scene.tweens.add({
+        targets: this,
+        scaleX: 0,
+        scaleY: 0,
+        alpha: 0,
+        angle: 180,
+        duration: 300,
+        onComplete: () => {
+          this.destroy();
+        }
+      });
     }
+  }
 
-    if (this.segmentIndex >= this.path.length - 1) {
-      this.reachedEnd = true;
+  update(delta: number, barrier: Barrier) {
+    if (this.isDead) return;
+
+    // Check if in range of barrier
+    if (this.x <= barrier.x + barrier.width / 2 + this.definition.speed * 0.1) {
+      // Reached the barrier, stop moving and start attacking
+      this.x = barrier.x + barrier.width / 2 + this.definition.speed * 0.1;
+      
+      this.attackCooldown -= delta;
+      if (this.attackCooldown <= 0) {
+        barrier.takeDamage(this.definition.damage);
+        this.attackCooldown = this.definition.attackRateMs;
+        // Visual attack cue
+        this.scene.tweens.add({ targets: this.bodyShape, x: -10, yoyo: true, duration: 100 });
+      }
+    } else {
+      // Move left
+      this.x -= this.definition.speed * (delta / 1000);
     }
   }
 }

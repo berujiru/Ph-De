@@ -1,52 +1,5 @@
-import type { WaveDefinition } from '../core/WaveManager';
-
-export type TowerId = 'archer' | 'cannon' | 'frost';
-
-export interface TowerDefinition {
-  id: TowerId;
-  name: string;
-  cost: number;
-  range: number;
-  damage: number;
-  fireRateMs: number;
-  projectileSpeed: number;
-  color: number;
-}
-
-export const TOWER_DEFINITIONS: Record<TowerId, TowerDefinition> = {
-  archer: {
-    id: 'archer',
-    name: 'Archer',
-    cost: 50,
-    range: 150,
-    damage: 8,
-    fireRateMs: 500,
-    projectileSpeed: 400,
-    color: 0x4ade80,
-  },
-  cannon: {
-    id: 'cannon',
-    name: 'Cannon',
-    cost: 100,
-    range: 120,
-    damage: 25,
-    fireRateMs: 1200,
-    projectileSpeed: 300,
-    color: 0xf97316,
-  },
-  frost: {
-    id: 'frost',
-    name: 'Frost',
-    cost: 75,
-    range: 130,
-    damage: 4,
-    fireRateMs: 600,
-    projectileSpeed: 500,
-    color: 0x38bdf8,
-  },
-};
-
 export type EnemyId = 'grunt' | 'runner' | 'brute';
+export type HeroId = 'eden' | 'teacher' | 'student' | 'jeepney_driver' | 'fisherfolk' | 'street_sweeper';
 
 /**
  * Per-enemy stats — every enemy type has its own value for each of these.
@@ -60,8 +13,10 @@ export interface EnemyDefinition {
   maxHp: number;
   /** Gold awarded to the player on kill. */
   reward: number;
-  /** Player lives lost if this enemy reaches the end of the path. */
-  livesLost: number;
+  /** Damage dealt to the Barrier per attack. */
+  damage: number;
+  /** How often the enemy attacks the barrier (ms). */
+  attackRateMs: number;
   /** Body tint, 0xRRGGBB. */
   color: number;
 }
@@ -88,7 +43,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     speed: 60,
     maxHp: 40,
     reward: 5,
-    livesLost: 1,
+    damage: 5,
+    attackRateMs: 1500,
     color: 0xef4444,
   },
   runner: {
@@ -97,7 +53,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     speed: 110,
     maxHp: 20,
     reward: 4,
-    livesLost: 1,
+    damage: 3,
+    attackRateMs: 800,
     color: 0xeab308,
   },
   brute: {
@@ -106,38 +63,137 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     speed: 40,
     maxHp: 150,
     reward: 15,
-    livesLost: 1,
+    damage: 15,
+    attackRateMs: 2500,
     color: 0x7c3aed,
   },
 };
 
-export const WAVES: WaveDefinition[] = [
-  { groups: [{ enemyId: 'grunt', count: 6, spawnIntervalMs: 800 }] },
-  {
-    groups: [
-      { enemyId: 'grunt', count: 8, spawnIntervalMs: 700 },
-      { enemyId: 'runner', count: 4, spawnIntervalMs: 500 },
-    ],
-  },
-  {
-    groups: [
-      { enemyId: 'runner', count: 8, spawnIntervalMs: 450 },
-      { enemyId: 'brute', count: 2, spawnIntervalMs: 2000 },
-    ],
-  },
-  {
-    groups: [
-      { enemyId: 'grunt', count: 10, spawnIntervalMs: 500 },
-      { enemyId: 'brute', count: 4, spawnIntervalMs: 1500 },
-    ],
-  },
-  {
-    groups: [
-      { enemyId: 'brute', count: 6, spawnIntervalMs: 1200 },
-      { enemyId: 'runner', count: 12, spawnIntervalMs: 300 },
-    ],
-  },
-];
-
 export const STARTING_GOLD = 150;
 export const STARTING_LIVES = 20;
+
+export interface HeroDefinition {
+  id: HeroId;
+  name: string;
+  profession: string;
+  damageType: 'Physical' | 'Wind' | 'Water' | 'Earth' | 'Frost' | 'Fire' | 'Holy' | 'Lightning' | 'Dark';
+  attackKind: 'melee' | 'ranged';
+  range: number;
+  damage: number;
+  attackRateMs: number;
+  color: number; // Hex color for the character placeholder
+  signatureSkill: {
+    name: string;
+    description: string;
+  };
+  passive?: {
+    name: string;
+    description: string;
+  };
+  projectileColor?: number;
+}
+
+export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
+  eden: {
+    id: 'eden',
+    name: 'Eden',
+    profession: 'Community Organizer',
+    damageType: 'Physical',
+    attackKind: 'ranged',
+    range: 1000, // Global ranger
+    damage: 15,
+    attackRateMs: 1500,
+    color: 0x3b82f6, // Blue
+    signatureSkill: {
+      name: 'Rally',
+      description: 'Brief squad-wide buff.'
+    },
+    passive: {
+      name: 'Anchor',
+      description: 'Provides adjacency bonuses to allies.'
+    },
+    projectileColor: 0x60a5fa,
+  },
+  teacher: {
+    id: 'teacher',
+    name: 'Teacher',
+    profession: 'Public School Teacher',
+    damageType: 'Physical',
+    attackKind: 'ranged',
+    range: 250,
+    damage: 15,
+    attackRateMs: 1500,
+    color: 0x8b5cf6, // Purple
+    signatureSkill: {
+      name: 'Pamalo (Wooden Ruler)',
+      description: 'Marks enemies; marked take bonus damage.'
+    },
+    projectileColor: 0xddd6fe,
+  },
+  student: {
+    id: 'student',
+    name: 'Student',
+    profession: 'Working Student',
+    damageType: 'Physical',
+    attackKind: 'ranged',
+    range: 250,
+    damage: 10,
+    attackRateMs: 1200,
+    color: 0xf59e0b, // Amber
+    signatureSkill: {
+      name: 'Slingshot',
+      description: 'Fires a high-speed pebble.'
+    },
+    passive: {
+      name: 'Grows',
+      description: 'Enhancement drops apply at increased potency.'
+    },
+    projectileColor: 0xfcd34d,
+  },
+  jeepney_driver: {
+    id: 'jeepney_driver',
+    name: 'Jeepney Driver',
+    profession: 'Driver',
+    damageType: 'Wind',
+    attackKind: 'melee',
+    range: 50,
+    damage: 25,
+    attackRateMs: 1200,
+    color: 0x10b981, // Emerald
+    signatureSkill: {
+      name: 'Barya (Loose change)',
+      description: 'Tosses coins like shrapnel for AoE damage.'
+    },
+  },
+  fisherfolk: {
+    id: 'fisherfolk',
+    name: 'Fisherfolk',
+    profession: 'Fisher',
+    damageType: 'Water',
+    attackKind: 'ranged',
+    range: 200,
+    damage: 10,
+    attackRateMs: 2000,
+    color: 0x0ea5e9, // Sky Blue
+    signatureSkill: {
+      name: 'Lambat',
+      description: 'Wide net, mass Wet setup causing Slow.'
+    },
+    projectileColor: 0x7dd3fc,
+  },
+  street_sweeper: {
+    id: 'street_sweeper',
+    name: 'Street Sweeper',
+    profession: 'Barangay Sweeper',
+    damageType: 'Earth',
+    attackKind: 'melee',
+    range: 50,
+    damage: 20,
+    attackRateMs: 1500,
+    color: 0xa8a29e, // Stone
+    signatureSkill: {
+      name: 'Dustpan Toss',
+      description: 'Tosses a dustpan of debris to blind/stun enemies.'
+    },
+  }
+};

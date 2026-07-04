@@ -2,48 +2,66 @@ import Phaser from 'phaser';
 import type { Enemy } from './Enemy';
 
 export class Projectile extends Phaser.GameObjects.Arc {
-  onHit?: (target: Enemy, damage: number) => void;
+  private target: Enemy | null;
+  private speed = 500;
+  private damage: number;
+  public isDead = false;
+  private vx = 0;
+  private vy = 0;
 
-  private readonly target: Enemy;
-  private readonly speed: number;
-  private readonly damage: number;
-
-  constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    target: Enemy,
-    speed: number,
-    damage: number,
-    color: number,
-  ) {
-    super(scene, x, y, 4, 0, 360, false, color);
+  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy, damage: number, color: number) {
+    super(scene, x, y, 6, 0, 360, false, color);
     this.target = target;
-    this.speed = speed;
     this.damage = damage;
     scene.add.existing(this);
+    
+    const dx = target.x - x;
+    const dy = target.y - y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > 0) {
+      this.vx = (dx / dist) * this.speed;
+      this.vy = (dy / dist) * this.speed;
+    }
   }
 
-  /** Advances the projectile; returns true once it has hit or its target is gone (and destroyed itself). */
-  update(dtMs: number): boolean {
-    if (this.target.isDead || this.target.reachedEnd) {
-      this.destroy();
-      return true;
+  update(delta: number) {
+    if (this.isDead) return;
+
+    if (this.target && this.target.isDead) {
+      this.target = null;
     }
 
-    const dx = this.target.x - this.x;
-    const dy = this.target.y - this.y;
-    const distance = Math.hypot(dx, dy);
-    const step = (this.speed * dtMs) / 1000;
-
-    if (distance <= step) {
-      this.onHit?.(this.target, this.damage);
-      this.destroy();
-      return true;
+    if (this.target) {
+      const dx = this.target.x - this.x;
+      const dy = this.target.y - this.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > 0) {
+        this.vx = (dx / dist) * this.speed;
+        this.vy = (dy / dist) * this.speed;
+      }
     }
 
-    this.x += (dx / distance) * step;
-    this.y += (dy / distance) * step;
-    return false;
+    const dt = delta / 1000;
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+
+    const enemies = (this.scene as any).enemies as Enemy[];
+    if (enemies) {
+      for (const enemy of enemies) {
+        if (!enemy.isDead) {
+          const dx = enemy.x - this.x;
+          const dy = enemy.y - this.y;
+          if (dx * dx + dy * dy < 400) { // 20 radius collision
+            enemy.takeDamage(this.damage);
+            this.isDead = true;
+            return;
+          }
+        }
+      }
+    }
+
+    if (this.x > 1000 || this.x < -100 || this.y > 1500 || this.y < -100) {
+      this.isDead = true;
+    }
   }
 }
