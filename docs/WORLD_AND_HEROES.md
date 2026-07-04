@@ -119,26 +119,30 @@ support-leaning worker still deals ~50–60% of a DPS worker's damage —
 squad math stays healthy in 5 slots). Damage types per
 `docs/DAMAGE_AND_AILMENTS.md`; every type's carrier is a hero now.
 
-| Hero | Worker | Type | Kind | Attack | Signature skill / passive | Joins via |
-|---|---|---|---|---|---|---|
-| **Eden** | Community organizer (protagonist, permanent leader) | Physical | Ranged | Rallying megaphone / Megaphone throw | Skill: Rally — brief squad-wide buff. Passive: adjacency bonuses she anchors | Start of game |
-| **Teacher** | Public school teacher | Physical | Ranged | Tossing graded papers/heavy textbooks | Melee/Skill: **Pamalo (Wooden Ruler)** — marks enemies; marked take bonus damage | Act 1 milestone (save the barangay) |
-| **Student** | Working student | Physical | Ranged | Slingshot with pebbles | Passive: **Grows** — enhancement drops apply at increased potency | Sari-Sari (Hope, early) |
-| **Jeepney Driver** | Driver | Wind | Melee (wall-guard) | Revving smog-spewing **Tambutso** (exhaust) | Skill: **Barya (Loose change)** — tosses coins like shrapnel for AoE damage | Act 2 milestone (the terminal) |
-| **Fisherfolk** | Fisher | Water | Ranged (mid) | Net throw — damage + group slow + **Wet** | Skill: **Lambat** — wide net, mass Wet setup | Sari-Sari (Hope) |
-| **Street Sweeper** | Barangay sweeper | Earth | Melee (wall-guard) | Sweeping **Walis Tingting** (knockback) | Skill: Tosses a **Dustpan of debris** to blind/stun enemies | Sari-Sari (Hope) |
-| **Taho Vendor** | Street vendor | Frost | Ranged (short lob) | Splashing scalding **Arnibal (Syrup)** | Skill: **Taho Bucket Bash** — heavy melee hit with high Slow chance | Sari-Sari (Hope) |
-| **Grill Vendor** | Street BBQ vendor | Fire | Melee (short cone) | Hot ember skewers / Hot oil splash — **Burn** | Skill: **Ihaw Rain** — flaming hot charcoal shower across a lane | Sari-Sari (Hope) |
-| **Nurse** | Public health nurse | Holy | Ranged | Throwing **Alcohol sprays** / First-aid supplies | Skill: **First-Aid Kit** — Barrier regeneration (the only healing in the game) | Act 3 milestone (provincial health crisis) |
-| **Construction Worker** | Laborer | Physical | Ranged (mid) | Throwing **Hollow Blocks** | Skill: **Yero Barricade** — drops corrugated iron in front of barrier to soak hits | Sari-Sari (Hope) |
-| **Call Center Agent** | BPO Graveyard shift | Lightning | Ranged | Projecting **Deafening Headset Feedback** | Passive: **Graveyard Shift** — deals amplified damage during night-themed waves | Sari-Sari (Hope) |
-| **Journalist** | Field reporter | Lightning | Ranged | Camera-flash burst | Reveal aura; skill: Breaking News — chain-lightning + stun chance | Second agency arc milestone |
-| **Whistleblower** | The one who spoke up | Dark | Ranged (mid) | Dropping **Boxes of Evidence / Dossiers** — **Curse** | Skill: **Exposé** — mass curse, everything takes amplified damage | Pre-finale milestone |
+| Hero | Worker | Type | Attack Style | Attack / Weapon | Signature skill / passive |
+|---|---|---|---|---|---|
+| **Eden** | Community organizer | Physical | Projectile | Throwing megaphones | Skill: Rally — brief squad-wide buff |
+| **Teacher** | Public school teacher | Physical | Boomerang | Tossing a wooden *Pamalo* (ruler) | Marks enemies for bonus damage |
+| **Student** | Working student | Physical | Pierce | Slingshot with pebbles | Passive: Enhancement drops apply at increased potency |
+| **Jeepney Driver** | Driver | Wind | Cone | Revving smog-spewing *Tambutso* | Skill: *Barya* — tosses coins like shrapnel for AoE damage |
+| **Fisherfolk** | Fisher | Water | Vortex | Net throw (*Lambat*) | Clumps enemies and applies Wet |
+| **Street Sweeper** | Barangay sweeper | Earth | Linear-Wave | Sweeping *Walis Tingting* | Sends a wave of dust/debris that hits the frontline |
+| **Taho Vendor** | Street vendor | Frost | Splash | Lobs scalding *Arnibal* (Syrup) | Sticky syrup slows and damages in a circle |
+| **Nurse** | Public health nurse | Holy | Projectile | Throwing Alcohol sprays | Attacks buff allies they pass through |
+| **Construction Worker** | Laborer / Carpenter | Physical | Summoner | Building *Yero* Fences | Summons barricades on the path to block enemies |
+| **Call Center Agent** | BPO Graveyard shift | Lightning | Chain | Headset Feedback | Instantly hits and arcs to nearby enemies |
+| **Security Guard (Sikyu)** | Security Guard | Physical | Melee-Cleave | Swinging a *Batuta* | Skill: *Shining Flashlight* - Blinds/slows a cone of enemies |
+| **Farmer (Magsasaka)** | Farmer | Earth | Melee-Cleave | Swings a *Karit* (Scythe) | Passive: Roots enemies to the ground periodically |
+| **Fishball Vendor** | Street Vendor | Physical | Pierce | Throws *Tuhog* (Barbecue Skewers) | Skewers pierce through multiple enemies |
+| **Sales Lady** | Department Store Worker | Wind | Hitscan | "Ma'am/Sir!" Megaphone Pitch | Relentless, high-speed verbal pitching |
+| **Sorbetes Vendor** | Ice Cream Vendor | Frost | Trap | Drops sticky ice cream puddles | Freezes enemies that step on the trap |
+| **Electrician** | Lineman | Lightning | Chain | Jumper Cables | Zaps enemies and arcs electricity |
+| **Baker (Panadero)** | Local Baker | Fire | Splash | Lobs hot *Pandesal* bags | Bags explode for fire splash damage |
+| **Traffic Enforcer** | Traffic Enforcer | Physical | Vortex | Blows a whistle and raises "STOP" | Magnetically pulls enemies into a clump |
+| **Plumber (Tubero)** | Water Worker | Water | Linear-Wave | Opens high-pressure pipe | Washes enemies away with a horizontal wave |
+| **Delivery Rider** | Motorcycle Courier | Wind | Boomerang | Throws parcels that return | Skill: Summons AI riders to crash into the horde |
 
-All 10 damage types have a carrier; 6 heroes join via story milestones,
-7 via Hope in player-chosen order. Kits, numbers, and skill cooldowns
-are `balance.ts` data (the **hero balance sheet** — actual numbers — is
-authored when implementation starts, tuned against the build).
+All 10 damage types have carriers; the roster of 20 heroes ensures immense variety in attack styles and synergies. Kits, numbers, and skill cooldowns are `balance.ts` data (the **hero balance sheet** — actual numbers — is authored when implementation starts, tuned against the build).
 
 ## The horde — anomalies of bad governance
 
@@ -256,6 +260,7 @@ interface HeroDefinition {
   profession: string;
   damageType: DamageType;
   attackKind: 'melee' | 'ranged';   // wall-guard vs long reach
+  attackStyle: 'projectile' | 'melee-cleave' | 'beam' | 'lobbed' | 'pierce' | 'chain' | 'trap' | 'vortex' | 'linear-wave' | 'summoner' | 'boomerang';
   range: number;
   skill: HeroSkillDefinition;        // cooldown, effect, cut-in, bark
   passive?: HeroPassiveDefinition;

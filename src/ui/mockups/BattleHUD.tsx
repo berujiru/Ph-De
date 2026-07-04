@@ -44,9 +44,17 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
     uiToGameEvents.emit('surrender', undefined);
   };
 
+  const handleDebugSpawn = () => {
+    uiToGameEvents.emit('debugSpawn', undefined);
+  };
+
   const handleSelectDrop = (dropId: string) => {
     uiToGameEvents.emit('selectDrop', { dropId });
     setDropOptions([]);
+  };
+
+  const playBtnSound = () => {
+    uiToGameEvents.emit('playSound', { key: 'sfx-btn-press' });
   };
 
   return (
@@ -100,7 +108,7 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
         <div style={{ display: 'flex', gap: '10px', pointerEvents: 'auto', alignItems: 'center' }}>
           {/* Speed Controls */}
           <div style={{ display: 'flex', gap: '5px', backgroundColor: theme.colors.surface, padding: '4px', borderRadius: '8px', border: `1px solid ${theme.colors.border}` }}>
-            <button onClick={() => handleSetSpeed(0)} style={{
+            <button onClick={() => { handleSetSpeed(0); playBtnSound(); }} style={{
               padding: '6px 12px',
               backgroundColor: state.gameSpeed === 0 ? theme.colors.primary : 'transparent',
               color: state.gameSpeed === 0 ? '#fff' : theme.colors.textSecondary,
@@ -109,7 +117,7 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
               cursor: 'pointer',
               fontWeight: 'bold',
             }} title="Pause">⏸</button>
-            <button onClick={() => handleSetSpeed(1)} style={{
+            <button onClick={() => { handleSetSpeed(1); playBtnSound(); }} style={{
               padding: '6px 12px',
               backgroundColor: state.gameSpeed === 1 ? theme.colors.primary : 'transparent',
               color: state.gameSpeed === 1 ? '#fff' : theme.colors.textSecondary,
@@ -118,7 +126,7 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
               cursor: 'pointer',
               fontWeight: 'bold',
             }} title="Normal Speed">▶</button>
-            <button onClick={() => handleSetSpeed(2)} style={{
+            <button onClick={() => { handleSetSpeed(2); playBtnSound(); }} style={{
               padding: '6px 12px',
               backgroundColor: state.gameSpeed === 2 ? theme.colors.primary : 'transparent',
               color: state.gameSpeed === 2 ? '#fff' : theme.colors.textSecondary,
@@ -129,7 +137,19 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
             }} title="Fast Forward">⏩</button>
           </div>
 
-          <button onClick={handleSurrender} style={{
+          <button onClick={() => { handleDebugSpawn(); playBtnSound(); }} style={{
+            padding: '8px 16px',
+            backgroundColor: theme.colors.accent,
+            color: '#fff',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+          }}>
+            Debug Spawn
+          </button>
+
+          <button onClick={() => { handleSurrender(); playBtnSound(); }} style={{
             padding: '8px 16px',
             backgroundColor: theme.colors.danger,
             color: '#fff',
@@ -167,7 +187,7 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
             {dropOptions.map(option => (
               <div 
                 key={option.id}
-                onClick={() => handleSelectDrop(option.id)}
+                onClick={() => { handleSelectDrop(option.id); playBtnSound(); }}
                 style={{
                   width: '200px',
                   height: '250px',
@@ -251,7 +271,7 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
           </div>
 
           <button 
-            onClick={onReturnToMenu}
+            onClick={() => { onReturnToMenu(); playBtnSound(); }}
             style={{
               padding: '16px 32px',
               backgroundColor: '#1e293b',

@@ -6,6 +6,14 @@ interface InventoryScreenProps {
   onBack: () => void;
 }
 
+// Simple Hero SVG Icon
+const HeroIcon = ({ color }: { color: string }) => (
+  <svg width="40" height="40" viewBox="0 0 24 24" fill={color} stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
+
 export function InventoryScreen({ onBack }: InventoryScreenProps) {
   const [selectedHero, setSelectedHero] = useState<HeroDefinition | null>(null);
 
@@ -39,10 +47,13 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
         <div style={{ color: theme.colors.textMuted }}>Your Unlocked Citizens</div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' }}>
         {allHeroes.map((hero) => {
-          // Mock unlocking logic - assume all are unlocked for prototype
+          // Mock unlocking and leveling logic
           const isUnlocked = true;
+          const mockLevel = hero.id === 'eden' ? 3 : 1;
+          const mockCards = hero.id === 'eden' ? 4 : 8;
+          const mockCardsNeeded = mockLevel * 5;
 
           return (
             <div 
@@ -61,22 +72,44 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 opacity: isUnlocked ? 1 : 0.6,
                 cursor: isUnlocked ? 'pointer' : 'default',
                 transition: 'transform 0.1s',
+                position: 'relative'
               }}
               onMouseOver={(e) => { if (isUnlocked) e.currentTarget.style.transform = 'scale(1.05)' }}
               onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
+              {isUnlocked && (
+                <div style={{
+                  position: 'absolute',
+                  top: '-10px',
+                  right: '-10px',
+                  backgroundColor: theme.colors.gold,
+                  color: '#000',
+                  fontWeight: 'bold',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '16px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  boxShadow: '0 2px 5px rgba(0,0,0,0.5)',
+                  fontSize: '14px'
+                }}>
+                  L{mockLevel}
+                </div>
+              )}
+              
               <div style={{
                 width: '80px',
                 height: '80px',
                 borderRadius: '50%',
-                backgroundColor: isUnlocked ? `#${hero.color.toString(16).padStart(6, '0')}` : theme.colors.textSecondary,
+                backgroundColor: isUnlocked ? 'rgba(255,255,255,0.05)' : theme.colors.textSecondary,
+                border: `3px solid #${hero.color.toString(16).padStart(6, '0')}`,
                 marginBottom: '15px',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                fontSize: '32px'
               }}>
-                {isUnlocked ? '👤' : '🔒'}
+                {isUnlocked ? <HeroIcon color={`#${hero.color.toString(16).padStart(6, '0')}`} /> : '🔒'}
               </div>
               <h3 style={{ margin: '0 0 5px 0', fontSize: '18px', color: isUnlocked ? theme.colors.textPrimary : theme.colors.textSecondary }}>
                 {isUnlocked ? hero.name : 'Unknown'}
@@ -85,9 +118,14 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 {isUnlocked ? hero.profession : '???'}
               </div>
               {isUnlocked && (
-                <span style={{ fontSize: '12px', padding: '4px 8px', borderRadius: '4px', backgroundColor: 'rgba(255,255,255,0.1)' }}>
-                  {hero.damageType}
-                </span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '12px', padding: '4px 8px', borderRadius: '4px', backgroundColor: 'rgba(255,255,255,0.1)' }}>
+                    {hero.damageType}
+                  </span>
+                  <div style={{ fontSize: '12px', color: mockCards >= mockCardsNeeded ? theme.colors.success : theme.colors.textSecondary }}>
+                    Cards: {mockCards} / {mockCardsNeeded}
+                  </div>
+                </div>
               )}
             </div>
           );
@@ -135,16 +173,28 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 width: '100px',
                 height: '100px',
                 borderRadius: '50%',
-                backgroundColor: `#${selectedHero.color.toString(16).padStart(6, '0')}`,
+                backgroundColor: 'rgba(255,255,255,0.05)',
+                border: `4px solid #${selectedHero.color.toString(16).padStart(6, '0')}`,
                 display: 'flex',
                 justifyContent: 'center',
-                alignItems: 'center',
-                fontSize: '48px'
+                alignItems: 'center'
               }}>
-                👤
+                <HeroIcon color={`#${selectedHero.color.toString(16).padStart(6, '0')}`} />
               </div>
-              <div>
-                <h2 style={{ margin: 0, fontSize: '28px', color: theme.colors.textPrimary }}>{selectedHero.name}</h2>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <h2 style={{ margin: 0, fontSize: '28px', color: theme.colors.textPrimary }}>{selectedHero.name}</h2>
+                  <div style={{
+                    backgroundColor: theme.colors.gold,
+                    color: '#000',
+                    fontWeight: 'bold',
+                    padding: '4px 12px',
+                    borderRadius: '12px',
+                    fontSize: '14px'
+                  }}>
+                    Level {selectedHero.id === 'eden' ? 3 : 1}
+                  </div>
+                </div>
                 <div style={{ color: theme.colors.textMuted, fontSize: '16px' }}>{selectedHero.profession}</div>
                 <div style={{ marginTop: '5px' }}>
                   <span style={{ fontSize: '12px', padding: '4px 8px', borderRadius: '4px', backgroundColor: 'rgba(255,255,255,0.1)' }}>
@@ -181,17 +231,50 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
               </div>
             </div>
 
-            <div style={{ marginBottom: '15px' }}>
+            <div style={{ marginBottom: '20px' }}>
               <h3 style={{ margin: '0 0 5px 0', color: theme.colors.gold }}>★ Signature Skill: {selectedHero.signatureSkill.name}</h3>
               <p style={{ margin: 0, fontSize: '14px', color: theme.colors.textSecondary }}>{selectedHero.signatureSkill.description}</p>
             </div>
 
             {selectedHero.passive && (
-              <div>
+              <div style={{ marginBottom: '25px' }}>
                 <h3 style={{ margin: '0 0 5px 0', color: theme.colors.primary }}>❖ Passive: {selectedHero.passive.name}</h3>
                 <p style={{ margin: 0, fontSize: '14px', color: theme.colors.textSecondary }}>{selectedHero.passive.description}</p>
               </div>
             )}
+
+            {/* Upgrade Section */}
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              borderTop: `1px solid ${theme.colors.border}`,
+              paddingTop: '20px'
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: '12px', color: theme.colors.textMuted }}>Cards Required</span>
+                <span style={{ fontSize: '16px', fontWeight: 'bold', color: theme.colors.success }}>
+                  {selectedHero.id === 'eden' ? '4 / 15' : '8 / 5'}
+                </span>
+              </div>
+              <button style={{
+                backgroundColor: (selectedHero.id === 'eden') ? 'rgba(34, 197, 94, 0.3)' : theme.colors.success,
+                color: (selectedHero.id === 'eden') ? theme.colors.textSecondary : '#000',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                cursor: (selectedHero.id === 'eden') ? 'not-allowed' : 'pointer',
+                textTransform: 'uppercase',
+                transition: 'transform 0.1s'
+              }}
+              onMouseOver={(e) => { if (selectedHero.id !== 'eden') e.currentTarget.style.transform = 'translateY(-2px)' }}
+              onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                Upgrade Hero
+              </button>
+            </div>
+
           </div>
         </div>
       )}

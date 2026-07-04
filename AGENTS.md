@@ -7,7 +7,7 @@ duplicating it, per the DRY guidance in `docs/BEST_PRACTICES.md`.
 
 ## What this is
 
-**Ph-De** is a mobile tower defense game. Stack: React + Phaser (game
+**First Ripple** is a mobile tower defense game. Stack: React + Phaser (game
 engine) + Capacitor (native iOS/Android wrapper). See
 `docs/ARCHITECTURE.md` for the full reasoning, including why this was chosen
 over React Native.

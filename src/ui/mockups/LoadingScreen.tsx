@@ -37,7 +37,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
       zIndex: 1000
     }}>
       <h1 style={{ fontSize: '48px', color: theme.colors.primary, marginBottom: '40px', letterSpacing: '4px' }}>
-        PH-DE
+        FIRST RIPPLE
       </h1>
       
       <div style={{ width: '60%', maxWidth: '400px' }}>

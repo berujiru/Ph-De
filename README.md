@@ -1,4 +1,4 @@
-# Ph-De
+# First Ripple
 
 A mobile tower defense game. React (UI) + Phaser (game engine) + Capacitor
 (iOS/Android wrapper). See `docs/ARCHITECTURE.md` for why.

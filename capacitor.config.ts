@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.berujiru.phde',
-  appName: 'Ph-De',
+  appName: 'First Ripple',
   webDir: 'dist',
   server: {
     androidScheme: 'https',

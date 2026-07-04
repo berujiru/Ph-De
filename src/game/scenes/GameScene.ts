@@ -2,7 +2,8 @@ import Phaser from 'phaser';
 import { Barrier } from '../entities/Barrier';
 import { Hero } from '../entities/Hero';
 import { Enemy } from '../entities/Enemy';
-import { Projectile } from '../entities/Projectile';
+import { Summon } from '../entities/Summon';
+import { Attack, ProjectileAttack, MeleeCleaveAttack, VortexAttack, BoomerangAttack, ChainAttack, SummonAttack, BeamAttack, LobbedAttack, LinearWaveAttack, TrapAttack } from '../entities/Attacks';
 import { gameToUiEvents, uiToGameEvents, type GameStateSnapshot, type DropOption } from '../core/GameEvents';
 import { ENEMY_DEFINITIONS, HERO_DEFINITIONS, type HeroId } from '../data/balance';
 import { GAME_WIDTH, GAME_HEIGHT } from '../data/level';
@@ -11,7 +12,8 @@ export class GameScene extends Phaser.Scene {
   private barrier!: Barrier;
   private enemies: Enemy[] = [];
   private heroes: Hero[] = [];
-  private projectiles: Projectile[] = [];
+  private attacks: Attack[] = [];
+  public summons: Summon[] = [];
   
   private voicesCount = 0;
   private maxVoicesCount = 5; // Drops a hero when full
@@ -30,6 +32,17 @@ export class GameScene extends Phaser.Scene {
     super('GameScene');
   }
 
+  preload() {
+    this.load.audio('sfx-btn-press', 'assets/sounds/btn-press.mp3');
+    this.load.audio('sfx-victory', 'assets/sounds/victory.mp3');
+    this.load.audio('sfx-defeat', 'assets/sounds/defeat.mp3');
+    this.load.audio('sfx-shoot', 'assets/sounds/shoot.mp3');
+    this.load.audio('sfx-enemy-hit', 'assets/sounds/enemy-hit.mp3');
+    this.load.audio('sfx-enemy-die', 'assets/sounds/enemy-die.mp3');
+    this.load.audio('sfx-barrier-hit', 'assets/sounds/barrier-hit.mp3');
+    this.load.audio('sfx-barrier-break', 'assets/sounds/barrier-break.mp3');
+  }
+
   create(): void {
     this.buildGame();
 
@@ -40,6 +53,8 @@ export class GameScene extends Phaser.Scene {
       unsubSetSpeed();
       unsubSurrender();
       unsubRestart();
+      unsubDebugSpawn();
+      unsubPlaySound();
     };
 
     // UI event binding — every handler guards against a destroyed scene
@@ -72,6 +87,22 @@ export class GameScene extends Phaser.Scene {
       this.resetGame();
     });
 
+    const unsubDebugSpawn = uiToGameEvents.on('debugSpawn', () => {
+      if (!this.sys) return;
+      const availableIds = Object.keys(HERO_DEFINITIONS).filter(
+        id => !this.heroes.some(h => h.id === id)
+      ) as HeroId[];
+      if (availableIds.length > 0) {
+        const randomId = Phaser.Math.RND.pick(availableIds);
+        this.spawnHero(randomId);
+      }
+    });
+
+    const unsubPlaySound = uiToGameEvents.on('playSound', ({ key }) => {
+      if (!this.sys) return;
+      this.sound.play(key);
+    });
+
     // Clean up on both shutdown (restart) AND destroy (game.destroy / React unmount)
     this.events.on('shutdown', cleanup);
     this.events.on('destroy', cleanup);
@@ -83,7 +114,8 @@ export class GameScene extends Phaser.Scene {
     // Destroy existing game objects
     for (const e of this.enemies) e.destroy();
     for (const h of this.heroes) h.destroy();
-    for (const p of this.projectiles) p.destroy();
+    for (const a of this.attacks) a.destroy();
+    for (const s of this.summons) s.destroy();
     if (this.barrier) this.barrier.destroy();
 
     this.buildGame();
@@ -93,7 +125,8 @@ export class GameScene extends Phaser.Scene {
   private buildGame(): void {
     this.heroes = [];
     this.enemies = [];
-    this.projectiles = [];
+    this.attacks = [];
+    this.summons = [];
     this.voicesCount = 0;
     this.maxVoicesCount = 3;
     this.waveActive = false;
@@ -110,7 +143,7 @@ export class GameScene extends Phaser.Scene {
     this.barrier = new Barrier(this, 200, GAME_HEIGHT / 2, 20, GAME_HEIGHT, 100);
 
     // Initial fixed hero (Eden)
-    this.spawnHero('Eden', 0x38bdf8);
+    this.spawnHero('eden');
 
     this.emitState(true);
   }
@@ -121,7 +154,7 @@ export class GameScene extends Phaser.Scene {
     // Apply time scaling
     delta *= this.gameSpeed;
 
-    if (!this.waveActive && this.heroes.length > 0 && this.heroes[0].x >= 150) {
+    if (!this.waveActive && _time > 1000) {
       this.waveActive = true;
       this.emitState();
     }
@@ -140,6 +173,7 @@ export class GameScene extends Phaser.Scene {
           this.enemiesToSpawn = this.currentWave * 5;
           this.spawnTimer = 3000; // wait 3s before next wave starts
         } else {
+          if (this.status !== 'won') this.sound.play('sfx-victory');
           this.status = 'won';
         }
       }
@@ -147,7 +181,7 @@ export class GameScene extends Phaser.Scene {
 
     // Update entities
     for (const enemy of this.enemies) {
-      enemy.update(delta, this.barrier);
+      enemy.update(delta, this.barrier, this.summons);
       if (enemy.isDead && enemy.hp <= 0) {
         // Was killed by hero, not by hitting barrier
         this.addVoices(1);
@@ -163,17 +197,22 @@ export class GameScene extends Phaser.Scene {
       hero.update(delta, this.enemies);
     }
     
-    for (const proj of this.projectiles) {
-      proj.update(delta);
+    for (const atk of this.attacks) {
+      atk.update(_time, delta);
     }
     
-    this.projectiles = this.projectiles.filter(p => {
-      if (p.isDead) p.destroy();
-      return !p.isDead;
+    this.attacks = this.attacks.filter(a => {
+      // Attacks clean up their own visuals when they die.
+      return !a.isDead;
+    });
+
+    this.summons = this.summons.filter(s => {
+      return !s.isDead;
     });
 
     // Game over conditions
     if (this.barrier.isDead) {
+      if (this.status !== 'lost') this.sound.play('sfx-defeat');
       this.status = 'lost';
     }
 
@@ -189,8 +228,34 @@ export class GameScene extends Phaser.Scene {
   private spawnHero(id: HeroId) {
     const y = GAME_HEIGHT / 2 + (this.heroes.length * 60) - 60;
     const def = HERO_DEFINITIONS[id];
-    const hero = new Hero(this, 50, y, def, 150, (hx, hy, target, dmg, color) => {
-      this.projectiles.push(new Projectile(this, hx, hy, target, dmg, color));
+    const hero = new Hero(this, 50, y, def, 150, (h, target) => {
+      let attack: Attack;
+      const color = h.definition.projectileColor || h.definition.color;
+      
+      if (h.definition.attackStyle === 'melee-cleave') {
+        attack = new MeleeCleaveAttack(this, h.x, h.y, target, h.damage, color);
+      } else if (h.definition.attackStyle === 'vortex') {
+        attack = new VortexAttack(this, h.x, h.y, target, h.damage, color);
+      } else if (h.definition.attackStyle === 'boomerang') {
+        attack = new BoomerangAttack(this, h, target, h.damage, color);
+      } else if (h.definition.attackStyle === 'chain') {
+        attack = new ChainAttack(this, h.x, h.y, target, h.damage, color);
+      } else if (h.definition.attackStyle === 'summoner') {
+        attack = new SummonAttack(this, h.x, h.y, target, h.damage, color);
+      } else if (h.definition.attackStyle === 'beam') {
+        attack = new BeamAttack(this, h.x, h.y, target, h.damage, color);
+      } else if (h.definition.attackStyle === 'lobbed') {
+        attack = new LobbedAttack(this, h.x, h.y, target, h.damage, color);
+      } else if (h.definition.attackStyle === 'linear-wave') {
+        attack = new LinearWaveAttack(this, h.x, h.y, h.damage, color);
+      } else if (h.definition.attackStyle === 'trap') {
+        attack = new TrapAttack(this, h.x, h.y, target, h.damage, color);
+      } else {
+        // Fallback to projectile
+        attack = new ProjectileAttack(this, h.x, h.y, target, h.damage, color);
+      }
+      
+      this.attacks.push(attack);
     });
     this.heroes.push(hero);
   }

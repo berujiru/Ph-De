@@ -16,7 +16,15 @@ export class Barrier extends Phaser.GameObjects.Rectangle {
   }
 
   takeDamage(amount: number) {
+    if (this.hp <= 0) return; // already dead
     this.hp = Math.max(0, this.hp - amount);
+    
+    if (this.hp <= 0) {
+      this.sceneRef.sound.play('sfx-barrier-break');
+    } else {
+      this.sceneRef.sound.play('sfx-barrier-hit');
+    }
+    
     // Visual feedback
     this.sceneRef.tweens.add({
       targets: this,

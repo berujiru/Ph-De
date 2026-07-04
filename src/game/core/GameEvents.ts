@@ -51,6 +51,8 @@ export interface UiToGameEvents extends Record<string, unknown> {
   surrender: undefined;
   restart: undefined;
   selectDrop: { dropId: string };
+  debugSpawn: undefined;
+  playSound: { key: string };
 }
 
 /** Emits game -> UI (React listens). */

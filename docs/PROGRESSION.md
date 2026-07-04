@@ -104,11 +104,11 @@ interface StageDefinition {
 
 ## Per-run rewards: Hope and the Sari-Sari Store
 
-Every run pays out **Hope (Pag-asa)** — the persistent meta currency —
-**win or lose**. A failed defense still wakes people up.
+Every run pays out **Hope (Pag-asa)** and **Hero Cards** — the persistent meta currencies — **win or lose**. A failed defense still wakes people up.
 
 Earn rules (all `balance.ts` data):
-- Base payout per wave cleared (so losses pay proportionally)
+- Base Hope payout per wave cleared (so losses pay proportionally)
+- **Hero Card Drops**: Every run guarantees a base number of Hero Cards, with bonuses for better performance. Cards are used to permanently level up unlocked heroes.
 - Win bonus; first-clear bonus (the big one); no-leak bonus
 - Daily first-run bonus (retention hook)
 

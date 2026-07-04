@@ -12,7 +12,7 @@ export class Hero extends Phaser.GameObjects.Container {
   public damage: number;
   public range: number;
   private projectileColor: number;
-  private onAttack: (x: number, y: number, target: Enemy, damage: number, color: number) => void;
+  private onAttack: (hero: Hero, target: Enemy) => void;
   
   public skillCooldownMs = 5000;
   public currentSkillCooldown = 5000; // start on cooldown
@@ -21,7 +21,7 @@ export class Hero extends Phaser.GameObjects.Container {
   private bodyShape: Phaser.GameObjects.Rectangle;
   private skillHighlight: Phaser.GameObjects.Text;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, def: HeroDefinition, rangeX: number, onAttack: (x: number, y: number, target: Enemy, damage: number, color: number) => void) {
+  constructor(scene: Phaser.Scene, x: number, y: number, def: HeroDefinition, rangeX: number, onAttack: (hero: Hero, target: Enemy) => void) {
     super(scene, x, y);
     this.id = def.id;
     this.definition = def;
@@ -43,6 +43,13 @@ export class Hero extends Phaser.GameObjects.Container {
 
     this.bodyShape = scene.add.rectangle(0, 0, 30, 40, def.color);
     this.add(this.bodyShape);
+    
+    const nameLabel = scene.add.text(0, 25, `${def.name}\n[${def.attackStyle}]`, { 
+      fontSize: '10px', 
+      color: '#ffffff', 
+      align: 'center' 
+    }).setOrigin(0.5, 0);
+    this.add(nameLabel);
     
     this.skillHighlight = scene.add.text(0, -35, '★ SKILL', { fontSize: '12px', color: '#facc15', fontStyle: 'bold' }).setOrigin(0.5);
     this.skillHighlight.setVisible(false);
@@ -80,7 +87,7 @@ export class Hero extends Phaser.GameObjects.Container {
       }
 
       if (target && target.x - this.x <= this.range) {
-        this.onAttack(this.x, this.y, target, this.damage, this.projectileColor);
+        this.onAttack(this, target);
         this.attackCooldown = this.attackRateMs;
         // Simple attack visual
         this.scene.tweens.add({ targets: this.bodyShape, x: 10, yoyo: true, duration: 100 });
