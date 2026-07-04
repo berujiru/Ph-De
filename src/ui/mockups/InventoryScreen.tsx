@@ -497,16 +497,16 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
             inset: 0,
             backgroundColor: 'rgba(0,0,0,0.8)',
             display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
             zIndex: 1000,
             backdropFilter: 'blur(5px)',
-            padding: '48px 20px'
+            padding: '48px 20px',
+            overflowY: 'auto'
           }}>
           {/* Dossier Folder */}
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
+              margin: 'auto',
               backgroundColor: '#e5d5b5', // Manila folder color
               border: '1px solid #c2b291',
               borderRadius: '4px 20px 4px 4px',
@@ -746,15 +746,15 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
               inset: 0,
               backgroundColor: 'rgba(0,0,0,0.8)',
               display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
               zIndex: 1000,
               backdropFilter: 'blur(5px)',
-              padding: '48px 20px'
+              padding: '48px 20px',
+              overflowY: 'auto'
             }}>
             <div
               onClick={(e) => e.stopPropagation()}
               style={{
+                margin: 'auto',
                 backgroundColor: '#e5d5b5',
                 border: '1px solid #c2b291',
                 borderRadius: '4px 20px 4px 4px',
