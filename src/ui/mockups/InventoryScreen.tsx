@@ -14,264 +14,471 @@ const HeroIcon = ({ color }: { color: string }) => (
   </svg>
 );
 
+// Currency Icons
+const HopeIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill={theme.colors.gold} stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <path d="M12 8v8M8 12h8" />
+  </svg>
+);
+
+const PermitIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="#f8fafc" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="6" width="18" height="12" rx="2" />
+    <path d="M3 12h18" strokeDasharray="4 4" />
+  </svg>
+);
+
 export function InventoryScreen({ onBack }: InventoryScreenProps) {
   const [selectedHero, setSelectedHero] = useState<HeroDefinition | null>(null);
 
   const allHeroes = Object.values(HERO_DEFINITIONS);
 
+  // Mock Currency Data
+  const currentHope = 1450;
+  const currentPermits = 3;
+
   return (
     <div style={{
       position: 'absolute',
       inset: 0,
-      backgroundColor: theme.colors.background,
+      backgroundColor: '#785b46', // Base cork color
+      backgroundImage: `
+        radial-gradient(#5a4231 15%, transparent 16%),
+        radial-gradient(#5a4231 15%, transparent 16%)
+      `,
+      backgroundSize: '20px 20px',
+      backgroundPosition: '0 0, 10px 10px',
       display: 'flex',
       flexDirection: 'column',
       padding: '40px',
       color: theme.colors.textPrimary,
-      overflowY: 'auto'
+      overflowY: 'auto',
+      boxShadow: 'inset 0 0 100px rgba(0,0,0,0.8)'
     }}>
-      <div style={{ marginBottom: '40px' }}>
-        <button onClick={onBack} style={{
-          background: 'none',
-          border: 'none',
-          color: theme.colors.textSecondary,
-          cursor: 'pointer',
-          fontSize: '16px',
-          marginBottom: '10px',
-          padding: 0,
-          textDecoration: 'underline'
+      
+      {/* Top Header / Nav Bar */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start',
+        marginBottom: '40px',
+        position: 'relative',
+        zIndex: 10
+      }}>
+        <div>
+          <button onClick={onBack} style={{
+            background: 'none',
+            border: 'none',
+            color: '#e2e8f0',
+            cursor: 'pointer',
+            fontSize: '18px',
+            fontWeight: 'bold',
+            padding: '8px 16px',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            borderRadius: '8px',
+            backdropFilter: 'blur(4px)',
+            marginBottom: '15px'
+          }}>
+            ← Back to Menu
+          </button>
+          
+          {/* Taped Sign Title */}
+          <div style={{
+            backgroundColor: '#fef08a',
+            color: '#000',
+            padding: '10px 30px',
+            transform: 'rotate(-2deg)',
+            boxShadow: '2px 4px 10px rgba(0,0,0,0.3)',
+            display: 'inline-block',
+            position: 'relative'
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: '-10px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '40px',
+              height: '15px',
+              backgroundColor: 'rgba(255,255,255,0.7)',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+            }} /> {/* Masking tape */}
+            <h1 style={{ margin: 0, fontSize: '32px', fontFamily: '"Courier New", Courier, monospace', fontWeight: '900', textTransform: 'uppercase' }}>
+              The Movement Archive
+            </h1>
+          </div>
+        </div>
+
+        {/* Currency Display (Pinned Card) */}
+        <div style={{
+          backgroundColor: '#fff',
+          padding: '15px 25px',
+          borderRadius: '4px',
+          boxShadow: '2px 4px 15px rgba(0,0,0,0.4)',
+          transform: 'rotate(1deg)',
+          display: 'flex',
+          gap: '30px',
+          position: 'relative'
         }}>
-          ← Back to Menu
-        </button>
-        <h1 style={{ margin: 0, fontSize: '32px', textTransform: 'uppercase', color: theme.colors.accent }}>Roster & Codex</h1>
-        <div style={{ color: theme.colors.textMuted }}>Your Unlocked Citizens</div>
+          {/* Push Pin */}
+          <div style={{
+            position: 'absolute',
+            top: '5px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '12px',
+            height: '12px',
+            backgroundColor: '#ef4444',
+            borderRadius: '50%',
+            boxShadow: 'inset -2px -2px 4px rgba(0,0,0,0.3), 2px 2px 5px rgba(0,0,0,0.5)'
+          }} />
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <HopeIcon />
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold' }}>HOPE POINTS</span>
+              <span style={{ fontSize: '20px', color: '#000', fontWeight: '900' }}>{currentHope}</span>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <PermitIcon />
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold' }}>RALLY PERMITS</span>
+              <span style={{ fontSize: '20px', color: '#000', fontWeight: '900' }}>{currentPermits}/5</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' }}>
-        {allHeroes.map((hero) => {
+      {/* Grid of Polaroid Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '40px', padding: '20px' }}>
+        {allHeroes.map((hero, idx) => {
           // Mock unlocking and leveling logic
           const isUnlocked = true;
           const mockLevel = hero.id === 'eden' ? 3 : 1;
           const mockCards = hero.id === 'eden' ? 4 : 8;
           const mockCardsNeeded = mockLevel * 5;
+          const rotation = (idx % 2 === 0 ? 1 : -1) * (2 + Math.random() * 3); // Random slight rotation
 
           return (
             <div 
               key={hero.id} 
               onClick={() => isUnlocked && setSelectedHero(hero)}
               style={{
-                backgroundColor: isUnlocked ? theme.colors.surface : 'rgba(30, 41, 59, 0.5)',
-                border: `2px solid ${isUnlocked ? theme.colors.border : 'rgba(51, 65, 85, 0.5)'}`,
-                borderRadius: '12px',
-                padding: '20px',
+                backgroundColor: '#f8fafc',
+                padding: '10px 10px 30px 10px', // Extra padding at bottom for polaroid look
+                boxShadow: '2px 5px 15px rgba(0,0,0,0.5)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                textAlign: 'center',
-                filter: isUnlocked ? 'none' : 'grayscale(100%)',
-                opacity: isUnlocked ? 1 : 0.6,
+                filter: isUnlocked ? 'none' : 'sepia(80%) grayscale(80%)',
                 cursor: isUnlocked ? 'pointer' : 'default',
-                transition: 'transform 0.1s',
-                position: 'relative'
+                transition: 'transform 0.2s, box-shadow 0.2s, z-index 0.2s',
+                position: 'relative',
+                transform: `rotate(${rotation}deg)`,
+                zIndex: 1
               }}
-              onMouseOver={(e) => { if (isUnlocked) e.currentTarget.style.transform = 'scale(1.05)' }}
-              onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              onMouseOver={(e) => { 
+                if (isUnlocked) {
+                  e.currentTarget.style.transform = 'scale(1.1) rotate(0deg)';
+                  e.currentTarget.style.zIndex = '10';
+                  e.currentTarget.style.boxShadow = '5px 15px 25px rgba(0,0,0,0.6)';
+                }
+              }}
+              onMouseOut={(e) => { 
+                e.currentTarget.style.transform = `scale(1) rotate(${rotation}deg)`;
+                e.currentTarget.style.zIndex = '1';
+                e.currentTarget.style.boxShadow = '2px 5px 15px rgba(0,0,0,0.5)';
+              }}
             >
-              {isUnlocked && (
-                <div style={{
-                  position: 'absolute',
-                  top: '-10px',
-                  right: '-10px',
-                  backgroundColor: theme.colors.gold,
-                  color: '#000',
-                  fontWeight: 'bold',
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '16px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  boxShadow: '0 2px 5px rgba(0,0,0,0.5)',
-                  fontSize: '14px'
-                }}>
-                  L{mockLevel}
-                </div>
-              )}
-              
+              {/* Push Pin */}
               <div style={{
-                width: '80px',
-                height: '80px',
+                position: 'absolute',
+                top: '-5px',
+                width: '10px',
+                height: '10px',
+                backgroundColor: idx % 3 === 0 ? '#ef4444' : (idx % 2 === 0 ? '#3b82f6' : '#22c55e'),
                 borderRadius: '50%',
-                backgroundColor: isUnlocked ? 'rgba(255,255,255,0.05)' : theme.colors.textSecondary,
-                border: `3px solid #${hero.color.toString(16).padStart(6, '0')}`,
-                marginBottom: '15px',
+                boxShadow: 'inset -2px -2px 3px rgba(0,0,0,0.3), 1px 2px 3px rgba(0,0,0,0.5)',
+                zIndex: 2
+              }} />
+
+              {/* Photo Area */}
+              <div style={{
+                width: '100%',
+                aspectRatio: '1',
+                backgroundColor: isUnlocked ? '#1e293b' : '#cbd5e1',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
+                border: '1px solid #e2e8f0',
+                marginBottom: '15px',
+                position: 'relative'
               }}>
-                {isUnlocked ? <HeroIcon color={`#${hero.color.toString(16).padStart(6, '0')}`} /> : '🔒'}
-              </div>
-              <h3 style={{ margin: '0 0 5px 0', fontSize: '18px', color: isUnlocked ? theme.colors.textPrimary : theme.colors.textSecondary }}>
-                {isUnlocked ? hero.name : 'Unknown'}
-              </h3>
-              <div style={{ fontSize: '12px', color: theme.colors.textMuted, marginBottom: '10px' }}>
-                {isUnlocked ? hero.profession : '???'}
-              </div>
-              {isUnlocked && (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '12px', padding: '4px 8px', borderRadius: '4px', backgroundColor: 'rgba(255,255,255,0.1)' }}>
-                    {hero.damageType}
-                  </span>
-                  <div style={{ fontSize: '12px', color: mockCards >= mockCardsNeeded ? theme.colors.success : theme.colors.textSecondary }}>
-                    Cards: {mockCards} / {mockCardsNeeded}
+                {isUnlocked ? <HeroIcon color={`#${hero.color.toString(16).padStart(6, '0')}`} /> : <span style={{fontSize: '40px'}}>🔒</span>}
+                
+                {isUnlocked && (
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '5px',
+                    right: '5px',
+                    backgroundColor: theme.colors.gold,
+                    color: '#000',
+                    fontWeight: '900',
+                    padding: '2px 6px',
+                    fontSize: '12px',
+                    border: '1px solid #000',
+                    transform: 'rotate(-5deg)'
+                  }}>
+                    LVL {mockLevel}
                   </div>
+                )}
+              </div>
+
+              {/* Text Area */}
+              <div style={{ width: '100%', textAlign: 'center' }}>
+                <h3 style={{ margin: '0 0 5px 0', fontSize: '18px', color: '#0f172a', fontFamily: '"Marker Felt", "Comic Sans MS", fantasy' }}>
+                  {isUnlocked ? hero.name : 'REDACTED'}
+                </h3>
+                <div style={{ fontSize: '12px', color: '#475569', fontWeight: 'bold', marginBottom: '10px' }}>
+                  {isUnlocked ? hero.profession : '???'}
                 </div>
-              )}
+                
+                {isUnlocked && (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', borderTop: '1px dashed #cbd5e1', paddingTop: '10px' }}>
+                    <span style={{ fontSize: '10px', padding: '2px 6px', backgroundColor: '#e2e8f0', color: '#334155', border: '1px solid #cbd5e1', fontWeight: 'bold' }}>
+                      {hero.damageType.toUpperCase()}
+                    </span>
+                    <div style={{ 
+                      fontSize: '11px', 
+                      fontWeight: 'bold',
+                      color: mockCards >= mockCardsNeeded ? '#166534' : '#b91c1c',
+                      backgroundColor: mockCards >= mockCardsNeeded ? '#bbf7d0' : '#fecaca',
+                      padding: '2px 8px',
+                      borderRadius: '10px'
+                    }}>
+                      CARDS: {mockCards} / {mockCardsNeeded}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}
       </div>
 
-      {/* Hero Info Modal */}
+      {/* Hero Info Modal (Dossier File Theme) */}
       {selectedHero && (
         <div style={{
           position: 'fixed',
           inset: 0,
-          backgroundColor: 'rgba(0,0,0,0.7)',
+          backgroundColor: 'rgba(0,0,0,0.8)',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          zIndex: 1000
+          zIndex: 1000,
+          backdropFilter: 'blur(5px)'
         }}>
+          {/* Dossier Folder */}
           <div style={{
-            backgroundColor: theme.colors.background,
-            border: `2px solid ${theme.colors.border}`,
-            borderRadius: '16px',
-            padding: '30px',
+            backgroundColor: '#e5d5b5', // Manila folder color
+            border: '1px solid #c2b291',
+            borderRadius: '4px 20px 4px 4px',
+            padding: '40px',
             width: '90%',
-            maxWidth: '500px',
-            position: 'relative'
+            maxWidth: '550px',
+            position: 'relative',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(0,0,0,0.02) 20px, rgba(0,0,0,0.02) 21px)'
           }}>
+            {/* Top Tab */}
+            <div style={{
+              position: 'absolute',
+              top: '-30px',
+              left: '0',
+              backgroundColor: '#e5d5b5',
+              padding: '5px 20px',
+              border: '1px solid #c2b291',
+              borderBottom: 'none',
+              borderRadius: '8px 8px 0 0',
+              color: '#000',
+              fontWeight: 'bold',
+              fontFamily: '"Courier New", Courier, monospace',
+              boxShadow: '0 -2px 5px rgba(0,0,0,0.1)'
+            }}>
+              CONFIDENTIAL // FILE NO. {selectedHero.id.toUpperCase()}
+            </div>
+
             <button 
               onClick={() => setSelectedHero(null)}
               style={{
                 position: 'absolute',
                 top: '15px',
                 right: '15px',
-                background: 'none',
-                border: 'none',
-                color: theme.colors.textSecondary,
-                fontSize: '24px',
-                cursor: 'pointer'
+                background: '#ef4444',
+                border: '2px solid #000',
+                color: '#fff',
+                fontSize: '20px',
+                fontWeight: 'bold',
+                width: '32px',
+                height: '32px',
+                cursor: 'pointer',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                boxShadow: '2px 2px 0 #000'
               }}
             >
               ×
             </button>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px' }}>
+              {/* Paper-clipped photo */}
               <div style={{
-                width: '100px',
-                height: '100px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(255,255,255,0.05)',
+                position: 'relative',
+                width: '120px',
+                height: '120px',
+                backgroundColor: '#1e293b',
                 border: `4px solid #${selectedHero.color.toString(16).padStart(6, '0')}`,
                 display: 'flex',
                 justifyContent: 'center',
-                alignItems: 'center'
+                alignItems: 'center',
+                boxShadow: '2px 2px 10px rgba(0,0,0,0.2)',
+                transform: 'rotate(-2deg)'
               }}>
+                {/* Paperclip */}
+                <div style={{
+                  position: 'absolute',
+                  top: '-15px',
+                  left: '20px',
+                  width: '12px',
+                  height: '40px',
+                  border: '3px solid #94a3b8',
+                  borderRadius: '10px',
+                  borderBottom: 'none',
+                  zIndex: 2
+                }} />
                 <HeroIcon color={`#${selectedHero.color.toString(16).padStart(6, '0')}`} />
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <h2 style={{ margin: 0, fontSize: '28px', color: theme.colors.textPrimary }}>{selectedHero.name}</h2>
-                  <div style={{
-                    backgroundColor: theme.colors.gold,
-                    color: '#000',
-                    fontWeight: 'bold',
-                    padding: '4px 12px',
-                    borderRadius: '12px',
-                    fontSize: '14px'
-                  }}>
-                    Level {selectedHero.id === 'eden' ? 3 : 1}
-                  </div>
+
+              <div style={{ flex: 1, color: '#000' }}>
+                <h2 style={{ margin: 0, fontSize: '32px', fontFamily: '"Courier New", Courier, monospace', textTransform: 'uppercase', borderBottom: '2px solid #000', paddingBottom: '5px' }}>
+                  {selectedHero.name}
+                </h2>
+                <div style={{ fontSize: '18px', fontWeight: 'bold', marginTop: '5px', color: '#334155' }}>
+                  ROLE: {selectedHero.profession.toUpperCase()}
                 </div>
-                <div style={{ color: theme.colors.textMuted, fontSize: '16px' }}>{selectedHero.profession}</div>
-                <div style={{ marginTop: '5px' }}>
-                  <span style={{ fontSize: '12px', padding: '4px 8px', borderRadius: '4px', backgroundColor: 'rgba(255,255,255,0.1)' }}>
-                    {selectedHero.damageType}
+                <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
+                  <span style={{ fontSize: '12px', padding: '2px 8px', border: '1px solid #000', fontWeight: 'bold' }}>
+                    {selectedHero.damageType.toUpperCase()}
                   </span>
-                  <span style={{ fontSize: '12px', padding: '4px 8px', borderRadius: '4px', backgroundColor: 'rgba(255,255,255,0.1)', marginLeft: '10px' }}>
-                    {selectedHero.attackKind === 'melee' ? 'Melee' : 'Ranged'}
+                  <span style={{ fontSize: '12px', padding: '2px 8px', border: '1px solid #000', fontWeight: 'bold' }}>
+                    {selectedHero.attackKind === 'melee' ? 'MELEE' : 'RANGED'}
                   </span>
                 </div>
               </div>
             </div>
 
+            {/* Typewritten Stats */}
             <div style={{
-              backgroundColor: theme.colors.surface,
-              borderRadius: '8px',
+              backgroundColor: 'rgba(255,255,255,0.5)',
+              border: '1px dashed #000',
               padding: '15px',
               marginBottom: '20px',
               display: 'grid',
               gridTemplateColumns: '1fr 1fr 1fr',
               textAlign: 'center',
-              gap: '10px'
+              fontFamily: '"Courier New", Courier, monospace',
+              color: '#000'
             }}>
               <div>
-                <div style={{ color: theme.colors.textMuted, fontSize: '12px' }}>Damage</div>
-                <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{selectedHero.damage}</div>
+                <div style={{ fontSize: '12px', fontWeight: 'bold' }}>DMG OUTPUT</div>
+                <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{selectedHero.damage}</div>
               </div>
               <div>
-                <div style={{ color: theme.colors.textMuted, fontSize: '12px' }}>Atk Rate</div>
-                <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{(selectedHero.attackRateMs / 1000).toFixed(1)}s</div>
+                <div style={{ fontSize: '12px', fontWeight: 'bold' }}>ATK SPD</div>
+                <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{(selectedHero.attackRateMs / 1000).toFixed(1)}s</div>
               </div>
               <div>
-                <div style={{ color: theme.colors.textMuted, fontSize: '12px' }}>Range</div>
-                <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{selectedHero.range}px</div>
+                <div style={{ fontSize: '12px', fontWeight: 'bold' }}>RANGE</div>
+                <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{selectedHero.range}px</div>
               </div>
             </div>
 
-            <div style={{ marginBottom: '20px' }}>
-              <h3 style={{ margin: '0 0 5px 0', color: theme.colors.gold }}>★ Signature Skill: {selectedHero.signatureSkill.name}</h3>
-              <p style={{ margin: 0, fontSize: '14px', color: theme.colors.textSecondary }}>{selectedHero.signatureSkill.description}</p>
+            <div style={{ marginBottom: '20px', color: '#000' }}>
+              <h3 style={{ margin: '0 0 5px 0', fontSize: '16px', borderBottom: '1px solid #000', display: 'inline-block' }}>SIGNATURE SKILL: {selectedHero.signatureSkill.name}</h3>
+              <p style={{ margin: '5px 0 0 0', fontSize: '14px', fontFamily: '"Courier New", Courier, monospace' }}>{selectedHero.signatureSkill.description}</p>
             </div>
 
             {selectedHero.passive && (
-              <div style={{ marginBottom: '25px' }}>
-                <h3 style={{ margin: '0 0 5px 0', color: theme.colors.primary }}>❖ Passive: {selectedHero.passive.name}</h3>
-                <p style={{ margin: 0, fontSize: '14px', color: theme.colors.textSecondary }}>{selectedHero.passive.description}</p>
+              <div style={{ marginBottom: '30px', color: '#000' }}>
+                <h3 style={{ margin: '0 0 5px 0', fontSize: '16px', borderBottom: '1px solid #000', display: 'inline-block' }}>PASSIVE: {selectedHero.passive.name}</h3>
+                <p style={{ margin: '5px 0 0 0', fontSize: '14px', fontFamily: '"Courier New", Courier, monospace' }}>{selectedHero.passive.description}</p>
               </div>
             )}
 
-            {/* Upgrade Section */}
+            {/* Stamped Upgrade Section */}
             <div style={{ 
               display: 'flex', 
               justifyContent: 'space-between', 
               alignItems: 'center',
-              borderTop: `1px solid ${theme.colors.border}`,
-              paddingTop: '20px'
+              paddingTop: '20px',
+              position: 'relative'
             }}>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '12px', color: theme.colors.textMuted }}>Cards Required</span>
-                <span style={{ fontSize: '16px', fontWeight: 'bold', color: theme.colors.success }}>
+              
+              {/* Red Approved Stamp if enough cards */}
+              {((selectedHero.id === 'eden' ? 4 : 8) >= (selectedHero.id === 'eden' ? 15 : 5)) && (
+                <div style={{
+                  position: 'absolute',
+                  top: '10px',
+                  left: '40%',
+                  transform: 'rotate(-15deg)',
+                  color: '#ef4444',
+                  border: '4px solid #ef4444',
+                  padding: '5px 15px',
+                  fontSize: '24px',
+                  fontWeight: '900',
+                  fontFamily: '"Courier New", Courier, monospace',
+                  opacity: 0.7,
+                  pointerEvents: 'none'
+                }}>
+                  READY FOR PROMOTION
+                </div>
+              )}
+
+              <div style={{ display: 'flex', flexDirection: 'column', color: '#000' }}>
+                <span style={{ fontSize: '14px', fontWeight: 'bold', fontFamily: '"Courier New", Courier, monospace' }}>CARDS GATHERED:</span>
+                <span style={{ fontSize: '24px', fontWeight: '900' }}>
                   {selectedHero.id === 'eden' ? '4 / 15' : '8 / 5'}
                 </span>
               </div>
+
               <button style={{
-                backgroundColor: (selectedHero.id === 'eden') ? 'rgba(34, 197, 94, 0.3)' : theme.colors.success,
-                color: (selectedHero.id === 'eden') ? theme.colors.textSecondary : '#000',
-                border: 'none',
+                backgroundColor: (selectedHero.id === 'eden') ? '#94a3b8' : '#22c55e',
+                color: (selectedHero.id === 'eden') ? '#cbd5e1' : '#000',
+                border: '2px solid #000',
                 padding: '12px 24px',
-                borderRadius: '8px',
-                fontWeight: 'bold',
+                fontWeight: '900',
                 cursor: (selectedHero.id === 'eden') ? 'not-allowed' : 'pointer',
                 textTransform: 'uppercase',
-                transition: 'transform 0.1s'
+                boxShadow: (selectedHero.id === 'eden') ? 'none' : '4px 4px 0 #000',
+                transition: 'transform 0.1s, box-shadow 0.1s'
               }}
-              onMouseOver={(e) => { if (selectedHero.id !== 'eden') e.currentTarget.style.transform = 'translateY(-2px)' }}
-              onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              onMouseDown={(e) => { 
+                if (selectedHero.id !== 'eden') {
+                  e.currentTarget.style.transform = 'translate(4px, 4px)';
+                  e.currentTarget.style.boxShadow = '0px 0px 0 #000';
+                }
+              }}
+              onMouseUp={(e) => { 
+                if (selectedHero.id !== 'eden') {
+                  e.currentTarget.style.transform = 'translate(0px, 0px)';
+                  e.currentTarget.style.boxShadow = '4px 4px 0 #000';
+                }
+              }}
               >
-                Upgrade Hero
+                Promote Worker
               </button>
             </div>
 

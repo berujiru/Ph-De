@@ -18,6 +18,8 @@ export class Hero extends Phaser.GameObjects.Container {
   public skillCooldownMs = 5000;
   public currentSkillCooldown = 5000; // start on cooldown
   public isSkillReady = false;
+  
+  public passiveOverride?: string;
 
   private bodyShape: Phaser.GameObjects.Rectangle;
   private skillHighlight: Phaser.GameObjects.Text;
@@ -25,6 +27,7 @@ export class Hero extends Phaser.GameObjects.Container {
   private attackBarFill: Phaser.GameObjects.Rectangle;
   private skillBarBg: Phaser.GameObjects.Rectangle;
   private skillBarFill: Phaser.GameObjects.Rectangle;
+  private rangeIndicator: Phaser.GameObjects.Arc;
 
   constructor(scene: Phaser.Scene, x: number, y: number, def: HeroDefinition, rangeX: number, onAttack: (hero: Hero, target: Enemy) => void) {
     super(scene, x, y);
@@ -45,6 +48,12 @@ export class Hero extends Phaser.GameObjects.Container {
     this.range = def.range;
     this.projectileColor = def.projectileColor || def.color;
     this.onAttack = onAttack;
+
+    // Range indicator (added first so it's behind the body shape)
+    this.rangeIndicator = scene.add.circle(0, 0, def.range, def.color, 0.1);
+    this.rangeIndicator.setStrokeStyle(1, def.color, 0.5);
+    this.rangeIndicator.setVisible(false);
+    this.add(this.rangeIndicator);
 
     this.bodyShape = scene.add.rectangle(0, 0, 30, 40, def.color);
     this.add(this.bodyShape);
@@ -80,6 +89,7 @@ export class Hero extends Phaser.GameObjects.Container {
     this.setInteractive({ useHandCursor: true });
     this.on('pointerdown', () => {
       this.useSkill();
+      this.showRange();
     });
 
     scene.add.existing(this);
@@ -90,18 +100,50 @@ export class Hero extends Phaser.GameObjects.Container {
     // Auto-attack
     this.attackCooldown = Math.max(0, this.attackCooldown - delta);
     if (this.attackCooldown === 0) {
-      // Find lowest-X enemy (closest to barrier)
+      // Find lowest-X enemy (closest to barrier), prioritizing tauntAura
       let target: Enemy | null = null;
       let minEnemyX = 9999;
+      let foundTaunt = false;
+      
       for (const enemy of enemies) {
-        if (!enemy.isDead && enemy.x < minEnemyX && enemy.x > this.x) {
-          minEnemyX = enemy.x;
-          target = enemy;
+        if (!enemy.isDead && enemy.x > this.x) {
+          // Ignore stealthed enemies unless hero has canSeeStealth
+          if (enemy.isStealthed && !this.definition.canSeeStealth) continue;
+          
+          if (enemy.definition.tauntAura && enemy.x - this.x <= this.range) {
+            // Found a taunting enemy in range. Prioritize it immediately.
+            // If multiple taunt, attack the closest one.
+            if (!foundTaunt || enemy.x < minEnemyX) {
+              minEnemyX = enemy.x;
+              target = enemy;
+              foundTaunt = true;
+            }
+          } else if (!foundTaunt && enemy.x < minEnemyX) {
+            minEnemyX = enemy.x;
+            target = enemy;
+          }
         }
       }
 
       if (target && target.x - this.x <= this.range) {
         this.onAttack(this, target);
+        
+        // Passives applied on attack
+        const activePassive = this.passiveOverride || this.id;
+        
+        if (activePassive === 'farmer' && Math.random() < 0.2) {
+          target.activeAilments['freeze'] = 100; // instant root
+          
+          const txt = this.scene.add.text(target.x, target.y - 30, 'ROOTED!', { color: '#22c55e', fontStyle: 'bold' }).setOrigin(0.5);
+          this.scene.tweens.add({ targets: txt, y: target.y - 60, alpha: 0, duration: 1000, onComplete: () => txt.destroy() });
+        } else if (activePassive === 'teacher') {
+          target.activeAilments['marked'] = 100;
+        } else if (activePassive === 'fisherfolk') {
+          target.activeAilments['wet'] = 100;
+        } else if (activePassive === 'sorbetes_vendor') {
+          target.activeAilments['freeze'] = Math.min(100, (target.activeAilments['freeze'] || 0) + 34);
+        }
+
         this.attackCooldown = this.attackRateMs;
         // Simple attack visual
         this.scene.tweens.add({ targets: this.bodyShape, x: 10, yoyo: true, duration: 100 });
@@ -128,7 +170,7 @@ export class Hero extends Phaser.GameObjects.Container {
     this.skillBarFill.scaleX = skillProgress;
   }
 
-  useSkill() {
+  useSkill(skillOverride?: string) {
     if (!this.isSkillReady) return;
     this.isSkillReady = false;
     this.currentSkillCooldown = this.skillCooldownMs;
@@ -138,5 +180,28 @@ export class Hero extends Phaser.GameObjects.Container {
     
     // Visually show skill used
     this.scene.tweens.add({ targets: this.bodyShape, angle: 360, duration: 300 });
+
+    const skillId = skillOverride || this.id;
+    this.scene.events.emit('heroSkillTriggered', { hero: this, skillId });
+    
+    // Bark
+    const skillName = this.definition.signatureSkill.name;
+    const txt = this.scene.add.text(this.x, this.y - 60, `${skillName}!`, { color: '#facc15', fontStyle: 'bold' }).setOrigin(0.5);
+    this.scene.tweens.add({ targets: txt, y: this.y - 100, alpha: 0, duration: 1500, onComplete: () => txt.destroy() });
+  }
+
+  private showRange() {
+    this.rangeIndicator.setVisible(true);
+    this.rangeIndicator.setAlpha(1);
+    this.scene.tweens.killTweensOf(this.rangeIndicator);
+    this.scene.tweens.add({
+      targets: this.rangeIndicator,
+      alpha: 0,
+      delay: 1500,
+      duration: 500,
+      onComplete: () => {
+        this.rangeIndicator.setVisible(false);
+      }
+    });
   }
 }

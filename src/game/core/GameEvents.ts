@@ -53,7 +53,10 @@ export interface UiToGameEvents extends Record<string, unknown> {
   selectDrop: { dropId: string };
   debugSpawn: { heroId?: string };
   spawnSandboxTarget: undefined;
+  spawnSpecificEnemy: { enemyId: string, passive?: string, skill?: string };
+  triggerEnemySkill: undefined;
   playSound: { key: string };
+  applySandboxAilment: { ailment: string, amount: number };
 }
 
 /** Emits game -> UI (React listens). */

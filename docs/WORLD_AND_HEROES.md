@@ -66,11 +66,13 @@ section and `docs/PROGRESSION.md` agency conditions):
 ### RNG rules (Voices and Drops)
 
 1. **Voice Meter Scaling** — Drops are no longer random per kill. Kills fill the Voices meter, which drops an RNG reward when full. The meter requirement scales up after each drop.
-2. **Hero Drops are finite and gated** — The RNG will only drop **unlocked heroes**, and only while there are empty slots. The player chooses which of the 4 empty slots to station the hero in.
-3. **No dead drops** — An enhancement that can't apply (stack cap reached, no eligible hero) is excluded from the roll before it happens.
-4. **Rarity scales with waves** — Later waves weight toward rarer enhancements, so late-battle drops stay exciting.
-5. **"Buhis-Buhay" (Desperate Measures) Drops** — To introduce tension, the RNG can occasionally offer high-risk, high-reward drops. These grant massive buffs (e.g., +200% attack speed) but inflict a temporary penalty (e.g., increased cooldowns or pausing Barrier healing) reflecting the toll of overworking to secure the nation.
-6. **Deterministic under the hood** — Seeded RNG in a pure `core/Drops.ts` state machine; all weights and caps are `balance.ts` data.
+2. **Multi-Drop Potential** — When a drop occurs, the RNG can offer multiple choices at once (e.g., presenting multiple heroes simultaneously, as long as there are empty slots available). The same multi-choice system applies to enhancements like bonus stats or modular ailments.
+3. **"Safe RNG" Targeting** — The RNG logic is tightly context-aware. It will *only* offer upgrades (stats or ailments) for specific heroes that are *currently active in the battle*. For example, the system can offer "Add Poison to Teacher's attacks" because the Teacher is deployed, but it will never offer upgrades for the Carpenter if the Carpenter is not in the active squad.
+4. **Hero Drops are finite and gated** — The RNG will only drop **unlocked heroes**, and only while there are empty slots. The player chooses which of the empty slots to station the hero in.
+5. **No dead drops** — An enhancement that can't apply (stack cap reached, no eligible hero) is excluded from the roll before it happens (reinforced by the Safe RNG rule).
+6. **Rarity scales with waves** — Later waves weight toward rarer enhancements, so late-battle drops stay exciting.
+7. **"Buhis-Buhay" (Desperate Measures) Drops** — To introduce tension, the RNG can occasionally offer high-risk, high-reward drops. These grant massive buffs (e.g., +200% attack speed) but inflict a temporary penalty (e.g., increased cooldowns or pausing Barrier healing) reflecting the toll of overworking to secure the nation.
+8. **Deterministic under the hood** — Seeded RNG in a pure `core/Drops.ts` state machine; all weights and caps are `balance.ts` data.
 
 Enhancements land as tappable pickups where the enemy died (auto-collect
 after a few seconds — tap for juice, never punished for missing it).
@@ -149,57 +151,74 @@ All 10 damage types have carriers; the roster of 20 heroes ensures immense varie
 Enemies reuse the **chassis × skin** engine (`docs/PROGRESSION.md`):
 behavior defined once per chassis, anomalies as skins.
 
-### Minion anomalies — the bestiary
+### Enemy Classification (The Three Tiers)
 
-Each anomaly is a **monster whose body telegraphs its mechanic**. The
-design rule for every entry: a player who has never read a tooltip should
-guess what it does from its silhouette and animation. (And per the
-binding content rules: any face, poster, or name on a monster is
-fictional and generic — e.g. the Epal's candidate face is an invented
-grinning politician, never a real one.)
+The game's enemy roster is structured into three escalating tiers, with a planned scope of at least 10 unique anomaly types per tier (30+ total).
 
-**Horde Synergy (Combat Puzzles)**: Enemies should organically form synergies as they march. For example, *Red Tape* acting as a physical shield that intercepts projectiles meant for the *Kickback Courier* hiding behind it, or *Ghost Employees* only becoming targetable after being hit by splash damage or a specific reveal skill.
+1. **Minions (10+ types)**
+   - **Mechanics**: Defined entirely by base attributes (e.g., HP, movement speed, and tags like `flying` or `armored`).
+   - **Rules**: Minions rely on swarm tactics and raw stats. They possess **no passives and no active skills**.
+2. **Mini-Bosses (10+ types)**
+   - **Mechanics**: Defined by base attributes plus **passive abilities**.
+   - **Rules**: Mini-bosses have **no active skills**, but their passives create distinct combat puzzles. Examples include having a separate Shield HP bar that must be broken first, or relying on "Illusion" padding (massive fake HP) that can only be instantly cleared by specific heroes like the Auditor.
+3. **Bosses (10+ types)**
+   - **Mechanics**: The ultimate threats. They possess base attributes, passives, AND **unique active skills**.
+   - **Rules**: Bosses are the focal point of an Act. Their active skills dynamically affect the battle state (e.g., manipulating the path, summoning endless waves, devouring resources, or disabling heroes).
+
+### 1. Minion anomalies — the frontline swarm
+
+Minions rely purely on their base attributes (speed, HP, tags) to overwhelm the player. They have no passives and no active skills. 
 
 | Anomaly | Chassis | Monster form | Behavior → mechanic | Weak to / resists |
 |---|---|---|---|---|
-| **Troll Bot** | Swarmling | Gremlin with a cracked phone for a head, blue-glow face, keyboard-claw fingers; chitters in speech bubbles | Fake-news spam in packs | Weak: fire (burn spreads through the pack) · Resists: dark |
-| **Fixer** | Runner | Many-armed scuttler sheathed in rush-stamped folders, a lanyard of too many IDs, grease-slick trail | Darts in bursts, rushing paperwork past you | Weak: frost (speed is its whole trick) · Resists: wind (low, slippery) |
-| **Ghost Employee** | Stealther | Translucent barong-clad office specter, blank ID on a lanyard, clutching a bundy time card — only its floating pay envelope is fully solid | Invisible until revealed by truth heroes (Auditor/Journalist) | Weak: holy (spectral) · Resists: physical (incorporeal) |
-| **Kickback Courier** | Runner | Hunched imp lugging a bulging duffel that leaks coins; **visibly fattens as it steals** | Steals gold as it walks; kill it before it exits to recover with interest | Weak: lightning (caught in the flash) · Resists: physical (slippery) |
-| **Red Tape** | Brute | Mummy wrapped in red ribbon and "RECEIVED" tape; **each armor layer is a visible wrap that shreds off** as armor breaks | Stacking paperwork armor (earth/shred counters); slows gold income while alive | Weak: earth (shred), fire (paper burns) · Resists: water (laminated) |
-| **Epal** | Elite | Hulking mobster whose real face is hidden behind a smiling **fictional candidate's tarpaulin face**, sash and rosette; the poster smile never changes, even when it roars; the tarp tears as it takes damage | Elite minion; "name recall" morale aura buffs nearby anomalies | Weak: wind (tarps rip in the wind) · Resists: physical (thick hide) |
-| **Fake News Blimp** | Flyer | Tabloid-skinned balloon beast with a megaphone snout, raining screaming-headline leaflets | Flying: immune to earth, weak to wind | Weak: wind, lightning · Immune: earth |
-| **The Overpriced** | Shieldbearer | Parade-balloon creature puffed to bursting, wearing a price tag with too many zeros; **an audit pops it, deflating it to a scrawny true form** | Hugely inflated HP bar; audit removes the padding | Weak: magic (truth pierces the padding) · Resists: physical (absorbed by padding) |
+| **Troll Bot** | Swarmling | Gremlin with a cracked phone for a head | Fragile swarm spam | Weak: Fire (Splash) / Resists: Dark |
+| **Fixer** | Runner | Many-armed scuttler in folders | Extremely fast, rushes defenses | Weak: Frost (Slow) / Resists: Wind |
+| **Red Tape** | Brute | Mummy wrapped in red ribbon | High base armor, slow | Weak: Earth (Armor Shred) / Resists: Water |
+| **Fake News Blimp** | Flyer | Tabloid-skinned balloon | Flies over ground obstacles | Weak: Wind / Immune: Earth |
+| **Flying Voter** | Flyer | Winged ballots or IDs | Bypasses ground melee entirely | Weak: Ranged / Splash |
+| **Colorum** | Rusher | Unregistered rogue jeepney/van | Very fast, high HP, large hitbox | Weak: Magic (Pierces chassis) |
+| **Goon / Private Army**| Brawler | Thug with makeshift batons | High melee damage | Weak: Control (Stun/Slow) |
+| **15-30 Worker** | Sluggish Tank | Ghost employee with massive belly | Very slow, massive bloated HP pool | Weak: Magic / Poison |
+| **Tongpats Collector** | Scout | Lean, fast collector | Fast, slightly tanky | Weak: Physical |
+| **Bribe Courier** | Dodger | Tiny imp with envelopes | High evasion/tiny hitbox | Weak: Splash / Ranged |
 
-Exact multipliers are `balance.ts` data; this column is the design
-intent the enemy info card telegraphs. Boss resistances get the same
-treatment in their balance pass.
+### 2. Mini-Boss anomalies — the combat puzzles
 
-(Corrupted folk creatures — manananggal splitter, tiyanak bait, kapre
-smoke — remain available as regional skin variants of the same chassis.)
+Mini-bosses introduce **passive mechanics** that force players to adapt their targeting or hero composition. They have no active skills.
 
-### Boss anomalies — named after the real issues
+| Anomaly | Chassis | Monster form | Passive → mechanic | Weak to / resists |
+|---|---|---|---|---|
+| **Ghost Employee** | Stealther | Translucent office specter | Untargetable until revealed/splashed | Weak: Holy (Spectral) |
+| **Epal** | Elite | Hulking mobster with candidate tarp face | Morale aura buffs nearby minions | Weak: Wind (Tarps rip) |
+| **The Overpriced** | Shieldbearer | Parade-balloon creature | Massive fake HP padding, popped by Audit| Weak: Magic (Truth) |
+| **Kickback Courier** | Thief | Imp lugging leaking duffel | Steals gold, drops with interest on death | Weak: Lightning |
+| **Shell Company** | Splitter | Suited corporate blob | Shatters into 3 Dummy Corps on death | Weak: Splash |
+| **Dummy / Crony** | Bodyguard | Inflated suit/shield | Taunt Aura: Redirects projectiles to itself | Weak: Earth (Shred) |
+| **Hoarder** | Cartel | Bloated merchant sitting on sacks | Drops a massive barricade on death blocking shots | Weak: Physical |
+| **Illegal Logger** | Destructor | Chainsaw-wielding brute | Deals 10x damage to Barricades | Weak: Water |
+| **Land Grabber** | Displacer | Earth-moving machine monster | Passively knocks back your frontline | Weak: Lightning |
+| **Tender Rigger** | Rigged Bidding | Monster wrapped in sealed envelopes | Immune to first 5 hits | Weak: Rapid-fire |
 
-Each campaign arc's boss is its **flagship anomaly**, named after a
-recognizable category of PH governance scandal (the category, never a
-person or case participant):
+Exact multipliers are `balance.ts` data; this column is the design intent the enemy info card telegraphs. 
 
-| Boss | The anomaly | Kind | Signature mechanic |
+### 3. Boss anomalies — named after the real issues
+
+Each campaign arc's boss is its **flagship anomaly**, named after a recognizable category of PH governance scandal. Bosses have stats, passives, AND **unique active skills**.
+
+| Boss | The anomaly | Kind | Signature active skill |
 |---|---|---|---|
 | **Troll Farm** | Paid disinformation | Ranged summoner | Endless Troll Bot swarms until the farm falls |
-| **Ghost Flood Control** | Ghost flood-control projects | Ranged stealth | **Floods the path in surges** — enemies ride the water faster; itself a ghost, untargetable until revealed |
-| **Pork Barrel** | Discretionary-fund abuse | Melee tank | Bloated hog of funds — **devours gold pickups on the field**, growing tougher with each one eaten |
-| **Vote Buying** | Election money | Ranged | Scatters **fake gold that subtracts when collected** — distrust the freebies |
-| **Nepotism** | Appointed relatives | Summoner | Continuously surrounds itself with respawning appointee Shieldbearers — kill the source |
-| **Wang-Wang** | VIP entitlement | Melee rusher | Convoy sirens: speed aura, escorts rush the Barrier in bursts |
-| **Budget Insertion** | Midnight insertions | Stealth elite | Massive HP smuggled quietly down a side lane — catch it before it slips through |
-| **Smuggling** | Customs leakage | Melee | Drains your economy while alive; killing it returns everything with interest |
-| **The Dynasty** | Political dynasties | 3-phase apex | Kill it and a relative takes over — bruiser → schemer → heir, three generations |
-| **Ang Sistema** *(finale — proposed)* | The system that lets them all thrive | Horde convergence | Not a creature — the final gauntlet: **every defeated anomaly returns at once**, with The Dynasty at the horde's heart. The full alliance and every unlocked Act against everything you've already beaten |
+| **Ghost Flood Control**| Ghost flood-control projects | Ranged stealth | **Floods the path in surges** — enemies ride the water faster |
+| **Pork Barrel** | Discretionary-fund abuse | Melee tank | Bloated hog of funds — **devours gold pickups** to grow max HP |
+| **Vote Buying** | Election money | Ranged | Scatters **fake gold** that subtracts from total if tapped |
+| **Nepotism** | Appointed relatives | Summoner | Continuously summons respawning appointee Shieldbearers |
+| **Wang-Wang** | VIP entitlement | Melee rusher | Convoy sirens: grants massive speed bursts ignoring slows |
+| **Budget Insertion** | Midnight insertions | Stealth elite | Smuggles massive HP down a side lane to split your focus |
+| **Smuggling** | Customs leakage | Melee | Drains your ongoing economy/Hope generation while alive |
+| **The Dynasty** | Political dynasties | 3-phase apex | Kill it and a relative takes over (Bruiser → Schemer → Heir) |
+| **Ang Sistema** *(finale)*| The system that lets them all thrive | Horde convergence | The finale: resurrects lesser versions of all defeated bosses at once |
 
-Boss rules unchanged: path-walkers, melee hit the Barrier on arrival /
-ranged bombard from partway, hard-CC immune, telegraphed weaknesses,
-skills only affect their own side or the Barrier.
+Boss rules unchanged: path-walkers, melee hit the Barrier on arrival / ranged bombard from partway, hard-CC immune, telegraphed weaknesses, skills only affect their own side or the Barrier.
 
 ## Recruitment — inspiration only
 

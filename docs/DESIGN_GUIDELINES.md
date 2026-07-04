@@ -38,6 +38,20 @@ Rules:
   - **Enemies**: Enemy movement should be smooth. Ailments (Burn, Slow, Stun) should apply vibrant tints or small status icons above the enemy HP bar.
 - **Icons**: Use modern, clean, line-art or flat-filled icons (e.g., Material Symbols or Lucide style). Avoid complex multi-colored icons in the UI chrome.
 
+## UI Thematic Design: The Rally / Protest Motif
+
+The primary aesthetic of the game's UI and menus must visually communicate a grassroots rally or street protest. UI components should feel like objects you'd find in the streets during a mobilization.
+
+- **Main Menu / Screens**: The background or framing of full-screen UI should incorporate visuals of protests, crowds, city streets, and makeshift stages. The **Main Menu** specifically represents the active street rally.
+- **Sari-Sari Store**: The meta-store takes the form of an authentic neighborhood store (Sari-Sari store) featuring a wooden storefront, metal security grilles, hanging goods on wires, and handwritten cardboard price tags.
+- **Inventory (Roster & Codex)**: Represented as a **Meeting Board / Archive**, taking the visual form of a corkboard with heroes pinned as Polaroid photos and ID lanyards.
+- **Preparation Screen**: Represented as a **Briefing / Meeting Room** before deployment, featuring a dimly lit command table with blueprints and silhouettes of movement leaders.
+- **Barricades & Fences**: Use visual motifs of metal barricades, corrugated iron, or chain-link fences as dividers, panel borders, or headers.
+- **Tarps & Placards**: Modals, dialogue boxes, and information cards should mimic the look of painted tarpaulins (tarps), cardboard placards, or hastily printed manifestos. 
+- **Cable Wires & Street Elements**: Use hanging electrical wires, caution tape, and street poles to visually separate UI elements or direct the user's eye between sections.
+- **Megaphones & Audio**: Use megaphone icons for announcements, notifications, and primary calls to action (like "Start Wave" or "Summon"). 
+- **Reusable Components**: Buttons and panels should consistently reuse these thematic elements rather than generic UI shapes (e.g. a button styled as a protest sign or a slider styled like a megaphone volume knob).
+
 ## Layout patterns: The Immersive Full-Screen Canvas
 
 - **Zero-Footprint HUD**: The Phaser game canvas must own 100% of the screen area (16:9 ratio, scaling with `FIT`). The React UI acts strictly as a transparent, floating overlay. Do not use opaque backgrounds, gradients, or heavy container panels that block the bottom or top of the screen.

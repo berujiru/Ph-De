@@ -19,33 +19,39 @@ implemented.
 1. **Poise and Stagger System**: Heavy melee attacks (e.g., from physical or earth wall-guards) deal "Poise Damage" alongside HP damage. Breaking an anomaly's poise interrupts their current action and grants a brief window of bonus damage, making combat impacts feel visceral.
 2. **Every damage type must have a distinct job.** If a proposed type would
    play the same as an existing one, it's a color, not a type — don't add it.
-2. **Every type needs a carrier.** A damage type ships only alongside at
+3. **Every type needs a carrier.** A damage type ships only alongside at
    least one hero that deals it and at least one enemy that resists or is
    weak to it. No orphan types in data. (Carriers were "towers" in the
    original draft; heroes are the only damage dealers now — see
    `docs/WORLD_AND_HEROES.md` for the type-to-hero mapping.)
-3. **Hard crowd control always has an immunity window.** Stun, Freeze,
+4. **Hard crowd control always has an immunity window.** Stun, Freeze,
    Sleep, and Knockback stop or reverse path progress, which is equivalent
    to free DPS. Every proc grants the enemy temporary immunity to that
    effect, and bosses are outright immune (via `ailmentImmunities`).
-4. **Resistances are multipliers**: `0` = immune, `0.5` = resistant,
+5. **Resistances are multipliers**: `0` = immune, `0.5` = resistant,
    `1` = neutral (default, omitted from data), `1.5+` = weak. Damage taken =
    `baseDamage × resistances[type]`, after armor where armor applies.
+6. **Decoupled attack stats**: A hero's `damageType` (e.g., fire, water, holy) is completely independent from their `attackStyle` (e.g., projectile, melee-cleave, beam). The damage type is determined by the hero's identity and theme, not the physical shape or mechanics of their attack.
+7. **Modular Ailments (Voices RNG Drops)**: Ailments (such as Poison, Rot, Burn, Bleed) are completely independent of a hero's base identity, damage type, or attack style. They are acquired as RNG drops (e.g., from Voices RNG during a run) and are applied to a specific individual hero's attacks/projectiles, rather than being inherently tied to damage types or applied globally to the squad.
+8. **Visual Rules for Ailments**:
+   - **Buildup Metric**: Ailments that require threshold accumulation must display a small, partially filled visual indicator (icon or bar) above the enemy.
+   - **Active State Icon**: Once activated, the indicator locks into a solid icon representing the active ailment.
+   - **Active Visual Overlays**: Enemies do not simply change color. Active ailments add distinct visual overlays onto the enemy sprite (e.g., lingering fire particles for Burn, or dripping green bubbles for Poison). Multiple active ailments stack their overlays visually rather than overwriting each other.
 
 ## Damage types
 
-| Type | Job | Rider / special rule | Countered by |
-|---|---|---|---|
-| `physical` | Baseline, most common | None — reliable | Armor (flat reduction per hit) |
-| `magic` | Anti-armor | Ignores armor entirely | Magic-resistant elites |
-| `fire` | Damage over time | Applies **Burn** on every hit | **Wet** enemies (burn doused) |
-| `frost` | Control | Applies **Slow**; chance to **Freeze** wet enemies | Frost-immune fire-themed enemies |
-| `lightning` | Burst + interrupt | Chance to **Stun**; vs **Wet**: +50% damage and double stun chance | Grounded/insulated enemies |
-| `water` | Enabler/utility | Applies **Wet**; modest damage by design | — (its weakness is low raw DPS) |
-| `wind` | Time-buyer | **Knockback** along the path; full value vs `flying` | Heavy/boss enemies (knockback-immune) |
-| `earth` | Anti-armor, physical flavor | Applies **Armor Shred**; splash affinity; cannot target `flying` | Flying enemies |
-| `holy` | Anti-undead | ×1.5 damage vs `undead`-tagged enemies | Neutral vs everything else |
-| `dark` | Force multiplier | Applies **Curse** (amplifies all incoming damage) | Weak alone — requires squad mixing |
+| Type | Visual Color | Job | Rider / special rule | Countered by |
+|---|---|---|---|---|
+| `physical` | Silver | Baseline, most common | None — reliable | Armor (flat reduction per hit) |
+| `magic` | Light Blue | Anti-armor | Ignores armor entirely | Magic-resistant elites |
+| `fire` | Red/Orange | Damage over time | Applies **Burn** on every hit | **Wet** enemies (burn doused) |
+| `frost` | Ice Blue | Control | Applies **Slow**; chance to **Freeze** wet enemies | Frost-immune fire-themed enemies |
+| `lightning` | Yellow | Burst + interrupt | Chance to **Stun**; vs **Wet**: +50% damage and double stun chance | Grounded/insulated enemies |
+| `water` | Deep Blue | Enabler/utility | Applies **Wet**; modest damage by design | — (its weakness is low raw DPS) |
+| `wind` | Teal/Green | Time-buyer | **Knockback** along the path; full value vs `flying` | Heavy/boss enemies (knockback-immune) |
+| `earth` | Brown | Anti-armor, physical flavor | Applies **Armor Shred**; splash affinity; cannot target `flying` | Flying enemies |
+| `holy` | Gold/White | Anti-undead | ×1.5 damage vs `undead`-tagged enemies | Neutral vs everything else |
+| `dark` | Purple | Force multiplier | Applies **Curse** (amplifies all incoming damage) | Weak alone — requires squad mixing |
 
 ### Elemental interplay (Wet as the hub)
 
@@ -66,18 +72,18 @@ through a shared mechanism.
 
 | Ailment | Source | Proc rule | Effect | Stacking / immunity |
 |---|---|---|---|---|
-| `burn` | fire | Every hit applies/refreshes | 5 dmg/sec for 3s | No stack; refresh only |
-| `slow` | frost | Every hit applies/refreshes | −40% speed for 2s | No stack; refresh only |
-| `wet` | water | Every hit applies/refreshes | No damage; douses Burn, enables Freeze, amplifies lightning | 4s duration |
-| `freeze` | frost hit on Wet enemy | 20% chance | Full stop 1s | Consumes Wet; shares Stun's immunity window |
-| `stun` | lightning | 10% chance per hit | Full stop 0.5s | 3s immunity after proc |
-| `poison` | future carrier hero (deferred) | 30% chance per hit | 2 dmg/sec for 8s | Stacks ×3 with independent timers |
-| `bleed` | future carrier hero (deferred) | +1 stack per hit (max 5) | At 5 stacks: burst 10% max HP, stacks reset | 2s no-stack window after proc; flat cap vs bosses (tune later) |
-| `rot` | future carrier hero (deferred) | Every hit adds a stack | 1 dmg/sec **permanently** (never expires) | Stacks ×5 |
-| `sleep` | future carrier hero (deferred) | Always applies on hit | Full stop up to 3s; **any damage wakes it** | Shares hard-CC immunity window |
-| `curse` | dark | Every hit applies/refreshes | +25% damage taken from all sources, 4s | No stack |
-| `knockback` | wind | 25% chance per hit | Pushed 40px back along path | 3s immunity; bosses immune |
-| `armorShred` | earth | Every hit | −1 armor (min 0) for 5s | Stacks until armor reaches 0 |
+| `burn` | Voices RNG Drop | Every hit applies/refreshes | 5 dmg/sec for 3s | No stack; refresh only |
+| `slow` | Voices RNG Drop | Every hit applies/refreshes | −40% speed for 2s | No stack; refresh only |
+| `wet` | Voices RNG Drop | Every hit applies/refreshes | No damage; douses Burn, enables Freeze, amplifies lightning | 4s duration |
+| `freeze` | Voices RNG Drop | 20% chance | Full stop 1s | Consumes Wet; shares Stun's immunity window |
+| `stun` | Voices RNG Drop | 10% chance per hit | Full stop 0.5s | 3s immunity after proc |
+| `poison` | Voices RNG Drop | 30% chance per hit | 2 dmg/sec for 8s | Stacks ×3 with independent timers |
+| `bleed` | Voices RNG Drop | +1 stack per hit (max 5) | At 5 stacks: burst 10% max HP, stacks reset | 2s no-stack window after proc; flat cap vs bosses (tune later) |
+| `rot` | Voices RNG Drop | Every hit adds a stack | 1 dmg/sec **permanently** (never expires) | Stacks ×5 |
+| `sleep` | Voices RNG Drop | Always applies on hit | Full stop up to 3s; **any damage wakes it** | Shares hard-CC immunity window |
+| `curse` | Voices RNG Drop | Every hit applies/refreshes | +25% damage taken from all sources, 4s | No stack |
+| `knockback` | Voices RNG Drop | 25% chance per hit | Pushed 40px back along path | 3s immunity; bosses immune |
+| `armorShred` | Voices RNG Drop | Every hit | −1 armor (min 0) for 5s | Stacks until armor reaches 0 |
 
 ### Deliberate distinctions (don't collapse these)
 

@@ -82,7 +82,7 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
           fontWeight: 'bold',
           fontSize: '18px'
         }}>
-          <div style={{ fontSize: '18px' }}>Barrier HP: {state.barrierHp}</div>
+          <div style={{ fontSize: '18px' }}>Morale: {state.barrierHp}</div>
           <div style={{ fontSize: '14px', color: theme.colors.textSecondary, marginTop: '4px' }}>
             {state.waveActive ? `Wave ${state.currentWave} / ${state.totalWaves}` : 'Waiting for Deployment'}
           </div>
@@ -257,11 +257,11 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
             fontWeight: '900',
             letterSpacing: '4px'
           }}>
-            {state.status === 'won' ? 'Victory' : 'Barrier Breached'}
+            {state.status === 'won' ? 'Victory' : 'Rally Broken'}
           </h1>
           
           <div style={{ color: '#fff', fontSize: '18px', marginBottom: '30px', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
-            {state.status === 'won' ? 'The barrier holds strong.' : 'The barrier was overwhelmed.'}
+            {state.status === 'won' ? 'The barrier holds strong.' : "The movement's morale dropped to zero."}
           </div>
 
           <div style={{

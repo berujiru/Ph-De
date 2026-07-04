@@ -102,30 +102,35 @@ interface StageDefinition {
   *stats/behavior* live once per chassis; factions reskin them. New act ≠
   new enemy code.
 
-## Per-run rewards: Hope and the Sari-Sari Store
+## Meta-Economy: Hope, Cards, and Rally Permits
 
-Every run pays out **Hope (Pag-asa)** and **Hero Cards** — the persistent meta currencies — **win or lose**. A failed defense still wakes people up.
+The game's progression revolves around a tightly integrated meta-economy, accessible via the main menu's **Inventory / Archive** screen and the **Sari-Sari Store**.
 
-Earn rules (all `balance.ts` data):
-- Base Hope payout per wave cleared (so losses pay proportionally)
-- **Hero Card Drops**: Every run guarantees a base number of Hero Cards, with bonuses for better performance. Cards are used to permanently level up unlocked heroes.
-- Win bonus; first-clear bonus (the big one); no-leak bonus
-- Daily first-run bonus (retention hook)
+### The Energy System: Rally Permits
+- **Rally Permits** are required to start any campaign stage. This is the game's energy/stamina system.
+- The UI for the campaign map must explicitly display the **cost per campaign run** in Permits.
+- Permits regenerate naturally over time, but players can also purchase extra Rally Permits in the Sari-Sari Store.
 
-Spend at the **Sari-Sari Store** (the neighborhood store as the game's
-shop — data-driven catalog):
+### The Store Currency: Hope Points
+- Every run pays out **Hope Points** — the persistent meta-currency (gold coin for the store) — **win or lose**. A failed defense still wakes people up and earns Hope.
+- **Earn rules**: Base Hope payout per wave cleared, win bonuses, no-leak bonuses, and daily first-run bonuses (all defined in `balance.ts`).
 
-| Purchase | Notes |
-|---|---|
-| **Hero unlocks** | Workers not tied to a story milestone — unlockable in player-chosen order |
-| **Hero mastery upgrades** | Permanent per-hero stat/skill tiers, alongside arc-replay mastery |
-| **Bayanihan Acts** | Additional barrier ultimates beyond milestone unlocks |
-| **Cosmetics** | Festival costumes, map skins, voice-line packs |
+### Progression: Hero Cards
+- Leveling up heroes uses **Cards**. 
+- Cards are acquired as RNG drops at the end of runs, or directly purchased in the Sari-Sari Store using Hope Points.
+- The **Inventory** screen (accessible via a main menu button) holds all collected drops, cards, and unlocked heroes.
 
-**Binding rule (proposed, pending owner confirmation): heroes are never
-sold for real money.** They're earned — by story milestone or by Hope,
-both in-game only. Real-money IAP, when it comes, maps to cosmetics (and
-possibly Hope top-ups — decide later, but never exclusive hero access).
+### The Sari-Sari Store (Data-driven catalog)
+
+| Purchase | Cost | Notes |
+|---|---|---|
+| **Hero Cards** | Hope Points | Used to permanently level up unlocked heroes. |
+| **Hero unlocks** | Hope Points | New workers not tied to a story milestone. |
+| **Rally Permits** | Hope Points/IAP | Refills energy to continue playing campaign runs. |
+| **Bayanihan Acts** | Hope Points | Additional barrier ultimates beyond milestone unlocks. |
+| **Cosmetics** | Hope Points/IAP | Festival costumes, map skins, voice-line packs. |
+
+**Binding rule (pending owner confirmation): heroes are never sold directly for real money.** They're earned — by story milestone or by Hope Points in-game only. Real-money IAP maps to cosmetics and Rally Permit / Hope top-ups.
 
 ## The goal layer — what players actually pursue
 
