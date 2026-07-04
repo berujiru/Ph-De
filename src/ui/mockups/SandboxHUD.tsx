@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { theme } from '../theme';
-import { uiToGameEvents } from '../../game/core/GameEvents';
+import { uiToGameEvents, gameToUiEvents } from '../../game/core/GameEvents';
+import type { GameStateSnapshot } from '../../game/core/GameEvents';
 import { HERO_DEFINITIONS } from '../../game/data/balance';
 import {
   BackIcon,
@@ -11,8 +12,10 @@ import {
   PlusIcon,
   SkullIcon,
   SpeedIcon,
+  BrainIcon,
 } from '../icons';
 import { battleCss, fab, glass, glassPanel, glassSelect, withAlpha } from './battleStyles';
+import { IntelModal } from '../components/IntelModal';
 
 interface SandboxHUDProps {
   onReturnToMenu: () => void;
@@ -43,7 +46,11 @@ const actionBtn: CSSProperties = {
 
 /** Solid accent action — primary "do it" buttons in the rig. */
 const primaryBtn: CSSProperties = {
-  ...actionBtn,
+  ...fab,
+  borderRadius: 8,
+  width: 'auto',
+  height: 32,
+  padding: '0 12px',
   backgroundColor: theme.colors.accent,
   color: theme.colors.background,
   boxShadow: `0 0 12px ${withAlpha(theme.colors.accent, 0.4)}`,
@@ -83,6 +90,15 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
   const [selectedSkill, setSelectedSkill] = useState<string>('none');
   const [selectedAilment, setSelectedAilment] = useState<string>('poison');
   const [gameSpeed, setGameSpeed] = useState<number>(1);
+  const [intelOpen, setIntelOpen] = useState(false);
+  const [gameState, setGameState] = useState<GameStateSnapshot | null>(null);
+
+  useEffect(() => {
+    const unsub = gameToUiEvents.on('stateChanged', (snapshot) => {
+      setGameState(snapshot);
+    });
+    return () => unsub();
+  }, []);
 
   const playBtnSound = () => uiToGameEvents.emit('playSound', { key: 'sfx-btn-press' });
 
@@ -386,30 +402,53 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
           </div>
         </RigSection>
 
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
           {speedFab(0, 'Pause', <PauseIcon size={18} />)}
           {speedFab(1, 'Normal speed', <PlayIcon size={18} />)}
           {speedFab(2, 'Fast forward', <SpeedIcon size={18} />)}
+          
+          <button
+            type="button"
+            className="hud-btn"
+            onClick={() => setIntelOpen(true)}
+            style={{
+              ...actionBtn,
+              ...glassPanel,
+              flex: 'none',
+              color: '#38bdf8', // accent color
+            }}
+          >
+            <BrainIcon size={14} />
+            Intel
+          </button>
+          
+          <button
+            type="button"
+            className="hud-btn"
+            onClick={() => {
+              onReturnToMenu();
+              playBtnSound();
+            }}
+            style={{
+              ...actionBtn,
+              ...glassPanel,
+              flex: 'none',
+              color: theme.colors.textPrimary,
+            }}
+          >
+            <BackIcon size={14} />
+            Leave Sandbox
+          </button>
         </div>
-
-        <button
-          type="button"
-          className="hud-btn"
-          onClick={() => {
-            onReturnToMenu();
-            playBtnSound();
-          }}
-          style={{
-            ...actionBtn,
-            ...glassPanel,
-            flex: 'none',
-            color: theme.colors.textPrimary,
-          }}
-        >
-          <BackIcon size={14} />
-          Leave Sandbox
-        </button>
       </div>
+      
+      {intelOpen && gameState && (
+        <IntelModal
+          heroes={gameState.activeHeroes || []}
+          enemies={gameState.activeEnemies || []}
+          onClose={() => setIntelOpen(false)}
+        />
+      )}
     </div>
   );
 }

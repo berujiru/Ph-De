@@ -8,7 +8,6 @@ import {
   type DropRarity,
   type GameStateSnapshot,
 } from '../../game/core/GameEvents';
-import { HERO_DEFINITIONS } from '../../game/data/balance';
 import {
   BarrierIcon,
   HeroCardIcon,
@@ -18,7 +17,6 @@ import {
   PlayIcon,
   PlusIcon,
   RaisedFistIcon,
-  SettingsIcon,
   SkullIcon,
   SpeedIcon,
   StarIcon,
@@ -27,10 +25,12 @@ import {
   VoicesIcon,
   WaveIcon,
   damageTypeIcons,
+  BrainIcon,
 } from '../icons';
-import { battleCss, cautionTape, fab, glass, glassPanel, glassSelect, withAlpha } from './battleStyles';
+import { battleCss, cautionTape, fab, glass, glassPanel, withAlpha } from '../mockups/battleStyles';
+import { IntelModal } from './IntelModal';
 
-interface BattleHUDProps {
+interface RallyScreenProps {
   onReturnToMenu: () => void;
 }
 
@@ -267,10 +267,10 @@ function SpoilRow({ icon, iconColor, label, value, valueColor, prefix = '+', suf
 }
 
 /* ------------------------------------------------------------------ */
-/* BattleHUD                                                           */
+/* RallyScreen                                                           */
 /* ------------------------------------------------------------------ */
 
-export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
+export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
   const [state, setState] = useState<GameStateSnapshot>({
     barrierHp: 100,
     maxBarrierHp: 100,
@@ -282,10 +282,12 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
     isPaused: false,
     gameSpeed: 1,
     status: 'playing',
+    activeHeroes: [],
+    activeEnemies: [],
   });
   const [dropOptions, setDropOptions] = useState<DropOption[]>([]);
-  const [selectedHero, setSelectedHero] = useState<string>('');
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [surrenderConfirmOpen, setSurrenderConfirmOpen] = useState(false);
+  const [intelOpen, setIntelOpen] = useState(false);
   const lastSpeedRef = useRef(1);
 
   useEffect(() => {
@@ -323,13 +325,8 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
 
   const handleSurrender = () => {
     playBtnSound();
-    setMenuOpen(false);
+    setSurrenderConfirmOpen(false);
     uiToGameEvents.emit('surrender', undefined);
-  };
-
-  const handleDebugSpawn = () => {
-    playBtnSound();
-    uiToGameEvents.emit('debugSpawn', { heroId: selectedHero || undefined });
   };
 
   const handleSelectDrop = (dropId: string) => {
@@ -380,8 +377,11 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
               padding: '8px 14px',
             }}
           >
-            <span style={{ color: moraleLow ? theme.colors.danger : theme.colors.success, display: 'flex' }}>
+            <span style={{ color: moraleLow ? theme.colors.danger : theme.colors.success, display: 'flex', alignItems: 'center', gap: 4 }}>
               <BarrierIcon size={18} />
+              <span style={{ fontSize: 12, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                {state.barrierHp}
+              </span>
             </span>
             <div
               style={{
@@ -402,16 +402,6 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
                 }}
               />
             </div>
-            <span
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                fontVariantNumeric: 'tabular-nums',
-                color: moraleLow ? theme.colors.danger : theme.colors.textPrimary,
-              }}
-            >
-              {state.barrierHp}
-            </span>
           </div>
 
           <div
@@ -480,16 +470,6 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
                 }}
               />
             </div>
-            <span
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                fontVariantNumeric: 'tabular-nums',
-                color: theme.colors.textPrimary,
-              }}
-            >
-              {state.voicesCount}/{state.maxVoicesCount}
-            </span>
           </div>
         </div>
 
@@ -505,6 +485,21 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
             title={paused ? 'Resume' : 'Pause'}
           >
             {paused ? <PlayIcon size={20} /> : <PauseIcon size={20} />}
+          </button>
+
+          <button
+            type="button"
+            className="hud-btn"
+            style={{ ...fab, color: theme.colors.accent, border: `1px solid ${withAlpha(theme.colors.accent, 0.4)}` }}
+            onClick={() => {
+              playBtnSound();
+              setIntelOpen(true);
+            }}
+            disabled={gameOver}
+            aria-label="Battle Intel"
+            title="Battle Intel"
+          >
+            <BrainIcon size={20} />
           </button>
 
           <button
@@ -532,99 +527,148 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
           <button
             type="button"
             className="hud-btn"
-            style={fab}
+            style={{ ...fab, color: theme.colors.danger, border: `1px solid ${withAlpha(theme.colors.danger, 0.4)}` }}
             onClick={() => {
               playBtnSound();
-              setMenuOpen((open) => !open);
+              setSurrenderConfirmOpen(true);
             }}
-            aria-expanded={menuOpen}
-            aria-label="Battle menu"
-            title="Battle menu"
+            disabled={gameOver}
+            aria-label="Surrender"
+            title="Surrender"
           >
-            <SettingsIcon size={20} />
+            <SkullIcon size={20} />
           </button>
+        </div>
+      </div>
 
-          {menuOpen && (
-            <div style={{ ...glassPanel, padding: 6, display: 'flex', flexDirection: 'column', minWidth: 160 }}>
+      {/* ---------- Bottom-center: Bayanihan Act Button ---------- */}
+      <div
+        style={{
+          position: 'absolute',
+          left: '50%',
+          bottom: 24,
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          pointerEvents: 'auto',
+          zIndex: 10,
+        }}
+      >
+        <button
+          type="button"
+          className="hud-btn"
+          disabled={gameOver}
+          title="Ultimate Ready!"
+          style={{
+            ...fab,
+            width: 72,
+            height: 72,
+            borderRadius: '50%',
+            backgroundColor: withAlpha(theme.colors.background, 0.85),
+            border: `2px solid ${theme.colors.accent}`,
+            color: theme.colors.accent,
+            boxShadow: `0 0 20px ${withAlpha(theme.colors.accent, 0.7)}, inset 0 0 10px ${withAlpha(theme.colors.accent, 0.4)}`,
+            animation: 'pulse-glow 2s infinite',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 4,
+          }}
+          onClick={() => {
+            playBtnSound();
+            // In the future: emit bayanihan act event
+          }}
+        >
+          <MegaphoneIcon size={28} />
+          <span style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.5 }}>Act</span>
+        </button>
+      </div>
+
+      {/* ---------- Abandon Rally Confirmation ---------- */}
+      {surrenderConfirmOpen && !gameOver && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 150,
+            backgroundColor: withAlpha(theme.colors.background, 0.72),
+            backdropFilter: 'blur(6px)',
+            WebkitBackdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 16,
+            pointerEvents: 'auto',
+            animation: 'overlay-fade 0.2s ease both',
+          }}
+        >
+          <div
+            style={{
+              ...glassPanel,
+              borderRadius: 16,
+              width: 'min(360px, 92vw)',
+              padding: 24,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 16,
+              boxShadow: `0 18px 40px ${withAlpha(theme.colors.background, 0.8)}`,
+              border: `1px solid ${withAlpha(theme.colors.danger, 0.3)}`,
+            }}
+          >
+            <span style={{ color: theme.colors.danger, display: 'flex' }}>
+              <SkullIcon size={36} />
+            </span>
+            <div style={{ textAlign: 'center' }}>
+              <h2 style={{ margin: '0 0 8px', fontSize: 20, fontWeight: 900, color: theme.colors.danger, textTransform: 'uppercase', letterSpacing: 1 }}>
+                Abandon Rally?
+              </h2>
+              <p style={{ margin: 0, fontSize: 13, color: theme.colors.textMuted, lineHeight: 1.5 }}>
+                Leaving now will break the movement's momentum. Are you sure you want to surrender?
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: 12, width: '100%', marginTop: 8 }}>
+              <button
+                type="button"
+                className="hud-btn"
+                onClick={() => setSurrenderConfirmOpen(false)}
+                style={{
+                  flex: 1,
+                  minHeight: 44,
+                  borderRadius: 10,
+                  border: `1px solid ${glass.border}`,
+                  backgroundColor: 'transparent',
+                  color: theme.colors.textPrimary,
+                  fontSize: 14,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
               <button
                 type="button"
                 className="hud-btn"
                 onClick={handleSurrender}
-                disabled={gameOver}
                 style={{
+                  flex: 1,
                   minHeight: 44,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: '0 12px',
-                  borderRadius: 8,
+                  borderRadius: 10,
                   border: 'none',
-                  backgroundColor: 'transparent',
-                  color: theme.colors.danger,
+                  backgroundColor: theme.colors.danger,
+                  color: theme.colors.textPrimary,
+                  fontSize: 14,
                   fontWeight: 700,
-                  fontSize: 13,
                   cursor: 'pointer',
+                  boxShadow: `0 0 16px ${withAlpha(theme.colors.danger, 0.4)}`,
                 }}
               >
-                <SkullIcon size={18} />
                 Surrender
               </button>
             </div>
-          )}
+          </div>
         </div>
-      </div>
-
-      {/* ---------- Bottom-left: DEV spawn rig (mockup affordance) ---------- */}
-      <div
-        style={{
-          position: 'absolute',
-          left: 12,
-          bottom: 12,
-          display: 'flex',
-          alignItems: 'stretch',
-          gap: 6,
-          pointerEvents: 'auto',
-        }}
-      >
-        <span
-          style={{
-            ...glassPanel,
-            borderRadius: 8,
-            alignSelf: 'center',
-            padding: '4px 6px',
-            fontSize: 9,
-            fontWeight: 800,
-            letterSpacing: 1,
-            color: theme.colors.textMuted,
-          }}
-        >
-          DEV
-        </span>
-        <select
-          value={selectedHero}
-          onChange={(e) => setSelectedHero(e.target.value)}
-          aria-label="Dev: hero to spawn"
-          style={{ ...glassSelect, maxWidth: 150 }}
-        >
-          <option value="">Random Hero</option>
-          {Object.entries(HERO_DEFINITIONS).map(([id, def]) => (
-            <option key={id} value={id}>
-              {def.name} ({def.attackStyle})
-            </option>
-          ))}
-        </select>
-        <button
-          type="button"
-          className="hud-btn"
-          onClick={handleDebugSpawn}
-          disabled={gameOver}
-          aria-label="Dev: spawn hero"
-          title="Dev: spawn hero"
-          style={{ ...fab, borderRadius: 10, color: theme.colors.accent }}
-        >
-          <PlusIcon size={18} />
-        </button>
-      </div>
+      )}
 
       {/* ---------- Drop selection: "A Voice Rises!" ---------- */}
       {dropOptions.length > 0 && !gameOver && (
@@ -793,20 +837,20 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
                   value={hopeEarned}
                   valueColor={theme.colors.gold}
                 />
-                <SpoilRow
-                  icon={<HeroCardIcon size={20} />}
-                  iconColor={theme.colors.accent}
-                  label="Hero Card Drops"
-                  value={heroCardDrops}
-                />
-                <SpoilRow
-                  icon={<WaveIcon size={20} />}
-                  iconColor={theme.colors.textMuted}
-                  label="Waves Cleared"
-                  value={wavesCleared}
-                  prefix=""
-                  suffix={`/${state.totalWaves}`}
-                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', marginTop: 4 }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: 'uppercase', color: theme.colors.textMuted }}>
+                    Hero Card Drops
+                  </div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    {heroCardDrops > 0 ? Array.from({ length: heroCardDrops }).map((_, i) => (
+                      <div key={i} style={{ width: 44, height: 60, borderRadius: 6, border: `1px solid ${theme.colors.accent}`, backgroundColor: withAlpha(theme.colors.accent, 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span style={{ color: theme.colors.accent, display: 'flex' }}><HeroCardIcon size={24} /></span>
+                      </div>
+                    )) : (
+                      <div style={{ fontSize: 13, color: theme.colors.textMuted }}>None</div>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {/* ONE clear action (docs/DESIGN_GUIDELINES.md game-over rule) */}
@@ -842,6 +886,15 @@ export function BattleHUD({ onReturnToMenu }: BattleHUDProps) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* 4. Intel Modal */}
+      {intelOpen && (
+        <IntelModal
+          heroes={state.activeHeroes || []}
+          enemies={state.activeEnemies || []}
+          onClose={() => setIntelOpen(false)}
+        />
       )}
     </div>
   );

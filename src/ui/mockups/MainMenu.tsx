@@ -29,7 +29,7 @@ function Skyline() {
       aria-hidden="true"
       style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '45%', opacity: 0.55 }}
     >
-      <g fill="#0b1120">
+      <g fill="#64748b" opacity="0.4">
         <rect x="0" y="90" width="70" height="110" />
         <rect x="80" y="50" width="55" height="150" />
         <rect x="145" y="110" width="80" height="90" />
@@ -40,17 +40,6 @@ function Skyline() {
         <rect x="585" y="40" width="65" height="160" />
         <rect x="665" y="85" width="70" height="115" />
         <rect x="745" y="120" width="55" height="80" />
-      </g>
-      {/* lit windows */}
-      <g fill="#facc15" opacity="0.28">
-        <rect x="92" y="66" width="8" height="10" />
-        <rect x="112" y="90" width="8" height="10" />
-        <rect x="252" y="46" width="8" height="10" />
-        <rect x="272" y="70" width="8" height="10" />
-        <rect x="597" y="58" width="8" height="10" />
-        <rect x="617" y="100" width="8" height="10" />
-        <rect x="435" y="72" width="8" height="10" />
-        <rect x="500" y="118" width="8" height="10" />
       </g>
     </svg>
   );
@@ -78,7 +67,7 @@ function RallyCrowd() {
         preserveAspectRatio="xMidYMax slice"
         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.9 }}
       >
-        <g fill="#111c33">
+        <g fill="#334155">
           {/* rolling heads of the crowd */}
           <path d="M0 260V190q30-24 60-10t60-6 62 10 58-14 62 8 60-10 62 12 58-12 62 10 60-8 62 12 58-10 62 8 54-6v66z" />
           {/* placards on sticks */}
@@ -103,20 +92,20 @@ function RallyCrowd() {
           </g>
         </g>
         {/* placard slogans, barely readable strokes */}
-        <g stroke="#38bdf8" strokeWidth="5" strokeLinecap="round" opacity="0.5">
+        <g stroke="#94a3b8" strokeWidth="5" strokeLinecap="round" opacity="0.6">
           <path d="M86 80h58M86 96h38" />
           <path d="M268 52h64M268 68h44" transform="rotate(-6 302 62)" />
           <path d="M486 72h58M486 88h36" transform="rotate(5 518 82)" />
         </g>
       </svg>
 
-      {/* Eden and two allies front and center */}
+      {/* Heroes rallying at the sides */}
+      {/* Left flank */}
       <div
         style={{
           position: 'absolute',
-          bottom: -14,
-          left: '50%',
-          transform: 'translateX(-50%)',
+          bottom: -10,
+          left: '2%',
           display: 'flex',
           alignItems: 'flex-end',
           gap: 4,
@@ -125,21 +114,35 @@ function RallyCrowd() {
         <img
           src="/assets/heroes/hero-placeholder.svg"
           alt=""
-          style={{ width: 110, height: 110, opacity: 0.85, transform: 'scaleX(-1)' }}
+          style={{ width: 160, height: 160, filter: 'drop-shadow(0 0 16px rgba(56, 189, 248, 0.3))' }}
         />
         <img
           src="/assets/heroes/hero-placeholder.svg"
           alt=""
-          style={{
-            width: 170,
-            height: 170,
-            filter: 'drop-shadow(0 0 24px rgba(56, 189, 248, 0.45))',
-          }}
+          style={{ width: 120, height: 120, opacity: 0.9, transform: 'scaleX(-1)' }}
+        />
+      </div>
+
+      {/* Right flank */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: -10,
+          right: '2%',
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: 4,
+        }}
+      >
+        <img
+          src="/assets/heroes/hero-placeholder.svg"
+          alt=""
+          style={{ width: 120, height: 120, opacity: 0.9 }}
         />
         <img
           src="/assets/heroes/hero-placeholder.svg"
           alt=""
-          style={{ width: 120, height: 120, opacity: 0.85 }}
+          style={{ width: 160, height: 160, filter: 'drop-shadow(0 0 16px rgba(56, 189, 248, 0.3))', transform: 'scaleX(-1)' }}
         />
       </div>
     </div>
@@ -241,7 +244,7 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
         zIndex: 100,
         display: 'flex',
         flexDirection: 'column',
-        background: 'linear-gradient(180deg, #0f172a 0%, #131f38 55%, #1e293b 100%)',
+        background: 'linear-gradient(180deg, #7dd3fc 0%, #bae6fd 55%, #e0f2fe 100%)',
       }}
     >
       <Skyline />

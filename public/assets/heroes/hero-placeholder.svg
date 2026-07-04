@@ -1,20 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Hero portrait placeholder: dignified worker bust, raised fist.
-       Slate silhouette + accent rim light. Transparent background. -->
+  <!-- Hero portrait placeholder: dignified worker bust, raised fist. -->
 
-  <!-- raised arm (character's right, viewer left) -->
+  <!-- Back/shadow of raised arm -->
   <g fill="#1e293b">
     <rect x="98" y="150" width="56" height="230" rx="28" transform="rotate(6 126 265)"/>
-    <!-- fist -->
-    <rect x="82" y="90" width="84" height="74" rx="20"/>
-    <circle cx="104" cy="90" r="13"/>
-    <circle cx="127" cy="86" r="13"/>
-    <circle cx="150" cy="90" r="13"/>
-    <rect x="148" y="112" width="24" height="44" rx="12"/>
-  </g>
-  <!-- knuckle creases -->
-  <g stroke="#0f172a" stroke-width="6" stroke-linecap="round">
-    <path d="M104 104v18M127 100v18M150 104v18"/>
   </g>
 
   <!-- shoulders / torso -->
@@ -22,25 +11,43 @@
   <!-- collar shadow -->
   <path d="M212 340q44 26 88 0l-14 34q-30 16-60 0z" fill="#0f172a"/>
 
+  <!-- scarf/bandana (new touch for "rally" vibe) -->
+  <path d="M210 320q46 30 92 0l-10 60q-36 20-72 0z" fill="#b91c1c"/>
+
   <!-- neck -->
   <rect x="228" y="242" width="56" height="56" rx="12" fill="#1e293b"/>
   <path d="M228 252q28 18 56 0v-14h-56z" fill="#0f172a"/>
 
   <!-- head -->
   <circle cx="256" cy="184" r="74" fill="#1e293b"/>
-  <!-- hair -->
+  <!-- hair / cap -->
   <path d="M182 184a74 74 0 0 1 148 0h-22a52 52 0 0 0-104 0z" fill="#0f172a"/>
+  
   <!-- ears -->
   <circle cx="182" cy="192" r="12" fill="#1e293b"/>
   <circle cx="330" cy="192" r="12" fill="#1e293b"/>
 
+  <!-- fist overlapping body -->
+  <g fill="#1e293b">
+    <rect x="70" y="70" width="94" height="84" rx="22"/>
+    <circle cx="94" cy="70" r="15"/>
+    <circle cx="127" cy="66" r="15"/>
+    <circle cx="160" cy="70" r="15"/>
+    <rect x="156" y="92" width="28" height="54" rx="14"/>
+  </g>
+  <!-- knuckle creases -->
+  <g stroke="#0f172a" stroke-width="8" stroke-linecap="round">
+    <path d="M94 88v20M127 84v20M160 88v20"/>
+  </g>
+
   <!-- accent rim light -->
   <g fill="none" stroke="#38bdf8" stroke-width="8" stroke-linecap="round" opacity="0.85">
+    <!-- head -->
     <path d="M312 128a74 74 0 0 1 18 54"/>
+    <!-- shoulder -->
     <path d="M352 352q62 22 70 84"/>
+    <!-- arm/fist -->
     <path d="M96 148q-10-42 22-52"/>
     <path d="M106 176l28 178"/>
   </g>
-  <!-- faint chest accent (movement pin) -->
-  <path d="M234 366l22 18 22-18" fill="none" stroke="#38bdf8" stroke-width="6" stroke-linecap="round" opacity="0.4"/>
 </svg>

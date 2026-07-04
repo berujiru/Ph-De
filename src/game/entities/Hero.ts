@@ -19,7 +19,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   
   public passiveOverride?: string;
 
-  private bodyShape: Phaser.GameObjects.Rectangle;
+  private bodyShape: Phaser.GameObjects.Image;
   private skillHighlight: Phaser.GameObjects.Text;
   private attackBarBg: Phaser.GameObjects.Rectangle;
   private attackBarFill: Phaser.GameObjects.Rectangle;
@@ -52,7 +52,9 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.rangeIndicator.setVisible(false);
     this.add(this.rangeIndicator);
 
-    this.bodyShape = scene.add.rectangle(0, 0, 30, 40, def.color);
+    this.bodyShape = scene.add.image(0, 0, 'hero-placeholder');
+    this.bodyShape.setDisplaySize(36, 48);
+    this.bodyShape.setTint(def.color);
     this.add(this.bodyShape);
     
     const labelText = `${def.name}\nAtk: ${def.attackStyle}\nSkill: ${def.signatureSkill.name}`;

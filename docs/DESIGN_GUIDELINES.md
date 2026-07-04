@@ -92,8 +92,8 @@ The primary aesthetic of the game's UI and menus must visually communicate a gra
 
 ## Game design patterns (Rally Auto-Battler conventions this project follows)
 
-- **Portrait Rally March Layout**: The game uses a vertical portrait layout. You do not place static towers. Instead, you "summon" heroes who spawn at the bottom of the screen and automatically march upwards to form the rally frontline. Enemies (Anomalies) spawn at the top and move downwards to stop the rally.
-- **"Frontline" targeting by default**: Heroes target the enemy closest to them in the Y-axis as they march. If a hero is a melee unit, they stop moving when they meet an enemy to attack. Ranged heroes stop at their maximum attack range.
+- **Landscape Rally March Layout**: The game uses a horizontal landscape layout (e.g., 16:9). You do not place static towers. Instead, you "summon" heroes who spawn at the left side of the screen and automatically march rightwards to form the rally frontline against the barricade. Enemies (Anomalies) spawn at the right and move leftwards to stop the rally. The environment may eventually feature a parallax background scrolling from right to left to emphasize forward momentum.
+- **"Frontline" targeting by default**: Heroes target the enemy closest to them in the X-axis (closest to the barricade) as they march. If a hero is a melee unit, they stop moving when they meet an enemy to attack. Ranged heroes stop at their maximum attack range behind the barricade.
 - **Data-driven balance**: all hero/enemy/wave numbers live in
   `src/game/data/balance.ts`, not scattered magic numbers. This is a design
   guideline as much as a code guideline — balancing the game should mean

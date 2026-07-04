@@ -439,6 +439,20 @@ export function DarkIcon(props: IconProps) {
   );
 }
 
+export function BrainIcon(props: IconProps) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" />
+      <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" />
+      <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4" />
+      <path d="M17.599 6.5a3 3 0 0 0 .399-1.375" />
+      <path d="M6.002 6.5A3 3 0 0 1 5.603 5.125" />
+      <path d="M11.588 15.5a3 3 0 0 1-.598 1.5" />
+      <path d="M13.01 15.5a3 3 0 0 0 .588 1.5" />
+    </SvgIcon>
+  );
+}
+
 /**
  * Damage-type icon lookup, keyed by the ids used in
  * `src/game/data/balance.ts` (`HeroDefinition['damageType']`).

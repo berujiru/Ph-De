@@ -20,6 +20,16 @@ export class TypedEmitter<Events extends Record<string, unknown>> {
   }
 }
 
+export interface ActiveHeroInfo {
+  id: string;
+  passiveOverride?: string;
+}
+
+export interface ActiveEnemyInfo {
+  id: string;
+  count: number;
+}
+
 export interface GameStateSnapshot {
   barrierHp: number;
   maxBarrierHp: number;
@@ -31,6 +41,8 @@ export interface GameStateSnapshot {
   isPaused: boolean;
   gameSpeed: number;
   status: 'playing' | 'won' | 'lost';
+  activeHeroes: ActiveHeroInfo[];
+  activeEnemies: ActiveEnemyInfo[];
 }
 
 /** Rarity tiers for RNG drops (docs/WORLD_AND_HEROES.md "RNG rules"). */

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { GameCanvas } from './ui/GameCanvas';
 import { MainMenu } from './ui/mockups/MainMenu';
-import { BattleHUD } from './ui/mockups/BattleHUD';
+import { RallyScreen } from './ui/components/RallyScreen';
 import { CampaignMap } from './ui/mockups/CampaignMap';
 import { SariSariStore } from './ui/mockups/SariSariStore';
 import { LoadingScreen } from './ui/mockups/LoadingScreen';
@@ -63,7 +63,7 @@ function App() {
       )}
 
       {currentView === 'battle' && (
-        <BattleHUD onReturnToMenu={() => setCurrentView('main')} />
+        <RallyScreen onReturnToMenu={() => setCurrentView('main')} />
       )}
       
       {currentView === 'sandbox' && (

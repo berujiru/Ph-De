@@ -6,7 +6,7 @@ import { Summon } from '../entities/Summon';
 import { Attack, ProjectileAttack, MeleeCleaveAttack, VortexAttack, BoomerangAttack, ChainAttack, SummonAttack, BeamAttack, LobbedAttack, LinearWaveAttack, TrapAttack } from '../entities/Attacks';
 import { gameToUiEvents, uiToGameEvents, type GameStateSnapshot, type DropOption } from '../core/GameEvents';
 import { BARRICADE_DEFAULTS, ENEMY_DEFINITIONS, HERO_DEFINITIONS, type EnemyId, type HeroId } from '../data/balance';
-import { GAME_HEIGHT, GAME_WIDTH } from '../data/level';
+import { GAME_HEIGHT, GAME_WIDTH, BARRIER_X, HERO_SPAWN_X, ENEMY_SPAWN_X_OFFSET } from '../data/level';
 import { applyHeroSkill, type SkillVisualEvent } from '../core/Skills';
 
 export class GameScene extends Phaser.Scene {
@@ -36,6 +36,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.image('map-barangay', '/assets/backgrounds/map-barangay.svg');
+    this.load.image('hero-placeholder', '/assets/heroes/hero-placeholder.svg');
     // this.load.audio('sfx-btn-press', 'assets/sounds/btn-press.mp3');
     // this.load.audio('sfx-victory', 'assets/sounds/victory.mp3');
     // this.load.audio('sfx-defeat', 'assets/sounds/defeat.mp3');
@@ -99,9 +101,13 @@ export class GameScene extends Phaser.Scene {
     const unsubDebugSpawn = uiToGameEvents.on('debugSpawn', ({ heroId, passive, skill } = {}) => {
       if (!this.sys) return;
       
-      // Clear existing heroes for clean testing
-      this.heroes.forEach(h => h.destroy());
-      this.heroes = [];
+      // Preserve Eden for ally interaction tests, but clear the previous test hero
+      for (const h of this.heroes) {
+        if (h.id !== 'eden') {
+          h.destroy();
+        }
+      }
+      this.heroes = this.heroes.filter(h => h.id === 'eden');
 
       if (heroId) {
         this.spawnHero(heroId as HeroId, passive, skill);
@@ -117,6 +123,7 @@ export class GameScene extends Phaser.Scene {
     const unsubTriggerHeroSkill = uiToGameEvents.on('triggerHeroSkill', ({ skill } = {}) => {
       if (!this.sys) return;
       for (const h of this.heroes) {
+        h.isSkillReady = true; // Force ready for sandbox
         h.useSkill(skill);
       }
     });
@@ -175,7 +182,7 @@ export class GameScene extends Phaser.Scene {
         def.activeSkill = { name: 'Sandbox Horde', effect: 'resurrectAll' };
       }
 
-      const enemy = new Enemy(this, GAME_WIDTH + 50, y, def);
+      const enemy = new Enemy(this, GAME_WIDTH + ENEMY_SPAWN_X_OFFSET, y, def);
       this.enemies.push(enemy);
     });
 
@@ -449,8 +456,14 @@ export class GameScene extends Phaser.Scene {
     this.spawnTimer = 2000;
     this.lastSnapshot = '';
 
+    // Apply background
+    const bg = this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'map-barangay');
+    bg.setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
+    bg.setAlpha(0.25);
+
+
     // Create the Barrier at x=120
-    this.barrier = new Barrier(this, 120, GAME_HEIGHT / 2, BARRICADE_DEFAULTS.width, GAME_HEIGHT, BARRICADE_DEFAULTS.maxHp);
+    this.barrier = new Barrier(this, BARRIER_X, GAME_HEIGHT / 2, BARRICADE_DEFAULTS.width, GAME_HEIGHT, BARRICADE_DEFAULTS.maxHp);
 
     // Initial fixed hero (Eden)
     this.spawnHero('eden');
@@ -543,7 +556,7 @@ export class GameScene extends Phaser.Scene {
 
   private spawnEnemy() {
     const y = Phaser.Math.Between(50, GAME_HEIGHT - 50);
-    const enemy = new Enemy(this, GAME_WIDTH + 50, y, ENEMY_DEFINITIONS['grunt']);
+    const enemy = new Enemy(this, GAME_WIDTH + ENEMY_SPAWN_X_OFFSET, y, ENEMY_DEFINITIONS['grunt']);
     this.enemies.push(enemy);
   }
 
@@ -555,11 +568,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   private spawnHero(id: HeroId, passiveOverride?: string, _skillOverride?: string) {
-    const y = GAME_HEIGHT / 2 + (this.heroes.length * 60) - 60;
+    // Spread heroes vertically to prevent overlapping (center out)
+    const offset = this.heroes.length === 0 ? 0 : (this.heroes.length % 2 === 0 ? 1 : -1) * Math.ceil(this.heroes.length / 2) * 55;
+    const y = GAME_HEIGHT / 2 + offset;
     const def = HERO_DEFINITIONS[id];
     
     // Create hero
-    const hero = new Hero(this, 50, y, def, 150, (h, target) => {
+    const hero = new Hero(this, HERO_SPAWN_X, y, def, BARRIER_X + 30, (h, target) => {
       let attack: Attack;
       const color = h.definition.projectileColor || h.definition.color;
       
@@ -590,9 +605,14 @@ export class GameScene extends Phaser.Scene {
       this.attacks.push(attack);
     });
     
-    if (passiveOverride) hero.passiveOverride = passiveOverride;
-    // We don't override the signature skill completely, but we can pass it to useSkill
-    
+    if (passiveOverride) {
+      hero.passiveOverride = passiveOverride;
+    }
+
+    if (this.isSandbox) {
+      hero.isSkillReady = true;
+    }
+
     this.heroes.push(hero);
   }
 
@@ -617,6 +637,17 @@ export class GameScene extends Phaser.Scene {
       // If hero cap reached, remove spawn option
       if (this.heroes.length >= 5) {
         options[0] = { id: 'heal', title: 'Barrier Patch', description: 'Restore 50 Barrier HP', type: 'spawn' };
+      } else {
+        const availableIds = Object.keys(HERO_DEFINITIONS).filter(
+          id => !this.heroes.some(h => h.id === id)
+        ) as HeroId[];
+        if (availableIds.length > 0) {
+          const randomId = Phaser.Math.RND.pick(availableIds);
+          const def = HERO_DEFINITIONS[randomId];
+          options[0] = { id: `spawn_${randomId}`, title: def.name, description: `Deploy ${def.name} to the barricade`, type: 'spawn' };
+        } else {
+          options[0] = { id: 'heal', title: 'Barrier Patch', description: 'Restore 50 Barrier HP', type: 'spawn' };
+        }
       }
 
       gameToUiEvents.emit('voicesFull', { options });
@@ -626,14 +657,9 @@ export class GameScene extends Phaser.Scene {
   private applyDrop(dropId: string) {
     this.maxVoicesCount += 1; // scale up requirement (was 2)
 
-    if (dropId === 'spawn') {
-      const availableIds = Object.keys(HERO_DEFINITIONS).filter(
-        id => !this.heroes.some(h => h.id === id)
-      ) as HeroId[];
-      if (availableIds.length > 0) {
-        const randomId = Phaser.Math.RND.pick(availableIds);
-        this.spawnHero(randomId);
-      }
+    if (dropId.startsWith('spawn_')) {
+      const heroId = dropId.replace('spawn_', '') as HeroId;
+      this.spawnHero(heroId);
     } else if (dropId === 'heal') {
       this.barrier.hp = Math.min(this.barrier.maxHp, this.barrier.hp + 50);
     } else if (dropId === 'damage') {
@@ -648,6 +674,18 @@ export class GameScene extends Phaser.Scene {
   }
 
   private emitState(force = false): void {
+    const activeEnemies = Object.values(
+      this.enemies.reduce((acc, enemy) => {
+        if (!enemy.isDead) {
+          acc[enemy.definition.id] = { 
+            id: enemy.definition.id, 
+            count: (acc[enemy.definition.id]?.count || 0) + 1 
+          };
+        }
+        return acc;
+      }, {} as Record<string, { id: string, count: number }>)
+    );
+
     const snapshot: GameStateSnapshot = {
       barrierHp: this.barrier.hp,
       maxBarrierHp: this.barrier.maxHp,
@@ -659,6 +697,8 @@ export class GameScene extends Phaser.Scene {
       isPaused: this.isPaused,
       gameSpeed: this.gameSpeed,
       status: this.status,
+      activeHeroes: this.heroes.map(h => ({ id: h.id, passiveOverride: h.passiveOverride })),
+      activeEnemies: activeEnemies
     };
     const serialized = JSON.stringify(snapshot);
     if (!force && serialized === this.lastSnapshot) return;
