@@ -1,16 +1,18 @@
 import Phaser from 'phaser';
-import { Barrier } from '../entities/Barrier';
+import { MoraleShield } from '../entities/MoraleShield';
 import { Hero } from '../entities/Hero';
 import { Enemy } from '../entities/Enemy';
 import { Summon } from '../entities/Summon';
 import { Attack, ProjectileAttack, MeleeCleaveAttack, VortexAttack, BoomerangAttack, ChainAttack, SummonAttack, BeamAttack, LobbedAttack, LinearWaveAttack, TrapAttack } from '../entities/Attacks';
 import { gameToUiEvents, uiToGameEvents, type GameStateSnapshot, type DropOption } from '../core/GameEvents';
 import { BARRICADE_DEFAULTS, ENEMY_DEFINITIONS, HERO_DEFINITIONS, type EnemyId, type HeroId } from '../data/balance';
-import { GAME_HEIGHT, GAME_WIDTH, BARRIER_X, HERO_SPAWN_X, ENEMY_SPAWN_X_OFFSET } from '../data/level';
+import { GAME_HEIGHT, GAME_WIDTH, WORLD_WIDTH, RALLY, ENEMY_SPAWN_X_OFFSET } from '../data/level';
+import { formationTargetX, nextShieldX } from '../core/RallyMarch';
 import { applyHeroSkill, type SkillVisualEvent } from '../core/Skills';
 
 export class GameScene extends Phaser.Scene {
-  private barrier!: Barrier;
+  private shield!: MoraleShield;
+  private backgroundTiles: Phaser.GameObjects.Image[] = [];
   private enemies: Enemy[] = [];
   private heroes: Hero[] = [];
   private attacks: Attack[] = [];
@@ -182,7 +184,9 @@ export class GameScene extends Phaser.Scene {
         def.activeSkill = { name: 'Sandbox Horde', effect: 'resurrectAll' };
       }
 
-      const enemy = new Enemy(this, GAME_WIDTH + ENEMY_SPAWN_X_OFFSET, y, def);
+      // Sandbox keeps the static camera and old spawn edge; live battles spawn ahead of the formation.
+      const x = this.isSandbox ? GAME_WIDTH + ENEMY_SPAWN_X_OFFSET : this.shield.x + RALLY.enemySpawnAheadPx;
+      const enemy = new Enemy(this, x, y, def);
       this.enemies.push(enemy);
     });
 
@@ -345,8 +349,9 @@ export class GameScene extends Phaser.Scene {
     this.events.on('enemyEconomyHeist', () => {
       this.voicesCount = Math.max(0, this.voicesCount - 5);
       this.emitState();
-      
-      const txt = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'HEIST! -5 VOICES', { color: '#ef4444', fontStyle: 'bold', fontSize: '24px' }).setOrigin(0.5);
+
+      // Screen-space announcement — pinned to the viewport, not the world.
+      const txt = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'HEIST! -5 VOICES', { color: '#ef4444', fontStyle: 'bold', fontSize: '24px' }).setOrigin(0.5).setScrollFactor(0);
       this.tweens.add({ targets: txt, y: GAME_HEIGHT / 2 - 100, alpha: 0, duration: 2000, onComplete: () => txt.destroy() });
     });
 
@@ -377,7 +382,9 @@ export class GameScene extends Phaser.Scene {
     // --- HERO SKILLS ---
     this.events.on('heroSkillTriggered', ({ hero, skillId }: { hero: Hero, skillId: HeroId }) => {
       applyHeroSkill(skillId, hero, {
-        GAME_WIDTH,
+        // Skills treat GAME_WIDTH as "the right edge of what the player sees";
+        // with a scrolling camera that's the camera's right edge in world coords.
+        GAME_WIDTH: this.cameras.main.scrollX + GAME_WIDTH,
         GAME_HEIGHT,
         heroes: this.heroes,
         enemies: this.enemies,
@@ -398,7 +405,7 @@ export class GameScene extends Phaser.Scene {
             const trap = this.add.circle(evt.x, evt.y, evt.radius, parseInt((evt.color || '#000').replace('#', '0x')));
             this.time.delayedCall(evt.duration || 3000, () => trap.destroy());
           } else if (evt.type === 'screenFlash') {
-            const blackout = this.add.rectangle(0, 0, GAME_WIDTH * 2, GAME_HEIGHT * 2, parseInt((evt.color || '#000').replace('#', '0x')), evt.alpha || 0.5);
+            const blackout = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, parseInt((evt.color || '#000').replace('#', '0x')), evt.alpha || 0.5).setScrollFactor(0);
             this.time.delayedCall(evt.duration || 3000, () => blackout.destroy());
           } else if (evt.type === 'spawnRider') {
             const rider = this.add.circle(evt.x, evt.y, 8, 0x22c55e);
@@ -433,12 +440,14 @@ export class GameScene extends Phaser.Scene {
     for (const h of this.heroes) h.destroy();
     for (const a of this.attacks) a.destroy();
     for (const s of this.summons) s.destroy();
-    if (this.barrier) this.barrier.destroy();
+    for (const bg of this.backgroundTiles) bg.destroy();
+    this.backgroundTiles = [];
+    if (this.shield) this.shield.destroy();
 
     this.buildGame();
   }
 
-  /** Create barrier + initial hero and reset all state counters. */
+  /** Create the morale shield + initial hero and reset all state counters. */
   private buildGame(): void {
     this.heroes = [];
     this.enemies = [];
@@ -456,14 +465,20 @@ export class GameScene extends Phaser.Scene {
     this.spawnTimer = 2000;
     this.lastSnapshot = '';
 
-    // Apply background
-    const bg = this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'map-barangay');
-    bg.setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
-    bg.setAlpha(0.25);
+    // Repeat the background across the whole rally route.
+    for (let x = 0; x < WORLD_WIDTH; x += GAME_WIDTH) {
+      const bg = this.add.image(x + GAME_WIDTH / 2, GAME_HEIGHT / 2, 'map-barangay');
+      bg.setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
+      bg.setAlpha(0.25);
+      this.backgroundTiles.push(bg);
+    }
 
+    // Scrolling camera over the wide world (sandbox stays static at scroll 0).
+    this.cameras.main.setBounds(0, 0, WORLD_WIDTH, GAME_HEIGHT);
+    this.cameras.main.scrollX = 0;
 
-    // Create the Barrier at x=120
-    this.barrier = new Barrier(this, BARRIER_X, GAME_HEIGHT / 2, BARRICADE_DEFAULTS.width, GAME_HEIGHT, BARRICADE_DEFAULTS.maxHp);
+    // The morale shield — the crowd's front line, advances as the rally marches.
+    this.shield = new MoraleShield(this, RALLY.shieldStartX, GAME_HEIGHT / 2, BARRICADE_DEFAULTS.width, GAME_HEIGHT, BARRICADE_DEFAULTS.maxHp);
 
     // Initial fixed hero (Eden)
     this.spawnHero('eden');
@@ -512,22 +527,41 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
+    // The rally marches forward while the field ahead is clear; halts to fight.
+    if (!this.isSandbox) {
+      const livingEnemyXs = this.enemies.filter(e => !e.isDead).map(e => e.x);
+      this.shield.x = nextShieldX(this.shield.x, delta, livingEnemyXs, {
+        marchSpeedPxPerSec: RALLY.marchSpeedPxPerSec,
+        engageRangePx: RALLY.engageRangePx,
+        shieldMaxX: RALLY.shieldMaxX,
+      });
+
+      // Camera keeps the shield at a fixed screen position, easing toward it.
+      const cam = this.cameras.main;
+      const targetScroll = Phaser.Math.Clamp(
+        this.shield.x - GAME_WIDTH * RALLY.cameraAnchorRatio,
+        0,
+        WORLD_WIDTH - GAME_WIDTH,
+      );
+      cam.scrollX += (targetScroll - cam.scrollX) * Math.min(1, RALLY.cameraLerpPerSec * (delta / 1000));
+    }
+
     // Update entities
     for (const enemy of this.enemies) {
-      enemy.update(delta, this.barrier, this.summons);
+      enemy.update(delta, this.shield, this.summons);
       if (enemy.isDead && enemy.hp <= 0) {
-        // Was killed by hero, not by hitting barrier
+        // Was killed by hero, not by hitting the shield
         this.addVoices(1);
       }
     }
-    
+
     this.enemies = this.enemies.filter(e => {
       // e.destroy() is now handled by Enemy.ts death animation
       return !e.isDead;
     });
 
     for (const hero of this.heroes) {
-      hero.update(delta, this.enemies);
+      hero.update(delta, this.enemies, this.shield.x);
     }
     
     for (const atk of this.attacks) {
@@ -544,7 +578,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     // Game over conditions
-    if (this.barrier.isDead && !this.isSandbox) {
+    if (this.shield.isDead && !this.isSandbox) {
       // status can only be 'playing' or 'won' here, so the defeat sound
       // fires at most once — next frame update returns early on 'lost'.
       try { this.sound.play('sfx-defeat'); } catch (e) {}
@@ -556,7 +590,8 @@ export class GameScene extends Phaser.Scene {
 
   private spawnEnemy() {
     const y = Phaser.Math.Between(50, GAME_HEIGHT - 50);
-    const enemy = new Enemy(this, GAME_WIDTH + ENEMY_SPAWN_X_OFFSET, y, ENEMY_DEFINITIONS['grunt']);
+    // Ahead of the advancing formation, off-camera to the right.
+    const enemy = new Enemy(this, this.shield.x + RALLY.enemySpawnAheadPx, y, ENEMY_DEFINITIONS['grunt']);
     this.enemies.push(enemy);
   }
 
@@ -569,39 +604,44 @@ export class GameScene extends Phaser.Scene {
 
   private spawnHero(id: HeroId, passiveOverride?: string, _skillOverride?: string) {
     // Spread heroes vertically to prevent overlapping (center out)
-    const offset = this.heroes.length === 0 ? 0 : (this.heroes.length % 2 === 0 ? 1 : -1) * Math.ceil(this.heroes.length / 2) * 55;
+    const offset = this.heroes.length === 0 ? 0 : (this.heroes.length % 2 === 0 ? 1 : -1) * Math.ceil(this.heroes.length / 2) * RALLY.formation.rowSpacingPx;
     const y = GAME_HEIGHT / 2 + offset;
     const def = HERO_DEFINITIONS[id];
-    
-    // Create hero
-    const hero = new Hero(this, HERO_SPAWN_X, y, def, BARRIER_X + 30, (h, target) => {
+
+    // Heroes join directly at their formation slot behind the shield.
+    const x = formationTargetX(this.shield.x, def.attackKind, RALLY.formation);
+
+    const hero = new Hero(this, x, y, def, (h, target) => {
       let attack: Attack;
       const color = h.definition.projectileColor || h.definition.color;
-      
+
       if (h.definition.attackStyle === 'melee-cleave') {
         attack = new MeleeCleaveAttack(this, h.x, h.y, target, h.damage, h.range, color);
       } else if (h.definition.attackStyle === 'vortex') {
         attack = new VortexAttack(this, h.x, h.y, target, h.damage, color);
       } else if (h.definition.attackStyle === 'boomerang') {
         attack = new BoomerangAttack(this, h, target, h.damage, color);
+        h.playProjectileLaunch();
       } else if (h.definition.attackStyle === 'chain') {
-        attack = new ChainAttack(this, h.x, h.y, target, h.damage, color);
+        attack = new ChainAttack(this, h.muzzleX, h.muzzleY, target, h.damage, color);
       } else if (h.definition.attackStyle === 'summoner') {
         attack = new SummonAttack(this, h.x, h.y, target, h.damage, color);
       } else if (h.definition.attackStyle === 'beam') {
-        attack = new BeamAttack(this, h.x, h.y, target, h.damage, color);
+        attack = new BeamAttack(this, h.muzzleX, h.muzzleY, target, h.damage, color);
       } else if (h.definition.attackStyle === 'lobbed') {
-        attack = new LobbedAttack(this, h.x, h.y, target, h.damage, color);
+        attack = new LobbedAttack(this, h.muzzleX, h.muzzleY, target, h.damage, color);
+        h.playProjectileLaunch();
       } else if (h.definition.attackStyle === 'linear-wave') {
-        attack = new LinearWaveAttack(this, h.x, h.y, h.damage, color);
+        attack = new LinearWaveAttack(this, h.muzzleX, h.muzzleY, h.damage, color);
       } else if (h.definition.attackStyle === 'trap') {
         attack = new TrapAttack(this, h.x, h.y, target, h.damage, color);
       } else {
         // Fallback to projectile (or pierce)
         const mods = h.definition.attackStyle === 'pierce' ? { bonusPierce: 2 } : undefined;
-        attack = new ProjectileAttack(this, h.x, h.y, target, h.damage, color, mods);
+        attack = new ProjectileAttack(this, h.muzzleX, h.muzzleY, target, h.damage, color, mods);
+        h.playProjectileLaunch();
       }
-      
+
       this.attacks.push(attack);
     });
     
@@ -661,7 +701,7 @@ export class GameScene extends Phaser.Scene {
       const heroId = dropId.replace('spawn_', '') as HeroId;
       this.spawnHero(heroId);
     } else if (dropId === 'heal') {
-      this.barrier.hp = Math.min(this.barrier.maxHp, this.barrier.hp + 50);
+      this.shield.hp = Math.min(this.shield.maxHp, this.shield.hp + 50);
     } else if (dropId === 'damage') {
       for (const hero of this.heroes) {
         hero.damage += 5;
@@ -687,8 +727,8 @@ export class GameScene extends Phaser.Scene {
     );
 
     const snapshot: GameStateSnapshot = {
-      barrierHp: this.barrier.hp,
-      maxBarrierHp: this.barrier.maxHp,
+      barrierHp: this.shield.hp,
+      maxBarrierHp: this.shield.maxHp,
       voicesCount: this.voicesCount,
       maxVoicesCount: this.maxVoicesCount,
       waveActive: this.waveActive,

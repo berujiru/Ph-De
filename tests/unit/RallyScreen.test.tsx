@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen } from '@testing-library/react';
-import { BattleHUD } from '../../src/ui/mockups/BattleHUD';
+import { RallyScreen } from '../../src/ui/components/RallyScreen';
 import {
   gameToUiEvents,
   uiToGameEvents,
@@ -20,20 +20,22 @@ function snapshot(overrides: Partial<GameStateSnapshot> = {}): GameStateSnapshot
     isPaused: false,
     gameSpeed: 1,
     status: 'playing',
+    activeHeroes: [],
+    activeEnemies: [],
     ...overrides,
   };
 }
 
-describe('BattleHUD', () => {
+describe('RallyScreen', () => {
   it('renders the floating HUD with no drop overlay or game-over modal by default', () => {
-    render(<BattleHUD onReturnToMenu={vi.fn()} />);
+    render(<RallyScreen onReturnToMenu={vi.fn()} />);
     expect(screen.queryByText('A Voice Rises!')).not.toBeInTheDocument();
     expect(screen.queryByText('Spoils of War')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Pause' })).toBeEnabled();
   });
 
   it('shows the drop overlay on voicesFull, including rarity and Buhis-Buhay risk framing', () => {
-    render(<BattleHUD onReturnToMenu={vi.fn()} />);
+    render(<RallyScreen onReturnToMenu={vi.fn()} />);
     const options: DropOption[] = [
       { id: 'a', title: 'New Hero: Eden', description: 'Joins the rally.', type: 'spawn', rarity: 'epic', kind: 'hero', damageType: 'Physical' },
       { id: 'b', title: 'Sharper Chants', description: '+10% damage.', type: 'damage' },
@@ -51,7 +53,7 @@ describe('BattleHUD', () => {
   });
 
   it('emits selectDrop and closes the overlay when a card is chosen', () => {
-    render(<BattleHUD onReturnToMenu={vi.fn()} />);
+    render(<RallyScreen onReturnToMenu={vi.fn()} />);
     const selected = vi.fn();
     const unsub = uiToGameEvents.on('selectDrop', selected);
 
@@ -69,7 +71,7 @@ describe('BattleHUD', () => {
 
   it('shows the Victory Spoils of War with star ratings and a single Continue action', () => {
     const onReturnToMenu = vi.fn();
-    render(<BattleHUD onReturnToMenu={onReturnToMenu} />);
+    render(<RallyScreen onReturnToMenu={onReturnToMenu} />);
     act(() => gameToUiEvents.emit('stateChanged', snapshot({ status: 'won', currentWave: 5 })));
 
     expect(screen.getByText('The Barrier Holds')).toBeInTheDocument();
@@ -83,7 +85,7 @@ describe('BattleHUD', () => {
   });
 
   it('shows a hopeful Defeat frame that still pays out Hope Points', () => {
-    render(<BattleHUD onReturnToMenu={vi.fn()} />);
+    render(<RallyScreen onReturnToMenu={vi.fn()} />);
     act(() => gameToUiEvents.emit('stateChanged', snapshot({ status: 'lost', barrierHp: 0, currentWave: 3 })));
 
     expect(screen.getByText('The Rally Breaks')).toBeInTheDocument();
@@ -94,11 +96,11 @@ describe('BattleHUD', () => {
   });
 
   it('disables battle controls once the run is over', () => {
-    render(<BattleHUD onReturnToMenu={vi.fn()} />);
+    render(<RallyScreen onReturnToMenu={vi.fn()} />);
     act(() => gameToUiEvents.emit('stateChanged', snapshot({ status: 'won' })));
 
     expect(screen.getByRole('button', { name: 'Pause' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Toggle game speed' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Dev: spawn hero' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Surrender' })).toBeDisabled();
   });
 });

@@ -54,6 +54,8 @@ export const ENEMY_VISUALS = {
   hpBarBackgroundColor: 0x000000,
   hpBarBackgroundAlpha: 0.5,
   hpBarFillColor: 0x22c55e,
+  /** At or above this speed (px/sec) a unit's model plays 'run' instead of 'walk'. */
+  runSpeedThresholdPxPerSec: 80,
 } as const;
 
 /**

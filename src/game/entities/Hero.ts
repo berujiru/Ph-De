@@ -1,25 +1,30 @@
 import Phaser from 'phaser';
 import type { Enemy } from './Enemy';
 import type { HeroDefinition } from '../data/balance';
+import { RALLY } from '../data/level';
+import { formationTargetX, stepTowardFormation } from '../core/RallyMarch';
 import { applyHeroPassive, type ISkillHero } from '../core/Skills';
+import { HeroModel } from './models/HeroModel';
 
 export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   public id: string;
   public definition: HeroDefinition;
-  public rangeX: number; // The X coordinate to stop marching
   private attackCooldown = 0;
   public attackRateMs: number;
   public damage: number;
   public range: number;
   private onAttack: (hero: Hero, target: Enemy) => void;
-  
+
   public skillCooldownMs = 5000;
   public currentSkillCooldown = 5000; // start on cooldown
   public isSkillReady = false;
-  
+
   public passiveOverride?: string;
 
-  private bodyShape: Phaser.GameObjects.Image;
+  /** Small per-hero stagger so ranged heroes don't stack on one pixel. */
+  private formationJitterX: number;
+
+  private model: HeroModel;
   private skillHighlight: Phaser.GameObjects.Text;
   private attackBarBg: Phaser.GameObjects.Rectangle;
   private attackBarFill: Phaser.GameObjects.Rectangle;
@@ -27,45 +32,35 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   private skillBarFill: Phaser.GameObjects.Rectangle;
   private rangeIndicator: Phaser.GameObjects.Arc;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, def: HeroDefinition, rangeX: number, onAttack: (hero: Hero, target: Enemy) => void) {
+  constructor(scene: Phaser.Scene, x: number, y: number, def: HeroDefinition, onAttack: (hero: Hero, target: Enemy) => void) {
     super(scene, x, y);
     this.id = def.id;
     this.definition = def;
-    
-    // Set actual range based on attackKind and range stat
-    // RangeX is the spot they stop on the field.
-    // If ranged, they stop further back. If melee, they stop right at the barrier.
-    if (def.attackKind === 'melee') {
-      this.rangeX = rangeX + 20;
-    } else {
-      this.rangeX = Math.max(50, rangeX - 100 + (Math.random() * 20)); // somewhat behind
-    }
-    
+
     this.damage = def.damage;
     this.attackRateMs = def.attackRateMs;
     this.range = def.range;
     this.onAttack = onAttack;
+    this.formationJitterX = def.attackKind === 'ranged' ? (Math.random() - 0.5) * 24 : 0;
 
-    // Range indicator (added first so it's behind the body shape)
+    // Range indicator (added first so it's behind the body)
     this.rangeIndicator = scene.add.circle(0, 0, def.range, def.color, 0.1);
     this.rangeIndicator.setStrokeStyle(1, def.color, 0.5);
     this.rangeIndicator.setVisible(false);
     this.add(this.rangeIndicator);
 
-    this.bodyShape = scene.add.image(0, 0, 'hero-placeholder');
-    this.bodyShape.setDisplaySize(36, 48);
-    this.bodyShape.setTint(def.color);
-    this.add(this.bodyShape);
-    
+    this.model = new HeroModel(scene, 0, 0, def.color);
+    this.add(this.model);
+
     const labelText = `${def.name}\nAtk: ${def.attackStyle}\nSkill: ${def.signatureSkill.name}`;
-    const nameLabel = scene.add.text(0, 25, labelText, { 
-      fontSize: '10px', 
-      color: '#ffffff', 
+    const nameLabel = scene.add.text(0, 25, labelText, {
+      fontSize: '10px',
+      color: '#ffffff',
       align: 'center',
       wordWrap: { width: 90, useAdvancedWrap: true }
     }).setOrigin(0.5, 0);
     this.add(nameLabel);
-    
+
     this.skillHighlight = scene.add.text(0, -45, '★ SKILL', { fontSize: '12px', color: '#facc15', fontStyle: 'bold' }).setOrigin(0.5);
     this.skillHighlight.setVisible(false);
     this.add(this.skillHighlight);
@@ -94,21 +89,45 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     scene.add.existing(this);
   }
 
-  update(delta: number, enemies: Enemy[]) {
+  /** World-space point projectiles visually launch from (the model's muzzle). */
+  get muzzleX(): number {
+    return this.x + this.model.muzzleOffset.x;
+  }
+
+  get muzzleY(): number {
+    return this.y + this.model.muzzleOffset.y;
+  }
+
+  /** Muzzle-flash hook for projectile-style attacks. */
+  playProjectileLaunch(): void {
+    this.model.playProjectileLaunch();
+  }
+
+  update(delta: number, enemies: Enemy[], shieldX: number) {
+    // Hold formation relative to the advancing morale shield.
+    const targetX = formationTargetX(shieldX, this.definition.attackKind, RALLY.formation) + this.formationJitterX;
+    const step = stepTowardFormation(this.x, targetX, delta, {
+      marchSpeedPxPerSec: RALLY.marchSpeedPxPerSec,
+      catchUpSpeedMultiplier: RALLY.formation.catchUpSpeedMultiplier,
+      runDistancePx: RALLY.formation.runDistancePx,
+      settleDistancePx: RALLY.formation.settleDistancePx,
+    });
+    this.x = step.x;
+    this.model.setState(step.locomotion);
 
     // Auto-attack
     this.attackCooldown = Math.max(0, this.attackCooldown - delta);
     if (this.attackCooldown === 0) {
-      // Find lowest-X enemy (closest to barrier), prioritizing tauntAura
+      // Find lowest-X enemy (closest to the shield), prioritizing tauntAura
       let target: Enemy | null = null;
-      let minEnemyX = 9999;
+      let minEnemyX = Infinity;
       let foundTaunt = false;
-      
+
       for (const enemy of enemies) {
         if (!enemy.isDead && enemy.x > this.x) {
           // Ignore stealthed enemies unless hero has canSeeStealth
           if (enemy.isStealthed && !this.definition.canSeeStealth) continue;
-          
+
           if (enemy.definition.tauntAura && enemy.x - this.x <= this.range) {
             // Found a taunting enemy in range. Prioritize it immediately.
             // If multiple taunt, attack the closest one.
@@ -126,7 +145,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
 
       if (target && target.x - this.x <= this.range) {
         this.onAttack(this, target);
-        
+
         // Passives applied on attack
         const activePassive = this.passiveOverride || this.id;
         applyHeroPassive(activePassive, this, target, {
@@ -143,8 +162,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
         });
 
         this.attackCooldown = this.attackRateMs;
-        // Simple attack visual
-        this.scene.tweens.add({ targets: this.bodyShape, x: 10, yoyo: true, duration: 100 });
+        this.model.setState('attack');
       }
     }
 
@@ -163,7 +181,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     // Update visuals
     const attackProgress = Math.max(0, 1 - (this.attackCooldown / this.attackRateMs));
     this.attackBarFill.scaleX = attackProgress;
-    
+
     const skillProgress = Math.max(0, 1 - (this.currentSkillCooldown / this.skillCooldownMs));
     this.skillBarFill.scaleX = skillProgress;
   }
@@ -175,13 +193,13 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.skillHighlight.setVisible(false);
     this.scene.tweens.killTweensOf(this.skillHighlight);
     this.skillHighlight.setScale(1);
-    
-    // Visually show skill used
-    this.scene.tweens.add({ targets: this.bodyShape, angle: 360, duration: 300 });
+
+    // Cast animation plays through the model.
+    this.model.setState('cast');
 
     const skillId = skillOverride || this.id;
     this.scene.events.emit('heroSkillTriggered', { hero: this, skillId });
-    
+
     // Bark
     const skillName = this.definition.signatureSkill.name;
     const txt = this.scene.add.text(this.x, this.y - 60, `${skillName}!`, { color: '#facc15', fontStyle: 'bold' }).setOrigin(0.5);

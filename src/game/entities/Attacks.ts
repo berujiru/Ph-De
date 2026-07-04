@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import type { Enemy } from './Enemy';
 import { Summon } from './Summon';
+import { WORLD_WIDTH } from '../data/level';
 
 export interface AttackModifiers {
   bonusDamage: number;
@@ -108,7 +109,7 @@ export class ProjectileAttack extends Attack {
         }
       }
     }
-    if (this.visual.x > 1000 || this.visual.x < -100 || this.visual.y > 1500 || this.visual.y < -100) {
+    if (this.visual.x > WORLD_WIDTH + 100 || this.visual.x < -100 || this.visual.y > 1500 || this.visual.y < -100) {
       this.die();
     }
   }
@@ -509,13 +510,16 @@ export class LobbedAttack extends Attack {
 
 export class LinearWaveAttack extends Attack {
   private speed = 300;
+  private maxTravelPx = 900;
+  private startX: number;
   private visual: Phaser.GameObjects.Rectangle;
   private hitEnemies = new Set<Enemy>();
-  
+
   constructor(scene: Phaser.Scene, x: number, y: number, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'LinearWaveAttack', damage, modifiers);
     const waveWidth = 40;
     const waveHeight = 150 + this.modifiers.bonusRadius * 2;
+    this.startX = x;
     this.visual = scene.add.rectangle(x, y, waveWidth, waveHeight, color, 0.6);
   }
   
@@ -536,7 +540,7 @@ export class LinearWaveAttack extends Attack {
       }
     }
     
-    if (this.visual.x > 1000) {
+    if (this.visual.x - this.startX > this.maxTravelPx) {
       this.isDead = true;
       this.visual.destroy();
       this.destroy();

@@ -1,8 +1,10 @@
 import Phaser from 'phaser';
 import type { EnemyDefinition } from '../data/balance';
-import type { Barrier } from './Barrier';
+import { ENEMY_VISUALS } from '../data/balance';
+import type { MoraleShield } from './MoraleShield';
 import type { Summon } from './Summon';
 import type { ISkillEnemy } from '../core/Skills';
+import { EnemyModel } from './models/EnemyModel';
 
 export type AilmentType = 'burn' | 'slow' | 'wet' | 'freeze' | 'stun' | 'poison' | 'bleed' | 'rot' | 'sleep' | 'curse' | 'knockback' | 'armorShred';
 
@@ -40,7 +42,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
   public id: string;
   public definition: EnemyDefinition;
   public hp: number;
-  private bodyShape: Phaser.GameObjects.Arc;
+  private model: EnemyModel;
   private hpBarBg: Phaser.GameObjects.Rectangle;
   private hpBarFill: Phaser.GameObjects.Rectangle;
   public isDead = false;
@@ -60,7 +62,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
   private ailmentBuildups: Record<string, number> = {};
   public activeAilments: Record<string, number> = {}; // Remaining ms
   private ailmentIcons: Record<string, Phaser.GameObjects.Text> = {};
-  
+
   // Overlay tracking (to spawn particles on update)
   private overlayTimer = 0;
 
@@ -73,8 +75,8 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     this.definition = definition;
     this.hp = definition.maxHp;
 
-    this.bodyShape = scene.add.circle(0, 0, 15, definition.color);
-    this.add(this.bodyShape);
+    this.model = new EnemyModel(scene, 0, 0, definition.color);
+    this.add(this.model);
 
     this.hpBarBg = scene.add.rectangle(0, -25, 30, 6, 0x000000, 0.5);
     this.hpBarFill = scene.add.rectangle(0, -25, 30, 6, 0x22c55e);
@@ -86,17 +88,17 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       this.isStealthed = true;
       this.setAlpha(0.3); // translucent
     }
-    
+
     if (definition.fakeHpPadding) {
       this.fakeHp = definition.fakeHpPadding;
-      // Add a blue outline to represent the fake HP shield
-      this.bodyShape.setStrokeStyle(3, 0x60a5fa);
+      // Blue outline represents the fake HP shield
+      this.model.setOutline(3, 0x60a5fa);
     }
 
     if (definition.hitImmunityCount) {
       this.hitImmunityCount = definition.hitImmunityCount;
-      // Add a white outline to represent immunity charges
-      this.bodyShape.setStrokeStyle(4, 0xffffff);
+      // White outline represents immunity charges
+      this.model.setOutline(4, 0xffffff);
     }
 
     if (definition.id === 'sandbox_target') {
@@ -106,7 +108,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
         this.x = dragX;
         this.y = dragY;
       });
-      
+
       const dragLabel = scene.add.text(0, 15, 'DRAG ME', { fontSize: '10px', color: '#ffffff' }).setOrigin(0.5);
       this.add(dragLabel);
     }
@@ -114,16 +116,17 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
 
   takeDamage(amount: number) {
     if (this.isDead) return;
-    
+
     // Hit immunity completely blocks the hit
     if (this.hitImmunityCount > 0) {
       this.hitImmunityCount--;
-      
+
       const blockText = this.scene.add.text(this.x, this.y - 30, 'BLOCKED', { fontSize: '12px', color: '#fff', fontStyle: 'bold' }).setOrigin(0.5);
       this.scene.tweens.add({ targets: blockText, y: this.y - 50, alpha: 0, duration: 800, onComplete: () => blockText.destroy() });
-      
+      this.model.playHitFlash();
+
       if (this.hitImmunityCount === 0) {
-        this.bodyShape.setStrokeStyle(0); // remove white outline
+        this.model.clearOutline();
       }
       return;
     }
@@ -143,11 +146,10 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
         // Any rollover damage applies to real HP
         amount = -this.fakeHp;
         this.fakeHp = 0;
-        this.bodyShape.setStrokeStyle(0); // remove blue outline
+        this.model.clearOutline();
       } else {
         amount = 0; // all absorbed
-        // Visual cue for fake HP hit
-        this.scene.tweens.add({ targets: this.bodyShape, alpha: 0.5, yoyo: true, duration: 100 });
+        this.model.playHitFlash();
       }
     }
 
@@ -155,16 +157,16 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       this.hp -= amount;
       try { this.scene.sound.play('sfx-enemy-hit'); } catch (e) {}
     }
-    
+
     const pct = Math.max(0, this.hp / this.definition.maxHp);
     this.hpBarFill.scaleX = pct;
-    
+
     if (this.hp <= 0) {
       this.isDead = true;
       try { this.scene.sound.play('sfx-enemy-die'); } catch (e) {}
       this.hpBarBg.setVisible(false);
       this.hpBarFill.setVisible(false);
-      
+
       // Hook death events
       if (this.definition.nextPhaseEnemyId) {
         this.scene.events.emit('bossPhaseShift', { source: this, nextPhaseId: this.definition.nextPhaseEnemyId });
@@ -176,19 +178,10 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
           this.scene.events.emit('enemyDeathDropObstacle', { source: this });
         }
       }
-      
-      // Death animation
-      this.scene.tweens.add({
-        targets: this,
-        scaleX: 0,
-        scaleY: 0,
-        alpha: 0,
-        angle: 180,
-        duration: 300,
-        onComplete: () => {
-          this.destroy();
-        }
-      });
+
+      // Death plays through the model; fade the rest (ailment icons, etc.) with it.
+      this.scene.tweens.add({ targets: this, alpha: 0, duration: 300 });
+      this.model.setState('death', { onComplete: () => this.destroy() });
     }
   }
 
@@ -221,7 +214,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       this.activeAilments[type] = 4000; // 4s active
       this.ailmentBuildups[type] = 0; // Reset buildup
       icon.setAlpha(1);
-      
+
       // Activation pop animation
       this.scene.tweens.add({
         targets: icon,
@@ -236,8 +229,10 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     if (this.isDead || !this.definition.activeSkill) return;
 
     const skill = this.definition.activeSkill;
-    
-    // Animate cast
+
+    // Cast animation plays through the model.
+    this.model.setState('cast');
+
     const castText = this.scene.add.text(this.x, this.y - 40, skill.name, {
       fontSize: '14px',
       color: '#fff',
@@ -277,7 +272,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       this.activeAilments['slow'] = 0;
       this.activeAilments['freeze'] = 0;
       this.definition.speed *= 3;
-      
+
       // Visual cue
       const flash = this.scene.add.circle(this.x, this.y, 30, 0xef4444, 0.5);
       this.scene.tweens.add({
@@ -287,7 +282,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
         duration: 1000,
         onComplete: () => flash.destroy()
       });
-      
+
       // Reset after 3 seconds
       this.scene.time.delayedCall(3000, () => {
         this.definition.speed /= 3;
@@ -295,7 +290,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     }
   }
 
-  update(delta: number, barrier: Barrier, summons: Summon[] = []) {
+  update(delta: number, shield: MoraleShield, summons: Summon[] = []) {
     if (this.isDead) return;
 
     // --- Periodic Passives ---
@@ -304,7 +299,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       if (this.stealVoicesTimer >= 1000) {
         this.stealVoicesTimer = 0;
         this.scene.events.emit('stealVoices', { amount: this.definition.stealVoicesPerSecond });
-        
+
         // Visual cue
         const txt = this.scene.add.text(this.x, this.y - 30, '-VOICE', { fontSize: '10px', color: '#10b981', fontStyle: 'bold' }).setOrigin(0.5);
         this.scene.tweens.add({ targets: txt, y: this.y - 60, alpha: 0, duration: 1000, onComplete: () => txt.destroy() });
@@ -316,7 +311,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       if (this.knockbackPulseTimer >= this.definition.knockbackPulseCooldown) {
         this.knockbackPulseTimer = 0;
         this.scene.events.emit('heroKnockback', { source: this, force: 100 });
-        
+
         // Visual pulse
         const wave = this.scene.add.circle(this.x, this.y, 15, this.definition.color, 0.5);
         this.scene.tweens.add({
@@ -355,6 +350,8 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
           // Ailment active effects
           if (type === 'freeze' || type === 'stun') {
             isStunnedOrFrozen = true;
+          } else if (type === 'slow') {
+            speedMult = 0.6; // −40% speed per docs/DAMAGE_AND_AILMENTS.md (no stack)
           }
         }
       }
@@ -369,9 +366,9 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
           const overlayChar = AILMENT_OVERLAYS[type as AilmentType];
           if (overlayChar) {
             const particle = this.scene.add.text(
-              Phaser.Math.Between(-10, 10), 
-              Phaser.Math.Between(-10, 10), 
-              overlayChar, 
+              Phaser.Math.Between(-10, 10),
+              Phaser.Math.Between(-10, 10),
+              overlayChar,
               { fontSize: '12px' }
             ).setOrigin(0.5);
             this.add(particle);
@@ -398,6 +395,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
 
     if (isStunnedOrFrozen) {
       // Cannot move or attack
+      this.model.setState('idle');
       return;
     }
 
@@ -410,30 +408,35 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       }
     }
 
+    const moveSpeed = this.definition.speed * speedMult;
+
     if (targetSummon) {
       // Reached a summon, stop moving and start attacking
+      this.model.setState('idle');
       this.attackCooldown -= delta;
       if (this.attackCooldown <= 0) {
         targetSummon.takeDamage(this.definition.damage);
         this.attackCooldown = this.definition.attackRateMs;
-        // Visual attack cue
-        this.scene.tweens.add({ targets: this.bodyShape, x: -10, yoyo: true, duration: 100 });
+        this.model.setState('attack');
       }
-    } else if (this.x <= barrier.x + barrier.width / 2 + (this.definition.speed * speedMult) * 0.1) {
-      // Reached the barrier, stop moving and start attacking
-      this.x = barrier.x + barrier.width / 2 + (this.definition.speed * speedMult) * 0.1;
-      
+    } else if (this.x <= shield.x + shield.width / 2 + moveSpeed * 0.1) {
+      // Reached the morale shield, stop moving and start attacking
+      this.x = shield.x + shield.width / 2 + moveSpeed * 0.1;
+
+      this.model.setState('idle');
       this.attackCooldown -= delta;
       if (this.attackCooldown <= 0) {
         const dmg = this.definition.damage * (this.definition.barrierDamageMultiplier || 1);
-        barrier.takeDamage(dmg);
+        shield.takeDamage(dmg);
         this.attackCooldown = this.definition.attackRateMs;
-        // Visual attack cue
-        this.scene.tweens.add({ targets: this.bodyShape, x: -10, yoyo: true, duration: 100 });
+        this.model.setState('attack');
       }
+    } else if (moveSpeed > 0) {
+      // Move left toward the rally
+      this.x -= moveSpeed * (delta / 1000);
+      this.model.setState(moveSpeed >= ENEMY_VISUALS.runSpeedThresholdPxPerSec ? 'run' : 'walk');
     } else {
-      // Move left
-      this.x -= (this.definition.speed * speedMult) * (delta / 1000);
+      this.model.setState('idle');
     }
   }
 }
