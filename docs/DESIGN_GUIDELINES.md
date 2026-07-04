@@ -12,34 +12,37 @@ keeps enemies/projectiles/UI legible against the game canvas.
 
 | Token | Hex | Use |
 |---|---|---|
-| `background` | `#0f172a` | App/canvas background |
-| `surface` | `#1e293b` | HUD panels, cards, tower buttons |
-| `border` | `#475569` | Panel borders, build-slot outlines |
+| `background` | `#0f172a` | App/canvas background (Night sky / deep slate) |
+| `surface` | `rgba(30, 41, 59, 0.7)` | HUD panels, glassmorphism backdrops (`backdrop-filter: blur(12px)`) |
+| `border` | `rgba(255, 255, 255, 0.1)` | Panel borders, glass edges, subtle dividers |
 | `textPrimary` | `#f8fafc` | Primary text |
 | `textMuted` | `#94a3b8` | Secondary/disabled text |
-| `gold` | `#facc15` | Currency only — never used for anything else, so a gold-colored number always means "money" at a glance |
+| `gold` | `#facc15` | Currency only — never used for anything else. |
 | `danger` | `#ef4444` | Lives/HP loss, defeat state, low-health warnings |
 | `success` | `#22c55e` | HP bars (full), victory state, affordable/valid actions |
-| `accent` | `#38bdf8` | Primary interactive actions (Start Wave), selected state |
+| `accent` | `#38bdf8` | Primary interactive actions, glowing elements, selected state |
 
 Rules:
+- **Glassmorphism**: UI panels should utilize semi-transparent surfaces with background blurs (`backdrop-filter: blur(12px)`). Add a subtle, 1px white border with 10% opacity to emulate frosted glass edges.
+- **Glowing Elements**: Use `box-shadow` to create soft, colored glows around primary interactive elements (like the 'Start Wave' button or ready skills).
 - Don't introduce new colors ad hoc. If a new UI element needs a color, map
-  it to an existing token's *meaning* (gold = currency, danger = loss/threat,
-  success = positive/valid, accent = primary action) rather than picking a
-  new hex value.
-- Enemy/tower colors (defined per-entity in `src/game/data/balance.ts`) are a
-  separate palette from UI chrome — gameplay colors can be saturated and
-  varied (need to be tell-apart-able at a glance mid-combat); UI chrome stays
-  restrained so it doesn't compete with the game canvas for attention.
-- Maintain WCAG AA contrast for text on `background`/`surface` (both already
-  verified: `#f8fafc` on `#0f172a` and `#1e293b` comfortably exceed 4.5:1).
+  it to an existing token's *meaning* rather than picking a new hex value.
+- Maintain WCAG AA contrast for text on backgrounds.
 
-## Layout patterns
+## Visual Aesthetics & Art Direction
 
-- **Canvas + HUD stack**, not overlay-on-top-of-canvas, except for modal
-  states (game over). The HUD lives below the canvas so it never obscures
-  gameplay and so touch targets aren't fighting with tower placement taps.
-- Game canvas is a fixed 960×540 (16:9) internal resolution, scaled with
+- **Sprites**: Use flat, modern, minimalist vector-style graphics. Avoid heavy outlines or excessive gradients. Characters should be easily identifiable by their silhouette.
+- **Animations**:
+  - **Skills**: Skill activations should feature fast, punchy CSS transitions. Use micro-animations (e.g., slight scaling `scale: 1.05`, quick rotations, flashes) to make the UI feel responsive.
+  - **Projectiles**: Projectiles should leave brief, fading particle trails (if implemented) or use simple scaling effects on impact.
+  - **Enemies**: Enemy movement should be smooth. Ailments (Burn, Slow, Stun) should apply vibrant tints or small status icons above the enemy HP bar.
+- **Icons**: Use modern, clean, line-art or flat-filled icons (e.g., Material Symbols or Lucide style). Avoid complex multi-colored icons in the UI chrome.
+
+## Layout patterns: The Immersive Full-Screen Canvas
+
+- **Zero-Footprint HUD**: The Phaser game canvas must own 100% of the screen area (16:9 ratio, scaling with `FIT`). The React UI acts strictly as a transparent, floating overlay. Do not use opaque backgrounds, gradients, or heavy container panels that block the bottom or top of the screen.
+- **Floating Action Buttons (FABs)**: UI elements (hero skills, waves, Voices) should float near the edges of the screen as minimal circular or pill-shaped buttons, allowing the game environment to be fully visible beneath them.
+- **Phaser-First Visuals**: Animations, combat text, hero avatars, and status effects belong in the game engine (Phaser) as animated entities. HTML is reserved *only* for menus, floating HUD buttons, and state logic.
   Phaser's `FIT` mode — this keeps gameplay math (ranges, speeds, positions)
   independent of the player's actual screen size. Never hardcode pixel
   positions against `window.innerWidth`; use the internal game coordinate

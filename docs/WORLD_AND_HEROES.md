@@ -55,39 +55,20 @@ section and `docs/PROGRESSION.md` agency conditions):
    automatically (targeting per `core/Targeting.ts`); each hero also has
    a **skill** — manually triggered, on cooldown, with a voiced bark and
    cut-in.
-4. **Drops**: kills roll for drops — first **heroes**, then
-   **enhancements** once the squad is full. See "Drops & enhancements"
-   for the RNG rules.
-5. **Gold is the control valve**: kills also earn gold; spend it to
-   **reroll an offered enhancement** or **summon your next hero
-   immediately** (escalating cost) instead of waiting on the RNG. Free
-   stuff comes from luck; control costs gold.
-6. **Rally**: kills also fill the **Voices meter**, which charges the
-   equipped Bayanihan Act (People Power pushback, Batingaw stun, Baha ng
-   Tulong barrier heal…). Fire it at the right moment.
+4. **Drops & Voices**: Kills fill the **Voices meter**. When the meter fills, it triggers an **RNG drop** and the required charge scales up (e.g., requires 2 kills, then 4, etc.).
+5. **RNG Rewards**: The drop can be a new **unlocked Hero** (player selects which of the 4 empty slots to station them in), a Hero Upgrade, or a General Upgrade (e.g., adding ailments or boosting damage types).
+6. **Bayanihan Acts**: The equipped Bayanihan Act is a configurable ultimate skill chosen during the pre-battle preparation screen.
 7. **Win/lose**: clear all waves before the Barrier falls. Enhancements
    are per-battle only — permanent growth is mastery
    (`docs/PROGRESSION.md`).
 
-## Drops & enhancements
+### RNG rules (Voices and Drops)
 
-### RNG rules (the dropper is a state machine, not a slot machine)
-
-1. **Hero drops are finite** — slots are limited, so the pool obeys the
-   field: while undeployed squad members remain, hero drops are heavily
-   weighted (the first drop of a battle is *always* a hero; a pity
-   counter guarantees another at most every N kills). The moment all
-   five stand on the field, **hero drops leave the table entirely**.
-2. **No dead drops** — an enhancement that can't apply (stack cap
-   reached, no eligible hero) is excluded from the roll before it
-   happens.
-3. **Pity everywhere** — every kill without a drop raises the next
-   drop's chance; elite/boss kills guarantee one.
-4. **Rarity scales with waves** — later waves weight toward rarer
-   enhancements, so late-battle drops stay exciting.
-5. **Deterministic under the hood** — seeded RNG in a pure `core/Drops.ts`
-   state machine, unit-tested like `WaveManager`; all weights, pity
-   increments, and caps are `balance.ts` data.
+1. **Voice Meter Scaling** — Drops are no longer random per kill. Kills fill the Voices meter, which drops an RNG reward when full. The meter requirement scales up after each drop.
+2. **Hero Drops are finite and gated** — The RNG will only drop **unlocked heroes**, and only while there are empty slots. The player chooses which of the 4 empty slots to station the hero in.
+3. **No dead drops** — An enhancement that can't apply (stack cap reached, no eligible hero) is excluded from the roll before it happens.
+4. **Rarity scales with waves** — Later waves weight toward rarer enhancements, so late-battle drops stay exciting.
+5. **Deterministic under the hood** — Seeded RNG in a pure `core/Drops.ts` state machine; all weights and caps are `balance.ts` data.
 
 Enhancements land as tappable pickups where the enemy died (auto-collect
 after a few seconds — tap for juice, never punished for missing it).
@@ -143,22 +124,22 @@ squad math stays healthy in 5 slots). Damage types per
 
 | Hero | Worker | Type | Kind | Attack | Signature skill / passive | Joins via |
 |---|---|---|---|---|---|---|
-| **Eden** | Community organizer (protagonist, permanent leader) | Physical | Ranged | Rallying sling | Skill: Rally — brief squad-wide buff. Passive: adjacency bonuses she anchors | Start of game |
-| **Teacher** | Public school teacher | Physical | Ranged | Chalk throw | Passive: **marks** enemies — marked take bonus damage from everyone | Act 1 milestone (save the barangay) |
-| **Student** | Working student | Physical | Ranged | Slingshot | Passive: **grows** — enhancement drops apply at increased potency | Sari-Sari (Hope, early) |
-| **Jeepney Driver** | Driver | Wind | Melee (wall-guard) | Horn blast — knockback | Passive: his **route** — a lane corridor where allies attack faster | Act 2 milestone (the terminal) |
-| **Fisherfolk** | Fisher | Water | Ranged (mid) | Net throw — damage + group slow + **Wet** | Skill: Lambat — wide net, mass Wet setup | Sari-Sari (Hope) |
-| **Farmer** | Rice farmer | Earth | Melee (wall-guard) | Scythe sweep (splash) | Armor shred; passive: harvest — kills nearby yield bonus gold | Sari-Sari (Hope) |
-| **Sorbetero** | Dirty-ice-cream vendor | Frost | Ranged | Ice scoop shots — **Slow** | Skill: Deep freeze scoop — Freeze chance on Wet enemies | Sari-Sari (Hope) |
-| **Grill Vendor** | Street BBQ vendor | Fire | Melee (short cone) | Ember skewers — **Burn** | Skill: Ihaw Rain — burn cone across a lane | Sari-Sari (Hope) |
-| **Nurse** | Public health nurse | Holy | Ranged | Syringe darts | Skill: **Barrier regeneration** — the only healing in the game | Act 3 milestone (provincial health crisis) |
-| **OFW** | Overseas worker | Physical | Ranged (long lob) | Balikbayan-box lob (splash) | Passive: remittance — steady bonus gold trickle | Sari-Sari (Hope) |
-| **Auditor** | Government auditor (honest insider) | Magic | Melee (wall-guard) | Stamp slam — **ignores armor** | Reveals ghosts; pops inflated HP padding ("audited!") | First agency arc milestone |
+| **Eden** | Community organizer (protagonist, permanent leader) | Physical | Ranged | Rallying megaphone / Megaphone throw | Skill: Rally — brief squad-wide buff. Passive: adjacency bonuses she anchors | Start of game |
+| **Teacher** | Public school teacher | Physical | Ranged | Tossing graded papers/heavy textbooks | Melee/Skill: **Pamalo (Wooden Ruler)** — marks enemies; marked take bonus damage | Act 1 milestone (save the barangay) |
+| **Student** | Working student | Physical | Ranged | Slingshot with pebbles | Passive: **Grows** — enhancement drops apply at increased potency | Sari-Sari (Hope, early) |
+| **Jeepney Driver** | Driver | Wind | Melee (wall-guard) | Revving smog-spewing **Tambutso** (exhaust) | Skill: **Barya (Loose change)** — tosses coins like shrapnel for AoE damage | Act 2 milestone (the terminal) |
+| **Fisherfolk** | Fisher | Water | Ranged (mid) | Net throw — damage + group slow + **Wet** | Skill: **Lambat** — wide net, mass Wet setup | Sari-Sari (Hope) |
+| **Street Sweeper** | Barangay sweeper | Earth | Melee (wall-guard) | Sweeping **Walis Tingting** (knockback) | Skill: Tosses a **Dustpan of debris** to blind/stun enemies | Sari-Sari (Hope) |
+| **Taho Vendor** | Street vendor | Frost | Ranged (short lob) | Splashing scalding **Arnibal (Syrup)** | Skill: **Taho Bucket Bash** — heavy melee hit with high Slow chance | Sari-Sari (Hope) |
+| **Grill Vendor** | Street BBQ vendor | Fire | Melee (short cone) | Hot ember skewers / Hot oil splash — **Burn** | Skill: **Ihaw Rain** — flaming hot charcoal shower across a lane | Sari-Sari (Hope) |
+| **Nurse** | Public health nurse | Holy | Ranged | Throwing **Alcohol sprays** / First-aid supplies | Skill: **First-Aid Kit** — Barrier regeneration (the only healing in the game) | Act 3 milestone (provincial health crisis) |
+| **Construction Worker** | Laborer | Physical | Ranged (mid) | Throwing **Hollow Blocks** | Skill: **Yero Barricade** — drops corrugated iron in front of barrier to soak hits | Sari-Sari (Hope) |
+| **Call Center Agent** | BPO Graveyard shift | Lightning | Ranged | Projecting **Deafening Headset Feedback** | Passive: **Graveyard Shift** — deals amplified damage during night-themed waves | Sari-Sari (Hope) |
 | **Journalist** | Field reporter | Lightning | Ranged | Camera-flash burst | Reveal aura; skill: Breaking News — chain-lightning + stun chance | Second agency arc milestone |
-| **Whistleblower** | The one who spoke up | Dark | Ranged (mid) | Dossier throw — **Curse** | Skill: Exposé — mass curse, everything takes amplified damage | Pre-finale milestone |
+| **Whistleblower** | The one who spoke up | Dark | Ranged (mid) | Dropping **Boxes of Evidence / Dossiers** — **Curse** | Skill: **Exposé** — mass curse, everything takes amplified damage | Pre-finale milestone |
 
-All 10 damage types have a carrier; 7 heroes join via story milestones,
-6 via Hope in player-chosen order. Kits, numbers, and skill cooldowns
+All 10 damage types have a carrier; 6 heroes join via story milestones,
+7 via Hope in player-chosen order. Kits, numbers, and skill cooldowns
 are `balance.ts` data (the **hero balance sheet** — actual numbers — is
 authored when implementation starts, tuned against the build).
 

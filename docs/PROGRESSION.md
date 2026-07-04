@@ -164,12 +164,15 @@ missing a progress affordance.
 
 ## Session → mid → long loops
 
-- **Session (3–5 min)**: Eden deploys at wave 1 → kills roll drops
-  (heroes until the squad is full, then enhancements), earn gold
-  (rerolls / instant summons), and fill Voices (Act charge) → clear
-  waves → Hope payout. Enhancements reset each battle; mastery is the
-  permanent track.
-- **Mid**: Hope purchases + hero unlocks compound into new squad options;
+- **The Core Gameplay Loop**:
+  1. **Preparation Screen (Main UI)**: The player selects their progress on the map and clicks **Defend** to start a run.
+  2. **The Run (Session, 3–5 min)**: Eden deploys at wave 1 → kills fill the **Voices Meter** → a full meter triggers **RNG drops** (heroes until the squad is full, then enhancements).
+  3. **Spoils of War**: The run ends in either Victory or Defeat. Regardless, the player earns persistent meta-currency (Hope points or Gold).
+  4. **Repeat**: The player returns to the Preparation screen to upgrade and repeat.
+
+- **Mid (Meta-Progression)**:
+  - **Unlockable Heroes**: Heroes are unlocked either naturally based on campaign progress, or can be directly bought using the Spoils of War (Hope points / Gold).
+  - Hope/Gold purchases and new hero unlocks compound into new squad options; the next arc opens.
   the next arc opens.
 - **Long**: complete the alliance and the ladder → the finale unlocks →
   golden archipelago. Post-campaign: **Balita daily challenge** (one
@@ -203,12 +206,7 @@ Guardrails:
   barrier; heroes on fixed pedestals behind it) — **Locked and confirmed**. Detailed
   in `WORLD_AND_HEROES.md`
 - ~~In-battle upgrade tiers~~ — superseded (2026-07-03): the owner
-  restored and refined the drop system. **Locked**: kills roll drops —
-  heroes while squad slots remain (guaranteed first drop, pity cadence),
-  then enhancements only (damage/AoE mods, split/bounce projectiles,
-  infusions…); no dead drops; gold is the RNG control valve (rerolls,
-  instant summons). Full rules in `WORLD_AND_HEROES.md` "Drops &
-  enhancements"
+  restored and refined the drop system. **Locked**: kills fill the Voices meter, which drops an RNG reward when full (heroes from your unlocked pool while squad slots remain, then enhancements only). The meter cost scales up per drop. No dead drops. Full rules in `WORLD_AND_HEROES.md` "Drops & enhancements"
 - **Ang Sistema** as the finale (horde-convergence gauntlet, The Dynasty
   at its heart) — replaces the trashed "Algorithm" machine finale
 - **Heroes never sold for real money** as a binding monetization rule
