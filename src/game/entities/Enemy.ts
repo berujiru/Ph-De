@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import type { EnemyDefinition } from '../data/balance';
 import type { Barrier } from './Barrier';
 import type { Summon } from './Summon';
+import type { ISkillEnemy } from '../core/Skills';
 
 export type AilmentType = 'burn' | 'slow' | 'wet' | 'freeze' | 'stun' | 'poison' | 'bleed' | 'rot' | 'sleep' | 'curse' | 'knockback' | 'armorShred';
 
@@ -35,7 +36,8 @@ const AILMENT_OVERLAYS: Record<AilmentType, string> = {
   armorShred: '🔨'
 };
 
-export class Enemy extends Phaser.GameObjects.Container {
+export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
+  public id: string;
   public definition: EnemyDefinition;
   public hp: number;
   private bodyShape: Phaser.GameObjects.Arc;
@@ -56,7 +58,7 @@ export class Enemy extends Phaser.GameObjects.Container {
 
   // Ailment Tracking
   private ailmentBuildups: Record<string, number> = {};
-  private activeAilments: Record<string, number> = {}; // Remaining ms
+  public activeAilments: Record<string, number> = {}; // Remaining ms
   private ailmentIcons: Record<string, Phaser.GameObjects.Text> = {};
   
   // Overlay tracking (to spawn particles on update)
@@ -67,6 +69,7 @@ export class Enemy extends Phaser.GameObjects.Container {
 
   constructor(scene: Phaser.Scene, x: number, y: number, definition: EnemyDefinition) {
     super(scene, x, y);
+    this.id = definition.id;
     this.definition = definition;
     this.hp = definition.maxHp;
 

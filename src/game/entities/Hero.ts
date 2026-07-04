@@ -1,18 +1,16 @@
 import Phaser from 'phaser';
 import type { Enemy } from './Enemy';
 import type { HeroDefinition } from '../data/balance';
-import { GAME_HEIGHT } from '../data/level';
+import { applyHeroPassive, type ISkillHero } from '../core/Skills';
 
-export class Hero extends Phaser.GameObjects.Container {
+export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   public id: string;
   public definition: HeroDefinition;
-  private rangeX: number; // The X coordinate to stop marching
-  private speed = 80;
+  public rangeX: number; // The X coordinate to stop marching
   private attackCooldown = 0;
   public attackRateMs: number;
   public damage: number;
   public range: number;
-  private projectileColor: number;
   private onAttack: (hero: Hero, target: Enemy) => void;
   
   public skillCooldownMs = 5000;
@@ -46,7 +44,6 @@ export class Hero extends Phaser.GameObjects.Container {
     this.damage = def.damage;
     this.attackRateMs = def.attackRateMs;
     this.range = def.range;
-    this.projectileColor = def.projectileColor || def.color;
     this.onAttack = onAttack;
 
     // Range indicator (added first so it's behind the body shape)
@@ -130,19 +127,18 @@ export class Hero extends Phaser.GameObjects.Container {
         
         // Passives applied on attack
         const activePassive = this.passiveOverride || this.id;
-        
-        if (activePassive === 'farmer' && Math.random() < 0.2) {
-          target.activeAilments['freeze'] = 100; // instant root
-          
-          const txt = this.scene.add.text(target.x, target.y - 30, 'ROOTED!', { color: '#22c55e', fontStyle: 'bold' }).setOrigin(0.5);
-          this.scene.tweens.add({ targets: txt, y: target.y - 60, alpha: 0, duration: 1000, onComplete: () => txt.destroy() });
-        } else if (activePassive === 'teacher') {
-          target.activeAilments['marked'] = 100;
-        } else if (activePassive === 'fisherfolk') {
-          target.activeAilments['wet'] = 100;
-        } else if (activePassive === 'sorbetes_vendor') {
-          target.activeAilments['freeze'] = Math.min(100, (target.activeAilments['freeze'] || 0) + 34);
-        }
+        applyHeroPassive(activePassive, this, target, {
+          GAME_WIDTH: Number(this.scene.game.config.width),
+          GAME_HEIGHT: Number(this.scene.game.config.height),
+          heroes: [], // Passive doesn't currently read other heroes
+          enemies: [], // or other enemies
+          onVisual: (evt) => {
+            if (evt.type === 'text') {
+              const txt = this.scene.add.text(evt.x || 0, evt.y || 0, evt.text || '', { color: evt.color || '#fff', fontStyle: 'bold' }).setOrigin(0.5);
+              this.scene.tweens.add({ targets: txt, y: (evt.y || 0) - 30, alpha: 0, duration: 1000, onComplete: () => txt.destroy() });
+            }
+          }
+        });
 
         this.attackCooldown = this.attackRateMs;
         // Simple attack visual

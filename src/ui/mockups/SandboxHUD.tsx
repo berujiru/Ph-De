@@ -1,10 +1,77 @@
 import { useState } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { theme } from '../theme';
 import { uiToGameEvents } from '../../game/core/GameEvents';
 import { HERO_DEFINITIONS } from '../../game/data/balance';
+import {
+  BackIcon,
+  LightningIcon,
+  PauseIcon,
+  PlayIcon,
+  PlusIcon,
+  SkullIcon,
+  SpeedIcon,
+} from '../icons';
+import { battleCss, fab, glass, glassPanel, glassSelect, withAlpha } from './battleStyles';
 
 interface SandboxHUDProps {
   onReturnToMenu: () => void;
+}
+
+const sectionLabel: CSSProperties = {
+  fontSize: 9,
+  fontWeight: 800,
+  letterSpacing: 1.5,
+  textTransform: 'uppercase',
+  color: theme.colors.textMuted,
+};
+
+const actionBtn: CSSProperties = {
+  flex: 1,
+  minHeight: 44,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 6,
+  padding: '0 12px',
+  borderRadius: 10,
+  border: 'none',
+  fontSize: 12,
+  fontWeight: 700,
+  cursor: 'pointer',
+};
+
+/** Solid accent action — primary "do it" buttons in the rig. */
+const primaryBtn: CSSProperties = {
+  ...actionBtn,
+  backgroundColor: theme.colors.accent,
+  color: theme.colors.background,
+  boxShadow: `0 0 12px ${withAlpha(theme.colors.accent, 0.4)}`,
+};
+
+/** Outlined accent action — secondary triggers. */
+const secondaryBtn: CSSProperties = {
+  ...actionBtn,
+  backgroundColor: 'transparent',
+  border: `1px solid ${withAlpha(theme.colors.accent, 0.6)}`,
+  color: theme.colors.accent,
+};
+
+/** Outlined danger action — harmful/test-damage controls. */
+const dangerBtn: CSSProperties = {
+  ...actionBtn,
+  backgroundColor: 'transparent',
+  border: `1px solid ${withAlpha(theme.colors.danger, 0.6)}`,
+  color: theme.colors.danger,
+};
+
+function RigSection({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div style={{ ...glassPanel, padding: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <span style={sectionLabel}>{label}</span>
+      {children}
+    </div>
+  );
 }
 
 export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
@@ -17,23 +84,26 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
   const [selectedAilment, setSelectedAilment] = useState<string>('poison');
   const [gameSpeed, setGameSpeed] = useState<number>(1);
 
+  const playBtnSound = () => uiToGameEvents.emit('playSound', { key: 'sfx-btn-press' });
+
   const handleSetSpeed = (speed: number) => {
     setGameSpeed(speed);
     uiToGameEvents.emit('setSpeed', { speed });
+    playBtnSound();
   };
 
   const handleSpawnDummy = () => {
-    uiToGameEvents.emit('debugSpawn', { 
+    uiToGameEvents.emit('debugSpawn', {
       heroId: selectedHero || undefined,
       passive: selectedHeroPassive === 'none' ? undefined : selectedHeroPassive,
-      skill: selectedHeroSkill === 'none' ? undefined : selectedHeroSkill
+      skill: selectedHeroSkill === 'none' ? undefined : selectedHeroSkill,
     });
     playBtnSound();
   };
 
   const handleTriggerHeroSkill = () => {
     uiToGameEvents.emit('triggerHeroSkill', {
-      skill: selectedHeroSkill === 'none' ? undefined : selectedHeroSkill
+      skill: selectedHeroSkill === 'none' ? undefined : selectedHeroSkill,
     });
     playBtnSound();
   };
@@ -49,7 +119,7 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
   };
 
   const handleSpawnSpecificEnemy = () => {
-    uiToGameEvents.emit('spawnSpecificEnemy', { 
+    uiToGameEvents.emit('spawnSpecificEnemy', {
       enemyId: selectedEnemy,
       passive: selectedPassive === 'none' ? undefined : selectedPassive,
       skill: selectedSkill === 'none' ? undefined : selectedSkill,
@@ -62,193 +132,240 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
     playBtnSound();
   };
 
-  const playBtnSound = () => {
-    uiToGameEvents.emit('playSound', { key: 'sfx-btn-press' });
-  };
-
   const realHeroes = Object.entries(HERO_DEFINITIONS).filter(([id]) => !id.startsWith('sandbox_'));
   const sandboxHeroes = Object.entries(HERO_DEFINITIONS).filter(([id]) => id.startsWith('sandbox_'));
 
+  const speedFab = (speed: number, label: string, icon: ReactNode): ReactNode => (
+    <button
+      type="button"
+      className="hud-btn"
+      onClick={() => handleSetSpeed(speed)}
+      aria-pressed={gameSpeed === speed}
+      aria-label={label}
+      title={label}
+      style={{
+        ...fab,
+        color: gameSpeed === speed ? theme.colors.background : theme.colors.textPrimary,
+        backgroundColor: gameSpeed === speed ? theme.colors.accent : glass.surface,
+        border: `1px solid ${gameSpeed === speed ? theme.colors.accent : glass.border}`,
+        boxShadow: gameSpeed === speed ? `0 0 12px ${withAlpha(theme.colors.accent, 0.5)}` : undefined,
+      }}
+    >
+      {icon}
+    </button>
+  );
+
   return (
-    <div style={{
-      position: 'absolute',
-      inset: 0,
-      pointerEvents: 'none',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      padding: '20px'
-    }}>
-      {/* Top Bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        {/* Left: Info */}
-        <div style={{ pointerEvents: 'auto' }}>
-          <div style={{
-            backgroundColor: 'rgba(15, 23, 42, 0.8)',
-            padding: '10px 20px',
-            borderRadius: '8px',
-            border: `2px solid ${theme.colors.accent}`,
-            color: '#fff',
-            marginBottom: '10px'
-          }}>
-            <h2 style={{ margin: 0, color: theme.colors.accent }}>ATTACK SANDBOX</h2>
-            <div style={{ color: theme.colors.textMuted, fontSize: '12px' }}>Wave mechanics disabled.</div>
+    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+      <style>{battleCss}</style>
+
+      {/* Top-left: sandbox placard */}
+      <div style={{ position: 'absolute', top: 12, left: 12, pointerEvents: 'auto' }}>
+        <div style={{ ...glassPanel, padding: '10px 14px', transform: 'rotate(-1deg)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: 15,
+                fontWeight: 900,
+                letterSpacing: 1.5,
+                textTransform: 'uppercase',
+                color: theme.colors.accent,
+              }}
+            >
+              Attack Sandbox
+            </h2>
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: 1,
+                padding: '2px 6px',
+                borderRadius: 6,
+                border: `1px solid ${glass.border}`,
+                color: theme.colors.textMuted,
+              }}
+            >
+              DEV
+            </span>
+          </div>
+          <div style={{ fontSize: 11, color: theme.colors.textMuted, marginTop: 2 }}>
+            Wave mechanics disabled.
           </div>
         </div>
+      </div>
 
-        {/* Right: Controls */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', pointerEvents: 'auto', alignItems: 'flex-end' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', backgroundColor: 'rgba(59, 130, 246, 0.2)', padding: '8px', borderRadius: '8px', border: `1px solid ${theme.colors.accent}` }}>
-            <select 
-              value={selectedHero} 
-              onChange={(e) => setSelectedHero(e.target.value)}
-              style={{ padding: '8px', backgroundColor: theme.colors.surface, color: '#fff', border: `1px solid ${theme.colors.border}`, borderRadius: '6px' }}
-            >
-              <optgroup label="Real Heroes">
-                {realHeroes.map(([id, def]) => (
-                  <option key={id} value={id}>{def.name} ({def.attackStyle})</option>
-                ))}
-              </optgroup>
-              <optgroup label="Test Mocks">
-                {sandboxHeroes.map(([id, def]) => (
-                  <option key={id} value={id}>{def.attackStyle.toUpperCase()}</option>
-                ))}
-              </optgroup>
-            </select>
-            
-            <select 
-              value={selectedHeroPassive} 
-              onChange={(e) => setSelectedHeroPassive(e.target.value)}
-              style={{ padding: '4px 8px', backgroundColor: theme.colors.surface, color: '#fff', border: 'none', borderRadius: '4px' }}
-            >
-              <option value="none">No Passive Override</option>
+      {/* Right rail: floating rig sections (scrolls on small screens) */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 12,
+          right: 12,
+          bottom: 12,
+          width: 'min(240px, 62vw)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+          overflowY: 'auto',
+          pointerEvents: 'auto',
+        }}
+      >
+        <RigSection label="Hero Rig">
+          <select
+            value={selectedHero}
+            onChange={(e) => setSelectedHero(e.target.value)}
+            aria-label="Hero to spawn"
+            style={glassSelect}
+          >
+            <optgroup label="Real Heroes">
               {realHeroes.map(([id, def]) => (
-                <option key={id} value={id}>{def.passive?.name} ({def.name})</option>
+                <option key={id} value={id}>
+                  {def.name} ({def.attackStyle})
+                </option>
               ))}
-            </select>
-
-            <select 
-              value={selectedHeroSkill} 
-              onChange={(e) => setSelectedHeroSkill(e.target.value)}
-              style={{ padding: '4px 8px', backgroundColor: theme.colors.surface, color: '#fff', border: 'none', borderRadius: '4px' }}
-            >
-              <option value="none">No Skill Override</option>
-              {realHeroes.map(([id, def]) => (
-                <option key={id} value={id}>{def.signatureSkill.name} ({def.name})</option>
+            </optgroup>
+            <optgroup label="Test Mocks">
+              {sandboxHeroes.map(([id, def]) => (
+                <option key={id} value={id}>
+                  {def.attackStyle.toUpperCase()}
+                </option>
               ))}
-            </select>
+            </optgroup>
+          </select>
 
-            <div style={{ display: 'flex', gap: '5px' }}>
-              <button onClick={handleSpawnDummy} style={{ flex: 1, padding: '8px 16px', backgroundColor: theme.colors.accent, color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
-                Spawn Hero
-              </button>
-              <button onClick={handleTriggerHeroSkill} style={{ flex: 1, padding: '8px 16px', backgroundColor: '#eab308', color: '#000', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
-                Trigger Skill
-              </button>
-            </div>
+          <select
+            value={selectedHeroPassive}
+            onChange={(e) => setSelectedHeroPassive(e.target.value)}
+            aria-label="Hero passive override"
+            style={glassSelect}
+          >
+            <option value="none">No Passive Override</option>
+            {realHeroes.map(([id, def]) => (
+              <option key={id} value={id}>
+                {def.passive?.name} ({def.name})
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedHeroSkill}
+            onChange={(e) => setSelectedHeroSkill(e.target.value)}
+            aria-label="Hero skill override"
+            style={glassSelect}
+          >
+            <option value="none">No Skill Override</option>
+            {realHeroes.map(([id, def]) => (
+              <option key={id} value={id}>
+                {def.signatureSkill.name} ({def.name})
+              </option>
+            ))}
+          </select>
+
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button type="button" className="hud-btn" onClick={handleSpawnDummy} style={primaryBtn}>
+              <PlusIcon size={14} />
+              Spawn
+            </button>
+            <button type="button" className="hud-btn" onClick={handleTriggerHeroSkill} style={secondaryBtn}>
+              <LightningIcon size={14} />
+              Skill
+            </button>
+          </div>
+        </RigSection>
+
+        <RigSection label="Anomaly Rig">
+          <select
+            value={selectedEnemy}
+            onChange={(e) => setSelectedEnemy(e.target.value)}
+            aria-label="Anomaly to spawn"
+            style={glassSelect}
+          >
+            <option value="grunt">Grunt</option>
+            <option value="runner">Runner</option>
+            <option value="brute">Brute</option>
+            <option value="ghost_employee">Ghost Employee (Stealth)</option>
+            <option value="epal">Epal (Morale Aura)</option>
+            <option value="the_overpriced">The Overpriced (Fake HP)</option>
+            <option value="kickback_courier">Kickback Courier (Thief)</option>
+            <option value="shell_company">Shell Company (Splitter)</option>
+            <option value="crony_bodyguard">Crony (Taunt)</option>
+            <option value="hoarder">Hoarder (Obstacle Drop)</option>
+            <option value="illegal_logger">Illegal Logger (Destructor)</option>
+            <option value="land_grabber">Land Grabber (Knockback)</option>
+            <option value="tender_rigger">Tender Rigger (Immunity)</option>
+            <option value="boss_flood_control">Ghost Flood Control</option>
+            <option value="boss_pork_barrel">Pork Barrel</option>
+            <option value="boss_troll_farm">Troll Farm</option>
+            <option value="boss_vote_buying">Vote Buying</option>
+            <option value="boss_nepotism">Nepotism</option>
+            <option value="boss_wang_wang">Wang-Wang</option>
+            <option value="boss_budget_insertion">Budget Insertion</option>
+            <option value="boss_smuggling">Smuggling</option>
+            <option value="boss_dynasty_1">The Dynasty (Bruiser)</option>
+            <option value="boss_ang_sistema">Ang Sistema</option>
+          </select>
+
+          <select
+            value={selectedPassive}
+            onChange={(e) => setSelectedPassive(e.target.value)}
+            aria-label="Anomaly passive override"
+            style={glassSelect}
+          >
+            <option value="none">No Passive</option>
+            <option value="stealth">Stealth</option>
+            <option value="barrierShred">Barrier Shred (x10)</option>
+            <option value="moraleAura">Morale Aura</option>
+            <option value="fakeHp">Fake HP (150)</option>
+            <option value="stealVoices">Steal Voices</option>
+            <option value="splitOnDeath">Split On Death (x3)</option>
+            <option value="taunt">Taunt Aura</option>
+            <option value="dropObstacle">Drop Obstacle</option>
+            <option value="knockback">Knockback Pulse</option>
+            <option value="hitImmunity">Hit Immunity (5)</option>
+          </select>
+
+          <select
+            value={selectedSkill}
+            onChange={(e) => setSelectedSkill(e.target.value)}
+            aria-label="Anomaly skill override"
+            style={glassSelect}
+          >
+            <option value="none">No Skill</option>
+            <option value="flood">Flood</option>
+            <option value="devour">Devour</option>
+            <option value="summonSwarm">Deploy Trolls</option>
+            <option value="summonShieldbearer">Appoint Shieldbearer</option>
+            <option value="scatterFakeGold">Bribe (Fake Gold)</option>
+            <option value="smuggleHp">Smuggle Funds (HP)</option>
+            <option value="economyHeist">Economy Heist</option>
+            <option value="sirenBurst">VIP Convoy (Siren)</option>
+            <option value="resurrectAll">Horde Convergence</option>
+          </select>
+
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button type="button" className="hud-btn" onClick={handleSpawnSpecificEnemy} style={primaryBtn}>
+              <PlusIcon size={14} />
+              Spawn
+            </button>
+            <button type="button" className="hud-btn" onClick={handleTriggerEnemySkill} style={secondaryBtn}>
+              <LightningIcon size={14} />
+              Skill
+            </button>
           </div>
 
-          <button onClick={handleSpawnTarget} style={{
-            padding: '8px 16px',
-            backgroundColor: theme.colors.danger,
-            color: '#fff',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-          }}>
+          <button type="button" className="hud-btn" onClick={handleSpawnTarget} style={dangerBtn}>
+            <SkullIcon size={14} />
             Drop Punching Bag
           </button>
+        </RigSection>
 
-          {/* Enemy Tester */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', backgroundColor: 'rgba(56, 189, 248, 0.2)', padding: '8px', borderRadius: '8px', border: `1px solid ${theme.colors.accent}` }}>
-            <select 
-              value={selectedEnemy} 
-              onChange={(e) => setSelectedEnemy(e.target.value)}
-              style={{ padding: '4px 8px', backgroundColor: theme.colors.surface, color: '#fff', border: 'none', borderRadius: '4px' }}
-            >
-              <option value="grunt">Grunt</option>
-              <option value="runner">Runner</option>
-              <option value="brute">Brute</option>
-              <option value="ghost_employee">Ghost Employee (Stealth)</option>
-              <option value="epal">Epal (Morale Aura)</option>
-              <option value="the_overpriced">The Overpriced (Fake HP)</option>
-              <option value="kickback_courier">Kickback Courier (Thief)</option>
-              <option value="shell_company">Shell Company (Splitter)</option>
-              <option value="crony_bodyguard">Crony (Taunt)</option>
-              <option value="hoarder">Hoarder (Obstacle Drop)</option>
-              <option value="illegal_logger">Illegal Logger (Destructor)</option>
-              <option value="land_grabber">Land Grabber (Knockback)</option>
-              <option value="tender_rigger">Tender Rigger (Immunity)</option>
-              <option value="boss_flood_control">Ghost Flood Control</option>
-              <option value="boss_pork_barrel">Pork Barrel</option>
-              <option value="boss_troll_farm">Troll Farm</option>
-              <option value="boss_vote_buying">Vote Buying</option>
-              <option value="boss_nepotism">Nepotism</option>
-              <option value="boss_wang_wang">Wang-Wang</option>
-              <option value="boss_budget_insertion">Budget Insertion</option>
-              <option value="boss_smuggling">Smuggling</option>
-              <option value="boss_dynasty_1">The Dynasty (Bruiser)</option>
-              <option value="boss_ang_sistema">Ang Sistema</option>
-            </select>
-            
-            <select 
-              value={selectedPassive} 
-              onChange={(e) => setSelectedPassive(e.target.value)}
-              style={{ padding: '4px 8px', backgroundColor: theme.colors.surface, color: '#fff', border: 'none', borderRadius: '4px' }}
-            >
-              <option value="none">No Passive</option>
-              <option value="stealth">Stealth</option>
-              <option value="barrierShred">Barrier Shred (x10)</option>
-              <option value="moraleAura">Morale Aura</option>
-              <option value="fakeHp">Fake HP (150)</option>
-              <option value="stealVoices">Steal Voices</option>
-              <option value="splitOnDeath">Split On Death (x3)</option>
-              <option value="taunt">Taunt Aura</option>
-              <option value="dropObstacle">Drop Obstacle</option>
-              <option value="knockback">Knockback Pulse</option>
-              <option value="hitImmunity">Hit Immunity (5)</option>
-            </select>
-
-            <select 
-              value={selectedSkill} 
-              onChange={(e) => setSelectedSkill(e.target.value)}
-              style={{ padding: '4px 8px', backgroundColor: theme.colors.surface, color: '#fff', border: 'none', borderRadius: '4px' }}
-            >
-              <option value="none">No Skill</option>
-              <option value="flood">Flood</option>
-              <option value="devour">Devour</option>
-              <option value="summonSwarm">Deploy Trolls</option>
-              <option value="summonShieldbearer">Appoint Shieldbearer</option>
-              <option value="scatterFakeGold">Bribe (Fake Gold)</option>
-              <option value="smuggleHp">Smuggle Funds (HP)</option>
-              <option value="economyHeist">Economy Heist</option>
-              <option value="sirenBurst">VIP Convoy (Siren)</option>
-              <option value="resurrectAll">Horde Convergence</option>
-            </select>
-
-            <div style={{ display: 'flex', gap: '5px' }}>
-              <button onClick={handleSpawnSpecificEnemy} style={{ flex: 1, padding: '6px 12px', backgroundColor: theme.colors.accent, color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-                Spawn
-              </button>
-              <button onClick={handleTriggerEnemySkill} style={{ flex: 1, padding: '6px 12px', backgroundColor: '#eab308', color: '#000', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-                Trigger Skill
-              </button>
-            </div>
-          </div>
-
-          {/* Ailment Tester */}
-          <div style={{ display: 'flex', gap: '5px', backgroundColor: 'rgba(30, 41, 59, 0.5)', padding: '4px', borderRadius: '8px', border: `1px solid ${theme.colors.border}` }}>
-            <select 
-              value={selectedAilment} 
+        <RigSection label="Ailment Rig">
+          <div style={{ display: 'flex', gap: 6 }}>
+            <select
+              value={selectedAilment}
               onChange={(e) => setSelectedAilment(e.target.value)}
-              style={{
-                padding: '4px 8px',
-                backgroundColor: theme.colors.surface,
-                color: '#fff',
-                border: 'none',
-                borderRadius: '4px'
-              }}
+              aria-label="Ailment to apply"
+              style={{ ...glassSelect, flex: 1, minWidth: 0 }}
             >
               <option value="poison">Poison</option>
               <option value="burn">Burn</option>
@@ -263,64 +380,35 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
               <option value="knockback">Knockback</option>
               <option value="armorShred">Armor Shred</option>
             </select>
-            <button onClick={handleApplyAilment} style={{
-              padding: '6px 12px',
-              backgroundColor: '#8b5cf6',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-            }}>
-              +35% Stack
+            <button type="button" className="hud-btn" onClick={handleApplyAilment} style={{ ...dangerBtn, flex: 'none' }}>
+              +35%
             </button>
           </div>
+        </RigSection>
 
-          <div style={{ display: 'flex', gap: '5px', backgroundColor: theme.colors.surface, padding: '4px', borderRadius: '8px', border: `1px solid ${theme.colors.border}` }}>
-            <button onClick={() => { handleSetSpeed(0); playBtnSound(); }} style={{
-              padding: '6px 12px',
-              backgroundColor: gameSpeed === 0 ? theme.colors.primary : 'transparent',
-              color: gameSpeed === 0 ? '#fff' : theme.colors.textSecondary,
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-            }}>II</button>
-            <button onClick={() => { handleSetSpeed(1); playBtnSound(); }} style={{
-              padding: '6px 12px',
-              backgroundColor: gameSpeed === 1 ? theme.colors.primary : 'transparent',
-              color: gameSpeed === 1 ? '#fff' : theme.colors.textSecondary,
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-            }}>▶</button>
-            <button onClick={() => { handleSetSpeed(2); playBtnSound(); }} style={{
-              padding: '6px 12px',
-              backgroundColor: gameSpeed === 2 ? theme.colors.primary : 'transparent',
-              color: gameSpeed === 2 ? '#fff' : theme.colors.textSecondary,
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-            }}>▶▶</button>
-          </div>
-          
-          <button 
-            onClick={() => { onReturnToMenu(); playBtnSound(); }}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#1e293b',
-              color: '#fff',
-              border: '1px solid #475569',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-            }}
-          >
-            Leave Sandbox
-          </button>
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+          {speedFab(0, 'Pause', <PauseIcon size={18} />)}
+          {speedFab(1, 'Normal speed', <PlayIcon size={18} />)}
+          {speedFab(2, 'Fast forward', <SpeedIcon size={18} />)}
         </div>
+
+        <button
+          type="button"
+          className="hud-btn"
+          onClick={() => {
+            onReturnToMenu();
+            playBtnSound();
+          }}
+          style={{
+            ...actionBtn,
+            ...glassPanel,
+            flex: 'none',
+            color: theme.colors.textPrimary,
+          }}
+        >
+          <BackIcon size={14} />
+          Leave Sandbox
+        </button>
       </div>
     </div>
   );

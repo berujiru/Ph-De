@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 960" preserveAspectRatio="xMidYMid slice">
+  <!-- Finale: Ang Sistema — converging city avenue at night, massed crowd -->
+  <rect width="540" height="960" fill="#0f172a"/>
+
+  <!-- glow at the vanishing point: where the march is headed -->
+  <circle cx="270" cy="240" r="150" fill="#38bdf8" opacity="0.06"/>
+  <circle cx="270" cy="240" r="90" fill="#38bdf8" opacity="0.08"/>
+  <circle cx="270" cy="240" r="40" fill="#38bdf8" opacity="0.12"/>
+
+  <!-- stars -->
+  <g fill="#f8fafc" opacity="0.25">
+    <circle cx="60" cy="60" r="1.4"/><circle cx="200" cy="40" r="1"/><circle cx="350" cy="75" r="1.2"/>
+    <circle cx="480" cy="45" r="1.4"/><circle cx="130" cy="120" r="1"/><circle cx="420" cy="130" r="1"/>
+  </g>
+
+  <!-- converging building walls (perspective toward the vanishing point) -->
+  <path d="M0 60 210 240v720H0z" fill="#0b1120"/>
+  <path d="M540 60 330 240v720h210z" fill="#0b1120"/>
+  <path d="M60 0 240 230v730H190L60 300z" fill="#0d1526" opacity="0.7"/>
+  <path d="M480 0 300 230v730h50l130-660z" fill="#0d1526" opacity="0.7"/>
+
+  <!-- window lights, denser near the bottom -->
+  <g fill="#facc15" opacity="0.16">
+    <rect x="30" y="300" width="12" height="14"/><rect x="70" y="360" width="12" height="14"/>
+    <rect x="40" y="440" width="14" height="16"/><rect x="100" y="500" width="14" height="16"/>
+    <rect x="60" y="590" width="14" height="16"/><rect x="120" y="650" width="14" height="16"/>
+    <rect x="45" y="720" width="16" height="18"/><rect x="110" y="770" width="16" height="18"/>
+    <rect x="498" y="300" width="12" height="14"/><rect x="458" y="360" width="12" height="14"/>
+    <rect x="486" y="440" width="14" height="16"/><rect x="426" y="500" width="14" height="16"/>
+    <rect x="466" y="590" width="14" height="16"/><rect x="406" y="650" width="14" height="16"/>
+    <rect x="479" y="720" width="16" height="18"/><rect x="414" y="770" width="16" height="18"/>
+  </g>
+  <g fill="#38bdf8" opacity="0.18">
+    <rect x="90" y="410" width="10" height="12"/><rect x="150" y="560" width="10" height="12"/>
+    <rect x="440" y="410" width="10" height="12"/><rect x="380" y="560" width="10" height="12"/>
+  </g>
+
+  <!-- avenue: wide at the bottom, narrowing to the vanishing point -->
+  <path d="M235 240h70l120 720H115z" fill="#131c31"/>
+  <path d="M235 240 115 960h14L242 240zM305 240l120 720h-14L298 240z" fill="#1e293b"/>
+  <g stroke="#94a3b8" stroke-width="4" opacity="0.14">
+    <path d="M270 280v36M270 360v42M270 450v48M270 550v54M270 660v60M270 780v66"/>
+  </g>
+
+  <!-- hanging wires converging overhead -->
+  <path d="M0 200q270 90 540 0" stroke="#0b1120" stroke-width="2.5" fill="none"/>
+  <path d="M40 150q230 110 460 20" stroke="#0b1120" stroke-width="2" fill="none" opacity="0.7"/>
+
+  <!-- the massed crowd filling the avenue mouth (heads as layered dots) -->
+  <g fill="#0d1526">
+    <path d="M100 960v-60q40-18 85-14t85-6q45-10 85 2t85 4q45-6 80 14v60z"/>
+  </g>
+  <g fill="#0b1120">
+    <circle cx="130" cy="900" r="14"/><circle cx="165" cy="890" r="13"/><circle cx="200" cy="902" r="15"/>
+    <circle cx="238" cy="888" r="13"/><circle cx="272" cy="900" r="15"/><circle cx="308" cy="887" r="13"/>
+    <circle cx="342" cy="900" r="14"/><circle cx="378" cy="890" r="13"/><circle cx="412" cy="902" r="15"/>
+    <circle cx="150" cy="932" r="16"/><circle cx="195" cy="938" r="15"/><circle cx="240" cy="930" r="16"/>
+    <circle cx="285" cy="940" r="16"/><circle cx="330" cy="930" r="15"/><circle cx="375" cy="938" r="16"/>
+    <circle cx="420" cy="930" r="15"/>
+  </g>
+  <!-- raised placards and a flag above the crowd -->
+  <g fill="#16213a">
+    <rect x="152" y="830" width="34" height="26" rx="2"/>
+    <rect x="330" y="820" width="36" height="26" rx="2"/>
+    <rect x="248" y="842" width="30" height="22" rx="2"/>
+  </g>
+  <g stroke="#16213a" stroke-width="4">
+    <path d="M169 856v34M348 846v34M263 864v26"/>
+  </g>
+  <g stroke="#0b1120" stroke-width="4">
+    <path d="M295 790v90"/>
+  </g>
+  <path d="M295 792h44l-10 12 10 12h-44z" fill="#38bdf8" opacity="0.45"/>
+  <!-- phone lights held up -->
+  <g fill="#f8fafc" opacity="0.35">
+    <circle cx="140" cy="868" r="3"/><circle cx="222" cy="862" r="3"/><circle cx="316" cy="866" r="3"/>
+    <circle cx="398" cy="864" r="3"/><circle cx="360" cy="874" r="2.5"/><circle cx="184" cy="874" r="2.5"/>
+  </g>
+</svg>

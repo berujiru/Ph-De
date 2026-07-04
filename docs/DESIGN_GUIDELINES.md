@@ -5,6 +5,8 @@ Covers visual design (color, layout, UI patterns) and game design patterns
 is `src/ui/theme.ts` — this doc explains the *why*; the code is the *what*.
 Keep them in sync when either changes.
 
+**Note**: For specific asset production requirements (animations, voice lines, cut-ins), see `docs/ART_AND_AUDIO_GUIDELINES.md`.
+
 ## Color palette
 
 Dark, high-contrast, slate-based — reads well outdoors on a phone screen and
@@ -13,14 +15,22 @@ keeps enemies/projectiles/UI legible against the game canvas.
 | Token | Hex | Use |
 |---|---|---|
 | `background` | `#0f172a` | App/canvas background (Night sky / deep slate) |
-| `surface` | `rgba(30, 41, 59, 0.7)` | HUD panels, glassmorphism backdrops (`backdrop-filter: blur(12px)`) |
-| `border` | `rgba(255, 255, 255, 0.1)` | Panel borders, glass edges, subtle dividers |
+| `surface` | `#1e293b` | Solid panel fills where blur is unavailable/undesired |
+| `surfaceGlass` | `rgba(30, 41, 59, 0.7)` | HUD panels, glassmorphism backdrops (`backdrop-filter: blur(12px)`) |
+| `border` | `#475569` | Solid panel borders |
+| `borderGlass` | `rgba(255, 255, 255, 0.1)` | Glass edges, subtle dividers |
 | `textPrimary` | `#f8fafc` | Primary text |
 | `textMuted` | `#94a3b8` | Secondary/disabled text |
 | `gold` | `#facc15` | Currency only — never used for anything else. |
 | `danger` | `#ef4444` | Lives/HP loss, defeat state, low-health warnings |
 | `success` | `#22c55e` | HP bars (full), victory state, affordable/valid actions |
 | `accent` | `#38bdf8` | Primary interactive actions, glowing elements, selected state |
+
+The rally set dressing (wooden storefronts, corkboard, cardboard tags,
+caution tape) draws from `theme.materials` in `src/ui/theme.ts` — scenery
+paint only, never interactive state. Note `materials.cautionYellow`
+(`#eab308`) exists so hazard stripes and star ratings don't borrow the
+currency-only `gold` hex.
 
 Rules:
 - **Glassmorphism**: UI panels should utilize semi-transparent surfaces with background blurs (`backdrop-filter: blur(12px)`). Add a subtle, 1px white border with 10% opacity to emulate frosted glass edges.

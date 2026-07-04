@@ -5,8 +5,9 @@ import { Enemy } from '../entities/Enemy';
 import { Summon } from '../entities/Summon';
 import { Attack, ProjectileAttack, MeleeCleaveAttack, VortexAttack, BoomerangAttack, ChainAttack, SummonAttack, BeamAttack, LobbedAttack, LinearWaveAttack, TrapAttack } from '../entities/Attacks';
 import { gameToUiEvents, uiToGameEvents, type GameStateSnapshot, type DropOption } from '../core/GameEvents';
-import { ENEMY_DEFINITIONS, HERO_DEFINITIONS, BARRICADE_DEFAULTS, type HeroId } from '../data/balance';
-import { GAME_WIDTH, GAME_HEIGHT } from '../data/level';
+import { BARRICADE_DEFAULTS, ENEMY_DEFINITIONS, HERO_DEFINITIONS, type EnemyId, type HeroId } from '../data/balance';
+import { GAME_HEIGHT, GAME_WIDTH } from '../data/level';
+import { applyHeroSkill, type SkillVisualEvent } from '../core/Skills';
 
 export class GameScene extends Phaser.Scene {
   private barrier!: Barrier;
@@ -58,6 +59,7 @@ export class GameScene extends Phaser.Scene {
       unsubDebugSpawn();
       unsubSpawnSandboxTarget();
       unsubSpawnSpecificEnemy();
+      unsubTriggerHeroSkill();
       unsubTriggerEnemySkill();
       unsubPlaySound();
       unsubApplyAilment();
@@ -88,7 +90,7 @@ export class GameScene extends Phaser.Scene {
       this.emitState(true);
     });
 
-    const unsubRestart = uiToGameEvents.on('restart', (data: any) => {
+    const unsubRestart = uiToGameEvents.on('restart', (data) => {
       if (!this.sys) return;
       this.isSandbox = data?.mode === 'sandbox';
       this.resetGame();
@@ -236,7 +238,7 @@ export class GameScene extends Phaser.Scene {
         hp: 150,
         color: 0xca8a04
       };
-      const summon = new Summon(this, source.x, source.y, barricadeDef, this.enemies);
+      const summon = new Summon(this, source.x, source.y, barricadeDef.hp, barricadeDef.color);
       this.summons.push(summon);
     });
 
@@ -297,7 +299,7 @@ export class GameScene extends Phaser.Scene {
         const coin = this.add.circle(x, y, 10, 0xeab308).setInteractive();
         const text = this.add.text(x, y, '$', { color: '#000', fontSize: '10px' }).setOrigin(0.5);
         
-        const grp = this.add.group([coin, text]);
+        this.add.group([coin, text]);
         
         // Trap! Drains voices when clicked
         coin.on('pointerdown', () => {
@@ -367,163 +369,48 @@ export class GameScene extends Phaser.Scene {
 
     // --- HERO SKILLS ---
     this.events.on('heroSkillTriggered', ({ hero, skillId }: { hero: Hero, skillId: HeroId }) => {
-      if (skillId === 'eden') {
-        // Rally: Attack speed buff to all heroes
-        for (const h of this.heroes) {
-          h.attackRateMs /= 2;
-          const fx = this.add.text(h.x, h.y - 20, 'RALLY!', { color: '#ef4444', fontStyle: 'bold' }).setOrigin(0.5);
-          this.tweens.add({ targets: fx, y: h.y - 50, alpha: 0, duration: 1000, onComplete: () => fx.destroy() });
-          this.time.delayedCall(5000, () => {
-            h.attackRateMs *= 2; // naive revert
-          });
-        }
-      } else if (skillId === 'teacher') {
-        // Recess: Silence enemy auras
-        for (const e of this.enemies) {
-          if (!e.isDead && (e.definition.moraleAura || e.definition.tauntAura)) {
-            e.definition.moraleAura = false;
-            e.definition.tauntAura = false;
-            const fx = this.add.text(e.x, e.y, 'SILENCED', { color: '#a855f7', fontStyle: 'bold' }).setOrigin(0.5);
-            this.tweens.add({ targets: fx, y: e.y - 30, alpha: 0, duration: 1000, onComplete: () => fx.destroy() });
-          }
-        }
-      } else if (skillId === 'student') {
-        // Cramming: Reset 1 random adjacent hero's skill
-        const adjacent = this.heroes.filter(h => h !== hero && Phaser.Math.Distance.Between(h.x, h.y, hero.x, hero.y) < 150);
-        if (adjacent.length > 0) {
-          const target = adjacent[Math.floor(Math.random() * adjacent.length)];
-          target.currentSkillCooldown = 0;
-          target.isSkillReady = true;
-          const fx = this.add.text(target.x, target.y - 20, 'CRAM!', { color: '#f59e0b', fontStyle: 'bold' }).setOrigin(0.5);
-          this.tweens.add({ targets: fx, y: target.y - 50, alpha: 0, duration: 1000, onComplete: () => fx.destroy() });
-        }
-      } else if (skillId === 'jeepney_driver') {
-        // Barya Lang Po: AoE Shotgun
-        for (const e of this.enemies) {
-          if (!e.isDead && Phaser.Math.Distance.Between(hero.x, hero.y, e.x, e.y) < 300) {
-            e.takeDamage(hero.damage * 3);
-          }
-        }
-      } else if (skillId === 'fisherfolk') {
-        // Lambat: Drag enemies to center
-        for (const e of this.enemies) {
-          if (!e.isDead) {
-            this.tweens.add({ targets: e, y: GAME_HEIGHT / 2, duration: 500 });
-          }
-        }
-      } else if (skillId === 'street_sweeper') {
-        // Dust Storm: Blind/Slow all
-        for (const e of this.enemies) {
-          if (!e.isDead) {
-            e.definition.speed *= 0.5;
-            e.definition.damage *= 0.5;
-          }
-        }
-      } else if (skillId === 'taho_vendor') {
-        // Hot Syrup: Strip speed buffs
-        for (const e of this.enemies) {
-          if (!e.isDead && e.definition.speed > 25) { // Assuming base speeds are lower
-            e.definition.speed = 10;
-          }
-        }
-      } else if (skillId === 'nurse') {
-        // Vaccine Drive: Immune to debuffs
-        for (const h of this.heroes) {
-          const fx = this.add.text(h.x, h.y - 20, 'IMMUNE!', { color: '#10b981', fontStyle: 'bold' }).setOrigin(0.5);
-          this.tweens.add({ targets: fx, y: h.y - 50, alpha: 0, duration: 2000, onComplete: () => fx.destroy() });
-        }
-      } else if (skillId === 'construction_worker') {
-        // Yero Barricade: Fake Obstacle
-        const block = this.add.rectangle(GAME_WIDTH - 150, GAME_HEIGHT / 2, 20, 200, 0xd97706);
-        this.time.delayedCall(5000, () => block.destroy());
-      } else if (skillId === 'call_center_agent') {
-        // Escalate: 15% Max HP to lowest HP enemy
-        const lowestHp = this.enemies.filter(e => !e.isDead).sort((a, b) => a.hp - b.hp)[0];
-        if (lowestHp) {
-          lowestHp.takeDamage(lowestHp.definition.maxHp * 0.15);
-        }
-      } else if (skillId === 'security_guard') {
-        // Flashlight: Wide cone slow
-        for (const e of this.enemies) {
-          if (!e.isDead && e.x > hero.x && e.x - hero.x < 400) {
-            e.activeAilments['slow'] = 100;
-          }
-        }
-      } else if (skillId === 'farmer') {
-        // Harvest: Damage per ailment
-        for (const e of this.enemies) {
-          if (!e.isDead) {
-            const ailmentCount = Object.values(e.activeAilments).filter(v => v > 0).length;
-            if (ailmentCount > 0) {
-              e.takeDamage(hero.damage * 5 * ailmentCount);
-            }
-          }
-        }
-      } else if (skillId === 'fishball_vendor') {
-        // Spicy Sauce: Ignite pierced (just ignite everyone in front for now)
-        for (const e of this.enemies) {
-          if (!e.isDead && Math.abs(e.y - hero.y) < 50 && e.x > hero.x) {
-            e.activeAilments['burn'] = 100;
-          }
-        }
-      } else if (skillId === 'sales_lady') {
-        // Closing Sale: Execute < 15% HP
-        for (const e of this.enemies) {
-          if (!e.isDead && e.hp < e.definition.maxHp * 0.15) {
-            e.takeDamage(99999);
-          }
-        }
-      } else if (skillId === 'sorbetes_vendor') {
-        // Dirty Ice Cream: drop traps
-        for(let i=0; i<3; i++) {
-          const trap = this.add.circle(GAME_WIDTH - 200 - (i*50), GAME_HEIGHT / 2 + (Math.random()-0.5)*100, 10, 0xf472b6);
-          this.time.delayedCall(3000, () => trap.destroy());
-        }
-      } else if (skillId === 'electrician') {
-        // Rolling Blackout: Stun all
-        const blackout = this.add.rectangle(0, 0, GAME_WIDTH * 2, GAME_HEIGHT * 2, 0x000000, 0.5);
-        this.time.delayedCall(3000, () => blackout.destroy());
-        for (const e of this.enemies) {
-          if (!e.isDead) e.activeAilments['freeze'] = 100;
-        }
-      } else if (skillId === 'baker') {
-        // Dough Knead: Flatten damage
-        for (const e of this.enemies) {
-          if (!e.isDead) e.definition.damage *= 0.5;
-        }
-      } else if (skillId === 'traffic_enforcer') {
-        // STOP!: Hard stun
-        for (const e of this.enemies) {
-          if (!e.isDead && Phaser.Math.Distance.Between(hero.x, hero.y, e.x, e.y) < 250) {
-            e.activeAilments['freeze'] = 100;
-          }
-        }
-      } else if (skillId === 'plumber') {
-        // Flush: Wash away summons
-        for (const e of this.enemies) {
-          if (!e.isDead && (e.id === 'grunt' || e.id === 'the_overpriced')) {
-            e.takeDamage(9999);
-          }
-        }
-      } else if (skillId === 'delivery_rider') {
-        // Kamote Riders
-        for(let i=0; i<3; i++) {
-          const rider = this.add.circle(hero.x, hero.y + (i-1)*30, 8, 0x22c55e);
-          this.tweens.add({
-            targets: rider,
-            x: GAME_WIDTH,
-            duration: 1000,
-            onComplete: () => {
-              rider.destroy();
-              for (const e of this.enemies) {
-                if (!e.isDead && Phaser.Math.Distance.Between(rider.x, rider.y, e.x, e.y) < 100) {
-                  e.takeDamage(hero.damage * 2);
+      applyHeroSkill(skillId, hero, {
+        GAME_WIDTH,
+        GAME_HEIGHT,
+        heroes: this.heroes,
+        enemies: this.enemies,
+        onVisual: (evt: SkillVisualEvent) => {
+          if (evt.type === 'text') {
+            const fx = this.add.text(evt.x || 0, evt.y || 0, evt.text || '', { color: evt.color || '#fff', fontStyle: 'bold' }).setOrigin(0.5);
+            this.tweens.add({ targets: fx, y: (evt.y || 0) - 30, alpha: 0, duration: 1000, onComplete: () => fx.destroy() });
+          } else if (evt.type === 'delayedRevertAttackRate') {
+            this.time.delayedCall(evt.delay || 5000, () => {
+              if (evt.target) evt.target.attackRateMs = evt.amount;
+            });
+          } else if (evt.type === 'dragTo') {
+            this.tweens.add({ targets: evt.target, y: evt.y, duration: evt.duration || 500 });
+          } else if (evt.type === 'spawnObstacle') {
+            const block = this.add.rectangle(evt.x, evt.y, evt.width, evt.height, parseInt((evt.color || '#000').replace('#', '0x')));
+            this.time.delayedCall(evt.duration || 5000, () => block.destroy());
+          } else if (evt.type === 'spawnTrap') {
+            const trap = this.add.circle(evt.x, evt.y, evt.radius, parseInt((evt.color || '#000').replace('#', '0x')));
+            this.time.delayedCall(evt.duration || 3000, () => trap.destroy());
+          } else if (evt.type === 'screenFlash') {
+            const blackout = this.add.rectangle(0, 0, GAME_WIDTH * 2, GAME_HEIGHT * 2, parseInt((evt.color || '#000').replace('#', '0x')), evt.alpha || 0.5);
+            this.time.delayedCall(evt.duration || 3000, () => blackout.destroy());
+          } else if (evt.type === 'spawnRider') {
+            const rider = this.add.circle(evt.x, evt.y, 8, 0x22c55e);
+            this.tweens.add({
+              targets: rider,
+              x: evt.targetX,
+              duration: evt.duration || 1000,
+              onComplete: () => {
+                rider.destroy();
+                for (const e of this.enemies) {
+                  if (!e.isDead && Phaser.Math.Distance.Between(rider.x, rider.y, e.x, e.y) < 100) {
+                    e.takeDamage(evt.damage || 10);
+                  }
                 }
               }
-            }
-          });
+            });
+          }
         }
-      }
+      });
     });
 
     // Clean up on both shutdown (restart) AND destroy (game.destroy / React unmount)
@@ -604,9 +491,9 @@ export class GameScene extends Phaser.Scene {
           this.enemiesToSpawn = this.currentWave * 5;
           this.spawnTimer = 3000; // wait 3s before next wave starts
         } else {
-          if (this.status !== 'won') {
-            try { this.sound.play('sfx-victory'); } catch (e) {}
-          }
+          // status is guaranteed 'playing' here (update returns early otherwise),
+          // so this transition — and the victory sound — fires exactly once.
+          try { this.sound.play('sfx-victory'); } catch (e) {}
           this.status = 'won';
         }
       }
@@ -645,9 +532,9 @@ export class GameScene extends Phaser.Scene {
 
     // Game over conditions
     if (this.barrier.isDead && !this.isSandbox) {
-      if (this.status !== 'lost') {
-        try { this.sound.play('sfx-defeat'); } catch (e) {}
-      }
+      // status can only be 'playing' or 'won' here, so the defeat sound
+      // fires at most once — next frame update returns early on 'lost'.
+      try { this.sound.play('sfx-defeat'); } catch (e) {}
       this.status = 'lost';
     }
 
@@ -667,7 +554,7 @@ export class GameScene extends Phaser.Scene {
     this.enemies.push(dummy);
   }
 
-  private spawnHero(id: HeroId, passiveOverride?: string, skillOverride?: string) {
+  private spawnHero(id: HeroId, passiveOverride?: string, _skillOverride?: string) {
     const y = GAME_HEIGHT / 2 + (this.heroes.length * 60) - 60;
     const def = HERO_DEFINITIONS[id];
     

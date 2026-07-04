@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 960" preserveAspectRatio="xMidYMid slice">
+  <!-- Act 4+: National agency arc — monumental agency building, queue barriers -->
+  <rect width="540" height="960" fill="#0f172a"/>
+
+  <!-- city skyline behind the agency -->
+  <g fill="#0d1526">
+    <rect x="0" y="120" width="70" height="180"/>
+    <rect x="80" y="80" width="55" height="220"/>
+    <rect x="410" y="100" width="60" height="200"/>
+    <rect x="480" y="150" width="60" height="150"/>
+  </g>
+  <g fill="#facc15" opacity="0.12">
+    <rect x="14" y="140" width="10" height="12"/><rect x="38" y="170" width="10" height="12"/>
+    <rect x="94" y="100" width="10" height="12"/><rect x="112" y="140" width="10" height="12"/>
+    <rect x="424" y="120" width="10" height="12"/><rect x="446" y="160" width="10" height="12"/>
+    <rect x="494" y="170" width="10" height="12"/>
+  </g>
+
+  <!-- agency building: wide steps + column facade -->
+  <g fill="#0b1120">
+    <rect x="120" y="140" width="300" height="150"/>
+    <path d="M108 140h324l-12-22H120z"/>
+    <rect x="140" y="164" width="18" height="126"/>
+    <rect x="176" y="164" width="18" height="126"/>
+    <rect x="212" y="164" width="18" height="126"/>
+    <rect x="248" y="164" width="18" height="126"/>
+    <rect x="284" y="164" width="18" height="126"/>
+    <rect x="320" y="164" width="18" height="126"/>
+    <rect x="356" y="164" width="18" height="126"/>
+    <rect x="392" y="164" width="18" height="126"/>
+  </g>
+  <!-- steps -->
+  <g fill="#0d1526">
+    <rect x="130" y="290" width="280" height="12"/>
+    <rect x="145" y="302" width="250" height="12"/>
+    <rect x="160" y="314" width="220" height="12"/>
+  </g>
+  <!-- doorway glow -->
+  <rect x="252" y="230" width="36" height="60" fill="#38bdf8" opacity="0.18"/>
+  <g fill="#facc15" opacity="0.14">
+    <circle cx="150" cy="300" r="5"/><circle cx="390" cy="300" r="5"/>
+  </g>
+
+  <!-- plaza tiles -->
+  <g stroke="#131c31" stroke-width="2" opacity="0.8">
+    <path d="M0 400h540M0 500h540M0 600h540M0 700h540M0 800h540M0 900h540"/>
+    <path d="M90 340 30 960M180 340 150 960M360 340l30 620M450 340l60 620"/>
+  </g>
+
+  <!-- central approach lane -->
+  <rect x="195" y="326" width="150" height="634" fill="#131c31"/>
+  <rect x="195" y="326" width="6" height="634" fill="#1e293b"/>
+  <rect x="339" y="326" width="6" height="634" fill="#1e293b"/>
+  <g stroke="#94a3b8" stroke-width="4" opacity="0.14">
+    <path d="M270 350v40M270 430v40M270 510v40M270 590v40M270 670v40M270 750v40M270 830v40M270 910v40"/>
+  </g>
+
+  <!-- queue barriers: stanchions + sagging ropes flanking the lane -->
+  <g fill="#0b1120">
+    <rect x="168" y="420" width="8" height="46"/><rect x="168" y="540" width="8" height="46"/>
+    <rect x="168" y="660" width="8" height="46"/><rect x="168" y="780" width="8" height="46"/>
+    <rect x="364" y="420" width="8" height="46"/><rect x="364" y="540" width="8" height="46"/>
+    <rect x="364" y="660" width="8" height="46"/><rect x="364" y="780" width="8" height="46"/>
+    <circle cx="172" cy="418" r="6"/><circle cx="172" cy="538" r="6"/><circle cx="172" cy="658" r="6"/><circle cx="172" cy="778" r="6"/>
+    <circle cx="368" cy="418" r="6"/><circle cx="368" cy="538" r="6"/><circle cx="368" cy="658" r="6"/><circle cx="368" cy="778" r="6"/>
+  </g>
+  <g stroke="#38bdf8" stroke-width="3" fill="none" opacity="0.28">
+    <path d="M172 424q0 56 0 114M172 544q0 56 0 114M172 664q0 56 0 114"/>
+    <path d="M368 424q0 56 0 114M368 544q0 56 0 114M368 664q0 56 0 114"/>
+  </g>
+  <!-- zigzag queue rails on the plaza sides -->
+  <g stroke="#16213a" stroke-width="5" fill="none">
+    <path d="M20 470h130M150 470v70H20M20 540v70h130"/>
+    <path d="M520 500H390M390 500v70h130M520 570v70H390"/>
+  </g>
+  <!-- caution stripe strip across lane mouth -->
+  <g opacity="0.35">
+    <rect x="195" y="340" width="150" height="8" fill="#0b1120"/>
+    <path d="M200 348l8-8M220 348l8-8M240 348l8-8M260 348l8-8M280 348l8-8M300 348l8-8M320 348l8-8M340 348l4-4" stroke="#facc15" stroke-width="3"/>
+  </g>
+</svg>

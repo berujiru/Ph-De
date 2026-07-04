@@ -1,33 +1,13 @@
 import { useState } from 'react';
 import { theme } from '../theme';
 import { HERO_DEFINITIONS, type HeroDefinition } from '../../game/data/balance';
+import { HopeCoinIcon, RallyPermitIcon, LockIcon, BackIcon } from '../icons';
 
 interface InventoryScreenProps {
   onBack: () => void;
 }
 
-// Simple Hero SVG Icon
-const HeroIcon = ({ color }: { color: string }) => (
-  <svg width="40" height="40" viewBox="0 0 24 24" fill={color} stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-    <circle cx="12" cy="7" r="4" />
-  </svg>
-);
-
-// Currency Icons
-const HopeIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill={theme.colors.gold} stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10" />
-    <path d="M12 8v8M8 12h8" />
-  </svg>
-);
-
-const PermitIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="#f8fafc" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="6" width="18" height="12" rx="2" />
-    <path d="M3 12h18" strokeDasharray="4 4" />
-  </svg>
-);
+const HERO_PLACEHOLDER_SRC = '/assets/heroes/hero-placeholder.svg';
 
 export function InventoryScreen({ onBack }: InventoryScreenProps) {
   const [selectedHero, setSelectedHero] = useState<HeroDefinition | null>(null);
@@ -78,9 +58,13 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
             backgroundColor: 'rgba(0,0,0,0.5)',
             borderRadius: '8px',
             backdropFilter: 'blur(4px)',
-            marginBottom: '15px'
+            marginBottom: '15px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            minHeight: '44px'
           }}>
-            ← Back to Menu
+            <BackIcon size={18} /> Back to Menu
           </button>
           
           {/* Taped Sign Title */}
@@ -134,7 +118,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
           }} />
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <HopeIcon />
+            <span style={{ color: theme.colors.gold, display: 'flex' }}><HopeCoinIcon size={22} /></span>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold' }}>HOPE POINTS</span>
               <span style={{ fontSize: '20px', color: '#000', fontWeight: '900' }}>{currentHope}</span>
@@ -142,7 +126,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <PermitIcon />
+            <span style={{ color: '#334155', display: 'flex' }}><RallyPermitIcon size={22} /></span>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold' }}>RALLY PERMITS</span>
               <span style={{ fontSize: '20px', color: '#000', fontWeight: '900' }}>{currentPermits}/5</span>
@@ -155,7 +139,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '40px', padding: '20px' }}>
         {allHeroes.map((hero, idx) => {
           // Mock unlocking and leveling logic
-          const isUnlocked = true;
+          const isUnlocked = idx < 12;
           const mockLevel = hero.id === 'eden' ? 3 : 1;
           const mockCards = hero.id === 'eden' ? 4 : 8;
           const mockCardsNeeded = mockLevel * 5;
@@ -216,14 +200,29 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 marginBottom: '15px',
                 position: 'relative'
               }}>
-                {isUnlocked ? <HeroIcon color={`#${hero.color.toString(16).padStart(6, '0')}`} /> : <span style={{fontSize: '40px'}}>🔒</span>}
+                <img
+                  src={HERO_PLACEHOLDER_SRC}
+                  alt={isUnlocked ? hero.name : 'Locked hero silhouette'}
+                  style={{
+                    width: '80%',
+                    height: '80%',
+                    objectFit: 'contain',
+                    filter: isUnlocked ? 'none' : 'brightness(0.25)',
+                    opacity: isUnlocked ? 1 : 0.7
+                  }}
+                />
+                {!isUnlocked && (
+                  <span style={{ position: 'absolute', color: '#e2e8f0', display: 'flex' }}>
+                    <LockIcon size={32} />
+                  </span>
+                )}
                 
                 {isUnlocked && (
                   <div style={{
                     position: 'absolute',
                     bottom: '5px',
                     right: '5px',
-                    backgroundColor: theme.colors.gold,
+                    backgroundColor: theme.materials.cautionYellow,
                     color: '#000',
                     fontWeight: '900',
                     padding: '2px 6px',
@@ -241,8 +240,8 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 <h3 style={{ margin: '0 0 5px 0', fontSize: '18px', color: '#0f172a', fontFamily: '"Marker Felt", "Comic Sans MS", fantasy' }}>
                   {isUnlocked ? hero.name : 'REDACTED'}
                 </h3>
-                <div style={{ fontSize: '12px', color: '#475569', fontWeight: 'bold', marginBottom: '10px' }}>
-                  {isUnlocked ? hero.profession : '???'}
+                <div style={{ fontSize: '12px', color: '#475569', fontWeight: 'bold', marginBottom: '10px', fontStyle: isUnlocked ? 'normal' : 'italic' }}>
+                  {isUnlocked ? hero.profession : `A ${hero.profession.toLowerCase()} waits for the movement to reach them…`}
                 </div>
                 
                 {isUnlocked && (
@@ -359,7 +358,11 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                   borderBottom: 'none',
                   zIndex: 2
                 }} />
-                <HeroIcon color={`#${selectedHero.color.toString(16).padStart(6, '0')}`} />
+                <img
+                  src={HERO_PLACEHOLDER_SRC}
+                  alt={selectedHero.name}
+                  style={{ width: '85%', height: '85%', objectFit: 'contain' }}
+                />
               </div>
 
               <div style={{ flex: 1, color: '#000' }}>

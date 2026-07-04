@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 960" preserveAspectRatio="xMidYMid slice">
+  <!-- Act 3: Province — provincial road, port, capitol -->
+  <rect width="540" height="960" fill="#0f172a"/>
+
+  <!-- moon + stars -->
+  <circle cx="440" cy="90" r="34" fill="#f8fafc" opacity="0.10"/>
+  <circle cx="440" cy="90" r="22" fill="#f8fafc" opacity="0.12"/>
+  <g fill="#f8fafc" opacity="0.25">
+    <circle cx="70" cy="60" r="1.4"/><circle cx="180" cy="35" r="1"/><circle cx="300" cy="70" r="1.2"/><circle cx="510" cy="180" r="1"/>
+  </g>
+
+  <!-- distant hills -->
+  <path d="M0 300q90-70 190-38 80 26 160 4 100-30 190 28v90H0z" fill="#0b1120"/>
+  <path d="M0 340q140-50 270-20t270 10v60H0z" fill="#0d1526"/>
+
+  <!-- capitol silhouette (top center, on the hill) -->
+  <g fill="#0b1120">
+    <rect x="185" y="180" width="170" height="90"/>
+    <path d="M175 180h190l-10-16H185z"/>
+    <path d="M240 140a30 30 0 0 1 60 0v26h-60z"/>
+    <rect x="200" y="196" width="12" height="74"/>
+    <rect x="228" y="196" width="12" height="74"/>
+    <rect x="256" y="196" width="12" height="74"/>
+    <rect x="284" y="196" width="12" height="74"/>
+    <rect x="312" y="196" width="12" height="74"/>
+  </g>
+  <circle cx="270" cy="126" r="4" fill="#38bdf8" opacity="0.5"/>
+  <rect x="212" y="250" width="116" height="8" fill="#facc15" opacity="0.15"/>
+
+  <!-- port inlet (left side): water + pier + crane -->
+  <path d="M0 470q80 12 110 60 24 40 20 110L0 660z" fill="#0a0f1e"/>
+  <g stroke="#38bdf8" opacity="0.18" stroke-width="3">
+    <path d="M18 520h48M34 560h52M20 604h44"/>
+  </g>
+  <rect x="10" y="470" width="110" height="12" fill="#0b1120"/>
+  <g fill="#0b1120">
+    <rect x="52" y="360" width="10" height="112"/>
+    <path d="M56 366l72 26-4 10-70-26z"/>
+    <path d="M120 390v34" stroke="#0b1120" stroke-width="4"/>
+    <rect x="112" y="424" width="16" height="14"/>
+    <rect x="14" y="440" width="42" height="30"/>
+    <rect x="60" y="450" width="34" height="20"/>
+  </g>
+
+  <!-- provincial road (rally lane) -->
+  <rect x="195" y="270" width="150" height="690" fill="#131c31"/>
+  <rect x="195" y="270" width="6" height="690" fill="#1e293b"/>
+  <rect x="339" y="270" width="6" height="690" fill="#1e293b"/>
+  <g stroke="#94a3b8" stroke-width="4" opacity="0.15">
+    <path d="M270 292v44M270 380v44M270 468v44M270 556v44M270 644v44M270 732v44M270 820v44M270 908v44"/>
+  </g>
+  <!-- roadside km posts -->
+  <g fill="#0b1120">
+    <rect x="176" y="500" width="10" height="26"/>
+    <rect x="354" y="640" width="10" height="26"/>
+    <rect x="176" y="780" width="10" height="26"/>
+  </g>
+  <g fill="#f8fafc" opacity="0.2">
+    <rect x="176" y="500" width="10" height="8"/>
+    <rect x="354" y="640" width="10" height="8"/>
+    <rect x="176" y="780" width="10" height="8"/>
+  </g>
+
+  <!-- rice fields (right side): terraced rows -->
+  <g stroke="#16213a" stroke-width="5" fill="none" opacity="0.9">
+    <path d="M360 520q90-14 180-6M360 570q90-14 180-6M360 620q90-14 180-6M360 670q90-14 180-6"/>
+  </g>
+  <g stroke="#16213a" stroke-width="5" fill="none" opacity="0.9">
+    <path d="M0 730q95-12 185-4M0 790q95-12 185-4M0 850q95-12 185-4"/>
+  </g>
+  <!-- nipa hut by the fields -->
+  <g fill="#0b1120">
+    <rect x="420" y="760" width="80" height="56"/>
+    <path d="M408 760l52-38 52 38z"/>
+    <rect x="432" y="816" width="8" height="20"/>
+    <rect x="480" y="816" width="8" height="20"/>
+  </g>
+  <rect x="446" y="778" width="24" height="22" fill="#facc15" opacity="0.2"/>
+
+  <!-- fireflies / distant lamps -->
+  <g fill="#facc15" opacity="0.3">
+    <circle cx="380" cy="480" r="3"/><circle cx="150" cy="690" r="3"/><circle cx="500" cy="720" r="3"/>
+  </g>
+</svg>

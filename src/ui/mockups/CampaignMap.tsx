@@ -1,5 +1,15 @@
 import { useState } from 'react';
 import { theme } from '../theme';
+import {
+  BackIcon,
+  CheckIcon,
+  LockIcon,
+  PlayIcon,
+  RallyPermitIcon,
+  SettingsIcon,
+  StarIcon,
+  StarOutlineIcon,
+} from '../icons';
 
 interface CampaignMapProps {
   onBack: () => void;
@@ -7,304 +17,576 @@ interface CampaignMapProps {
   onStartSandbox: () => void;
 }
 
-// Nested Data Structure for 4 Acts x 10 Stages
-const CAMPAIGN_DATA = [
+const MARKER_FONT = '"Segoe Print", "Bradley Hand", "Comic Sans MS", cursive';
+
+interface StageEntry {
+  id: number;
+  name: string;
+  /** Rally Permits required per run (PROGRESSION.md energy system). */
+  permitCost: number;
+}
+
+interface ActEntry {
+  id: number;
+  title: string;
+  description: string;
+  /** Portrait map thumbnail for the act's tier. */
+  map: string;
+  stages: StageEntry[];
+}
+
+const stage = (id: number, name: string, permitCost = 1): StageEntry => ({ id, name, permitCost });
+
+// Nested Data Structure for 4 Acts x 10 Stages + Finale
+const CAMPAIGN_DATA: ActEntry[] = [
   {
     id: 1,
     title: 'Act 1: The Grassroots',
     description: 'Protecting local communities from immediate threats like Troll Bots and Fixers.',
+    map: '/assets/maps/map-barangay.svg',
     stages: [
-      { id: 1, name: 'The Street Corner' },
-      { id: 2, name: 'Alleyway Ambush' },
-      { id: 3, name: 'Sari-Sari Standoff' },
-      { id: 4, name: 'Basketball Court' },
-      { id: 5, name: 'Tricycle Terminal' },
-      { id: 6, name: 'Barangay Outpost' },
-      { id: 7, name: 'The Wet Market' },
-      { id: 8, name: 'Local Clinic' },
-      { id: 9, name: 'Barangay Plaza' },
-      { id: 10, name: 'Barangay Hall (Boss)' }
-    ]
+      stage(1, 'The Street Corner'),
+      stage(2, 'Alleyway Ambush'),
+      stage(3, 'Sari-Sari Standoff'),
+      stage(4, 'Basketball Court'),
+      stage(5, 'Tricycle Terminal'),
+      stage(6, 'Barangay Outpost'),
+      stage(7, 'The Wet Market'),
+      stage(8, 'Local Clinic'),
+      stage(9, 'Barangay Plaza'),
+      stage(10, 'Barangay Hall (Boss)', 2),
+    ],
   },
   {
     id: 2,
     title: 'Act 2: The Town Core',
     description: 'Taking back public utilities and spaces from entrenched local corruption.',
+    map: '/assets/maps/map-bayan.svg',
     stages: [
-      { id: 11, name: 'Public Market Gates' },
-      { id: 12, name: 'Jeepney Terminal' },
-      { id: 13, name: 'Town Plaza' },
-      { id: 14, name: 'Public Library' },
-      { id: 15, name: 'Municipal Hospital' },
-      { id: 16, name: 'Town Overpass' },
-      { id: 17, name: 'Police Station' },
-      { id: 18, name: 'Town Hall Steps' },
-      { id: 19, name: "Mayor's Driveway" },
-      { id: 20, name: 'City Hall (Boss)' }
-    ]
+      stage(11, 'Public Market Gates'),
+      stage(12, 'Jeepney Terminal'),
+      stage(13, 'Town Plaza'),
+      stage(14, 'Public Library'),
+      stage(15, 'Municipal Hospital'),
+      stage(16, 'Town Overpass'),
+      stage(17, 'Police Station'),
+      stage(18, 'Town Hall Steps'),
+      stage(19, "Mayor's Driveway"),
+      stage(20, 'City Hall (Boss)', 2),
+    ],
   },
   {
     id: 3,
     title: 'Act 3: The Regional Hub',
     description: 'Dismantling provincial syndicates and ghost projects across the region.',
+    map: '/assets/maps/map-province.svg',
     stages: [
-      { id: 21, name: 'Provincial Highway' },
-      { id: 22, name: 'Ghost Bridge' },
-      { id: 23, name: 'Regional Port' },
-      { id: 24, name: 'Industrial Park' },
-      { id: 25, name: 'Provincial Hospital' },
-      { id: 26, name: 'Power Plant' },
-      { id: 27, name: 'Agri-Business Center' },
-      { id: 28, name: 'Regional Court' },
-      { id: 29, name: 'Capitol Grounds' },
-      { id: 30, name: 'Provincial Capitol (Boss)' }
-    ]
+      stage(21, 'Provincial Highway'),
+      stage(22, 'Ghost Bridge'),
+      stage(23, 'Regional Port'),
+      stage(24, 'Industrial Park'),
+      stage(25, 'Provincial Hospital'),
+      stage(26, 'Power Plant'),
+      stage(27, 'Agri-Business Center'),
+      stage(28, 'Regional Court'),
+      stage(29, 'Capitol Grounds'),
+      stage(30, 'Provincial Capitol (Boss)', 2),
+    ],
   },
   {
     id: 4,
     title: 'Act 4: The National Gauntlet',
     description: 'Facing the systemic root of the anomalies across national government agencies.',
+    map: '/assets/maps/map-national.svg',
     stages: [
-      { id: 31, name: 'National Highway' },
-      { id: 32, name: 'Transport Agency' },
-      { id: 33, name: 'Social Welfare HQ' },
-      { id: 34, name: 'Dept of Public Works' },
-      { id: 35, name: 'Bureau of Customs' },
-      { id: 36, name: 'National Treasury' },
-      { id: 37, name: 'The Senate Gates' },
-      { id: 38, name: 'Congress Steps' },
-      { id: 39, name: 'Palace Gates' },
-      { id: 40, name: "The System's Heart (Final Boss)" }
-    ]
-  }
+      stage(31, 'National Highway'),
+      stage(32, 'Transport Agency'),
+      stage(33, 'Social Welfare HQ'),
+      stage(34, 'Dept of Public Works'),
+      stage(35, 'Bureau of Customs'),
+      stage(36, 'National Treasury'),
+      stage(37, 'The Senate Gates'),
+      stage(38, 'Congress Steps'),
+      stage(39, 'Palace Gates'),
+      stage(40, "The System's Heart (Boss)", 2),
+    ],
+  },
+  {
+    id: 5,
+    title: 'Finale: Ang Sistema',
+    description: 'Every defeated anomaly returns at once. The full alliance holds the line.',
+    map: '/assets/maps/map-finale.svg',
+    stages: [stage(41, 'Ang Sistema (Finale)', 3)],
+  },
 ];
 
+// Mock campaign progress: stage id → stars earned (1–3). Cleared = present.
+const MOCK_STAGE_STARS: Record<number, number> = {
+  1: 3,
+  2: 3,
+  3: 2,
+  4: 3,
+  5: 1,
+  6: 2,
+  7: 2,
+};
+const HIGHEST_CLEARED_STAGE = 7;
+const MOCK_PERMITS = 3;
+const MOCK_PERMITS_MAX = 5;
+
+/** 0–3 star rating strip for a stage. */
+function StageStars({ stars }: { stars: number }) {
+  return (
+    <span
+      role="img"
+      aria-label={`${stars} of 3 stars`}
+      style={{ display: 'inline-flex', gap: 2, verticalAlign: 'middle' }}
+    >
+      {[1, 2, 3].map((slot) =>
+        slot <= stars ? (
+          <span key={slot} style={{ color: theme.materials.cautionYellow, display: 'flex' }}>
+            <StarIcon size={14} />
+          </span>
+        ) : (
+          <span key={slot} style={{ color: theme.colors.textMuted, opacity: 0.6, display: 'flex' }}>
+            <StarOutlineIcon size={14} />
+          </span>
+        ),
+      )}
+    </span>
+  );
+}
+
+/** Act progress meter dressed as caution tape stretched across a barricade. */
+function CautionTapeMeter({ cleared, total }: { cleared: number; total: number }) {
+  const pct = Math.round((cleared / total) * 100);
+  return (
+    <div
+      role="img"
+      aria-label={`${cleared} of ${total} stages protected`}
+      style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}
+    >
+      <div
+        style={{
+          flex: 1,
+          height: 14,
+          backgroundColor: 'rgba(0,0,0,0.55)',
+          border: `1px solid ${theme.colors.borderGlass}`,
+          borderRadius: 3,
+          overflow: 'hidden',
+          // barricade posts behind the tape
+          backgroundImage:
+            'repeating-linear-gradient(90deg, transparent, transparent 34px, rgba(148,163,184,0.35) 34px, rgba(148,163,184,0.35) 37px)',
+        }}
+      >
+        <div
+          style={{
+            width: `${pct}%`,
+            height: '100%',
+            backgroundImage: `repeating-linear-gradient(45deg, ${theme.materials.cautionYellow}, ${theme.materials.cautionYellow} 10px, ${theme.materials.ink} 10px, ${theme.materials.ink} 20px)`,
+            boxShadow: '0 0 8px rgba(234, 179, 8, 0.35)',
+            transition: 'width 0.3s',
+          }}
+        />
+      </div>
+      <span
+        style={{
+          fontSize: 13,
+          fontWeight: 900,
+          color: cleared === total ? theme.colors.success : theme.colors.textPrimary,
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {cleared}/{total}
+      </span>
+    </div>
+  );
+}
+
 export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: CampaignMapProps) {
-  // Mock data for campaign progress (0 means no stages cleared yet)
-  const highestClearedStage = 0; 
-  
-  // Accordion State
-  const [expandedAct, setExpandedAct] = useState<number | null>(1); // Default to Act 1 expanded
+  const [expandedAct, setExpandedAct] = useState<number | null>(1);
+  const canAffordRun = MOCK_PERMITS > 0;
 
   return (
-    <div style={{
-      position: 'absolute',
-      inset: 0,
-      backgroundColor: theme.colors.background,
-      display: 'flex',
-      flexDirection: 'column',
-      padding: '40px',
-      color: theme.colors.textPrimary,
-      overflowY: 'auto'
-    }}>
-      <div style={{ marginBottom: '40px' }}>
-        <button onClick={onBack} style={{
-          background: 'none',
-          border: 'none',
-          color: theme.colors.textSecondary,
-          cursor: 'pointer',
-          fontSize: '16px',
-          marginBottom: '10px',
-          padding: 0,
-          textDecoration: 'underline'
-        }}>
-          ← Back to Menu
-        </button>
-        <h1 style={{ margin: 0, fontSize: '32px', textTransform: 'uppercase', color: theme.colors.accent }}>Campaign Map</h1>
-        <div style={{ color: theme.colors.textMuted }}>Select a stage to defend the movement's Morale</div>
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '600px', margin: '0 auto', width: '100%' }}>
-        
-        {/* Sandbox Entry */}
-        <div style={{
-          backgroundColor: 'rgba(56, 189, 248, 0.1)',
-          border: `2px dashed ${theme.colors.accent}`,
-          borderRadius: '12px',
-          padding: '20px',
+    <div
+      className="rally-screen"
+      style={{
+        position: 'absolute',
+        inset: 0,
+        backgroundColor: theme.colors.background,
+        backgroundImage: 'radial-gradient(ellipse at 50% -10%, rgba(56,189,248,0.08), transparent 60%)',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: 'clamp(16px, 4vw, 40px)',
+        color: theme.colors.textPrimary,
+        overflowY: 'auto',
+        zIndex: 100,
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <div>
-            <h3 style={{ margin: '0 0 5px 0', fontSize: '20px', color: theme.colors.accent }}>🧪 Attack Sandbox</h3>
-            <p style={{ margin: 0, fontSize: '14px', color: theme.colors.textMuted }}>Isolated environment for testing mechanics.</p>
+          alignItems: 'flex-start',
+          gap: 12,
+          flexWrap: 'wrap',
+          marginBottom: 24,
+          maxWidth: 640,
+          margin: '0 auto 24px',
+          width: '100%',
+        }}
+      >
+        <div>
+          <button
+            onClick={onBack}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              minHeight: 44,
+              padding: '8px 14px',
+              background: theme.colors.surfaceGlass,
+              border: `1px solid ${theme.colors.borderGlass}`,
+              borderRadius: 8,
+              color: theme.colors.textPrimary,
+              cursor: 'pointer',
+              fontSize: 14,
+              fontWeight: 700,
+              backdropFilter: 'blur(12px)',
+              marginBottom: 12,
+              fontFamily: 'inherit',
+            }}
+          >
+            <BackIcon size={18} />
+            Back to the Rally
+          </button>
+          <h1 style={{ margin: 0, fontSize: 'clamp(24px, 5vw, 32px)', textTransform: 'uppercase', letterSpacing: 2 }}>
+            The March
+          </h1>
+          <div style={{ color: theme.colors.textMuted, fontSize: 14 }}>
+            Barangay to Bayan to the whole archipelago — one street at a time.
           </div>
-          <button onClick={onStartSandbox} style={{
-            padding: '12px 24px',
-            backgroundColor: theme.colors.accent,
-            color: '#fff',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            fontSize: '16px',
-            boxShadow: '0 4px 0 #0284c7',
-          }}>
+        </div>
+
+        {/* Permit balance — the energy that pays for every run */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            minHeight: 44,
+            padding: '8px 16px',
+            backgroundColor: theme.colors.surfaceGlass,
+            border: `1px solid ${theme.colors.borderGlass}`,
+            borderRadius: 999,
+            backdropFilter: 'blur(12px)',
+          }}
+        >
+          <span style={{ color: theme.colors.accent, display: 'flex' }}>
+            <RallyPermitIcon size={24} />
+          </span>
+          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
+            <span style={{ fontSize: 10, letterSpacing: 1, color: theme.colors.textMuted, fontWeight: 700 }}>
+              RALLY PERMITS
+            </span>
+            <span style={{ fontSize: 17, fontWeight: 900 }}>
+              {MOCK_PERMITS}/{MOCK_PERMITS_MAX}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 640, margin: '0 auto', width: '100%' }}>
+        {/* Sandbox Entry */}
+        <div
+          style={{
+            backgroundColor: 'rgba(56, 189, 248, 0.08)',
+            border: `2px dashed ${theme.colors.accent}`,
+            borderRadius: 12,
+            padding: 16,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 12,
+            flexWrap: 'wrap',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ color: theme.colors.accent, display: 'flex' }}>
+              <SettingsIcon size={26} />
+            </span>
+            <div>
+              <h3 style={{ margin: '0 0 2px 0', fontSize: 18, color: theme.colors.accent }}>Attack Sandbox</h3>
+              <p style={{ margin: 0, fontSize: 13, color: theme.colors.textMuted }}>
+                Isolated environment for testing mechanics. No permit needed.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onStartSandbox}
+            style={{
+              minHeight: 44,
+              padding: '10px 20px',
+              backgroundColor: theme.colors.accent,
+              color: theme.colors.background,
+              border: 'none',
+              borderRadius: 8,
+              cursor: 'pointer',
+              fontWeight: 900,
+              fontSize: 14,
+              boxShadow: '0 4px 0 #0284c7',
+              fontFamily: 'inherit',
+            }}
+          >
             ENTER SANDBOX
           </button>
         </div>
 
         {/* Acts Accordion */}
         {CAMPAIGN_DATA.map((act) => {
-          // An Act is accessible if the highest cleared stage is >= the first stage of the act - 1.
-          // Stage IDs start at 1. Act 1 starts at Stage 1. Act 2 starts at Stage 11.
           const firstStageId = act.stages[0].id;
-          const isActUnlocked = highestClearedStage >= firstStageId - 1;
+          const isActUnlocked = HIGHEST_CLEARED_STAGE >= firstStageId - 1;
           const isExpanded = expandedAct === act.id;
-
-          // Calculate progress within this act
-          const actClearedStages = Math.max(0, Math.min(10, highestClearedStage - (firstStageId - 1)));
+          const actClearedStages = Math.max(
+            0,
+            Math.min(act.stages.length, HIGHEST_CLEARED_STAGE - (firstStageId - 1)),
+          );
 
           return (
-            <div key={act.id} style={{
-              backgroundColor: isActUnlocked ? theme.colors.surface : 'rgba(30, 41, 59, 0.5)',
-              border: `2px solid ${isActUnlocked ? theme.colors.border : 'rgba(51, 65, 85, 0.5)'}`,
-              borderRadius: '12px',
-              display: 'flex',
-              flexDirection: 'column',
-              opacity: isActUnlocked ? 1 : 0.6,
-              overflow: 'hidden',
-              transition: 'all 0.3s'
-            }}>
-              {/* Accordion Header (Banner) */}
-              <div 
+            <div
+              key={act.id}
+              style={{
+                backgroundColor: isActUnlocked ? theme.colors.surfaceGlass : 'rgba(30, 41, 59, 0.4)',
+                border: `1px solid ${isActUnlocked ? theme.colors.borderGlass : 'rgba(51, 65, 85, 0.5)'}`,
+                borderRadius: 12,
+                display: 'flex',
+                flexDirection: 'column',
+                opacity: isActUnlocked ? 1 : 0.6,
+                overflow: 'hidden',
+                backdropFilter: 'blur(12px)',
+                transition: 'all 0.3s',
+              }}
+            >
+              {/* Accordion Header */}
+              <button
                 onClick={() => {
-                  if (isActUnlocked) {
-                    setExpandedAct(isExpanded ? null : act.id);
-                  }
+                  if (isActUnlocked) setExpandedAct(isExpanded ? null : act.id);
                 }}
+                disabled={!isActUnlocked}
+                aria-expanded={isExpanded}
                 style={{
-                  padding: '20px',
+                  padding: 14,
                   display: 'flex',
-                  justifyContent: 'space-between',
                   alignItems: 'center',
-                  cursor: isActUnlocked ? 'pointer' : 'default',
+                  gap: 14,
+                  cursor: isActUnlocked ? 'pointer' : 'not-allowed',
                   backgroundColor: isExpanded ? 'rgba(56, 189, 248, 0.05)' : 'transparent',
-                  borderBottom: isExpanded ? `1px solid ${theme.colors.border}` : 'none'
+                  border: 'none',
+                  borderBottom: isExpanded ? `1px solid ${theme.colors.borderGlass}` : 'none',
+                  color: 'inherit',
+                  textAlign: 'left',
+                  width: '100%',
+                  fontFamily: 'inherit',
                 }}
               >
-                <div>
-                  <h3 style={{ margin: '0 0 5px 0', fontSize: '20px', color: isActUnlocked ? theme.colors.textPrimary : theme.colors.textSecondary }}>
+                {/* Tier map thumbnail */}
+                <img
+                  src={act.map}
+                  alt=""
+                  style={{
+                    width: 58,
+                    height: 88,
+                    objectFit: 'cover',
+                    borderRadius: 6,
+                    border: `2px solid ${isActUnlocked ? theme.materials.metalDark : 'rgba(51,65,85,0.6)'}`,
+                    filter: isActUnlocked ? 'none' : 'grayscale(90%) brightness(0.6)',
+                    flexShrink: 0,
+                  }}
+                />
+
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h3
+                    style={{
+                      margin: '0 0 3px 0',
+                      fontSize: 17,
+                      color: isActUnlocked ? theme.colors.textPrimary : theme.colors.textSecondary,
+                    }}
+                  >
                     {act.title}
                   </h3>
-                  <p style={{ margin: 0, fontSize: '14px', color: theme.colors.textMuted }}>
+                  <p style={{ margin: 0, fontSize: 12.5, color: theme.colors.textMuted }}>
                     {isActUnlocked ? act.description : 'Act locked. Complete previous acts to unlock.'}
                   </p>
+                  {isActUnlocked && <CautionTapeMeter cleared={actClearedStages} total={act.stages.length} />}
                 </div>
-                
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                  {isActUnlocked && (
-                    <div style={{ fontSize: '14px', fontWeight: 'bold', color: actClearedStages === 10 ? theme.colors.success : theme.colors.accent }}>
-                      {actClearedStages} / 10
-                    </div>
-                  )}
+
+                <span style={{ color: theme.colors.textSecondary, display: 'flex', flexShrink: 0 }}>
                   {isActUnlocked ? (
-                    <div style={{ fontSize: '24px', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
-                      ▼
-                    </div>
+                    <span
+                      style={{
+                        display: 'flex',
+                        transform: isExpanded ? 'rotate(-90deg)' : 'rotate(90deg)',
+                        transition: 'transform 0.2s',
+                      }}
+                    >
+                      <PlayIcon size={18} />
+                    </span>
                   ) : (
-                    <div style={{ fontSize: '24px', color: theme.colors.textSecondary }}>
-                      🔒
-                    </div>
+                    <LockIcon size={22} />
                   )}
-                </div>
-              </div>
+                </span>
+              </button>
 
               {/* Accordion Body (Stages List) */}
               {isExpanded && isActUnlocked && (
-                <div style={{ padding: '20px', backgroundColor: 'rgba(15, 23, 42, 0.5)' }}>
-                  
-                  {/* Vertical Path of Stages */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {act.stages.map((stage) => {
-                      const isCleared = highestClearedStage >= stage.id;
-                      const isNext = highestClearedStage === stage.id - 1;
-                      const isLocked = highestClearedStage < stage.id - 1;
+                <div style={{ padding: 16, backgroundColor: 'rgba(15, 23, 42, 0.5)' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    {act.stages.map((stageEntry, stageIdx) => {
+                      const isCleared = HIGHEST_CLEARED_STAGE >= stageEntry.id;
+                      const isNext = HIGHEST_CLEARED_STAGE === stageEntry.id - 1;
+                      const isLocked = HIGHEST_CLEARED_STAGE < stageEntry.id - 1;
+                      const isLast = stageIdx === act.stages.length - 1;
+                      const stars = MOCK_STAGE_STARS[stageEntry.id] ?? 0;
 
-                      let nodeColor = theme.colors.textSecondary;
-                      let borderColor = 'rgba(51, 65, 85, 0.5)';
-                      let bg = 'rgba(30, 41, 59, 0.5)';
-
-                      if (isCleared) {
-                        nodeColor = theme.colors.success;
-                        borderColor = theme.colors.success;
-                        bg = 'rgba(34, 197, 94, 0.1)';
-                      } else if (isNext) {
-                        nodeColor = theme.colors.accent;
-                        borderColor = theme.colors.accent;
-                        bg = 'rgba(56, 189, 248, 0.2)';
-                      }
+                      const nodeColor: string = isCleared
+                        ? theme.colors.success
+                        : isNext
+                          ? theme.colors.accent
+                          : theme.colors.textSecondary;
+                      const borderColor: string = isCleared
+                        ? theme.colors.success
+                        : isNext
+                          ? theme.colors.accent
+                          : 'rgba(51, 65, 85, 0.5)';
+                      const nodeBg: string = isCleared
+                        ? 'rgba(34, 197, 94, 0.1)'
+                        : isNext
+                          ? 'rgba(56, 189, 248, 0.2)'
+                          : 'rgba(30, 41, 59, 0.5)';
 
                       return (
-                        <div key={stage.id} style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '15px',
-                          opacity: isLocked ? 0.5 : 1
-                        }}>
-                          
-                          {/* Node visual */}
+                        <div
+                          key={stageEntry.id}
+                          style={{ display: 'flex', alignItems: 'stretch', gap: 12, opacity: isLocked ? 0.5 : 1 }}
+                        >
+                          {/* Route node + connecting line */}
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            <div style={{
-                              width: '24px',
-                              height: '24px',
-                              borderRadius: '50%',
-                              border: `2px solid ${borderColor}`,
-                              backgroundColor: bg,
-                              display: 'flex',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              boxShadow: isNext ? `0 0 10px ${theme.colors.accent}` : 'none'
-                            }}>
-                              {isCleared && <span style={{ fontSize: '12px', color: theme.colors.success }}>✓</span>}
+                            <div
+                              style={{
+                                width: 26,
+                                height: 26,
+                                borderRadius: '50%',
+                                border: `2px solid ${borderColor}`,
+                                backgroundColor: nodeBg,
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                boxShadow: isNext ? `0 0 10px ${theme.colors.accent}` : 'none',
+                                color: theme.colors.success,
+                                flexShrink: 0,
+                              }}
+                            >
+                              {isCleared && <CheckIcon size={14} />}
                             </div>
-                            {/* Connecting Line (don't draw after stage 10) */}
-                            {stage.id % 10 !== 0 && (
-                              <div style={{ width: '2px', height: '30px', backgroundColor: borderColor, margin: '2px 0' }} />
+                            {!isLast && (
+                              <div style={{ width: 2, flex: 1, backgroundColor: borderColor, margin: '2px 0' }} />
                             )}
                           </div>
 
-                          {/* Stage Info & Button */}
-                          <div style={{ 
-                            flex: 1, 
-                            display: 'flex', 
-                            justifyContent: 'space-between', 
-                            alignItems: 'center',
-                            backgroundColor: 'rgba(30, 41, 59, 0.3)',
-                            padding: '12px 15px',
-                            borderRadius: '8px',
-                            border: `1px solid ${borderColor}`,
-                            marginBottom: stage.id % 10 !== 0 ? '30px' : '0' // Align with the connecting line gap
-                          }}>
-                            <div>
-                              <div style={{ fontSize: '12px', color: nodeColor, fontWeight: 'bold' }}>
-                                STAGE {stage.id}
+                          {/* Stage card */}
+                          <div
+                            style={{
+                              flex: 1,
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              gap: 10,
+                              backgroundColor: 'rgba(30, 41, 59, 0.35)',
+                              padding: '10px 14px',
+                              borderRadius: 8,
+                              border: `1px solid ${borderColor}`,
+                              marginBottom: isLast ? 0 : 12,
+                            }}
+                          >
+                            <div style={{ minWidth: 0 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                                <span style={{ fontSize: 11, color: nodeColor, fontWeight: 700, letterSpacing: 1 }}>
+                                  STAGE {stageEntry.id}
+                                </span>
+                                <StageStars stars={stars} />
                               </div>
-                              <div style={{ fontSize: '16px', color: theme.colors.textPrimary, fontWeight: isNext ? 'bold' : 'normal' }}>
-                                {stage.name}
+                              <div
+                                style={{
+                                  fontSize: 15,
+                                  color: theme.colors.textPrimary,
+                                  fontWeight: isNext ? 700 : 400,
+                                }}
+                              >
+                                {stageEntry.name}
                               </div>
                             </div>
 
                             {!isLocked ? (
-                              <button 
+                              <button
                                 onClick={onPrepareBattle}
+                                disabled={!canAffordRun}
+                                aria-label={`${isCleared ? 'Replay' : 'Prepare'} ${stageEntry.name} — costs ${stageEntry.permitCost} rally permit${stageEntry.permitCost > 1 ? 's' : ''}`}
                                 style={{
-                                  padding: '8px 16px',
+                                  minHeight: 44,
+                                  padding: '6px 14px',
                                   backgroundColor: isNext ? theme.colors.success : 'transparent',
-                                  color: isNext ? '#fff' : theme.colors.textPrimary,
+                                  color: !canAffordRun
+                                    ? theme.colors.textMuted
+                                    : isNext
+                                      ? theme.colors.background
+                                      : theme.colors.textPrimary,
                                   border: isNext ? 'none' : `1px solid ${theme.colors.border}`,
-                                  borderRadius: '6px',
-                                  cursor: 'pointer',
-                                  fontWeight: 'bold',
-                                  fontSize: '12px',
-                                  boxShadow: isNext ? '0 3px 0 #166534' : 'none',
+                                  borderRadius: 6,
+                                  cursor: canAffordRun ? 'pointer' : 'not-allowed',
+                                  opacity: canAffordRun ? 1 : 0.45,
+                                  fontWeight: 900,
+                                  fontSize: 12,
+                                  boxShadow: isNext && canAffordRun ? '0 3px 0 #166534' : 'none',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  gap: 2,
+                                  flexShrink: 0,
+                                  fontFamily: 'inherit',
                                 }}
                               >
-                                {isCleared ? 'REPLAY' : 'PREPARE'}
+                                <span>{isCleared ? 'REPLAY' : 'PREPARE'}</span>
+                                <span
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 4,
+                                    fontSize: 11,
+                                    fontWeight: 700,
+                                    color: !canAffordRun
+                                      ? theme.colors.textMuted
+                                      : isNext
+                                        ? 'rgba(15,23,42,0.8)'
+                                        : theme.colors.accent,
+                                  }}
+                                >
+                                  <RallyPermitIcon size={13} />
+                                  {stageEntry.permitCost} permit{stageEntry.permitCost > 1 ? 's' : ''}
+                                </span>
                               </button>
                             ) : (
-                              <div style={{ color: theme.colors.textSecondary, fontSize: '12px' }}>
+                              <div
+                                style={{
+                                  color: theme.colors.textSecondary,
+                                  fontSize: 12,
+                                  fontWeight: 700,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 6,
+                                }}
+                              >
+                                <LockIcon size={16} />
                                 LOCKED
                               </div>
                             )}
@@ -313,12 +595,23 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                       );
                     })}
                   </div>
-
                 </div>
               )}
             </div>
           );
         })}
+
+        <div
+          style={{
+            textAlign: 'center',
+            fontFamily: MARKER_FONT,
+            color: theme.colors.textMuted,
+            fontSize: 13,
+            paddingBottom: 24,
+          }}
+        >
+          Buong Pilipinas, protektado.
+        </div>
       </div>
     </div>
   );

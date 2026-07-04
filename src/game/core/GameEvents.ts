@@ -33,11 +33,25 @@ export interface GameStateSnapshot {
   status: 'playing' | 'won' | 'lost';
 }
 
+/** Rarity tiers for RNG drops (docs/WORLD_AND_HEROES.md "RNG rules"). */
+export type DropRarity = 'common' | 'rare' | 'epic';
+
+/** Semantic drop category — richer than `type`, used for card art in the HUD. */
+export type DropKind = 'hero' | 'heroUpgrade' | 'generalUpgrade' | 'buhisBuhay';
+
 export interface DropOption {
   id: string;
   title: string;
   description: string;
   type: 'spawn' | 'damage' | 'speed';
+  /** Rarity tier for UI framing. UI treats absence as 'common'. */
+  rarity?: DropRarity;
+  /** Drop category for card rendering. UI infers from `type` when omitted. */
+  kind?: DropKind;
+  /** Damage type id (a `damageTypeIcons` key, e.g. 'Fire') for hero/upgrade drops. */
+  damageType?: string;
+  /** Penalty description shown on high-risk "Buhis-Buhay" drops. */
+  risk?: string;
 }
 
 export interface GameToUiEvents extends Record<string, unknown> {
@@ -51,7 +65,8 @@ export interface UiToGameEvents extends Record<string, unknown> {
   surrender: undefined;
   restart: { mode?: 'sandbox' } | undefined;
   selectDrop: { dropId: string };
-  debugSpawn: { heroId?: string };
+  debugSpawn: { heroId?: string; passive?: string; skill?: string };
+  triggerHeroSkill: { skill?: string };
   spawnSandboxTarget: undefined;
   spawnSpecificEnemy: { enemyId: string, passive?: string, skill?: string };
   triggerEnemySkill: undefined;

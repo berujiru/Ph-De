@@ -19,6 +19,8 @@ over React Native.
   conventions
 - `docs/DESIGN_GUIDELINES.md` — color tokens, layout/UI patterns, game design
   conventions (targeting, wave structure, economy tuning)
+- `docs/ART_AND_AUDIO_GUIDELINES.md` — visual style, anime-style skill cut-ins,
+  animations, and comedic Tagalog sound/foley mappings for heroes and enemies.
 - `docs/FEATURES.md` — what's built, what's next, what's explicitly out of
   scope. Check before proposing something that might already be
   planned/rejected.

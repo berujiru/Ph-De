@@ -73,7 +73,7 @@ export class ProjectileAttack extends Attack {
     }
   }
 
-  update(time: number, delta: number) {
+  update(_time: number, delta: number) {
     if (this.isDead) return;
     if (this.target && this.target.isDead) this.target = null;
     if (this.target) {
@@ -157,7 +157,7 @@ export class MeleeCleaveAttack extends Attack {
     }
   }
 
-  update(time: number, delta: number) {
+  update(_time: number, delta: number) {
     if (this.isDead) return;
     this.ageMs += delta;
     const progress = Math.min(1, this.ageMs / this.lifeTimeMs);
@@ -178,14 +178,14 @@ export class VortexAttack extends Attack {
   private tickRateMs = 500;
   private timeSinceLastTick = 0;
   
-  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
+  constructor(scene: Phaser.Scene, _x: number, _y: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'VortexAttack', damage, modifiers);
     const radius = 100 + this.modifiers.bonusRadius;
     // Spawn at target location so it traps enemies there
     this.visual = scene.add.circle(target.x, target.y, radius, color, 0.3);
   }
   
-  update(time: number, delta: number) {
+  update(_time: number, delta: number) {
     if (this.isDead) return;
     this.ageMs += delta;
     this.timeSinceLastTick += delta;
@@ -259,7 +259,7 @@ export class BoomerangAttack extends Attack {
     }
   }
   
-  update(time: number, delta: number) {
+  update(_time: number, delta: number) {
     if (this.isDead) return;
     const dt = delta / 1000;
     
@@ -355,7 +355,7 @@ export class ChainAttack extends Attack {
     }
   }
   
-  update(time: number, delta: number) {
+  update(_time: number, delta: number) {
     if (this.isDead) return;
     this.ageMs += delta;
     for (const line of this.lines) {
@@ -370,7 +370,7 @@ export class ChainAttack extends Attack {
 }
 
 export class SummonAttack extends Attack {
-  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
+  constructor(scene: Phaser.Scene, _x: number, _y: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'SummonAttack', damage, modifiers);
     
     // Total damage stat is repurposed as maxHP for summons
@@ -409,10 +409,7 @@ export class BeamAttack extends Attack {
     
     this.visual = scene.add.line(0, 0, startX, startY, endX, endY, color).setOrigin(0, 0);
     this.visual.setLineWidth(4 + this.modifiers.bonusRadius);
-    
-    let hitCount = 0;
-    const maxHits = 1 + this.modifiers.bonusPierce;
-    
+
     const enemies = (scene as any).enemies as Enemy[];
     if (enemies) {
       for (const enemy of enemies) {
@@ -433,7 +430,7 @@ export class BeamAttack extends Attack {
     }
   }
   
-  update(time: number, delta: number) {
+  update(_time: number, delta: number) {
     if (this.isDead) return;
     this.ageMs += delta;
     this.visual.setAlpha(1 - this.ageMs / this.lifeTimeMs);
@@ -464,7 +461,7 @@ export class LobbedAttack extends Attack {
     this.visual = scene.add.circle(startX, startY, 6, color);
   }
   
-  update(time: number, delta: number) {
+  update(_time: number, delta: number) {
     if (this.isDead) return;
     this.progress += delta / this.travelTimeMs;
     
@@ -522,7 +519,7 @@ export class LinearWaveAttack extends Attack {
     this.visual = scene.add.rectangle(x, y, waveWidth, waveHeight, color, 0.6);
   }
   
-  update(time: number, delta: number) {
+  update(_time: number, delta: number) {
     if (this.isDead) return;
     this.visual.x += this.speed * (delta / 1000);
     
@@ -550,16 +547,16 @@ export class LinearWaveAttack extends Attack {
 export class TrapAttack extends Attack {
   private visual: Phaser.GameObjects.Arc;
   
-  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
+  constructor(scene: Phaser.Scene, _x: number, _y: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'TrapAttack', damage, modifiers);
     const trapX = target.x - 50;
     const trapY = target.y;
     this.visual = scene.add.circle(trapX, trapY, 10, color, 0.4);
   }
   
-  update(time: number, delta: number) {
+  update(_time: number, _delta: number) {
     if (this.isDead) return;
-    
+
     const triggerRadius = 20;
     const explosionRadius = 80 + this.modifiers.bonusRadius;
     

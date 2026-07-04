@@ -126,3 +126,90 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+/* ------------------------------------------------------------------ */
+/* Rally meta screens — shared thematic animation + focus treatment    */
+/* ------------------------------------------------------------------ */
+
+/* Goods swinging gently from the storefront wire. */
+@keyframes rally-sway {
+  from {
+    transform: rotate(var(--sway-from, -1.5deg));
+  }
+  to {
+    transform: rotate(var(--sway-to, 1.5deg));
+  }
+}
+
+.rally-sway {
+  animation: rally-sway 4s ease-in-out infinite alternate;
+  transform-origin: top center;
+}
+
+/* Caution-tape stripes crawling — loading bars, live progress meters. */
+@keyframes rally-march {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 28px 0;
+  }
+}
+
+.rally-march {
+  animation: rally-march 1.1s linear infinite;
+}
+
+/* Megaphone CTA breathing glow. */
+@keyframes rally-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.rally-pulse {
+  animation: rally-pulse 2.2s ease-in-out infinite;
+}
+
+/* Bare bulb flicker in the briefing room. */
+@keyframes rally-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 0.55;
+  }
+  96% {
+    opacity: 0.9;
+  }
+  98% {
+    opacity: 0.7;
+  }
+}
+
+.rally-flicker {
+  animation: rally-flicker 5s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rally-sway,
+  .rally-march,
+  .rally-pulse,
+  .rally-flicker {
+    animation: none;
+  }
+}
+
+/* Keyboard focus stays visible on the heavily-styled thematic buttons. */
+.rally-screen button:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
