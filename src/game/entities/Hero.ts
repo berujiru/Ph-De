@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import type { Enemy } from './Enemy';
-import type { HeroDefinition } from '../data/balance';
+import { ATTACK_STYLE_BADGES, type HeroDefinition } from '../data/balance';
 import { RALLY } from '../data/level';
 import { formationTargetX, stepTowardFormation } from '../core/RallyMarch';
 import { applyHeroPassive, type ISkillHero } from '../core/Skills';
@@ -41,7 +41,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.attackRateMs = def.attackRateMs;
     this.range = def.range;
     this.onAttack = onAttack;
-    this.formationJitterX = def.attackKind === 'ranged' ? (Math.random() - 0.5) * 24 : 0;
+    this.formationJitterX = def.attackKind === 'ranged' ? (Math.random() - 0.5) * RALLY.formation.rangedJitterPx : 0;
 
     // Range indicator (added first so it's behind the body)
     this.rangeIndicator = scene.add.circle(0, 0, def.range, def.color, 0.1);
@@ -52,14 +52,23 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.model = new HeroModel(scene, 0, 0, def.color);
     this.add(this.model);
 
-    const labelText = `${def.name}\nAtk: ${def.attackStyle}\nSkill: ${def.signatureSkill.name}`;
-    const nameLabel = scene.add.text(0, 25, labelText, {
+    const nameLabel = scene.add.text(0, 25, def.name, {
       fontSize: '10px',
       color: '#ffffff',
       align: 'center',
-      wordWrap: { width: 90, useAdvancedWrap: true }
     }).setOrigin(0.5, 0);
     this.add(nameLabel);
+
+    // Attack-type hint chip — quick read on what this hero's basic attack does.
+    const badge = ATTACK_STYLE_BADGES[def.attackStyle];
+    const badgeChip = scene.add.text(0, 38, badge.label, {
+      fontSize: '9px',
+      fontStyle: 'bold',
+      color: '#0f172a',
+      backgroundColor: badge.background,
+      padding: { x: 4, y: 1 },
+    }).setOrigin(0.5, 0);
+    this.add(badgeChip);
 
     this.skillHighlight = scene.add.text(0, -45, '★ SKILL', { fontSize: '12px', color: '#facc15', fontStyle: 'bold' }).setOrigin(0.5);
     this.skillHighlight.setVisible(false);
@@ -105,7 +114,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
 
   update(delta: number, enemies: Enemy[], shieldX: number) {
     // Hold formation relative to the advancing morale shield.
-    const targetX = formationTargetX(shieldX, this.definition.attackKind, RALLY.formation) + this.formationJitterX;
+    const targetX = formationTargetX(shieldX, { attackKind: this.definition.attackKind, rangePx: this.range }, RALLY.formation) + this.formationJitterX;
     const step = stepTowardFormation(this.x, targetX, delta, {
       marchSpeedPxPerSec: RALLY.marchSpeedPxPerSec,
       catchUpSpeedMultiplier: RALLY.formation.catchUpSpeedMultiplier,

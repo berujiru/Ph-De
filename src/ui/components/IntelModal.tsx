@@ -57,6 +57,8 @@ export function IntelModal({ heroes, enemies, onClose }: IntelModalProps) {
             type="button"
             className="hud-btn"
             onClick={onClose}
+            aria-label="Close intel"
+            title="Close intel"
             style={{
               marginLeft: 'auto',
               background: 'transparent',

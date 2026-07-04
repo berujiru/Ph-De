@@ -4,8 +4,11 @@ import {
   isFieldClear,
   nextShieldX,
   stepTowardFormation,
+  type FormationSlotConfig,
   type RallyMarchConfig,
 } from '../../src/game/core/RallyMarch';
+import { RALLY } from '../../src/game/data/level';
+import { HERO_DEFINITIONS } from '../../src/game/data/balance';
 
 const config: RallyMarchConfig = {
   marchSpeedPxPerSec: 50,
@@ -74,14 +77,58 @@ describe('nextShieldX', () => {
 });
 
 describe('formationTargetX', () => {
-  const offsets = { meleeOffsetX: -45, rangedOffsetX: -150 };
+  // enemyContactAheadPx is small (shield half-width) so short-range heroes
+  // get pulled forward; slack keeps a comfortable margin inside range.
+  const formation: FormationSlotConfig = {
+    meleeOffsetX: -45,
+    rangedOffsetX: -150,
+    enemyContactAheadPx: 15,
+    rangeSlackPx: 20,
+  };
 
-  it('places melee heroes just behind the shield front', () => {
-    expect(formationTargetX(500, 'melee', offsets)).toBe(455);
+  it('holds a long-range hero at its preferred crowd depth', () => {
+    // range 1000 easily reaches the front, so the preferred offset wins.
+    expect(formationTargetX(500, { attackKind: 'ranged', rangePx: 1000 }, formation)).toBe(350);
+    expect(formationTargetX(500, { attackKind: 'melee', rangePx: 1000 }, formation)).toBe(455);
   });
 
-  it('places ranged heroes further back in the crowd', () => {
-    expect(formationTargetX(500, 'ranged', offsets)).toBe(350);
+  it('pulls a short-range melee hero forward so it can reach the shield front', () => {
+    // Preferred -45 would leave a range-50 melee hero 60px from the contact
+    // point (out of range); range-awareness clamps the slot forward to -15.
+    expect(formationTargetX(500, { attackKind: 'melee', rangePx: 50 }, formation)).toBe(485);
+  });
+
+  it('pulls a mid-range ranged hero forward past its preferred depth', () => {
+    // range 150 can't reach from -150; clamps to -115.
+    expect(formationTargetX(500, { attackKind: 'ranged', rangePx: 150 }, formation)).toBe(385);
+  });
+
+  // The load-bearing invariant: whatever slot a hero holds, an enemy stopped
+  // at the shield's front edge must be inside its basic-attack range.
+  const shieldX = 500;
+  const enemyAtFrontX = shieldX + formation.enemyContactAheadPx;
+
+  it('lands a range-50 melee hero on an enemy at the shield front', () => {
+    const heroX = formationTargetX(shieldX, { attackKind: 'melee', rangePx: 50 }, formation);
+    expect(enemyAtFrontX - heroX).toBeLessThanOrEqual(50);
+  });
+
+  it('lands a range-150 ranged hero on an enemy at the shield front', () => {
+    const heroX = formationTargetX(shieldX, { attackKind: 'ranged', rangePx: 150 }, formation);
+    expect(enemyAtFrontX - heroX).toBeLessThanOrEqual(150);
+  });
+
+  it('keeps every shipped hero definition in range of an enemy at the shield front', () => {
+    const contactX = RALLY.shieldStartX + RALLY.formation.enemyContactAheadPx;
+    for (const hero of Object.values(HERO_DEFINITIONS)) {
+      const heroX = formationTargetX(
+        RALLY.shieldStartX,
+        { attackKind: hero.attackKind, rangePx: hero.range },
+        RALLY.formation,
+      );
+      const distance = contactX - heroX;
+      expect(distance, `${hero.id} slot is out of range`).toBeLessThanOrEqual(hero.range);
+    }
   });
 });
 

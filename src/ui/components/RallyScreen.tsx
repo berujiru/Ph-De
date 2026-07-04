@@ -289,6 +289,8 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
   const [surrenderConfirmOpen, setSurrenderConfirmOpen] = useState(false);
   const [intelOpen, setIntelOpen] = useState(false);
   const lastSpeedRef = useRef(1);
+  /** True only when the Intel modal itself paused the game (vs. the user's pause button). */
+  const intelPausedGameRef = useRef(false);
 
   useEffect(() => {
     const unsubState = gameToUiEvents.on('stateChanged', setState);
@@ -321,6 +323,31 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
     const next = state.gameSpeed === 2 ? 1 : 2;
     lastSpeedRef.current = next;
     handleSetSpeed(next);
+  };
+
+  const openIntel = () => {
+    playBtnSound();
+    if (!paused) {
+      // Same remember-then-freeze flow as togglePause, tagged so closing
+      // Intel only resumes a pause that Intel itself caused.
+      lastSpeedRef.current = state.gameSpeed || 1;
+      handleSetSpeed(0);
+      intelPausedGameRef.current = true;
+    } else {
+      intelPausedGameRef.current = false;
+    }
+    setIntelOpen(true);
+  };
+
+  const closeIntel = () => {
+    setIntelOpen(false);
+    if (intelPausedGameRef.current) {
+      intelPausedGameRef.current = false;
+      // Don't emit a resume into a finished game.
+      if (!gameOver) {
+        handleSetSpeed(lastSpeedRef.current || 1);
+      }
+    }
   };
 
   const handleSurrender = () => {
@@ -491,10 +518,7 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
             type="button"
             className="hud-btn"
             style={{ ...fab, color: theme.colors.accent, border: `1px solid ${withAlpha(theme.colors.accent, 0.4)}` }}
-            onClick={() => {
-              playBtnSound();
-              setIntelOpen(true);
-            }}
+            onClick={openIntel}
             disabled={gameOver}
             aria-label="Battle Intel"
             title="Battle Intel"
@@ -893,7 +917,7 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
         <IntelModal
           heroes={state.activeHeroes || []}
           enemies={state.activeEnemies || []}
-          onClose={() => setIntelOpen(false)}
+          onClose={closeIntel}
         />
       )}
     </div>

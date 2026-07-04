@@ -8,14 +8,21 @@ import { UnitModel } from './UnitModel';
  * later replace the play* methods here without touching Enemy.ts.
  */
 export class EnemyModel extends UnitModel {
-  private bodySprite: Phaser.GameObjects.Arc;
+  private bodySprite: Phaser.GameObjects.Image;
   private shadow: Phaser.GameObjects.Ellipse;
+  /** Ring behind the body used for passive telegraphs (fake HP / immunity). */
+  private outline: Phaser.GameObjects.Arc;
 
   constructor(scene: Phaser.Scene, x: number, y: number, tint: number) {
     super(scene, x, y);
-    this.shadow = scene.add.ellipse(0, 14, 24, 8, 0x000000, 0.35);
+    this.shadow = scene.add.ellipse(0, 16, 28, 9, 0x000000, 0.35);
     this.add(this.shadow);
-    this.bodySprite = scene.add.circle(0, 0, 15, tint);
+    this.outline = scene.add.circle(0, 0, 18, 0x000000, 0);
+    this.outline.setVisible(false);
+    this.add(this.outline);
+    this.bodySprite = scene.add.image(0, 0, 'enemy-base');
+    this.bodySprite.setDisplaySize(38, 38);
+    this.bodySprite.setTint(tint);
     this.add(this.bodySprite);
     this.setState('idle');
   }
@@ -25,13 +32,15 @@ export class EnemyModel extends UnitModel {
     return { x: -14, y: 0 };
   }
 
-  /** Passive telegraphs (fake HP shield, hit immunity) render as outlines. */
+  /** Passive telegraphs (fake HP shield, hit immunity) render as a ring. */
   setOutline(width: number, color: number): void {
-    this.bodySprite.setStrokeStyle(width, color);
+    this.outline.setStrokeStyle(width, color, 0.95);
+    this.outline.setVisible(true);
   }
 
   clearOutline(): void {
-    this.bodySprite.setStrokeStyle(0);
+    this.outline.setStrokeStyle(0);
+    this.outline.setVisible(false);
   }
 
   protected bodyTarget(): Phaser.GameObjects.GameObject {

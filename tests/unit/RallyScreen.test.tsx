@@ -103,4 +103,52 @@ describe('RallyScreen', () => {
     expect(screen.getByRole('button', { name: 'Toggle game speed' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Surrender' })).toBeDisabled();
   });
+
+  it('pauses on opening Battle Intel and restores the previous speed on close', () => {
+    render(<RallyScreen onReturnToMenu={vi.fn()} />);
+    act(() => gameToUiEvents.emit('stateChanged', snapshot({ gameSpeed: 2 })));
+
+    const setSpeed = vi.fn();
+    const unsub = uiToGameEvents.on('setSpeed', setSpeed);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Battle Intel' }));
+    expect(screen.getByText('Battle Intel', { selector: 'h2' })).toBeInTheDocument();
+    expect(setSpeed).toHaveBeenCalledWith({ speed: 0 });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close intel' }));
+    expect(setSpeed).toHaveBeenLastCalledWith({ speed: 2 });
+    expect(setSpeed).toHaveBeenCalledTimes(2);
+    unsub();
+  });
+
+  it('does not unpause a user-paused game when Battle Intel closes', () => {
+    render(<RallyScreen onReturnToMenu={vi.fn()} />);
+    act(() => gameToUiEvents.emit('stateChanged', snapshot({ isPaused: true, gameSpeed: 0 })));
+
+    const setSpeed = vi.fn();
+    const unsub = uiToGameEvents.on('setSpeed', setSpeed);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Battle Intel' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Close intel' }));
+
+    expect(setSpeed).not.toHaveBeenCalled();
+    unsub();
+  });
+
+  it('does not emit a resume into a finished game when Battle Intel closes', () => {
+    render(<RallyScreen onReturnToMenu={vi.fn()} />);
+
+    const setSpeed = vi.fn();
+    const unsub = uiToGameEvents.on('setSpeed', setSpeed);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Battle Intel' }));
+    expect(setSpeed).toHaveBeenCalledWith({ speed: 0 });
+    setSpeed.mockClear();
+
+    act(() => gameToUiEvents.emit('stateChanged', snapshot({ status: 'lost', barrierHp: 0 })));
+    fireEvent.click(screen.getByRole('button', { name: 'Close intel' }));
+
+    expect(setSpeed).not.toHaveBeenCalled();
+    unsub();
+  });
 });

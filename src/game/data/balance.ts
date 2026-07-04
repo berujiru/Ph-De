@@ -394,6 +394,25 @@ export interface HeroDefinition {
   canSeeStealth?: boolean;
 }
 
+/**
+ * Compact attack-type hint rendered as a chip under each hero in battle, so
+ * the player can tell attack styles apart at a glance (playtest feedback).
+ * Purely presentational — glyph + short word on a colored chip.
+ */
+export const ATTACK_STYLE_BADGES: Record<HeroDefinition['attackStyle'], { label: string; background: string }> = {
+  projectile: { label: '➤ shot', background: '#38bdf8' },
+  'melee-cleave': { label: '⚔ cleave', background: '#f87171' },
+  beam: { label: '☄ beam', background: '#f472b6' },
+  lobbed: { label: '➶ lobbed', background: '#facc15' },
+  pierce: { label: '⇶ pierce', background: '#fb923c' },
+  chain: { label: '⚡ chain', background: '#fde047' },
+  trap: { label: '✹ trap', background: '#a78bfa' },
+  vortex: { label: '◎ vortex', background: '#22d3ee' },
+  'linear-wave': { label: '≋ wave', background: '#60a5fa' },
+  summoner: { label: '⛨ summon', background: '#fbbf24' },
+  boomerang: { label: '↩ rang', background: '#4ade80' },
+};
+
 export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
   eden: {
     id: 'eden',

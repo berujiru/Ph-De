@@ -12,8 +12,8 @@ export class HeroModel extends UnitModel {
 
   constructor(scene: Phaser.Scene, x: number, y: number, tint: number) {
     super(scene, x, y);
-    this.bodySprite = scene.add.image(0, 0, 'hero-placeholder');
-    this.bodySprite.setDisplaySize(36, 48);
+    this.bodySprite = scene.add.image(0, 0, 'hero-base');
+    this.bodySprite.setDisplaySize(40, 54);
     this.bodySprite.setTint(tint);
     this.add(this.bodySprite);
     this.setState('idle');
@@ -30,7 +30,7 @@ export class HeroModel extends UnitModel {
   protected resetPose(): void {
     this.bodySprite.setPosition(0, 0);
     this.bodySprite.setAngle(0);
-    this.bodySprite.setDisplaySize(36, 48);
+    this.bodySprite.setDisplaySize(40, 54);
     this.bodySprite.setAlpha(1);
   }
 

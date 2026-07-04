@@ -48,13 +48,32 @@ export function nextShieldX(
   return Math.min(config.shieldMaxX, shieldX + config.marchSpeedPxPerSec * (dtMs / 1000));
 }
 
-/** Where a hero should hold formation, relative to the shield front. */
+export interface FormationSlotConfig {
+  /** Preferred hold offset for melee heroes, relative to the shield's x. */
+  meleeOffsetX: number;
+  /** Preferred hold offset for ranged heroes (deeper in the crowd). */
+  rangedOffsetX: number;
+  /** Enemies halt and attack this far ahead of the shield's x (the wall front edge). */
+  enemyContactAheadPx: number;
+  /** Safety margin kept between a hero's slot and the edge of its range. */
+  rangeSlackPx: number;
+}
+
+/**
+ * Where a hero should hold formation, relative to the shield front.
+ *
+ * Range-aware: a hero never holds so far back that an enemy stopped at the
+ * shield front would be outside its basic-attack range — the range
+ * requirement (plus a slack margin) overrides the preferred crowd depth.
+ */
 export function formationTargetX(
   shieldX: number,
-  attackKind: 'melee' | 'ranged',
-  offsets: { meleeOffsetX: number; rangedOffsetX: number },
+  hero: { attackKind: 'melee' | 'ranged'; rangePx: number },
+  formation: FormationSlotConfig,
 ): number {
-  return shieldX + (attackKind === 'melee' ? offsets.meleeOffsetX : offsets.rangedOffsetX);
+  const preferredOffset = hero.attackKind === 'melee' ? formation.meleeOffsetX : formation.rangedOffsetX;
+  const minOffsetForRange = formation.enemyContactAheadPx + formation.rangeSlackPx - hero.rangePx;
+  return shieldX + Math.max(preferredOffset, minOffsetForRange);
 }
 
 /**

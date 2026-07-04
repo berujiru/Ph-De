@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+  <!--
+    In-game enemy base model: a grotesque anomaly - a dripping blob with
+    stubby grasping limbs, lurching left toward the rally. Cel-shaded cut-out
+    per docs/ART_AND_AUDIO_GUIDELINES.md - bold silhouette, clean #0f172a
+    outer stroke, flat shading. Fills are near-white/gray so Phaser's
+    per-enemy tint (EnemyDefinition.color) colors the whole body.
+  -->
+  <g stroke="#0f172a" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- stubby arms reaching left toward the shield -->
+    <path d="M20 40 C4 34 0 46 10 52 C16 55 22 50 20 40 Z" fill="#e2e8f0"/>
+    <path d="M18 58 C4 58 4 70 14 72 C20 73 22 64 18 58 Z" fill="#94a3b8"/>
+
+    <!-- main blob body, lumpy and asymmetric -->
+    <path d="M18 60
+             C10 42 20 22 42 16
+             C66 10 86 24 84 46
+             C90 52 90 62 82 66
+             C84 76 72 82 64 76
+             C56 86 38 86 32 74
+             C22 78 14 70 18 60 Z" fill="#e2e8f0"/>
+
+    <!-- drips sloughing off the underside -->
+    <path d="M30 80 C28 90 36 92 37 84 C37 80 34 78 30 80 Z" fill="#e2e8f0"/>
+    <path d="M56 82 C55 91 62 92 62 85 C62 81 60 80 56 82 Z" fill="#94a3b8"/>
+  </g>
+
+  <!-- flat shade mass on the trailing side (no outline - interior shading) -->
+  <path d="M62 18 C80 26 88 38 82 52 C86 58 84 64 76 66 C80 50 76 32 62 18 Z" fill="#94a3b8"/>
+
+  <!-- angry uneven eyes + jagged mouth stay dark so the tint never hides them -->
+  <g fill="#0f172a">
+    <circle cx="38" cy="42" r="5"/>
+    <circle cx="58" cy="38" r="7"/>
+  </g>
+  <g fill="none" stroke="#0f172a" stroke-width="5" stroke-linecap="round">
+    <path d="M28 33 L45 39"/>
+    <path d="M70 27 L51 34"/>
+  </g>
+  <path d="M34 58 L41 53 L47 59 L54 53 L60 59" fill="none" stroke="#0f172a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

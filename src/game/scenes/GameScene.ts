@@ -9,6 +9,7 @@ import { BARRICADE_DEFAULTS, ENEMY_DEFINITIONS, HERO_DEFINITIONS, type EnemyId, 
 import { GAME_HEIGHT, GAME_WIDTH, WORLD_WIDTH, RALLY, ENEMY_SPAWN_X_OFFSET } from '../data/level';
 import { formationTargetX, nextShieldX } from '../core/RallyMarch';
 import { applyHeroSkill, type SkillVisualEvent } from '../core/Skills';
+import { SkillCutIn } from '../entities/fx/SkillCutIn';
 
 export class GameScene extends Phaser.Scene {
   private shield!: MoraleShield;
@@ -32,6 +33,7 @@ export class GameScene extends Phaser.Scene {
   private lastSnapshot = '';
   private isSandbox = false;
   private sandboxRespawnTimer = 0;
+  private skillCutIn!: SkillCutIn;
 
   constructor() {
     super('GameScene');
@@ -39,7 +41,8 @@ export class GameScene extends Phaser.Scene {
 
   preload() {
     this.load.image('map-barangay', '/assets/backgrounds/map-barangay.svg');
-    this.load.image('hero-placeholder', '/assets/heroes/hero-placeholder.svg');
+    this.load.image('hero-base', '/assets/heroes/hero-base.svg');
+    this.load.image('enemy-base', '/assets/enemies/enemy-base.svg');
     // this.load.audio('sfx-btn-press', 'assets/sounds/btn-press.mp3');
     // this.load.audio('sfx-victory', 'assets/sounds/victory.mp3');
     // this.load.audio('sfx-defeat', 'assets/sounds/defeat.mp3');
@@ -51,6 +54,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.skillCutIn = new SkillCutIn(this);
     this.buildGame();
 
     // Shared cleanup — called on both shutdown (scene.restart) and destroy (game.destroy)
@@ -381,6 +385,22 @@ export class GameScene extends Phaser.Scene {
 
     // --- HERO SKILLS ---
     this.events.on('heroSkillTriggered', ({ hero, skillId }: { hero: Hero, skillId: HeroId }) => {
+      // Anime-style cut-in for every hero (Eden is the reference). Pauses
+      // gameplay while it plays, reusing the system-pause pattern (no UI
+      // events — the GameEvents contract stays unchanged). Skipped in sandbox
+      // so rapid skill-testing isn't interrupted.
+      if (!this.isSandbox && !this.isPaused) {
+        this.isPaused = true;
+        this.skillCutIn.play({
+          skillName: hero.definition.signatureSkill.name,
+          tint: hero.definition.color,
+          onComplete: () => {
+            if (!this.sys) return;
+            this.isPaused = false;
+          },
+        });
+      }
+
       applyHeroSkill(skillId, hero, {
         // Skills treat GAME_WIDTH as "the right edge of what the player sees";
         // with a scrolling camera that's the camera's right edge in world coords.
@@ -609,7 +629,7 @@ export class GameScene extends Phaser.Scene {
     const def = HERO_DEFINITIONS[id];
 
     // Heroes join directly at their formation slot behind the shield.
-    const x = formationTargetX(this.shield.x, def.attackKind, RALLY.formation);
+    const x = formationTargetX(this.shield.x, { attackKind: def.attackKind, rangePx: def.range }, RALLY.formation);
 
     const hero = new Hero(this, x, y, def, (h, target) => {
       let attack: Attack;

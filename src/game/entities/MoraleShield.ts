@@ -13,7 +13,8 @@ export class MoraleShield extends Phaser.GameObjects.Container {
   public width: number;
   public height: number;
   private wall: Phaser.GameObjects.Rectangle;
-  private front: Phaser.GameObjects.Arc;
+  private edgeGlow: Phaser.GameObjects.Rectangle;
+  private edge: Phaser.GameObjects.Rectangle;
 
   constructor(scene: Phaser.Scene, x: number, y: number, width: number, height: number, maxHp: number) {
     super(scene, x, y);
@@ -22,20 +23,17 @@ export class MoraleShield extends Phaser.GameObjects.Container {
     this.width = width;
     this.height = height;
 
-    // Translucent energy wall.
+    // Translucent energy wall — the single shield visual. Its leading edge is
+    // brightened in place rather than drawn as a separate shape floating
+    // ahead of it (playtesters read a detached arc as a second shield).
     this.wall = scene.add.rectangle(0, 0, width, height, 0x38bdf8, 0.18);
-    this.add(this.wall);
-
-    // Glowing leading edge — an arc bulging toward the enemies.
-    this.front = scene.add.arc(width / 2, 0, height / 2, -80, 80, false);
-    this.front.setStrokeStyle(4, 0x38bdf8, 0.9);
-    this.front.setScale(0.35, 1);
-    this.front.isFilled = false;
-    this.add(this.front);
+    this.edgeGlow = scene.add.rectangle(width / 2 - 5, 0, 10, height, 0x38bdf8, 0.3);
+    this.edge = scene.add.rectangle(width / 2 - 2, 0, 4, height, 0x7dd3fc, 0.9);
+    this.add([this.wall, this.edgeGlow, this.edge]);
 
     // Idle morale pulse.
     scene.tweens.add({
-      targets: [this.wall, this.front],
+      targets: [this.wall, this.edgeGlow, this.edge],
       alpha: 0.55,
       yoyo: true,
       repeat: -1,

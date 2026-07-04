@@ -419,9 +419,10 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
         this.attackCooldown = this.definition.attackRateMs;
         this.model.setState('attack');
       }
-    } else if (this.x <= shield.x + shield.width / 2 + moveSpeed * 0.1) {
-      // Reached the morale shield, stop moving and start attacking
-      this.x = shield.x + shield.width / 2 + moveSpeed * 0.1;
+    } else if (this.x <= shield.x + shield.width / 2) {
+      // Reached the morale shield's front edge, stop moving and start attacking.
+      // Fixed contact point — RALLY.formation.enemyContactAheadPx relies on it.
+      this.x = shield.x + shield.width / 2;
 
       this.model.setState('idle');
       this.attackCooldown -= delta;
