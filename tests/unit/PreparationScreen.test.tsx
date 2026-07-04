@@ -1,91 +1,51 @@
 import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { PreparationScreen } from '../../src/ui/mockups/PreparationScreen';
-import { HERO_DEFINITIONS, type HeroId } from '../../src/game/data/balance';
+import { HERO_DEFINITIONS } from '../../src/game/data/balance';
 
 /**
- * Guards the squad-coverage warning + roster disabled-state logic in
- * PreparationScreen. Hero references are looked up from HERO_DEFINITIONS by
- * id so the assertions follow the data if names/damage types are retuned —
- * only the stage's enemy intel (Fire/Frost/Earth weaknesses) is treated as
- * fixed content of this screen.
+ * The Briefing Room does NOT pre-select a squad — workers arrive mid-battle
+ * from the Voices meter. It only *hints* which recruited workers counter this
+ * stage's telegraphed weaknesses (Fire → Troll Bot, Frost → Fixer,
+ * Earth → Red Tape). Hero references resolve from HERO_DEFINITIONS by id so
+ * assertions follow the data if names/damage types are retuned.
  *
- * Covering heroes for this stage's telegraphed weaknesses:
- *   baker → Fire (Troll Bot), taho_vendor → Frost (Fixer),
- *   street_sweeper → Earth (Red Tape).
+ * Recruited counters for this stage: baker (Fire), taho_vendor (Frost),
+ * street_sweeper (Earth).
  */
-function addHero(id: HeroId) {
-  const hero = HERO_DEFINITIONS[id];
-  fireEvent.click(
-    screen.getByRole('button', { name: `Add ${hero.name} (${hero.damageType}) to squad` }),
-  );
+function renderScreen(onDeploy = vi.fn()) {
+  render(<PreparationScreen onBack={vi.fn()} onDeploy={onDeploy} />);
+  return { onDeploy };
 }
 
-function renderScreen() {
-  return render(<PreparationScreen onBack={vi.fn()} onDeploy={vi.fn()} />);
-}
-
-describe('PreparationScreen squad coverage', () => {
-  it('warns about uncovered enemies and every open slot on an empty squad', () => {
+describe('PreparationScreen companion hints', () => {
+  it('shows Eden as the wave-1 leader', () => {
     renderScreen();
-    const note = screen.getByRole('status');
-    // Eden only covers Physical, so all three telegraphed weaknesses are open.
-    expect(within(note).getByText(/no Fire, Frost, Earth coverage/i)).toBeInTheDocument();
-    expect(within(note).getByText(/Troll Bot, Fixer, Red Tape/)).toBeInTheDocument();
-    expect(within(note).getByText(/4 squad slots still open/i)).toBeInTheDocument();
+    expect(screen.getByText(HERO_DEFINITIONS['eden'].name)).toBeInTheDocument();
+    expect(screen.getByText(/deploys at wave 1/i)).toBeInTheDocument();
   });
 
-  it('drops an enemy from the coverage warning once a matching damage type is picked', () => {
+  it('recommends recruited workers that counter the stage weaknesses', () => {
     renderScreen();
-    addHero('baker'); // Fire → covers Troll Bot
-    const note = screen.getByRole('status');
-    expect(within(note).queryByText(/Troll Bot/)).not.toBeInTheDocument();
-    expect(within(note).getByText(/no Frost, Earth coverage/i)).toBeInTheDocument();
-    expect(within(note).getByText(/Fixer, Red Tape/)).toBeInTheDocument();
-    expect(within(note).getByText(/3 squad slots still open/i)).toBeInTheDocument();
+    for (const id of ['baker', 'taho_vendor', 'street_sweeper'] as const) {
+      expect(screen.getByText(HERO_DEFINITIONS[id].name)).toBeInTheDocument();
+    }
+    expect(screen.getByText(/Counters Troll Bot/)).toBeInTheDocument();
+    expect(screen.getByText(/Counters Fixer/)).toBeInTheDocument();
+    expect(screen.getByText(/Counters Red Tape/)).toBeInTheDocument();
   });
 
-  it('hides the organizer note once the squad is full and all weaknesses are covered', () => {
+  it('has no interactive squad selection (workers arrive from drops)', () => {
     renderScreen();
-    addHero('baker'); // Fire
-    addHero('taho_vendor'); // Frost
-    addHero('street_sweeper'); // Earth
-    addHero('teacher'); // fills the 4th slot; coverage already complete
+    expect(screen.queryByRole('button', { name: /to squad/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /remove .* from squad/i })).not.toBeInTheDocument();
+    // Every telegraphed weakness has a recruited counter → no organizer warning.
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
-  it('still warns when the squad is full but a weakness is left uncovered', () => {
-    renderScreen();
-    // Four heroes, none of them Fire/Frost/Earth → no open slots but no coverage.
-    addHero('teacher'); // Physical
-    addHero('student'); // Physical
-    addHero('jeepney_driver'); // Wind
-    addHero('fisherfolk'); // Water
-    const note = screen.getByRole('status');
-    expect(within(note).getByText(/no Fire, Frost, Earth coverage/i)).toBeInTheDocument();
-    expect(within(note).queryByText(/squad slots still open/i)).not.toBeInTheDocument();
-  });
-
-  it('disables the remaining roster once four heroes are chosen', () => {
-    renderScreen();
-    addHero('baker');
-    addHero('taho_vendor');
-    addHero('street_sweeper');
-    addHero('teacher');
-    // A hero not in the squad can no longer be added.
-    const electrician = HERO_DEFINITIONS['electrician'];
-    expect(
-      screen.getByRole('button', {
-        name: `Add ${electrician.name} (${electrician.damageType}) to squad`,
-      }),
-    ).toBeDisabled();
-  });
-
-  it('re-opens a slot when a squad member is removed', () => {
-    renderScreen();
-    addHero('baker');
-    const baker = HERO_DEFINITIONS['baker'];
-    fireEvent.click(screen.getByRole('button', { name: `Remove ${baker.name} from squad slot 1` }));
-    expect(within(screen.getByRole('status')).getByText(/4 squad slots still open/i)).toBeInTheDocument();
+  it('deploys when the deploy CTA is pressed', () => {
+    const { onDeploy } = renderScreen();
+    fireEvent.click(screen.getByRole('button', { name: /deploy to the streets/i }));
+    expect(onDeploy).toHaveBeenCalledTimes(1);
   });
 });

@@ -56,6 +56,26 @@ export const ENEMY_VISUALS = {
   hpBarFillColor: 0x22c55e,
 } as const;
 
+/**
+ * Display scale: gameplay positions, ranges (px) and speeds (px/sec) live in
+ * the internal 960×540 Phaser field. Player-facing UI renders distances in
+ * "meters" and speeds in "m/s" so the numbers read like a real street rally.
+ * Purely presentational — all gameplay math stays in pixels.
+ */
+export const PIXELS_PER_METER = 20;
+
+/** Format an internal px distance as a compact meters label (e.g. "7.5 m"). */
+export function metersLabel(px: number): string {
+  const m = px / PIXELS_PER_METER;
+  return `${Number.isInteger(m) ? m : m.toFixed(1)} m`;
+}
+
+/** Format an internal px/sec speed as a compact m/s label (e.g. "3 m/s"). */
+export function metersPerSecondLabel(pxPerSec: number): string {
+  const mps = pxPerSec / PIXELS_PER_METER;
+  return `${Number.isInteger(mps) ? mps : mps.toFixed(1)} m/s`;
+}
+
 export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   grunt: {
     id: 'grunt',

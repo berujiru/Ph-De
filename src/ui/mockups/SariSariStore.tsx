@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { theme } from '../theme';
+import { useState } from 'react';
 import {
-  BackIcon,
   HeroCardIcon,
   HopeCoinIcon,
   PlacardIcon,
@@ -9,6 +9,9 @@ import {
   RallyPermitIcon,
   VictoryIcon,
 } from '../icons';
+import { BackButton } from '../components/BackButton';
+import { RewardReveal, type RevealReward } from '../components/RewardReveal';
+import type { DropRarity } from '../../game/core/GameEvents';
 
 interface SariSariStoreProps {
   onBack: () => void;
@@ -150,7 +153,7 @@ function Awning() {
 }
 
 /** One item hanging off the storefront wire. */
-function HangingGood({ item, index, affordable }: { item: CatalogItem; index: number; affordable: boolean }) {
+function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; index: number; affordable: boolean; onBuy: (item: CatalogItem) => void }) {
   const swing = (index % 2 === 0 ? 1 : -1) * (1 + (index % 3));
   const tagTilt = index % 2 === 0 ? -5 : 4;
 
@@ -245,6 +248,7 @@ function HangingGood({ item, index, affordable }: { item: CatalogItem; index: nu
       {/* Handwritten cardboard price tag = the buy button */}
       <button
         disabled={!affordable}
+        onClick={() => affordable && onBuy(item)}
         aria-label={
           affordable
             ? `Buy ${item.title} for ${item.cost} Hope Points`
@@ -332,7 +336,57 @@ function HangingGood({ item, index, affordable }: { item: CatalogItem; index: nu
   );
 }
 
+const HERO_PLACEHOLDER_SRC = '/assets/heroes/hero-placeholder.svg';
+const CARD_RARITIES: DropRarity[] = ['common', 'common', 'rare', 'common', 'epic', 'rare'];
+
+/** Build the reveal payload for a purchase — hero unlocks and card packs
+ *  share the same card-flip reveal (per owner request). */
+function rewardsFor(item: CatalogItem): { heading: string; rewards: RevealReward[] } {
+  switch (item.category) {
+    case 'Hero Unlocks':
+      return {
+        heading: 'A Worker Joins!',
+        rewards: [{
+          id: item.id,
+          title: item.title.replace(/^Recruit:\s*/, ''),
+          subtitle: 'Answered the call — stationed in the roster.',
+          rarity: 'epic',
+          portraitSrc: HERO_PLACEHOLDER_SRC,
+        }],
+      };
+    case 'Hero Cards': {
+      const count = item.id === 'eden_bundle' ? 5 : 3;
+      const fixedName = item.id === 'eden_bundle' ? 'Eden' : null;
+      const rewards: RevealReward[] = Array.from({ length: count }, (_, i) => ({
+        id: `${item.id}-${i}`,
+        title: `${fixedName ?? 'Hero'} Card`,
+        subtitle: 'Level up the roster.',
+        rarity: fixedName ? 'rare' : CARD_RARITIES[i % CARD_RARITIES.length],
+        icon: <HeroCardIcon size={44} />,
+      }));
+      return { heading: 'Cards Drawn!', rewards };
+    }
+    default:
+      return {
+        heading: 'Bought!',
+        rewards: [{
+          id: item.id,
+          title: item.title,
+          subtitle: item.description,
+          rarity: 'rare',
+          icon: item.icon,
+        }],
+      };
+  }
+}
+
 export function SariSariStore({ onBack }: SariSariStoreProps) {
+  const [reveal, setReveal] = useState<{ heading: string; rewards: RevealReward[] } | null>(null);
+
+  const handleBuy = (item: CatalogItem) => {
+    setReveal(rewardsFor(item));
+  };
+
   return (
     <div
       className="rally-screen"
@@ -381,29 +435,9 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
           }}
         >
           <div>
-            <button
-              onClick={onBack}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                minHeight: 44,
-                color: '#e2e8f0',
-                cursor: 'pointer',
-                fontSize: 14,
-                fontWeight: 700,
-                padding: '8px 14px',
-                backgroundColor: 'rgba(0,0,0,0.6)',
-                borderRadius: 8,
-                backdropFilter: 'blur(4px)',
-                marginBottom: 16,
-                border: `1px solid ${theme.colors.borderGlass}`,
-                fontFamily: 'inherit',
-              }}
-            >
-              <BackIcon size={18} />
-              Back to the Street
-            </button>
+            <div style={{ marginBottom: 16 }}>
+              <BackButton onClick={onBack} label="Back to the Street" tone="wood" />
+            </div>
 
             {/* Hand-painted wooden signboard */}
             <div
@@ -574,7 +608,7 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
             }}
           >
             {CATALOG.map((item, i) => (
-              <HangingGood key={item.id} item={item} index={i} affordable={item.cost <= MOCK_HOPE} />
+              <HangingGood key={item.id} item={item} index={i} affordable={item.cost <= MOCK_HOPE} onBuy={handleBuy} />
             ))}
           </div>
         </div>
@@ -609,6 +643,14 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
           Heroes are never sold for money — only Hope, earned on the streets.
         </div>
       </div>
+
+      {reveal && (
+        <RewardReveal
+          heading={reveal.heading}
+          rewards={reveal.rewards}
+          onClose={() => setReveal(null)}
+        />
+      )}
     </div>
   );
 }

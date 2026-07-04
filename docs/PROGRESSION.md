@@ -110,6 +110,10 @@ The game's progression revolves around a tightly integrated meta-economy, access
 - **Rally Permits** are required to start any campaign stage. This is the game's energy/stamina system.
 - The UI for the campaign map must explicitly display the **cost per campaign run** in Permits.
 - Permits regenerate naturally over time, but players can also purchase extra Rally Permits in the Sari-Sari Store.
+- **No storage cap** (owner decision, 2026-07-04): permits accumulate
+  without an upper limit — the UI shows the current count only, never an
+  `X / max`. (A run is still gated on holding *enough* permits for its
+  cost; there is simply no ceiling on how many you can bank.)
 
 ### The Store Currency: Hope Points
 - Every run pays out **Hope Points** — the persistent meta-currency (gold coin for the store) — **win or lose**. A failed defense still wakes people up and earns Hope.
@@ -152,11 +156,14 @@ Supporting systems for the goal layer:
 
 - **Stage star ratings** (1–3) with star-gated bonus content — the
   cheapest replayability multiplier in the genre.
-- **The Truth Codex** — a collection book: every enemy type defeated adds
-  a "lie debunked" entry (its mechanic + a one-line satirical debrief);
-  every hero recruited adds a bio; every Act, a chronicle page.
-  Completionists get a second full progression track for free, and the
-  codex doubles as the game's soft media-literacy message.
+- **The Truth Codex** — a collection book, surfaced as the **Enemies** tab
+  of the Archive/Inventory screen. Every enemy type is **sealed by default
+  and unlocks on first encounter in the field** (owner decision,
+  2026-07-04) — a faced anomaly becomes a "lie debunked" entry (its
+  mechanic + a one-line satirical debrief), while unfaced ones show a
+  redacted silhouette. Every hero recruited adds a bio; every Act, a
+  chronicle page. Completionists get a second full progression track for
+  free, and the codex doubles as the game's soft media-literacy message.
 - **Streaks**: Balita daily streak with growing (but capped, never
   punishing) bonuses.
 - **First-clear vs. repeat rewards** already split in `StageDefinition` —
@@ -197,9 +204,12 @@ skills lives in `docs/WORLD_AND_HEROES.md` — that table is the single
 source of truth.
 
 Guardrails:
-- Squad-power hint at squad select: soft warning (never a block) if the
-  squad lacks damage or lacks coverage vs. the stage's telegraphed enemy
-  types (reuses enemy-card data).
+- Companion hint in the Briefing Room: since there is **no squad
+  pre-selection** (owner decision, 2026-07-04 — companions come from
+  in-battle drops), the pre-battle screen instead shows a soft, non-blocking
+  hint of which *recruited* workers counter the stage's telegraphed enemy
+  types (reuses enemy-card data), plus an "organizer's note" when a
+  telegraphed weakness has no recruited counter yet.
 - Eden is always deployed and always deals real damage — the guaranteed
   floor. Support-leaning squads compensate through drops (economy
   passives buy more rerolls and instant summons, and enhancement mods

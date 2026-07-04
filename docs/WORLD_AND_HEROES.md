@@ -46,12 +46,18 @@ section and `docs/PROGRESSION.md` agency conditions):
 
 ## The battle (core loop)
 
-1. **Pre-battle**: read the stage's enemy cards (telegraphed weaknesses)
-   and pick a squad — Eden + 4 workers whose damage types counter the
-   stage. Choose one **Bayanihan Act** (barrier ultimate).
-2. **Deploy**: Eden takes the field at wave 1. The other four arrive via
-   **hero drops** (below). Lineup order matters — adjacent heroes buff
-   each other (**Bayanihan adjacency**).
+1. **Pre-battle (Briefing Room)**: read the stage's enemy cards
+   (telegraphed weaknesses) and choose one **Bayanihan Act** (barrier
+   ultimate). **There is no squad pre-selection** (owner decision,
+   2026-07-04): the player does *not* hand-pick Eden + 4 before the run.
+   Companions arrive mid-battle from the Voices meter (below), drawn from
+   the player's *unlocked roster*. The briefing therefore only **hints**
+   which recruited workers counter this stage — a non-blocking
+   "who to hope for from your drops" panel that reuses the enemy-card
+   weakness data.
+2. **Deploy**: Eden takes the field at wave 1. The rest of the squad (up
+   to 4) arrive via **hero drops** (below). Lineup order matters —
+   adjacent heroes buff each other (**Bayanihan adjacency**).
 3. **Fight**: enemies walk the path toward the Barrier. Heroes attack
    automatically (targeting per `core/Targeting.ts`); each hero also has
    a **skill** — manually triggered, on cooldown, with a voiced bark and

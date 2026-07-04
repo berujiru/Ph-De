@@ -19,7 +19,6 @@ const MARKER_FONT = '"Segoe Print", "Bradley Hand", "Comic Sans MS", cursive';
 // Mock meta balances (PROGRESSION.md: Hope Points + Rally Permits).
 const MOCK_HOPE = 1450;
 const MOCK_PERMITS = 3;
-const MOCK_PERMITS_MAX = 5;
 
 /** Distant city skyline behind the rally. */
 function Skyline() {
@@ -287,7 +286,7 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
         <BalancePill
           icon={<span style={{ color: theme.colors.accent, display: 'flex' }}><RallyPermitIcon size={22} /></span>}
           label="Rally Permits"
-          value={`${MOCK_PERMITS}/${MOCK_PERMITS_MAX}`}
+          value={`${MOCK_PERMITS}`}
           valueColor={theme.colors.textPrimary}
         />
       </div>

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { theme } from '../theme';
 import {
-  BackIcon,
   CheckIcon,
   LockIcon,
   PlayIcon,
@@ -10,6 +9,7 @@ import {
   StarIcon,
   StarOutlineIcon,
 } from '../icons';
+import { BackButton } from '../components/BackButton';
 
 interface CampaignMapProps {
   onBack: () => void;
@@ -132,7 +132,6 @@ const MOCK_STAGE_STARS: Record<number, number> = {
 };
 const HIGHEST_CLEARED_STAGE = 7;
 const MOCK_PERMITS = 3;
-const MOCK_PERMITS_MAX = 5;
 
 /** 0–3 star rating strip for a stage. */
 function StageStars({ stars }: { stars: number }) {
@@ -238,29 +237,9 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
         }}
       >
         <div>
-          <button
-            onClick={onBack}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              minHeight: 44,
-              padding: '8px 14px',
-              background: theme.colors.surfaceGlass,
-              border: `1px solid ${theme.colors.borderGlass}`,
-              borderRadius: 8,
-              color: theme.colors.textPrimary,
-              cursor: 'pointer',
-              fontSize: 14,
-              fontWeight: 700,
-              backdropFilter: 'blur(12px)',
-              marginBottom: 12,
-              fontFamily: 'inherit',
-            }}
-          >
-            <BackIcon size={18} />
-            Back to the Rally
-          </button>
+          <div style={{ marginBottom: 12 }}>
+            <BackButton onClick={onBack} label="Back to the Rally" />
+          </div>
           <h1 style={{ margin: 0, fontSize: 'clamp(24px, 5vw, 32px)', textTransform: 'uppercase', letterSpacing: 2 }}>
             The March
           </h1>
@@ -290,9 +269,7 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
             <span style={{ fontSize: 10, letterSpacing: 1, color: theme.colors.textMuted, fontWeight: 700 }}>
               RALLY PERMITS
             </span>
-            <span style={{ fontSize: 17, fontWeight: 900 }}>
-              {MOCK_PERMITS}/{MOCK_PERMITS_MAX}
-            </span>
+            <span style={{ fontSize: 17, fontWeight: 900 }}>{MOCK_PERMITS}</span>
           </div>
         </div>
       </div>

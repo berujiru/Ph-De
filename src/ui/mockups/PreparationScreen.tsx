@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { theme } from '../theme';
 import {
   CheckIcon,
-  CloseIcon,
   InfoIcon,
   LockIcon,
   MegaphoneIcon,
-  PlusIcon,
   RallyPermitIcon,
+  VoicesIcon,
   damageTypeIcons,
 } from '../icons';
+import { BackButton } from '../components/BackButton';
 import { HERO_DEFINITIONS, type HeroDefinition, type HeroId } from '../../game/data/balance';
 
 interface PreparationScreenProps {
@@ -31,7 +31,6 @@ const STAGE = {
 };
 
 const MOCK_PERMITS = 3;
-const MOCK_PERMITS_MAX = 5;
 
 /** Telegraphed enemy intel for the stage (reuses enemy-card data shape). */
 interface EnemyIntel {
@@ -146,37 +145,32 @@ function SectionLabel({ children }: { children: string }) {
 
 // ---------------------------------------------------------------- screen
 
+/** A recruited worker who counters one of the stage's telegraphed anomalies. */
+interface CompanionHint {
+  hero: HeroDefinition;
+  counters: string[];
+}
+
 export function PreparationScreen({ onBack, onDeploy }: PreparationScreenProps) {
-  const [squad, setSquad] = useState<(HeroId | null)[]>([null, null, null, null]);
   const [selectedAct, setSelectedAct] = useState<string>('people_power');
 
   const roster = UNLOCKED_HERO_IDS.map((id) => HERO_DEFINITIONS[id]);
-  const squadHeroes = squad.filter((id): id is HeroId => id !== null).map((id) => HERO_DEFINITIONS[id]);
-  const squadIsFull = !squad.includes(null);
 
-  const coveredTypes = new Set<HeroDefinition['damageType']>([
-    EDEN.damageType,
-    ...squadHeroes.map((hero) => hero.damageType),
-  ]);
+  // Companions arrive mid-battle from the Voices meter — you do not pre-pick a
+  // squad. The briefing only *hints* which recruited workers counter this
+  // stage, so the player knows who to hope for from drops.
+  const recommended: CompanionHint[] = roster
+    .map((hero) => ({
+      hero,
+      counters: ENEMY_INTEL.filter((intel) => intel.weakTo === hero.damageType).map((intel) => intel.name),
+    }))
+    .filter((hint) => hint.counters.length > 0);
+
+  // Telegraphed weaknesses with no recruited counter yet — a soft, non-blocking note.
+  const coveredTypes = new Set<HeroDefinition['damageType']>(recommended.map((hint) => hint.hero.damageType));
   const uncovered = ENEMY_INTEL.filter((intel) => !coveredTypes.has(intel.weakTo));
-  const openSlots = squad.filter((id) => id === null).length;
 
   const canDeploy = MOCK_PERMITS >= STAGE.permitCost;
-
-  const handlePick = (heroId: HeroId) => {
-    if (squad.includes(heroId)) return;
-    const emptyIndex = squad.indexOf(null);
-    if (emptyIndex === -1) return;
-    const next = [...squad];
-    next[emptyIndex] = heroId;
-    setSquad(next);
-  };
-
-  const handleRemove = (index: number) => {
-    const next = [...squad];
-    next[index] = null;
-    setSquad(next);
-  };
 
   return (
     <div
@@ -234,29 +228,9 @@ export function PreparationScreen({ onBack, onDeploy }: PreparationScreenProps) 
       >
         {/* Header */}
         <div>
-          <button
-            onClick={onBack}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              minHeight: 44,
-              padding: '8px 14px',
-              background: theme.colors.surfaceGlass,
-              border: `1px solid ${theme.colors.borderGlass}`,
-              borderRadius: 8,
-              color: theme.colors.textPrimary,
-              cursor: 'pointer',
-              fontSize: 14,
-              fontWeight: 700,
-              backdropFilter: 'blur(12px)',
-              marginBottom: 14,
-              fontFamily: 'inherit',
-            }}
-          >
-            <CloseIcon size={16} />
-            Cancel Briefing
-          </button>
+          <div style={{ marginBottom: 14 }}>
+            <BackButton onClick={onBack} label="Cancel Briefing" />
+          </div>
           <h1
             style={{
               margin: 0,
@@ -396,101 +370,93 @@ export function PreparationScreen({ onBack, onDeploy }: PreparationScreenProps) 
           </div>
         </div>
 
-        {/* Squad picker */}
+        {/* Companion hints — no pre-battle squad; workers arrive from drops */}
         <div>
-          <SectionLabel>The squad — Eden + 4</SectionLabel>
+          <SectionLabel>Who to rally — companion hints</SectionLabel>
 
-          {/* Slots */}
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 14 }}>
-            {/* Eden — always deployed */}
-            <div
-              style={{
-                width: 104,
-                borderRadius: 10,
-                border: `2px solid ${theme.colors.accent}`,
-                backgroundColor: 'rgba(56, 189, 248, 0.08)',
-                padding: 8,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 4,
-                boxShadow: '0 0 16px rgba(56, 189, 248, 0.25)',
-              }}
-            >
-              <img src="/assets/heroes/hero-placeholder.svg" alt="" style={{ width: 52, height: 52 }} />
-              <div style={{ fontSize: 12, fontWeight: 900 }}>{EDEN.name}</div>
-              <DamageTypeChip type={EDEN.damageType} />
-              <div style={{ fontSize: 9.5, letterSpacing: 1.5, color: theme.colors.accent, fontWeight: 900 }}>
-                LEADER
+          {/* Eden — always deploys at wave 1 */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: 12,
+              marginBottom: 14,
+              borderRadius: 12,
+              border: `2px solid ${theme.colors.accent}`,
+              backgroundColor: 'rgba(56, 189, 248, 0.08)',
+              boxShadow: '0 0 16px rgba(56, 189, 248, 0.2)',
+            }}
+          >
+            <img src="/assets/heroes/hero-placeholder.svg" alt="" style={{ width: 56, height: 56, flexShrink: 0 }} />
+            <div style={{ minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 15, fontWeight: 900 }}>{EDEN.name}</span>
+                <DamageTypeChip type={EDEN.damageType} />
+                <span style={{ fontSize: 9.5, letterSpacing: 1.5, color: theme.colors.accent, fontWeight: 900 }}>
+                  LEADER · DEPLOYS AT WAVE 1
+                </span>
+              </div>
+              <div style={{ fontSize: 12, color: theme.colors.textMuted, marginTop: 3 }}>
+                The rest of the movement answers mid-rally — kills fill the Voices meter and the crowd sends who it can.
               </div>
             </div>
-
-            {squad.map((heroId, index) => {
-              const hero = heroId ? HERO_DEFINITIONS[heroId] : null;
-              return hero ? (
-                <button
-                  key={index}
-                  onClick={() => handleRemove(index)}
-                  aria-label={`Remove ${hero.name} from squad slot ${index + 1}`}
-                  style={{
-                    width: 104,
-                    borderRadius: 10,
-                    border: `2px solid ${theme.colors.border}`,
-                    backgroundColor: theme.colors.surfaceGlass,
-                    padding: 8,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 4,
-                    cursor: 'pointer',
-                    color: 'inherit',
-                    position: 'relative',
-                    fontFamily: 'inherit',
-                  }}
-                >
-                  <span
-                    aria-hidden="true"
-                    style={{
-                      position: 'absolute',
-                      top: 4,
-                      right: 4,
-                      color: theme.colors.danger,
-                      display: 'flex',
-                    }}
-                  >
-                    <CloseIcon size={14} />
-                  </span>
-                  <img src="/assets/heroes/hero-placeholder.svg" alt="" style={{ width: 52, height: 52 }} />
-                  <span style={{ fontSize: 12, fontWeight: 900 }}>{hero.name}</span>
-                  <DamageTypeChip type={hero.damageType} />
-                </button>
-              ) : (
-                <div
-                  key={index}
-                  aria-label={`Empty squad slot ${index + 1}`}
-                  style={{
-                    width: 104,
-                    minHeight: 128,
-                    borderRadius: 10,
-                    border: `2px dashed ${theme.colors.borderGlass}`,
-                    backgroundColor: 'rgba(0,0,0,0.25)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    gap: 6,
-                    color: theme.colors.textMuted,
-                  }}
-                >
-                  <PlusIcon size={22} />
-                  <span style={{ fontSize: 10, letterSpacing: 1 }}>OPEN SLOT</span>
-                </div>
-              );
-            })}
           </div>
 
-          {/* Soft squad-power warning — never blocks deployment */}
-          {(uncovered.length > 0 || openSlots > 0) && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              fontSize: 12,
+              color: theme.colors.textSecondary,
+              marginBottom: 10,
+            }}
+          >
+            <span style={{ color: theme.colors.accent, display: 'flex' }}>
+              <VoicesIcon size={16} />
+            </span>
+            Hope for these recruited workers from your drops — they counter this stage:
+          </div>
+
+          {/* Recommended companion hint cards (non-interactive) */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+              gap: 8,
+            }}
+          >
+            {recommended.map(({ hero, counters }) => (
+              <div
+                key={hero.id}
+                style={{
+                  borderRadius: 10,
+                  border: `1px solid ${theme.colors.borderGlass}`,
+                  borderLeft: `4px solid ${theme.colors.success}`,
+                  backgroundColor: theme.colors.surfaceGlass,
+                  padding: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                }}
+              >
+                <img src="/assets/heroes/hero-placeholder.svg" alt="" style={{ width: 42, height: 42, flexShrink: 0 }} />
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 12.5, fontWeight: 800, lineHeight: 1.2 }}>{hero.name}</div>
+                  <div style={{ margin: '3px 0' }}>
+                    <DamageTypeChip type={hero.damageType} emphasized />
+                  </div>
+                  <div style={{ fontSize: 10.5, color: theme.colors.success, fontWeight: 700 }}>
+                    Counters {counters.join(', ')}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Soft note — a telegraphed weakness with no recruited counter yet */}
+          {uncovered.length > 0 && (
             <div
               role="status"
               style={{
@@ -502,7 +468,7 @@ export function PreparationScreen({ onBack, onDeploy }: PreparationScreenProps) 
                 borderLeft: `5px solid ${theme.materials.cautionYellow}`,
                 borderRadius: 8,
                 padding: '10px 14px',
-                marginBottom: 14,
+                marginTop: 14,
                 fontSize: 13,
               }}
             >
@@ -512,77 +478,13 @@ export function PreparationScreen({ onBack, onDeploy }: PreparationScreenProps) 
               <div>
                 <strong style={{ letterSpacing: 1 }}>ORGANIZER'S NOTE</strong>
                 <div style={{ color: theme.colors.textSecondary, marginTop: 2 }}>
-                  {uncovered.length > 0 && (
-                    <span>
-                      No {uncovered.map((intel) => intel.weakTo).join(', ')} coverage for{' '}
-                      {uncovered.map((intel) => intel.name).join(', ')}.{' '}
-                    </span>
-                  )}
-                  {openSlots > 0 && <span>{openSlots} squad slot{openSlots > 1 ? 's' : ''} still open. </span>}
-                  You can still deploy — the streets decide.
+                  No recruited worker yet counters{' '}
+                  {uncovered.map((intel) => `${intel.name} (${intel.weakTo})`).join(', ')}. You can still deploy —
+                  Eden and the drops decide.
                 </div>
               </div>
             </div>
           )}
-
-          {/* Roster to pick from */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(104px, 1fr))',
-              gap: 8,
-            }}
-          >
-            {roster.map((hero) => {
-              const inSquad = squad.includes(hero.id);
-              const disabled = inSquad || (squadIsFull && !inSquad);
-              return (
-                <button
-                  key={hero.id}
-                  onClick={() => handlePick(hero.id)}
-                  disabled={disabled}
-                  aria-label={
-                    inSquad
-                      ? `${hero.name} — already in squad`
-                      : `Add ${hero.name} (${hero.damageType}) to squad`
-                  }
-                  style={{
-                    borderRadius: 10,
-                    border: `1px solid ${inSquad ? theme.colors.success : theme.colors.borderGlass}`,
-                    backgroundColor: inSquad ? 'rgba(34, 197, 94, 0.08)' : theme.colors.surfaceGlass,
-                    padding: 8,
-                    minHeight: 118,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 4,
-                    cursor: disabled ? 'not-allowed' : 'pointer',
-                    opacity: disabled && !inSquad ? 0.4 : 1,
-                    color: 'inherit',
-                    fontFamily: 'inherit',
-                    position: 'relative',
-                  }}
-                >
-                  {inSquad && (
-                    <span
-                      style={{ position: 'absolute', top: 4, right: 4, color: theme.colors.success, display: 'flex' }}
-                    >
-                      <CheckIcon size={14} />
-                    </span>
-                  )}
-                  <img
-                    src="/assets/heroes/hero-placeholder.svg"
-                    alt=""
-                    style={{ width: 46, height: 46, opacity: disabled && !inSquad ? 0.5 : 1 }}
-                  />
-                  <span style={{ fontSize: 11.5, fontWeight: 700, textAlign: 'center', lineHeight: 1.15 }}>
-                    {hero.name}
-                  </span>
-                  <DamageTypeChip type={hero.damageType} />
-                </button>
-              );
-            })}
-          </div>
         </div>
 
         {/* Bayanihan Act selector */}
@@ -666,7 +568,7 @@ export function PreparationScreen({ onBack, onDeploy }: PreparationScreenProps) 
           <span style={{ color: theme.colors.accent, display: 'flex' }}>
             <RallyPermitIcon size={18} />
           </span>
-          Permits: {MOCK_PERMITS}/{MOCK_PERMITS_MAX}
+          Permits: {MOCK_PERMITS}
         </div>
         <button
           onClick={onDeploy}
