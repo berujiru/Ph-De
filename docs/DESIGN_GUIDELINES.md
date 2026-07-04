@@ -66,11 +66,11 @@ Rules:
 - Game-over/victory is a modal overlay with one clear action (Restart) — no
   secondary options competing for attention in that moment.
 
-## Game design patterns (tower defense conventions this project follows)
+## Game design patterns (Rally Auto-Battler conventions this project follows)
 
-- **Portrait Barrier Defense Layout**: The game uses a vertical portrait layout. Enemies spawn at the top and move downwards (swarming or along specific straight/fanning paths) toward the "People Power Shield" at the bottom. Heroes stand on fixed pedestals behind the shield and fire upwards. This replaces the old winding/snaking path layout.
-- **"First" targeting by default**: towers target the enemy furthest down the screen (closest to the barrier) within range (`src/game/core/Targeting.ts`). This is the genre-standard default because it minimizes leaked damage — other strategies (closest, strongest, weakest) are future per-tower options, not a replacement for this default.
-- **Data-driven balance**: all tower/enemy/wave numbers live in
+- **Portrait Rally March Layout**: The game uses a vertical portrait layout. You do not place static towers. Instead, you "summon" heroes who spawn at the bottom of the screen and automatically march upwards to form the rally frontline. Enemies (Anomalies) spawn at the top and move downwards to stop the rally.
+- **"Frontline" targeting by default**: Heroes target the enemy closest to them in the Y-axis as they march. If a hero is a melee unit, they stop moving when they meet an enemy to attack. Ranged heroes stop at their maximum attack range.
+- **Data-driven balance**: all hero/enemy/wave numbers live in
   `src/game/data/balance.ts`, not scattered magic numbers. This is a design
   guideline as much as a code guideline — balancing the game should mean
   editing numbers in one file, not hunting through scene code.
@@ -79,7 +79,7 @@ Rules:
   countdown is a common QoL addition (tracked in FEATURES.md) but manual
   start keeps the prototype's core loop simple to reason about and test.
 - **Economy loop**: gold in (kill rewards) must stay roughly proportional to
-  gold out (tower costs) per wave, tuned so the player is never fully unable
-  to afford at least one relevant tower by the wave where a given enemy type
-  first appears. When adding enemies/towers to `balance.ts`, sanity-check
+  gold out (hero summon costs) per wave, tuned so the player is never fully unable
+  to afford at least one relevant hero summon by the wave where a given enemy type
+  first appears. When adding enemies/heroes to `balance.ts`, sanity-check
   this ratio rather than picking numbers that feel right in isolation.

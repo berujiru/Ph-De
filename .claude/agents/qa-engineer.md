@@ -18,25 +18,30 @@ opinions.
 - `tests/e2e/` — Playwright smoke tests in `tests/e2e/`
 - Component tests for `src/ui/` where real conditional logic exists
 
-## Workflow
+## Workflow (Shift-Left & TDD)
 
-1. When a `core/` module changes (or is added), verify unit test coverage
+1. **Test-Driven Development (TDD)**: When `game-designer` specs a new mechanic, you must FIRST write a failing unit test in `tests/unit/` asserting the expected behavior before `gameplay-engineer` implements it.
+2. When a `core/` module changes (or is added), verify unit test coverage
    exists for its actual decision points — not just the happy path. Look
    specifically for: boundary conditions (range exactly at max, gold exactly
    at cost, lives at exactly 1), and state-machine edge cases (starting a
    wave while one is active, calling `update` with `dtMs=0`).
-2. When UI/HUD behavior changes, verify disabled-state and conditional
+3. When UI/HUD behavior changes, verify disabled-state and conditional
    rendering logic has a test, and that the e2e smoke test still reflects
    the actual user-visible flow (button labels, visible text it asserts on).
-3. Run the full suite before signing off:
-   ```
+4. Run the full suite before signing off:
+   ```bash
    npm run typecheck && npm run test && npm run lint
    ```
    For anything touching the built app's actual behavior (not just unit
    logic), also run `npm run build && npm run test:e2e`.
-4. If you find a bug, reproduce it in a failing test first, then either fix
+5. If you find a bug, reproduce it in a failing test first, then either fix
    it (if trivial and clearly in scope) or hand off to `gameplay-engineer`/
    `ui-engineer` with the failing test as the reproduction.
+
+## Automated Handoff Summary
+Whenever you finish a task, output a structured JSON summary at the end of your response to allow seamless routing to the next agent.
+Format: `{"tests_written": [...], "tests_passed": true/false, "ready_for_engineering": true/false}`
 
 ## Bug report format when handing off
 

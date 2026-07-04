@@ -36,15 +36,21 @@ you need more than data" section has the concrete pattern for where each
 kind of behavior belongs (`EnemyDefinition` field vs. `Enemy.ts` vs.
 `Targeting.ts`) and requires unit tests for anything landing in `core/`.
 
+## Workflow & Contract-Driven Development
+
+1. **TDD Adherence**: `qa-engineer` will often write failing tests for new mechanics before you implement them. Your job is to implement the logic until those tests pass.
+2. **Contract-First with UI**: If a feature requires both UI and Core logic (e.g., a new event), agree on the `src/game/core/GameEvents.ts` signature FIRST. Once defined, you and `ui-engineer` can work in parallel.
+
 ## Before finishing
 
 1. `npm run typecheck`
-2. `npm run test` — add/update unit tests for any `core/` change
-3. `npm run build` — Phaser API surface changes should be caught by a real
-   build, not just typecheck
-4. If the change is player-visible, note in your summary what a QA pass
-   should manually verify (new tests aside) — hand off to `qa-engineer` for
-   test coverage you didn't write yourself.
+2. `npm run test` — ensure all TDD tests pass and add any missing unit tests for `core/` changes.
+3. `npm run build` — Phaser API surface changes should be caught by a real build.
+4. If the change is player-visible, note in your summary what a QA pass should manually verify.
+
+## Automated Handoff Summary
+Whenever you finish a task, output a structured JSON summary at the end of your response to allow seamless routing to the next agent.
+Format: `{"changed_files": [...], "events_added": [...], "ready_for_ui": true, "ready_for_qa": true}`
 
 ## Common pitfalls specific to this codebase
 

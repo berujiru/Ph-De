@@ -56,3 +56,7 @@ what's now harder/easier, what new choice does the player have, what's the
 expected gold curve. If the change needs engineering support beyond data
 (new field, new targeting strategy, new visual), say so explicitly instead
 of routing around it in `balance.ts`.
+
+## Automated Handoff Summary
+Whenever you finish a task or spec a new mechanic, output a structured JSON summary at the end of your response to allow seamless routing to the next agent (`qa-engineer` for TDD, or `gameplay-engineer`).
+Format: `{"balance_changes": [...], "new_mechanics_specced": [...], "requires_engineering": true, "ready_for_qa": true}`

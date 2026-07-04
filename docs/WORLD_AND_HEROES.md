@@ -6,6 +6,7 @@ meme-hero/two-arm-machine design):
 
 - The base defended is **the Barrier of the Philippines**. "Lives" =
   barrier integrity.
+  - **Despair & Rally (Morale System)**: In addition to HP, the Barrier has "Morale." Taking heavy hits breaks Morale, temporarily disabling a hero's passive. Using a Bayanihan Act instantly rallies the Barrier, restoring Morale and swinging momentum back to the player.
 - **Heroes are citizen workers only** — the meme-hero tier is removed.
   Every hero is an ordinary Filipino worker with a real job, a real
   attack, and a signature skill.
@@ -68,7 +69,8 @@ section and `docs/PROGRESSION.md` agency conditions):
 2. **Hero Drops are finite and gated** — The RNG will only drop **unlocked heroes**, and only while there are empty slots. The player chooses which of the 4 empty slots to station the hero in.
 3. **No dead drops** — An enhancement that can't apply (stack cap reached, no eligible hero) is excluded from the roll before it happens.
 4. **Rarity scales with waves** — Later waves weight toward rarer enhancements, so late-battle drops stay exciting.
-5. **Deterministic under the hood** — Seeded RNG in a pure `core/Drops.ts` state machine; all weights and caps are `balance.ts` data.
+5. **"Buhis-Buhay" (Desperate Measures) Drops** — To introduce tension, the RNG can occasionally offer high-risk, high-reward drops. These grant massive buffs (e.g., +200% attack speed) but inflict a temporary penalty (e.g., increased cooldowns or pausing Barrier healing) reflecting the toll of overworking to secure the nation.
+6. **Deterministic under the hood** — Seeded RNG in a pure `core/Drops.ts` state machine; all weights and caps are `balance.ts` data.
 
 Enhancements land as tappable pickups where the enemy died (auto-collect
 after a few seconds — tap for juice, never punished for missing it).
@@ -106,14 +108,9 @@ adding new ones: an enhancement must either *change how a hero plays*
 (behaviors, infusions) or *change what the player watches* (instants,
 meta) — flat stat sticks are filler and stay rare.
 
-### Field layout — portrait barrier defense (confirmed)
+### Field layout — portrait rally march (confirmed)
 
-Enemies descend from the top along a path template toward the **Barrier
-spanning the bottom**; the squad stands on **fixed pedestals behind the
-Barrier**, firing projectiles over it. A hero's `range` = how far
-up-screen they reach; "melee" workers are short-range wall-guards with
-the heaviest hits. Portrait, one-handed, thumb-friendly; sessions 3–5
-minutes.
+The game is a **Vertical Auto-Battler**. Enemies descend from the top. Players summon heroes at the bottom of the screen. Summoned heroes automatically march upwards to form the "Rally Frontline". The player does not place static towers; they manage the economy and the timing of summoning workers. "Melee" workers walk directly up to enemies to brawl, while ranged workers stop behind the melee line to fire projectiles. Portrait, one-handed, thumb-friendly; sessions 3–5 minutes.
 
 ## The heroes — workers with skills
 
@@ -156,6 +153,8 @@ guess what it does from its silhouette and animation. (And per the
 binding content rules: any face, poster, or name on a monster is
 fictional and generic — e.g. the Epal's candidate face is an invented
 grinning politician, never a real one.)
+
+**Horde Synergy (Combat Puzzles)**: Enemies should organically form synergies as they march. For example, *Red Tape* acting as a physical shield that intercepts projectiles meant for the *Kickback Courier* hiding behind it, or *Ghost Employees* only becoming targetable after being hit by splash damage or a specific reveal skill.
 
 | Anomaly | Chassis | Monster form | Behavior → mechanic | Weak to / resists |
 |---|---|---|---|---|

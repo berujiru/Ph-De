@@ -16,7 +16,8 @@ implemented.
 
 ## Design rules
 
-1. **Every damage type must have a distinct job.** If a proposed type would
+1. **Poise and Stagger System**: Heavy melee attacks (e.g., from physical or earth wall-guards) deal "Poise Damage" alongside HP damage. Breaking an anomaly's poise interrupts their current action and grants a brief window of bonus damage, making combat impacts feel visceral.
+2. **Every damage type must have a distinct job.** If a proposed type would
    play the same as an existing one, it's a color, not a type — don't add it.
 2. **Every type needs a carrier.** A damage type ships only alongside at
    least one hero that deals it and at least one enemy that resists or is

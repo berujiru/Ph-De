@@ -28,6 +28,10 @@ Read `docs/DESIGN_GUIDELINES.md` before making visual changes — it enforces mi
   loss, success = valid/positive, accent = primary action) — no new hex
   values invented ad hoc.
 
+## Workflow & Contract-Driven Development
+
+1. **Contract-First with Gameplay**: If a feature requires new events from the game core, agree on the `src/game/core/GameEvents.ts` signature with `gameplay-engineer` FIRST. Once the contract is set, you can build the React listener in parallel while they build the Phaser emitter.
+
 ## Before finishing
 
 1. `npm run typecheck`
@@ -36,3 +40,7 @@ Read `docs/DESIGN_GUIDELINES.md` before making visual changes — it enforces mi
 3. Actually look at it: `npm run dev` and check the change at a mobile
    viewport width (375px) as well as desktop, since this ships as a phone
    app first.
+
+## Automated Handoff Summary
+Whenever you finish a task, output a structured JSON summary at the end of your response to allow seamless routing to the next agent.
+Format: `{"changed_components": [...], "ready_for_qa": true}`
