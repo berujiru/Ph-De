@@ -121,7 +121,11 @@ base reference for every following phase.*
 >    **taking a knee**, slumped and exhausted, water pooling at his feet (rear
 >    view). He is tired, NOT dead.
 >
-> Verify every frame in every row is present in the final grid.
+> **SELF-CHECK — before returning the image, verify each item; if any FAILS, fix it and regenerate:**
+> 1. **Consistent view** — every frame in every row uses the SAME camera angle stated above (heroes: rear / top-behind — we see the back; enemies: front / top-front — we see the face). No side profiles, no switching between front and back between frames.
+> 2. **Frame counts** — each row has EXACTLY the number of frames listed for that row above.
+> 3. **Clean output** — fully transparent background; NO grid lines, borders, boxes, text, labels, numbers, or captions anywhere.
+> 4. **On-model & separated** — outfit / hair / props identical in every frame; poses do not touch or overlap.
 
 *Export from Aseprite as `plumber.png` + `plumber.json` (JSON Hash or Array), with
 the tag names above spelled exactly: `idle march attack cast celebrate defeat`.*

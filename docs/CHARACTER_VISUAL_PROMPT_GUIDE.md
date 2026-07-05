@@ -180,3 +180,35 @@ Since AI image generators can sometimes hallucinate or skip frames, QA and devel
 - [ ] **Clean Silhouettes:** Are the character poses overlapping? (If yes, it will be impossible to slice. Prompt the AI to space them out).
 - [ ] **Consistency:** Did the character's colors or clothing randomly change in one of the frames?
 - [ ] **Cropping:** Are any of the character's limbs or weapons cut off by the edge of the generated image bounds?
+
+### Make the model QA itself (two layers)
+
+Image models follow a checklist far better when you make them *self-verify*. Two
+layers, both already built into the packs:
+
+**1. Baked-in self-check (automatic).** Every Phase 2 prompt now ends with a
+`SELF-CHECK` block telling the model to verify view-consistency, frame counts,
+clean transparent output, and on-model separation *before returning the image,
+and regenerate if any item fails*. You don't add anything — it's in the prompt.
+
+**2. Review pass (do this after it generates).** Vision models like Gemini can
+critique their own output. In a **new message, attach the generated sheet** and
+paste:
+
+> You are a strict sprite-sheet QA reviewer. Review the attached sheet against
+> this checklist and reply with **PASS/FAIL for each item** plus a one-line
+> reason. Then, if anything FAILED, **regenerate a corrected version** that fixes
+> only those issues while keeping everything that passed.
+>
+> 1. **View consistency** — is EVERY frame the same camera angle? (heroes:
+>    top-behind/rear, we see the back; enemies: top-front, we see the face). No
+>    side profiles, no frames that flip to face the camera.
+> 2. **Frame counts** — does each row have exactly the required number of frames?
+> 3. **Clean output** — fully transparent background, and absolutely NO grid
+>    lines, borders, boxes, text, labels, or numbers?
+> 4. **On-model** — same outfit/hair/props/colors in every frame?
+> 5. **No overlap / no cropping** — poses separated, nothing clipped by the edges?
+
+This catches the two things models most often botch — **perspective drift** (a
+side-view march, a front-facing attack) and **stray grids/labels** — and lets the
+model fix them without you re-typing the whole prompt.

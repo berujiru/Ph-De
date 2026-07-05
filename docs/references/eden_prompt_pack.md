@@ -90,6 +90,11 @@ reference for every following phase.*
 > **ALL frames must be drawn from a HIGH-ANGLE REAR VIEW (top-behind, rear 3/4)**
 > — top of head, the pink bow from above, shoulders, and back. Not a flat
 > zenith, no side profiles, no low angles.
+> **This applies to EVERY row, no exceptions** — march is walking straight AWAY
+> from the camera (we see her back, NOT a side profile); attack is throwing the
+> megaphone forward *still seen from behind*; celebrate only turns her head
+> slightly. **If her face or a side silhouette is visible in any frame, that
+> frame is WRONG — redraw it from behind.**
 >
 > **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (pink tee, black hair, pink+blue polka-dot bow, red/white megaphone). Lay out as horizontal rows, one animation per row, each frame in its own evenly-spaced cell, non-overlapping, with consistent size and centering.
@@ -112,7 +117,11 @@ reference for every following phase.*
 > 6. **`defeat`** — EXACTLY 2 frames: morale broken — lowering the megaphone and
 >    **taking a knee**, slumped and exhausted (rear view). She is tired, NOT dead.
 >
-> Verify every frame in every row is present in the final grid.
+> **SELF-CHECK — before returning the image, verify each item; if any FAILS, fix it and regenerate:**
+> 1. **Consistent view** — every frame in every row uses the SAME camera angle stated above (heroes: rear / top-behind — we see the back; enemies: front / top-front — we see the face). No side profiles, no switching between front and back between frames.
+> 2. **Frame counts** — each row has EXACTLY the number of frames listed for that row above.
+> 3. **Clean output** — fully transparent background; NO grid lines, borders, boxes, text, labels, numbers, or captions anywhere.
+> 4. **On-model & separated** — outfit / hair / props identical in every frame; poses do not touch or overlap.
 
 *Export from Aseprite as `eden.png` + `eden.json` (JSON Hash or Array), with the
 tag names above spelled exactly: `idle march attack cast celebrate defeat`.*
