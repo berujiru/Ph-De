@@ -21,6 +21,12 @@ over React Native.
   conventions (targeting, wave structure, economy tuning)
 - `docs/ART_AND_AUDIO_GUIDELINES.md` — visual style, anime-style skill cut-ins,
   animations, and comedic Tagalog sound/foley mappings for heroes and enemies.
+- `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` — **canonical camera & sprite
+  perspective** (high top-down oblique; heroes top-behind / enemies top-front),
+  the required per-character animation-state set (idle/march/attack/cast/
+  stunned/celebrate/defeat/death, matching `UnitModel`), and the Gemini→Claude
+  workflow for generating turnarounds and animated sprite sheets. Read before
+  creating or wiring any character art.
 - `docs/FEATURES.md` — what's built, what's next, what's explicitly out of
   scope. Check before proposing something that might already be
   planned/rejected.

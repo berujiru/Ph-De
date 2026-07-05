@@ -77,6 +77,50 @@ export class HeroModel extends UnitModel {
     return tweens;
   }
 
+  protected playStunned(): Phaser.Tweens.Tween[] {
+    // Dazed wobble — knocked off the march (seen from top-behind).
+    return [
+      this.scene.tweens.add({
+        targets: this.bodySprite,
+        angle: { from: -10, to: 10 },
+        yoyo: true,
+        repeat: -1,
+        duration: 180,
+        ease: 'Sine.easeInOut',
+      }),
+    ];
+  }
+
+  protected playCelebrate(): Phaser.Tweens.Tween[] {
+    // Victory — bouncing cheer, raised-fist energy (rear view).
+    return [
+      this.scene.tweens.add({
+        targets: this.bodySprite,
+        y: -8,
+        scaleX: this.bodySprite.scaleX * 1.06,
+        scaleY: this.bodySprite.scaleY * 1.06,
+        yoyo: true,
+        repeat: -1,
+        duration: 260,
+        ease: 'Quad.easeOut',
+      }),
+    ];
+  }
+
+  protected playDefeat(): Phaser.Tweens.Tween[] {
+    // Morale broken — heroes don't die, they take a knee and slump (rear view).
+    return [
+      this.scene.tweens.add({
+        targets: this.bodySprite,
+        y: 8,
+        angle: -12,
+        scaleY: this.bodySprite.scaleY * 0.85,
+        duration: 500,
+        ease: 'Quad.easeIn',
+      }),
+    ];
+  }
+
   protected playAttack(onComplete: () => void): void {
     // Throw lunge toward the enemy side (right).
     this.scene.tweens.add({

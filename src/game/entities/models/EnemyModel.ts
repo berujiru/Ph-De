@@ -93,6 +93,50 @@ export class EnemyModel extends UnitModel {
     ];
   }
 
+  protected playStunned(): Phaser.Tweens.Tween[] {
+    // Dazed spin-in-place — the "spinning stars" beat (seen from top-front).
+    return [
+      this.scene.tweens.add({
+        targets: this.bodySprite,
+        angle: { from: -12, to: 12 },
+        yoyo: true,
+        repeat: -1,
+        duration: 200,
+        ease: 'Sine.easeInOut',
+      }),
+    ];
+  }
+
+  protected playCelebrate(): Phaser.Tweens.Tween[] {
+    // Anomaly wins — lurching forward, tearing at the barrier (front view).
+    return [
+      this.scene.tweens.add({
+        targets: this.bodySprite,
+        x: -8,
+        scaleX: 1.12,
+        yoyo: true,
+        repeat: -1,
+        duration: 220,
+        ease: 'Quad.easeInOut',
+      }),
+    ];
+  }
+
+  protected playDefeat(): Phaser.Tweens.Tween[] {
+    // API parity — anomalies normally die outright; if forced into "defeat"
+    // (e.g. rally victory), they cower and shrink back.
+    return [
+      this.scene.tweens.add({
+        targets: this.bodySprite,
+        scaleX: 0.85,
+        scaleY: 0.85,
+        y: 4,
+        duration: 400,
+        ease: 'Quad.easeIn',
+      }),
+    ];
+  }
+
   protected playAttack(onComplete: () => void): void {
     // Lunge toward the shield (left).
     this.scene.tweens.add({

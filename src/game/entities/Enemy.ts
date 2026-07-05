@@ -300,6 +300,16 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     }
   }
 
+  /**
+   * Lock this anomaly into a terminal battle-outcome pose. Called by GameScene
+   * when the rally is decided: 'celebrate' when the player loses (anomalies
+   * overrun the barrier), 'defeat' on the rare forced case.
+   */
+  playOutcome(outcome: 'celebrate' | 'defeat') {
+    if (this.isDead) return;
+    this.model.setState(outcome);
+  }
+
   update(delta: number, shield: MoraleShield, summons: Summon[] = []) {
     if (this.isDead) return;
 
@@ -404,8 +414,8 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     }
 
     if (isStunnedOrFrozen) {
-      // Cannot move or attack
-      this.model.setState('idle');
+      // Cannot move or attack — dazed in place.
+      this.model.setState('stunned');
       return;
     }
 

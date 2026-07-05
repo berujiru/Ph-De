@@ -1,10 +1,25 @@
 import Phaser from 'phaser';
 import { FX } from '../../data/level';
 
-export type UnitModelState = 'idle' | 'walk' | 'run' | 'attack' | 'cast' | 'death';
+export type UnitModelState =
+  // Persistent locomotion / crowd-control loops — hold until told otherwise.
+  | 'idle' | 'walk' | 'run' | 'stunned'
+  // One-shot overlays on top of locomotion — revert when done.
+  | 'attack' | 'cast'
+  // Terminal battle-outcome loops — lock the model, play until the scene ends.
+  | 'celebrate' | 'defeat'
+  // Terminal — plays once, then the owner destroys itself.
+  | 'death';
 
-/** States a unit stays in until told otherwise. */
-const PERSISTENT_STATES: ReadonlySet<UnitModelState> = new Set(['idle', 'walk', 'run']);
+/** States a unit stays in until told otherwise (loop forever). */
+const PERSISTENT_STATES: ReadonlySet<UnitModelState> = new Set(['idle', 'walk', 'run', 'stunned']);
+
+/**
+ * Terminal battle-outcome loops. Once set (on win/lose) they lock the model:
+ * further setState calls are ignored so a marching/attacking tween can't stomp
+ * the celebration or the morale-broken slump.
+ */
+const OUTCOME_STATES: ReadonlySet<UnitModelState> = new Set(['celebrate', 'defeat']);
 
 export interface UnitModelStateOptions {
   /** Fired when a one-shot state (attack / cast / death) finishes playing. */
@@ -18,19 +33,28 @@ export interface UnitModelStateOptions {
  * real sprite-sheet animations can later replace each state inside a subclass
  * without touching Hero.ts / Enemy.ts logic:
  *
- * - `setState('idle' | 'walk' | 'run')` — persistent locomotion; loops until changed.
+ * - `setState('idle' | 'walk' | 'run' | 'stunned')` — persistent locomotion /
+ *   crowd-control; loops until changed.
  * - `setState('attack' | 'cast')` — one-shot overlay; reverts to the current
  *   locomotion state when done.
+ * - `setState('celebrate' | 'defeat')` — terminal battle-outcome loop; locks
+ *   the model so nothing else animates it until the scene tears down.
  * - `setState('death')` — terminal; plays once, then fires onComplete (the
  *   owner destroys itself there).
  * - `playProjectileLaunch()` — muzzle-flash hook fired the moment a projectile
  *   leaves the model; projectiles should spawn at `muzzleOffset`.
+ *
+ * See docs/CHARACTER_VISUAL_PROMPT_GUIDE.md for how each state maps to a
+ * sprite-sheet row (idle / march / attack / cast / celebrate / defeat /
+ * stunned / death) and the top-behind (hero) vs top-front (enemy) camera view.
  */
 export abstract class UnitModel extends Phaser.GameObjects.Container {
   private currentState: UnitModelState = 'idle';
   private locomotionState: UnitModelState = 'idle';
   private locomotionTweens: Phaser.Tweens.Tween[] = [];
   private dead = false;
+  /** Set once a terminal outcome (celebrate/defeat) locks the model. */
+  private outcomeLocked = false;
 
   constructor(scene: Phaser.Scene, x = 0, y = 0) {
     super(scene, x, y);
@@ -47,12 +71,21 @@ export abstract class UnitModel extends Phaser.GameObjects.Container {
 
   // Narrows Phaser's GameObject.setState(string | number) into the model-state API.
   override setState(state: UnitModelState, options?: UnitModelStateOptions): this {
-    if (this.dead || !this.scene) return this;
+    if (this.dead || this.outcomeLocked || !this.scene) return this;
     if (state === 'death') {
       this.dead = true;
       this.stopLocomotion();
       this.currentState = 'death';
       this.playDeath(options?.onComplete);
+      return this;
+    }
+
+    if (OUTCOME_STATES.has(state)) {
+      // Terminal battle-outcome loop — lock the model and hold it.
+      this.outcomeLocked = true;
+      this.stopLocomotion();
+      this.currentState = state;
+      this.locomotionTweens = state === 'celebrate' ? this.playCelebrate() : this.playDefeat();
       return this;
     }
 
@@ -124,6 +157,7 @@ export abstract class UnitModel extends Phaser.GameObjects.Container {
     this.currentState = state;
     if (state === 'walk') this.locomotionTweens = this.playWalk(false);
     else if (state === 'run') this.locomotionTweens = this.playWalk(true);
+    else if (state === 'stunned') this.locomotionTweens = this.playStunned();
     else this.locomotionTweens = this.playIdle();
   }
 
@@ -145,6 +179,11 @@ export abstract class UnitModel extends Phaser.GameObjects.Container {
   /** Looping placeholder animations — return the tweens so they can be stopped. */
   protected abstract playIdle(): Phaser.Tweens.Tween[];
   protected abstract playWalk(running: boolean): Phaser.Tweens.Tween[];
+  /** Crowd-controlled loop (dazed / spinning stars). */
+  protected abstract playStunned(): Phaser.Tweens.Tween[];
+  /** Terminal battle-outcome loops — held until the scene tears down. */
+  protected abstract playCelebrate(): Phaser.Tweens.Tween[];
+  protected abstract playDefeat(): Phaser.Tweens.Tween[];
   /** One-shot placeholder animations — MUST call onComplete exactly once. */
   protected abstract playAttack(onComplete: () => void): void;
   protected abstract playCast(onComplete: () => void): void;

@@ -36,6 +36,26 @@ you need more than data" section has the concrete pattern for where each
 kind of behavior belongs (`EnemyDefinition` field vs. `Enemy.ts` vs.
 `Targeting.ts`) and requires unit tests for anything landing in `core/`.
 
+## Character models & animation states
+
+Every unit renders through the placeholder model layer in
+`src/game/entities/models/` (`UnitModel` base → `HeroModel` / `EnemyModel`).
+Drive visuals only through the explicit state API — never tween the body
+sprite from `Enemy.ts` / `Hero.ts` / `GameScene.ts` directly:
+
+- Persistent loops: `setState('idle' | 'walk' | 'run' | 'stunned')`.
+- One-shot overlays: `setState('attack' | 'cast')` — revert to locomotion.
+- Terminal outcome loops: `setState('celebrate' | 'defeat')` — lock the model.
+- Terminal: `setState('death', { onComplete })` — owner destroys itself.
+
+When real Aseprite sprite sheets replace the placeholders, you reimplement the
+`play*` methods inside the subclass only; entity/scene logic stays untouched.
+Animation tags map 1:1 to these state names (`${spriteKey}-${state}`) — the
+required set and the top-behind (hero) / top-front (enemy) camera perspective
+are specified in `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md`. If a mechanic needs a
+new visual state, add it to `UnitModel` (with abstract `play*` + subclass
+impls), not an ad-hoc tween.
+
 ## Workflow & Contract-Driven Development
 
 1. **TDD Adherence**: `qa-engineer` will often write failing tests for new mechanics before you implement them. Your job is to implement the logic until those tests pass.

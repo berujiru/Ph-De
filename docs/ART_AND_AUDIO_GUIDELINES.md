@@ -13,6 +13,15 @@ This document serves as the master specification for creating visual and audio a
 - **Line Art**: Clean, bold outer strokes with flat cel-shading. Avoid messy textures. Readability on a small mobile screen is the highest priority.
 - **Motifs**: Megaphones, placards, barricades, caution tape, and DIY signage. The heroes should look like everyday, hardworking Filipinos, not shiny fantasy warriors.
 
+**Camera & sprite perspective (canonical):** the battle uses a **fixed high
+top-down oblique camera above and behind the hero line**. Heroes are drawn
+**TOP-BEHIND** (rear 3/4 — we see their backs); enemies are drawn **TOP-FRONT**
+(front 3/4 — we see their faces bearing down). This is facing-relative and holds
+on any screen axis. The full rules, the required animation-state set, and the
+Gemini→Claude generation workflow live in
+`docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` — treat that file as authoritative and
+keep the lists below in sync with it.
+
 ---
 
 ## 2. Hero Asset Requirements
@@ -24,12 +33,15 @@ For each of the 20 Heroes, the following visual assets are required:
 - **Guideline**: A tight headshot/bust. The hero should look determined, stressed, or angry. Framed like a polaroid or a lanyard ID.
 
 ### B. In-Game Base Model (Sprite Sheet)
-- **Specs**: Isometric or slight top-down angle, designed for a vertical auto-battler march.
+- **Specs**: TOP-BEHIND (rear 3/4 high-angle). Tag names must match the
+  `UnitModel` states exactly (`src/game/entities/models/UnitModel.ts`).
 - **Animations Required**:
-  1. **Idle/Marching**: The default walk cycle moving upward.
-  2. **Attack (Looping)**: The primary attack motion (e.g., throwing a fishball, waving a broom, shouting into a headset). Must have a clear "impact" frame.
-  3. **Defeated/Broken**: Since heroes don't die, they take a knee, drop their equipment, or look exhausted (Morale broken).
-  4. **Winning**: Cheering, raising a fist, or wiping sweat off their brow.
+  1. **`idle`**: Breathing/bouncing in place.
+  2. **`march`**: The default walk cycle advancing forward.
+  3. **`attack`**: The primary attack motion (e.g., throwing a fishball, waving a broom, shouting into a headset). Must have a clear "impact" frame.
+  4. **`cast`**: Signature-skill wind-up pose, played under the anime cut-in.
+  5. **`celebrate`**: Victory — cheering, raising a fist, or wiping sweat off the brow.
+  6. **`defeat`**: Morale broken — since heroes don't die, they take a knee, drop their equipment, or look exhausted.
 
 ### C. Skill Cut-In Overlays (Anime-Style)
 When a hero casts their signature skill, the game pauses, and a large 2D sprite slides across the screen (similar to an anime or fighting game super-move).
@@ -49,12 +61,14 @@ The enemies are personifications of bad governance (anomalies). They should look
 - **Specs**: 256x256px, Transparent PNG. Used for pre-battle prep screens.
 
 ### B. In-Game Base Model (Sprite Sheet)
-- **Specs**: Top-down/Isometric angle, marching downward.
+- **Specs**: TOP-FRONT (front 3/4 high-angle) — facing the camera as they bear
+  down. Tag names must match the `UnitModel` states exactly.
 - **Animations Required**:
-  1. **Walking**: Plodding, sneaking, or confidently strutting downward.
-  2. **Stunned (CC'd)**: Dazed, spinning stars, or frozen mid-step.
-  3. **Death**: Shattering into piles of paperwork, dissolving into mud, or exploding into gold coins.
-  4. **Winning**: Reaching the bottom barrier and violently tearing at it.
+  1. **`march`**: Plodding, sneaking, or confidently strutting toward the line.
+  2. **`attack`**: Clawing/lunging at the morale shield; clear impact frame.
+  3. **`stunned`**: Dazed, spinning stars, or frozen mid-step (freeze/stun CC).
+  4. **`celebrate`**: Overrunning the barrier and violently tearing at it (plays when the player loses).
+  5. **`death`**: Shattering into piles of paperwork, dissolving into mud, or exploding into gold coins.
 
 ---
 
@@ -62,8 +76,8 @@ The enemies are personifications of bad governance (anomalies). They should look
 
 The battlefields are vertically aligned streets and paths. To ensure the world geometry matches the characters:
 
-- **Perspective**: Top-Down Oblique ("A little top view" / 3/4 Isometric). The ground plane must recede upward, showing the tops and faces of buildings, barricades, and environmental props to perfectly match the angles of the marching heroes and enemies.
-- **Orientation**: Vertically tall, designed for a portrait mobile screen where enemies spawn at the top and the Barrier is at the bottom.
+- **Perspective**: The same high top-down oblique the characters use ("a little top view" / 3/4). The ground plane recedes toward the enemy end, showing the tops and faces of buildings, barricades, and environmental props so the world matches the top-behind heroes and top-front enemies.
+- **Orientation**: The rally advances down a lane toward the incoming anomalies while the morale shield holds the near end; the current build scrolls this lane horizontally, but props are authored to read correctly under the shared oblique camera regardless of march axis.
 - **Style**: High-contrast, cel-shaded vector art. The ground should use muted or darker tones (deep slate, dark asphalt) so the bright characters and UI elements pop clearly.
 
 ---

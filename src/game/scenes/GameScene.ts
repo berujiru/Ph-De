@@ -105,7 +105,7 @@ export class GameScene extends Phaser.Scene {
 
     const unsubSurrender = uiToGameEvents.on('surrender', () => {
       if (!this.sys) return;
-      this.status = 'lost';
+      this.endBattle('lost');
       this.emitState(true);
     });
 
@@ -556,7 +556,7 @@ export class GameScene extends Phaser.Scene {
           // status is guaranteed 'playing' here (update returns early otherwise),
           // so this transition — and the victory sound — fires exactly once.
           try { this.sound.play('sfx-victory'); } catch (e) {}
-          this.status = 'won';
+          this.endBattle('won');
         }
       }
     }
@@ -620,10 +620,24 @@ export class GameScene extends Phaser.Scene {
       // status can only be 'playing' or 'won' here, so the defeat sound
       // fires at most once — next frame update returns early on 'lost'.
       try { this.sound.play('sfx-defeat'); } catch (e) {}
-      this.status = 'lost';
+      this.endBattle('lost');
     }
 
     this.emitState();
+  }
+
+  /**
+   * Lock in the battle result exactly once and play everyone's outcome pose:
+   * heroes celebrate / take a knee, and on a loss the anomalies celebrate
+   * overrunning the barrier. Guards on 'playing' so it can't fire twice.
+   */
+  private endBattle(status: 'won' | 'lost'): void {
+    if (this.status !== 'playing') return;
+    this.status = status;
+    for (const hero of this.heroes) hero.playOutcome(status === 'won' ? 'celebrate' : 'defeat');
+    if (status === 'lost') {
+      for (const enemy of this.enemies) enemy.playOutcome('celebrate');
+    }
   }
 
   private spawnEnemy() {

@@ -27,6 +27,11 @@ Read `docs/DESIGN_GUIDELINES.md` before making visual changes — it enforces mi
 - Colors come from `theme.ts` tokens by meaning (gold = currency, danger =
   loss, success = valid/positive, accent = primary action) — no new hex
   values invented ad hoc.
+- Character art perspective is not yours to redefine: HUD **portraits** are
+  front-facing headshots (UI only), while on-battlefield sprites and the
+  anime **skill cut-in** are top-behind/top-front Phaser assets rendered in the
+  canvas (`src/game/entities/fx/SkillCutIn.ts`), **not** React overlays. See
+  `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md`; don't rebuild cut-ins in the DOM.
 
 ## Workflow & Contract-Driven Development
 

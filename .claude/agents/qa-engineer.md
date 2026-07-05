@@ -43,6 +43,19 @@ opinions.
 Whenever you finish a task, output a structured JSON summary at the end of your response to allow seamless routing to the next agent.
 Format: `{"tests_written": [...], "tests_passed": true/false, "ready_for_engineering": true/false}`
 
+## Character model states (manual-verify checklist)
+
+The unit model exposes an explicit animation-state machine (`UnitModel`:
+idle/walk/run/stunned/attack/cast/celebrate/defeat/death). Don't unit-test
+Phaser tween internals, but when gameplay touches these, manually verify the
+transitions actually fire: enemies enter `stunned` under freeze/stun, heroes
+`celebrate` on victory and `defeat` on loss/surrender, enemies `celebrate` when
+the barrier falls, and a terminal outcome pose isn't stomped by a stray
+march/attack. Perspective (top-behind heroes / top-front enemies) and the
+required state-tag set are defined in `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` —
+flag generated sprite sheets that are missing a state or drawn from the wrong
+facing.
+
 ## Bug report format when handing off
 
 State: what you did, what you expected, what happened instead, and the

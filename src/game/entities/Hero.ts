@@ -124,6 +124,15 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.model.playProjectileLaunch();
   }
 
+  /**
+   * Lock this hero into a terminal battle-outcome pose. Called by GameScene
+   * when the rally is decided: 'celebrate' on victory (raised fist), 'defeat'
+   * on loss (morale broken — heroes take a knee, they don't die).
+   */
+  playOutcome(outcome: 'celebrate' | 'defeat') {
+    this.model.setState(outcome);
+  }
+
   update(delta: number, enemies: Enemy[], shieldX: number) {
     // Hold formation relative to the advancing morale shield.
     const targetX = formationTargetX(shieldX, { attackKind: this.definition.attackKind, rangePx: this.range }, RALLY.formation) + this.formationJitterX;

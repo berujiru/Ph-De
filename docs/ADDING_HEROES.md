@@ -4,9 +4,18 @@ This is the worked, step-by-step guide for AI agents and developers adding a new
 
 ## 1. Asset Pipeline & View Angle
 
-*First Ripple* is a Vertical Auto-Battler where heroes spawn at the bottom and march upward.
-- **Hero Perspective**: Top-Down Oblique ("A little top view" / 3/4 Isometric).
-- **Facing Direction**: Because heroes move upwards, all gameplay sprites must be drawn from a **Rear / 3/4 Back View**.
+*First Ripple* is an auto-battler rally: the hero line holds the rear, a morale
+shield pushes the front forward, and anomalies stream in from ahead. The battle
+runs under a **fixed high top-down oblique camera** sitting above and behind the
+hero line — see `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` → *Camera & Perspective
+Model* for the canonical rules and the AI generation workflow.
+- **Hero Perspective**: **TOP-BEHIND** — high-angle rear 3/4. The camera is
+  behind the heroes, so gameplay sprites show the tops of heads, shoulders, and
+  backs. Never a flat zenith or a side profile.
+- **Enemy Perspective** (for contrast): **TOP-FRONT** — high-angle front 3/4,
+  facing the camera. Covered fully in `docs/ADDING_ENEMIES.md` /
+  `ART_AND_AUDIO_GUIDELINES.md`.
+- **HUD Portrait exception**: front-facing headshot (see the face).
 
 ### Required Art Assets
 
@@ -19,12 +28,16 @@ For every new hero, three assets must be created and placed in `public/assets/he
    - **Required Animation Flow**: Must show the momentum of the action (e.g., Anticipation/inhaling -> Action/shouting into megaphone -> Resolution) to feel like a short, punchy video.
 3. **Animated Sprite Sheet (`[hero_id].png` + `[hero_id].json`)**
    - **Specs**: A transparent texture atlas (preferably exported from Aseprite using the "Aseprite JSON Array" or "Hash" format).
-   - **Required Animations** (Tag names in the JSON must match exactly):
-     - `idle`: Bouncing/breathing while standing still (Rear view).
-     - `march`: Walking cycle moving "up" the screen (Rear view).
-     - `attack`: Swinging weapon or throwing projectile (Rear view).
-     - `winning`: Cheering or raising a fist (Rear view or turning slightly).
-     - `defeat`: Taking a knee, looking exhausted (morale broken).
+   - **Required Animations** — tag names must match the `UnitModel` states in
+     `src/game/entities/models/UnitModel.ts` exactly, since
+     `createFromAseprite` keys animations as `${spriteKey}-${tag}`. All drawn
+     TOP-BEHIND (rear 3/4):
+     - `idle`: Bouncing/breathing while standing still.
+     - `march`: Walk cycle advancing forward.
+     - `attack`: Swinging weapon / throwing projectile; clear impact frame.
+     - `cast`: Signature-skill wind-up pose (plays under the anime cut-in).
+     - `celebrate`: Victory — cheering, raising a fist (may turn head slightly).
+     - `defeat`: Morale broken — taking a knee, exhausted (heroes never die).
 
 ---
 

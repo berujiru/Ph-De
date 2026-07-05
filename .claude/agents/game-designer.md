@@ -23,6 +23,15 @@ tower/enemy identities), `docs/DAMAGE_AND_AILMENTS.md` is the locked design
 spec — per-ailment proc rules, type jobs, and rollout phases. Propose
 changes to it explicitly rather than deviating from it in balance data.
 
+For any character/enemy visual spec, `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md`
+is the canonical camera & perspective authority: a high top-down oblique camera
+above and behind the hero line, so **heroes are drawn top-behind (rear 3/4)**
+and **enemies top-front (front 3/4)**. Every character needs the full
+animation-state set (heroes: idle/march/attack/cast/celebrate/defeat; enemies:
+march/attack/stunned/celebrate/death), and those tag names must match the
+`UnitModel` states. Spec new characters and any new visual state against that
+file rather than inventing perspectives or one-off poses.
+
 For characters, story, heroes, domains, and meta-game systems,
 `docs/WORLD_AND_HEROES.md` is the locked spec. Its character-design rules
 (parody archetypes only — never a specific real person's likeness, name,
