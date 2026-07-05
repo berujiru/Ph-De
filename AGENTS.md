@@ -107,7 +107,7 @@ build is actually needed.
 
 Claude Code additionally has specialized subagents defined in
 `.claude/agents/` (game-designer, gameplay-engineer, ui-engineer,
-qa-engineer) — see `CLAUDE.md` for how those are used. Other tools without an
+character-art, qa-engineer) — see `CLAUDE.md` for how those are used. Other tools without an
 equivalent subagent mechanism should still follow the role boundaries those
 files describe (e.g. balance/content changes vs. engine code vs. UI vs.
 tests) even without dedicated agent routing.

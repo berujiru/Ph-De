@@ -15,6 +15,9 @@ Specialized agents live in `.claude/agents/`:
 - **gameplay-engineer** — game logic (`src/game/core/`, `entities/`,
   `scenes/`)
 - **ui-engineer** — React UI (`src/ui/`, `App.tsx`, styling)
+- **character-art** — sprite pipeline: prompt packs, atlas wiring,
+  placeholders, sprite-sheet QA (`docs/references/`, `public/assets/`,
+  the thin preload/atlas glue). Cannot generate raster art itself.
 - **qa-engineer** — tests and verification
 
 Use them proactively for work matching their description rather than doing

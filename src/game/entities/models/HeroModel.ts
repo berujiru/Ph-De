@@ -2,23 +2,42 @@ import Phaser from 'phaser';
 import { UnitModel } from './UnitModel';
 
 /**
- * The one placeholder hero model. Every hero renders through this class —
- * per-hero identity is just the tint (from HeroDefinition.color). Each state
- * is a simple tween on the shared hero-placeholder image; swapping in a real
- * sprite sheet later means reimplementing the play* methods here only.
+ * The hero model. Renders through a `Phaser.Sprite` so a real Aseprite sheet can
+ * drive every state: when animations `${spriteKey}-${state}` are registered the
+ * frame animation plays; until then each `play*` method falls back to the tween
+ * placeholder below. A hero with no art (or a missing texture) renders the
+ * shared tinted `hero-base` cut-out — never a broken green box.
+ *
+ * See docs/CHARACTER_VISUAL_PROMPT_GUIDE.md (top-behind view + state set) and
+ * docs/ADDING_HEROES.md for the asset/integration pipeline.
  */
 export class HeroModel extends UnitModel {
-  private bodySprite: Phaser.GameObjects.Image;
+  private bodySprite: Phaser.GameObjects.Sprite;
+  private readonly baseW: number;
+  private readonly baseH: number;
 
   constructor(scene: Phaser.Scene, x: number, y: number, tint: number, spriteKey?: string) {
     super(scene, x, y);
-    this.bodySprite = scene.add.image(0, 0, spriteKey || 'hero-base');
-    if (!spriteKey) {
-      this.bodySprite.setDisplaySize(40, 54);
-      this.bodySprite.setTint(tint);
+    // Only treat spriteKey as real art if its texture actually loaded; otherwise
+    // fall back to the shared placeholder so a missing sheet can't green-box.
+    const hasArt = !!spriteKey && scene.textures.exists(spriteKey);
+    const key = hasArt ? spriteKey! : 'hero-base';
+    this.bodySprite = scene.add.sprite(0, 0, key);
+    if (hasArt) {
+      this.baseW = 60;
+      this.baseH = 60;
     } else {
-      this.bodySprite.setDisplaySize(60, 60);
+      this.baseW = 40;
+      this.baseH = 54;
+      this.bodySprite.setTint(tint);
     }
+    this.bodySprite.setDisplaySize(this.baseW, this.baseH);
+
+    // Wire the sprite-sheet animation path. hasStateAnim() gates every play*
+    // call, so this is a no-op (tweens run) until an atlas keyed `key` is loaded.
+    this.animatedBody = this.bodySprite;
+    this.spriteBaseKey = key;
+
     this.add(this.bodySprite);
     this.setState('idle');
   }
@@ -34,15 +53,12 @@ export class HeroModel extends UnitModel {
   protected resetPose(): void {
     this.bodySprite.setPosition(0, 0);
     this.bodySprite.setAngle(0);
-    if (this.bodySprite.texture.key === 'hero-base') {
-      this.bodySprite.setDisplaySize(40, 54);
-    } else {
-      this.bodySprite.setDisplaySize(60, 60);
-    }
+    this.bodySprite.setDisplaySize(this.baseW, this.baseH);
     this.bodySprite.setAlpha(1);
   }
 
   protected playIdle(): Phaser.Tweens.Tween[] {
+    if (this.playLoopAnim('idle')) return [];
     // Gentle breathing.
     return [
       this.scene.tweens.add({
@@ -57,6 +73,7 @@ export class HeroModel extends UnitModel {
   }
 
   protected playWalk(running: boolean): Phaser.Tweens.Tween[] {
+    if (this.playLoopAnim(running ? 'run' : 'walk', running ? 1.5 : 1)) return [];
     // March bob; running leans into the advance and bobs faster.
     const duration = running ? 130 : 220;
     const tweens = [
@@ -78,6 +95,7 @@ export class HeroModel extends UnitModel {
   }
 
   protected playStunned(): Phaser.Tweens.Tween[] {
+    if (this.playLoopAnim('stunned')) return [];
     // Dazed wobble — knocked off the march (seen from top-behind).
     return [
       this.scene.tweens.add({
@@ -92,6 +110,7 @@ export class HeroModel extends UnitModel {
   }
 
   protected playCelebrate(): Phaser.Tweens.Tween[] {
+    if (this.playLoopAnim('celebrate')) return [];
     // Victory — bouncing cheer, raised-fist energy (rear view).
     return [
       this.scene.tweens.add({
@@ -108,6 +127,7 @@ export class HeroModel extends UnitModel {
   }
 
   protected playDefeat(): Phaser.Tweens.Tween[] {
+    if (this.playLoopAnim('defeat')) return [];
     // Morale broken — heroes don't die, they take a knee and slump (rear view).
     return [
       this.scene.tweens.add({
@@ -122,6 +142,7 @@ export class HeroModel extends UnitModel {
   }
 
   protected playAttack(onComplete: () => void): void {
+    if (this.playOneShotAnim('attack', onComplete)) return;
     // Throw lunge toward the enemy side (right).
     this.scene.tweens.add({
       targets: this.bodySprite,
@@ -134,6 +155,7 @@ export class HeroModel extends UnitModel {
   }
 
   protected playCast(onComplete: () => void): void {
+    if (this.playOneShotAnim('cast', onComplete)) return;
     // Skill flash — glow ring + white pop, the placeholder for a cut-in.
     const ring = this.scene.add.circle(0, 0, 20, 0xfacc15, 0.35);
     ring.setStrokeStyle(2, 0xfacc15, 0.9);
@@ -156,6 +178,7 @@ export class HeroModel extends UnitModel {
   }
 
   protected playDeath(onComplete?: () => void): void {
+    if (this.playOneShotAnim('death', () => onComplete?.())) return;
     // Heroes don't die in the design — "morale broken" collapse, kept for API parity.
     this.scene.tweens.add({
       targets: this.bodySprite,

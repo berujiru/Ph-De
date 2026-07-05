@@ -15,6 +15,16 @@ export type UnitModelState =
 const PERSISTENT_STATES: ReadonlySet<UnitModelState> = new Set(['idle', 'walk', 'run', 'stunned']);
 
 /**
+ * Maps a model state to its sprite-sheet animation tag where they differ.
+ * `walk` and `run` share the one `march` cycle (run just plays it faster). Every
+ * other state's tag equals its own name (see docs/CHARACTER_VISUAL_PROMPT_GUIDE.md).
+ */
+const STATE_ANIM_TAG: Partial<Record<UnitModelState, string>> = {
+  walk: 'march',
+  run: 'march',
+};
+
+/**
  * Terminal battle-outcome loops. Once set (on win/lose) they lock the model:
  * further setState calls are ignored so a marching/attacking tween can't stomp
  * the celebration or the morale-broken slump.
@@ -56,8 +66,51 @@ export abstract class UnitModel extends Phaser.GameObjects.Container {
   /** Set once a terminal outcome (celebrate/defeat) locks the model. */
   private outcomeLocked = false;
 
+  /**
+   * Set by a subclass whose body is a real Aseprite `Sprite`. When an animation
+   * `${spriteBaseKey}-${tag}` exists for a state, that frame animation plays and
+   * the tween placeholder is skipped; otherwise the placeholder tween runs. This
+   * is how a generated sprite sheet takes over each state with zero changes to
+   * Hero.ts / Enemy.ts / GameScene.ts.
+   */
+  protected animatedBody?: Phaser.GameObjects.Sprite;
+  protected spriteBaseKey?: string;
+
   constructor(scene: Phaser.Scene, x = 0, y = 0) {
     super(scene, x, y);
+  }
+
+  /** True when a real frame animation is registered for this state. */
+  protected hasStateAnim(state: UnitModelState): boolean {
+    if (!this.animatedBody || !this.spriteBaseKey) return false;
+    return this.scene.anims.exists(`${this.spriteBaseKey}-${STATE_ANIM_TAG[state] ?? state}`);
+  }
+
+  /**
+   * Play a looping frame animation for a persistent state. Returns true if a
+   * real animation existed and started (the caller then skips its tween).
+   */
+  protected playLoopAnim(state: UnitModelState, timeScale = 1): boolean {
+    if (!this.hasStateAnim(state)) return false;
+    const key = `${this.spriteBaseKey}-${STATE_ANIM_TAG[state] ?? state}`;
+    this.animatedBody!.play({ key, repeat: -1 });
+    this.animatedBody!.anims.timeScale = timeScale;
+    return true;
+  }
+
+  /**
+   * Play a one-shot frame animation, firing onComplete when it finishes.
+   * Returns true if a real animation existed (the caller then skips its tween).
+   */
+  protected playOneShotAnim(state: UnitModelState, onComplete: () => void): boolean {
+    if (!this.hasStateAnim(state)) return false;
+    const key = `${this.spriteBaseKey}-${STATE_ANIM_TAG[state] ?? state}`;
+    const sprite = this.animatedBody!;
+    sprite.anims.timeScale = 1;
+    sprite.once(`${Phaser.Animations.Events.ANIMATION_COMPLETE_KEY}${key}`, onComplete);
+    // repeat: 0 so a one-shot fires onComplete even if the tag was exported looping.
+    sprite.play({ key, repeat: 0 });
+    return true;
   }
 
   get modelState(): UnitModelState {

@@ -79,7 +79,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     this.definition = definition;
     this.hp = definition.maxHp;
 
-    this.model = new EnemyModel(scene, 0, 0, definition.color);
+    this.model = new EnemyModel(scene, 0, 0, definition.color, definition.spriteKey ?? definition.id);
     this.add(this.model);
 
     this.hpBarBg = scene.add.rectangle(0, -25, 30, 6, 0x000000, 0.5);

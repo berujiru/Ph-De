@@ -52,8 +52,14 @@ export class GameScene extends Phaser.Scene {
     }
     this.load.image('hero-base', '/assets/heroes/hero-base.svg');
     this.load.image('eden_portrait', '/assets/heroes/eden_portrait.png');
-    this.load.image('eden_sprite', '/assets/heroes/eden_sprite.png');
     this.load.image('enemy-base', '/assets/enemies/enemy-base.svg');
+    // Character sprite sheets (Aseprite atlas). Uncomment each as its art lands;
+    // the model falls back to the tinted base cut-out until then, and
+    // create{Hero,Enemy}Animations() below wire whatever loaded. The atlas key
+    // defaults to the unit's id (override via `spriteKey` in balance.ts).
+    // Heroes → public/assets/heroes/, enemies → public/assets/enemies/.
+    // this.load.aseprite('eden', '/assets/heroes/eden.png', '/assets/heroes/eden.json');
+    // this.load.aseprite('grunt', '/assets/enemies/grunt.png', '/assets/enemies/grunt.json');
     // this.load.audio('sfx-btn-press', 'assets/sounds/btn-press.mp3');
     // this.load.audio('sfx-victory', 'assets/sounds/victory.mp3');
     // this.load.audio('sfx-defeat', 'assets/sounds/defeat.mp3');
@@ -66,6 +72,8 @@ export class GameScene extends Phaser.Scene {
 
   create(): void {
     this.skillCutIn = new SkillCutIn(this);
+    this.createHeroAnimations();
+    this.createEnemyAnimations();
     this.buildGame();
 
     // Shared cleanup — called on both shutdown (scene.restart) and destroy (game.destroy)
@@ -637,6 +645,33 @@ export class GameScene extends Phaser.Scene {
     for (const hero of this.heroes) hero.playOutcome(status === 'won' ? 'celebrate' : 'defeat');
     if (status === 'lost') {
       for (const enemy of this.enemies) enemy.playOutcome('celebrate');
+    }
+  }
+
+  /**
+   * Register Aseprite tag animations (`${spriteKey}-<state>`) for every hero
+   * whose atlas actually loaded. Heroes without art simply have no animations,
+   * so HeroModel keeps using its tween placeholders. Safe to call once in
+   * create(); the atlas key defaults to the hero id.
+   */
+  private createHeroAnimations(): void {
+    this.createAtlasAnimations(Object.values(HERO_DEFINITIONS).map(d => d.spriteKey ?? d.id));
+  }
+
+  /** Same as createHeroAnimations(), for enemies (top-front sprite sheets). */
+  private createEnemyAnimations(): void {
+    this.createAtlasAnimations(Object.values(ENEMY_DEFINITIONS).map(d => d.spriteKey ?? d.id));
+  }
+
+  /** Wire tag animations for any of these atlas keys that actually loaded. */
+  private createAtlasAnimations(keys: string[]): void {
+    for (const key of keys) {
+      if (!this.textures.exists(key)) continue;
+      try {
+        this.anims.createFromAseprite(key);
+      } catch {
+        /* texture exists but isn't an Aseprite atlas — leave it to the placeholder */
+      }
     }
   }
 

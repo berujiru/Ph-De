@@ -2,27 +2,38 @@ import Phaser from 'phaser';
 import { UnitModel } from './UnitModel';
 
 /**
- * The one placeholder enemy model. Every anomaly renders through this class —
- * per-enemy identity is the tint (from EnemyDefinition.color). A shaped
- * placeholder (blob body + shadow) with tween states; real sprite sheets
- * later replace the play* methods here without touching Enemy.ts.
+ * The enemy model. Renders through a `Phaser.Sprite` (blob body + shadow) so a
+ * real Aseprite sheet can drive every state later: when animations
+ * `${spriteKey}-${state}` are registered they play; until then each `play*`
+ * method falls back to the tween placeholder. Per-enemy identity is the tint
+ * (from EnemyDefinition.color) while no art exists.
+ *
+ * See docs/CHARACTER_VISUAL_PROMPT_GUIDE.md — anomalies are drawn TOP-FRONT.
  */
 export class EnemyModel extends UnitModel {
-  private bodySprite: Phaser.GameObjects.Image;
+  private bodySprite: Phaser.GameObjects.Sprite;
   private shadow: Phaser.GameObjects.Ellipse;
   /** Ring behind the body used for passive telegraphs (fake HP / immunity). */
   private outline: Phaser.GameObjects.Arc;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, tint: number) {
+  constructor(scene: Phaser.Scene, x: number, y: number, tint: number, spriteKey?: string) {
     super(scene, x, y);
     this.shadow = scene.add.ellipse(0, 16, 28, 9, 0x000000, 0.35);
     this.add(this.shadow);
     this.outline = scene.add.circle(0, 0, 18, 0x000000, 0);
     this.outline.setVisible(false);
     this.add(this.outline);
-    this.bodySprite = scene.add.image(0, 0, 'enemy-base');
+    const key = spriteKey && scene.textures.exists(spriteKey) ? spriteKey : 'enemy-base';
+    this.bodySprite = scene.add.sprite(0, 0, key);
     this.bodySprite.setDisplaySize(38, 38);
-    this.bodySprite.setTint(tint);
+    // Tint is the placeholder's per-enemy identity; a real sheet ships its own colors.
+    if (key === 'enemy-base') this.bodySprite.setTint(tint);
+
+    // Wire the sprite-sheet animation path — a no-op (tweens run) until an atlas
+    // keyed `key` is loaded with `${key}-<state>` tags.
+    this.animatedBody = this.bodySprite;
+    this.spriteBaseKey = key;
+
     this.add(this.bodySprite);
     this.setState('idle');
   }
@@ -55,6 +66,7 @@ export class EnemyModel extends UnitModel {
   }
 
   protected playIdle(): Phaser.Tweens.Tween[] {
+    if (this.playLoopAnim('idle')) return [];
     // Menacing pulse in place.
     return [
       this.scene.tweens.add({
@@ -69,6 +81,7 @@ export class EnemyModel extends UnitModel {
   }
 
   protected playWalk(running: boolean): Phaser.Tweens.Tween[] {
+    if (this.playLoopAnim(running ? 'run' : 'walk', running ? 1.5 : 1)) return [];
     // Plodding bob; runners skitter faster with a squash-and-stretch feel.
     const duration = running ? 110 : 260;
     return [
@@ -94,6 +107,7 @@ export class EnemyModel extends UnitModel {
   }
 
   protected playStunned(): Phaser.Tweens.Tween[] {
+    if (this.playLoopAnim('stunned')) return [];
     // Dazed spin-in-place — the "spinning stars" beat (seen from top-front).
     return [
       this.scene.tweens.add({
@@ -108,6 +122,7 @@ export class EnemyModel extends UnitModel {
   }
 
   protected playCelebrate(): Phaser.Tweens.Tween[] {
+    if (this.playLoopAnim('celebrate')) return [];
     // Anomaly wins — lurching forward, tearing at the barrier (front view).
     return [
       this.scene.tweens.add({
@@ -123,6 +138,7 @@ export class EnemyModel extends UnitModel {
   }
 
   protected playDefeat(): Phaser.Tweens.Tween[] {
+    if (this.playLoopAnim('defeat')) return [];
     // API parity — anomalies normally die outright; if forced into "defeat"
     // (e.g. rally victory), they cower and shrink back.
     return [
@@ -138,6 +154,7 @@ export class EnemyModel extends UnitModel {
   }
 
   protected playAttack(onComplete: () => void): void {
+    if (this.playOneShotAnim('attack', onComplete)) return;
     // Lunge toward the shield (left).
     this.scene.tweens.add({
       targets: this.bodySprite,
@@ -149,6 +166,7 @@ export class EnemyModel extends UnitModel {
   }
 
   protected playCast(onComplete: () => void): void {
+    if (this.playOneShotAnim('cast', onComplete)) return;
     // Boss skill telegraph — dark expanding ring.
     const ring = this.scene.add.circle(0, 0, 18, 0x000000, 0.25);
     ring.setStrokeStyle(2, 0xffffff, 0.8);
@@ -170,12 +188,10 @@ export class EnemyModel extends UnitModel {
   }
 
   protected playDeath(onComplete?: () => void): void {
-    // Collapse and dissolve (replaces the old inline shrink/spin tween).
-    this.scene.tweens.add({
-      targets: this.shadow,
-      alpha: 0,
-      duration: 250,
-    });
+    // Shadow fades out with the body in either path.
+    this.scene.tweens.add({ targets: this.shadow, alpha: 0, duration: 250 });
+    if (this.playOneShotAnim('death', () => onComplete?.())) return;
+    // Collapse and dissolve (placeholder).
     this.scene.tweens.add({
       targets: this.bodySprite,
       scaleY: 0.2,

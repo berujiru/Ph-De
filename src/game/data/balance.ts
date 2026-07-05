@@ -19,7 +19,11 @@ export interface EnemyDefinition {
   attackRateMs: number;
   /** Body tint, 0xRRGGBB. */
   color: number;
-  
+  /** Aseprite atlas key for this enemy's sprite sheet. Defaults to `id` when
+   *  omitted; the atlas is auto-wired in GameScene once loaded (top-front view,
+   *  states march/attack/stunned/celebrate/death — see CHARACTER_VISUAL_PROMPT_GUIDE). */
+  spriteKey?: string;
+
   // Passive & Skill properties
   stealth?: boolean;
   barrierDamageMultiplier?: number;
@@ -453,7 +457,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     passive: { name: 'Voice of the People', description: 'Generates 1 Voice every 10 seconds.' },
     projectileColor: 0x60a5fa,
     portraitKey: 'eden_portrait',
-    spriteKey: 'eden_sprite',
+    spriteKey: 'eden', // Aseprite atlas key — loaded in GameScene.preload once eden.png/.json exist.
   },
   teacher: {
     id: 'teacher',
