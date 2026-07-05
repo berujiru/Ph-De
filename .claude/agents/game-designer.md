@@ -25,8 +25,8 @@ changes to it explicitly rather than deviating from it in balance data.
 
 For any character/enemy visual spec, `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md`
 is the canonical camera & perspective authority: a high top-down oblique camera
-above and behind the hero line, so **heroes are drawn top-behind (rear 3/4)**
-and **enemies top-front (front 3/4)**. Every character needs the full
+above and behind the hero line, so **heroes are drawn top-behind (back view)**
+and **enemies top-front (front view)**. Every character needs the full
 animation-state set (heroes: idle/march/attack/cast/celebrate/defeat; enemies:
 march/attack/stunned/celebrate/death), and those tag names must match the
 `UnitModel` states. Spec new characters and any new visual state against that

@@ -7,7 +7,7 @@ anomaly. This pack mirrors the enemy template `grunt_prompt_pack.md`; the
 **`cast`** row (EXACTLY 3 frames) between `attack` and `stunned` showing the boss
 channelling its signature `activeSkill`.
 
-- **Perspective is TOP-FRONT** (high-angle front 3/4) — the anomaly faces the
+- **Perspective is TOP-FRONT** (high-angle front view) — the anomaly faces the
   camera as it bears down on the barrier. Never a flat zenith, never a side
   profile (`docs/CHARACTER_VISUAL_PROMPT_GUIDE.md`).
 - **State set is `march / attack / cast / stunned / celebrate / death`** (6 rows
@@ -89,12 +89,12 @@ coin/Hope motes out of the air toward its cargo hoard.
 > 2. **Side Profile:** 90-degree turn — the container-stack backpack reads clearly.
 > 3. **Rear View (straight back):** facing away — we see the full lashed-on
 >    container stack and cargo netting.
-> 4. **TOP-FRONT (high-angle front 3/4) — THE GAMEPLAY VIEW:** camera high above
+> 4. **TOP-FRONT (high-angle front view) — THE GAMEPLAY VIEW:** camera high above
 >    and in front, tilted (NOT flat zenith). We see the top of its head plus its
 >    face, chest seal, forearm slab, and the crates cresting over its shoulders as
 >    it lurches toward the viewer. This is the angle its in-game sprites are drawn
 >    from — make it clean and clear.
-> 5. **TOP-BEHIND (high-angle rear 3/4):** camera high above and behind, tilted;
+> 5. **TOP-BEHIND (high-angle back view):** camera high above and behind, tilted;
 >    top of head, shoulders, and the towering container stack.
 >
 > Ensure the container-stack backpack, spilling contraband, peeled chest seal,
@@ -115,7 +115,7 @@ the base reference for the next phase.*
 > **Crucial Perspective:** Smuggling is an Enemy boss. The camera is a high
 > top-down oblique above and behind the player's line, so it faces TOWARD the
 > camera as it bears down on the barrier. **ALL frames must be drawn from a
-> HIGH-ANGLE FRONT VIEW (top-front, front 3/4)** — top of head, plus face, chest
+> HIGH-ANGLE FRONT VIEW (top-front, front view)** — top of head, plus face, chest
 > seal, forearm slab, and cresting crates. Not a flat zenith, no side profiles, no
 > low angles.
 >

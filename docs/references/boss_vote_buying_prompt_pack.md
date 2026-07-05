@@ -8,7 +8,7 @@ boss anomaly. This pack **mirrors the enemy template**
 - Phase 2 has **6 rows** — a 6th **`cast`** row (EXACTLY 3 frames) is inserted
   between `attack` and `stunned`, showing the boss channelling its `activeSkill`
   **Bribe** (`scatterFakeGold`).
-- Still **TOP-FRONT** (high-angle front 3/4), still **no anime skill cut-in**
+- Still **TOP-FRONT** (high-angle front view), still **no anime skill cut-in**
   (that's a hero-only feature — see `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md`).
 
 > Run these in an image-capable Claude/Gemini (not the coding CLI). Always
@@ -78,12 +78,12 @@ its `balance.ts` color anchor `#eab308` (dirty-money gold). Do not drift:
 > 2. **Side Profile:** 90-degree turn.
 > 3. **Rear View (straight back):** facing away — we see its back, the bulging
 >    money-sack gut, and envelopes stuck to it.
-> 4. **TOP-FRONT (high-angle front 3/4) — THE GAMEPLAY VIEW:** camera high above
+> 4. **TOP-FRONT (high-angle front view) — THE GAMEPLAY VIEW:** camera high above
 >    and in front, tilted (NOT flat zenith). We see the top of its head plus its
 >    smirking face, the envelope torso, and its coin-flinging hands as it advances
 >    toward the viewer. This is the angle its in-game sprites are drawn from —
 >    make it clean and clear.
-> 5. **TOP-BEHIND (high-angle rear 3/4):** camera high above and behind, tilted;
+> 5. **TOP-BEHIND (high-angle back view):** camera high above and behind, tilted;
 >    top of head, shoulders, and the envelope-stuffed back.
 >
 > Ensure the pay-off envelopes, the many cash-filled grasping hands, the leaking
@@ -104,7 +104,7 @@ is the base reference for the next phase.*
 > **Crucial Perspective:** Vote Buying is an Enemy boss. The camera is a high
 > top-down oblique above and behind the player's line, so it faces TOWARD the
 > camera as it bears down on the barrier. **ALL frames must be drawn from a
-> HIGH-ANGLE FRONT VIEW (top-front, front 3/4)** — top of head, plus the smirking
+> HIGH-ANGLE FRONT VIEW (top-front, front view)** — top of head, plus the smirking
 > face, the envelope torso, and its cash-hands. Not a flat zenith, no side
 > profiles, no low angles. Draw it BOSS-SCALE: larger, more detailed, and more
 > menacing than a minion.

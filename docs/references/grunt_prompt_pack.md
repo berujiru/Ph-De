@@ -4,7 +4,7 @@ Ready-to-paste prompts for generating **Grunt**, a basic anomaly minion. This is
 the **template all enemy packs mirror**. Enemies differ from heroes in two ways
 (see `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md`):
 
-- **Perspective is TOP-FRONT** (high-angle front 3/4) — anomalies face the camera
+- **Perspective is TOP-FRONT** (high-angle front view) — anomalies face the camera
   as they bear down on the barrier.
 - **State set is `march / attack / stunned / celebrate / death`** (5 rows). There
   is **no anime skill cut-in** for enemies. **Bosses** add a 6th **`cast`** row
@@ -66,11 +66,11 @@ frontline bureaucratic-anomaly swarmer) and its `balance.ts` color anchor
 > 2. **Side Profile:** 90-degree turn.
 > 3. **Rear View (straight back):** facing away — we see its back and the tape
 >    trailing off it.
-> 4. **TOP-FRONT (high-angle front 3/4) — THE GAMEPLAY VIEW:** camera high above
+> 4. **TOP-FRONT (high-angle front view) — THE GAMEPLAY VIEW:** camera high above
 >    and in front, tilted (NOT flat zenith). We see the top of its head plus its
 >    face, chest, and the stamp-hand as it lurches toward the viewer. This is the
 >    angle its in-game sprites are drawn from — make it clean and clear.
-> 5. **TOP-BEHIND (high-angle rear 3/4):** camera high above and behind, tilted;
+> 5. **TOP-BEHIND (high-angle back view):** camera high above and behind, tilted;
 >    top of head, shoulders, and back.
 >
 > Ensure the red-tape wrapping, manila forms, and the rubber-stamp hand are
@@ -91,7 +91,7 @@ reference for the next phase.*
 > **Crucial Perspective:** Grunt is an Enemy. The camera is a high top-down
 > oblique above and behind the player's line, so Grunt faces TOWARD the camera as
 > it bears down on the barrier. **ALL frames must be drawn from a HIGH-ANGLE FRONT
-> VIEW (top-front, front 3/4)** — top of head, plus face, chest, and stamp-hand.
+> VIEW (top-front, front view)** — top of head, plus face, chest, and stamp-hand.
 > Not a flat zenith, no side profiles, no low angles.
 >
 > **Style & Formatting:** Match the cel-shaded vector style of the reference

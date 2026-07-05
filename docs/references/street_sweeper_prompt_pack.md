@@ -68,12 +68,12 @@ taupe/dust grey). Do not drift:
 > 2. **Side Profile:** 90-degree turn.
 > 3. **Rear View (straight back):** looking completely away from the camera — we
 >    see the back of the straw hat and the work shirt, broom held to one side.
-> 4. **TOP-BEHIND (high-angle rear 3/4) — THE GAMEPLAY VIEW:** camera high above
+> 4. **TOP-BEHIND (high-angle back view) — THE GAMEPLAY VIEW:** camera high above
 >    and behind them, tilted (NOT flat zenith). We see the top of the straw hat,
 >    shoulders and back from above, and the tall broom as they face away into the
 >    distance. This is the angle their in-game sprites are drawn from — make it
 >    clean and clear.
-> 5. **TOP-FRONT (high-angle front 3/4):** camera high above and in front, tilted.
+> 5. **TOP-FRONT (high-angle front view):** camera high above and in front, tilted.
 >    We see the top of the straw hat plus the bandana-covered face and chest, broom
 >    held ready.
 >
@@ -94,8 +94,7 @@ the base reference for every following phase.*
 >
 > **Crucial Perspective:** Street Sweeper is a Hero. The camera is a high top-down
 > oblique above and BEHIND our front line, so they face AWAY from us into the
-> enemy. **ALL frames must be drawn from a HIGH-ANGLE REAR VIEW (top-behind, rear
-> 3/4)** — top of the straw hat, shoulders and back from above. Not a flat zenith,
+> enemy. **ALL frames must be drawn from a HIGH-ANGLE REAR VIEW (top-behind, back view)** — top of the straw hat, shoulders and back from above. Not a flat zenith,
 > no side profiles, no low angles.
 >
 > **Style & Formatting:** Match the anime cel-shaded style of the reference
@@ -103,24 +102,16 @@ the base reference for every following phase.*
 >
 > **OUTPUT RULES (critical — the last generation drew these by mistake):** Fully **transparent** background — NO white fill. Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere in the image. Output ONLY the character art, arranged in evenly-spaced **invisible** cells.
 >
-> **MANDATORY LAYOUT — exactly 6 rows, in this exact top-to-bottom order:**
+> **MANDATORY LAYOUT — exactly 3 rows, in this exact top-to-bottom order:**
 > 1. **`idle`** — EXACTLY 3 frames: standing, gentle breathing/bounce, broom
 >    resting upright at their side (rear view).
-> 2. **`march`** — EXACTLY 4 frames: a full walk cycle advancing forward, a steady
->    purposeful stride, broom shouldered (rear view).
-> 3. **`attack`** — EXACTLY 3 frames: their basic attack — **a big two-handed sweep
+> 2. **`attack`** — EXACTLY 3 frames: their basic attack — **a big two-handed sweep
 >    of the Walis Tingting sending a linear wave of dust and debris forward across
 >    the frontline**. Frame 2 is the clear impact frame, broom at full extension
 >    with the dust-wave launching away (rear view).
-> 4. **`cast`** — EXACTLY 3 frames: their signature skill **Dust Storm** —
+> 3. **`cast`** — EXACTLY 3 frames: their signature skill **Dust Storm** —
 >    whirling the broom in rapid strokes to **kick up a blinding cloud of dust**
 >    that billows out ahead, energy building (rear view, dramatic).
-> 5. **`celebrate`** — EXACTLY 2 frames: victory cheer, **raised fist**, broom
->    hoisted overhead, head turned slightly so we catch the grin over the bandana
->    (rear-3/4 view).
-> 6. **`defeat`** — EXACTLY 2 frames: morale broken — leaning the broom down and
->    **taking a knee**, slumped and exhausted, hat tipping (rear view). They are
->    tired, NOT dead.
 >
 > **SELF-CHECK — before returning the image, verify each item; if any FAILS, fix it and regenerate:**
 > 1. **Consistent view** — every frame in every row uses the SAME camera angle stated above (heroes: rear / top-behind — we see the back; enemies: front / top-front — we see the face). No side profiles, no switching between front and back between frames.
@@ -129,8 +120,7 @@ the base reference for every following phase.*
 > 4. **On-model & separated** — outfit / hair / props identical in every frame; poses do not touch or overlap.
 
 *Export from Aseprite as `street_sweeper.png` + `street_sweeper.json` (JSON Hash
-or Array), with the tag names above spelled exactly: `idle march attack cast
-celebrate defeat`.*
+or Array), with the tag names above spelled exactly: `idle attack cast`.*
 
 ---
 

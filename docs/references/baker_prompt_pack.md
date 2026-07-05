@@ -66,12 +66,12 @@ drift:
 > 2. **Side Profile:** 90-degree turn.
 > 3. **Rear View (straight back):** looking completely away from the camera — we
 >    see the back of his cap, the bandana knot, and the apron ties across his back.
-> 4. **TOP-BEHIND (high-angle rear 3/4) — THE GAMEPLAY VIEW:** camera high above
+> 4. **TOP-BEHIND (high-angle back view) — THE GAMEPLAY VIEW:** camera high above
 >    and behind him, tilted (NOT flat zenith). We see the top of his cap, his
 >    shoulders and back, and the pandesal sack, as he faces away into the
 >    distance. This is the angle his in-game sprites are drawn from — make it
 >    clean and clear.
-> 5. **TOP-FRONT (high-angle front 3/4):** camera high above and in front, tilted.
+> 5. **TOP-FRONT (high-angle front view):** camera high above and in front, tilted.
 >    We see the top of his cap plus his grinning face, apron and the hot bread.
 >
 > Ensure the red bandana, flour-dusted apron, and the glowing-hot pandesal sack
@@ -91,7 +91,7 @@ reference for every following phase.*
 >
 > **Crucial Perspective:** Baker is a Hero. The camera is a high top-down oblique
 > above and BEHIND our front line, so Baker faces AWAY from us into the enemy.
-> **ALL frames must be drawn from a HIGH-ANGLE REAR VIEW (top-behind, rear 3/4)**
+> **ALL frames must be drawn from a HIGH-ANGLE REAR VIEW (top-behind, back view)**
 > — top of the cap, bandana knot, shoulders, and back. Not a flat zenith, no side
 > profiles, no low angles.
 >
@@ -100,23 +100,15 @@ reference for every following phase.*
 >
 > **OUTPUT RULES (critical — the last generation drew these by mistake):** Fully **transparent** background — NO white fill. Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere in the image. Output ONLY the character art, arranged in evenly-spaced **invisible** cells.
 >
-> **MANDATORY LAYOUT — exactly 6 rows, in this exact top-to-bottom order:**
+> **MANDATORY LAYOUT — exactly 3 rows, in this exact top-to-bottom order:**
 > 1. **`idle`** — EXACTLY 3 frames: standing, gentle breathing/bounce, wiping his
 >    brow, the hot bread sack at his hip (rear view).
-> 2. **`march`** — EXACTLY 4 frames: a full walk cycle advancing forward, tray and
->    bread sack bouncing at his hip (rear view).
-> 3. **`attack`** — EXACTLY 3 frames: **lobbing a bag of oven-hot pandesal in a
+> 2. **`attack`** — EXACTLY 3 frames: **lobbing a bag of oven-hot pandesal in a
 >    high arc** at the enemy. Frame 2 is the clear release frame — arm extended
 >    overhead, the glowing bread bag leaving his hand mid-lob (rear view).
-> 4. **`cast`** — EXACTLY 3 frames: his signature skill **Dough Knead** — planting
+> 3. **`cast`** — EXACTLY 3 frames: his signature skill **Dough Knead** — planting
 >    his feet, raising both fists and slamming/**kneading a big glowing mass of
 >    dough** downward, heat and flour bursting (rear view, dramatic).
-> 5. **`celebrate`** — EXACTLY 2 frames: victory cheer, **raised fist** holding a
->    pandesal high, jumping, head turned slightly so we catch his grin (rear-3/4
->    view).
-> 6. **`defeat`** — EXACTLY 2 frames: morale broken — lowering the tray and
->    **taking a knee**, slumped and exhausted, flour drifting down (rear view). He
->    is tired, NOT dead.
 >
 > **SELF-CHECK — before returning the image, verify each item; if any FAILS, fix it and regenerate:**
 > 1. **Consistent view** — every frame in every row uses the SAME camera angle stated above (heroes: rear / top-behind — we see the back; enemies: front / top-front — we see the face). No side profiles, no switching between front and back between frames.
@@ -125,7 +117,7 @@ reference for every following phase.*
 > 4. **On-model & separated** — outfit / hair / props identical in every frame; poses do not touch or overlap.
 
 *Export from Aseprite as `baker.png` + `baker.json` (JSON Hash or Array), with the
-tag names above spelled exactly: `idle march attack cast celebrate defeat`.*
+tag names above spelled exactly: `idle attack cast`.*
 
 ---
 

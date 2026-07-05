@@ -64,11 +64,11 @@ Synthesized from his profession + attack (no portrait exists yet). Do not drift:
 > 2. **Side Profile:** 90-degree turn.
 > 3. **Rear View (straight back):** looking completely away from the camera — we
 >    see the back of the salakot and his back.
-> 4. **TOP-BEHIND (high-angle rear 3/4) — THE GAMEPLAY VIEW:** camera high above
+> 4. **TOP-BEHIND (high-angle back view) — THE GAMEPLAY VIEW:** camera high above
 >    and behind him, tilted (NOT flat zenith). We see the top of the salakot from
 >    above, his shoulders and back as he faces away into the distance. This is the
 >    angle his in-game sprites are drawn from — make it clean and clear.
-> 5. **TOP-FRONT (high-angle front 3/4):** camera high above and in front,
+> 5. **TOP-FRONT (high-angle front view):** camera high above and in front,
 >    tilted. We see the top of the salakot plus his face and chest.
 >
 > Ensure the woven salakot and the steel karit are clearly readable in all five
@@ -88,7 +88,7 @@ base reference for every following phase.*
 >
 > **Crucial Perspective:** Farmer is a Hero. The camera is a high top-down oblique
 > above and BEHIND our front line, so Farmer faces AWAY from us into the enemy.
-> **ALL frames must be drawn from a HIGH-ANGLE REAR VIEW (top-behind, rear 3/4)**
+> **ALL frames must be drawn from a HIGH-ANGLE REAR VIEW (top-behind, back view)**
 > — top of the salakot from above, shoulders, and back. Not a flat zenith, no side
 > profiles, no low angles.
 >
@@ -97,21 +97,15 @@ base reference for every following phase.*
 >
 > **OUTPUT RULES (critical — the last generation drew these by mistake):** Fully **transparent** background — NO white fill. Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere in the image. Output ONLY the character art, arranged in evenly-spaced **invisible** cells.
 >
-> **MANDATORY LAYOUT — exactly 6 rows, in this exact top-to-bottom order:**
+> **MANDATORY LAYOUT — exactly 3 rows, in this exact top-to-bottom order:**
 > 1. **`idle`** — EXACTLY 3 frames: standing, gentle breathing/bounce, karit
 >    resting at his side (rear view).
-> 2. **`march`** — EXACTLY 4 frames: a full walk cycle advancing forward,
->    trudging with purpose (rear view).
-> 3. **`attack`** — EXACTLY 3 frames: a short horizontal **karit cleave** — a
+> 2. **`attack`** — EXACTLY 3 frames: a short horizontal **karit cleave** — a
 >    scythe swing arcing across the enemies in front. Frame 2 is the clear impact
 >    frame with the blade fully swept through the arc (rear view).
-> 4. **`cast`** — EXACTLY 3 frames: his signature skill **Harvest** — planting his
+> 3. **`cast`** — EXACTLY 3 frames: his signature skill **Harvest** — planting his
 >    feet and **raising the karit high overhead** as the ground/earth energy
 >    gathers for a big reaping sweep (rear view, dramatic).
-> 5. **`celebrate`** — EXACTLY 2 frames: victory cheer, **raised fist** and karit
->    lifted, head turned slightly so we catch his weathered grin (rear-3/4 view).
-> 6. **`defeat`** — EXACTLY 2 frames: morale broken — lowering the karit and
->    **taking a knee**, slumped and exhausted (rear view). He is tired, NOT dead.
 >
 > **SELF-CHECK — before returning the image, verify each item; if any FAILS, fix it and regenerate:**
 > 1. **Consistent view** — every frame in every row uses the SAME camera angle stated above (heroes: rear / top-behind — we see the back; enemies: front / top-front — we see the face). No side profiles, no switching between front and back between frames.
@@ -120,7 +114,7 @@ base reference for every following phase.*
 > 4. **On-model & separated** — outfit / hair / props identical in every frame; poses do not touch or overlap.
 
 *Export from Aseprite as `farmer.png` + `farmer.json` (JSON Hash or Array), with
-the tag names above spelled exactly: `idle march attack cast celebrate defeat`.*
+the tag names above spelled exactly: `idle attack cast`.*
 
 ---
 

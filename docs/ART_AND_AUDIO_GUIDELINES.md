@@ -18,8 +18,8 @@ heroic-anime; enemies use the same anime cel-shaded language but grotesque.
 
 **Camera & sprite perspective (canonical):** the battle uses a **fixed high
 top-down oblique camera above and behind the hero line**. Heroes are drawn
-**TOP-BEHIND** (rear 3/4 — we see their backs); enemies are drawn **TOP-FRONT**
-(front 3/4 — we see their faces bearing down). This is facing-relative and holds
+**TOP-BEHIND** (back view — we see their backs); enemies are drawn **TOP-FRONT**
+(front view — we see their faces bearing down). This is facing-relative and holds
 on any screen axis. The full rules, the required animation-state set, and the
 Gemini→Claude generation workflow live in
 `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` — treat that file as authoritative and
@@ -36,13 +36,14 @@ For each of the 20 Heroes, the following visual assets are required:
 - **Guideline**: A tight headshot/bust. The hero should look determined, stressed, or angry. Framed like a polaroid or a lanyard ID.
 
 ### B. In-Game Base Model (Sprite Sheet)
-- **Specs**: TOP-BEHIND (rear 3/4 high-angle). Tag names must match the
+- **Specs**: TOP-BEHIND (high-angle back view). Tag names must match the
   `UnitModel` states exactly (`src/game/entities/models/UnitModel.ts`).
-- **Animations Required**:
+- **Animations Required** (heroes draw only THREE — owner decision):
   1. **`idle`**: Breathing/bouncing in place.
-  2. **`march`**: The default walk cycle advancing forward.
-  3. **`attack`**: The primary attack motion (e.g., throwing a fishball, waving a broom, shouting into a headset). Must have a clear "impact" frame.
-  4. **`cast`**: Signature-skill wind-up pose, played under the anime cut-in.
+  2. **`attack`**: The primary attack motion (e.g., throwing a fishball, waving a broom, shouting into a headset). Must have a clear "impact" frame.
+  3. **`cast`**: Signature-skill wind-up pose, played under the anime cut-in.
+  - `march`, `celebrate`, `defeat` are **not drawn** — the engine plays a tween
+    placeholder for those, so heroes still move and react without frames.
   5. **`celebrate`**: Victory — cheering, raising a fist, or wiping sweat off the brow.
   6. **`defeat`**: Morale broken — since heroes don't die, they take a knee, drop their equipment, or look exhausted.
 
@@ -64,7 +65,7 @@ The enemies are personifications of bad governance (anomalies). They should look
 - **Specs**: 256x256px, Transparent PNG. Used for pre-battle prep screens.
 
 ### B. In-Game Base Model (Sprite Sheet)
-- **Specs**: TOP-FRONT (front 3/4 high-angle) — facing the camera as they bear
+- **Specs**: TOP-FRONT (high-angle front view) — facing the camera as they bear
   down. Tag names must match the `UnitModel` states exactly.
 - **Animations Required**:
   1. **`march`**: Plodding, sneaking, or confidently strutting toward the line.
@@ -79,7 +80,7 @@ The enemies are personifications of bad governance (anomalies). They should look
 
 The battlefields are vertically aligned streets and paths. To ensure the world geometry matches the characters:
 
-- **Perspective**: The same high top-down oblique the characters use ("a little top view" / 3/4). The ground plane recedes toward the enemy end, showing the tops and faces of buildings, barricades, and environmental props so the world matches the top-behind heroes and top-front enemies.
+- **Perspective**: The same high top-down oblique the characters use ("a little top view"). The ground plane recedes toward the enemy end, showing the tops and faces of buildings, barricades, and environmental props so the world matches the top-behind heroes and top-front enemies.
 - **Orientation**: The rally advances down a lane toward the incoming anomalies while the morale shield holds the near end; the current build scrolls this lane horizontally, but props are authored to read correctly under the shared oblique camera regardless of march axis.
 - **Style**: High-contrast, cel-shaded vector art. The ground should use muted or darker tones (deep slate, dark asphalt) so the bright characters and UI elements pop clearly.
 

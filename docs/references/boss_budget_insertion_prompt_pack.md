@@ -7,7 +7,7 @@ anomaly. This pack mirrors the enemy template `grunt_prompt_pack.md`; the
 **`cast`** row (EXACTLY 3 frames) between `attack` and `stunned` showing the boss
 channelling its signature `activeSkill`.
 
-- **Perspective is TOP-FRONT** (high-angle front 3/4) — the anomaly faces the
+- **Perspective is TOP-FRONT** (high-angle front view) — the anomaly faces the
   camera as it bears down on the barrier. Never a flat zenith, never a side
   profile (`docs/CHARACTER_VISUAL_PROMPT_GUIDE.md`).
 - **State set is `march / attack / cast / stunned / celebrate / death`** (6 rows
@@ -86,12 +86,12 @@ and shoves it sideways/off-lane.
 > 2. **Side Profile:** 90-degree turn.
 > 3. **Rear View (straight back):** facing away — we see its back and the loose
 >    pages spilling out of the ledger-belly behind it.
-> 4. **TOP-FRONT (high-angle front 3/4) — THE GAMEPLAY VIEW:** camera high above
+> 4. **TOP-FRONT (high-angle front view) — THE GAMEPLAY VIEW:** camera high above
 >    and in front, tilted (NOT flat zenith). We see the top of its head plus its
 >    face, the ledger-belly, the glowing teal chest line-item, and the pen-fingers
 >    as it sneaks toward the viewer. This is the angle its in-game sprites are
 >    drawn from — make it clean and clear.
-> 5. **TOP-BEHIND (high-angle rear 3/4):** camera high above and behind, tilted;
+> 5. **TOP-BEHIND (high-angle back view):** camera high above and behind, tilted;
 >    top of head, hunched shoulders, and the spilling back pages.
 >
 > Ensure the ledger-belly, wedged-in insertion pages, teal chest line-item, and
@@ -112,7 +112,7 @@ This is the base reference for the next phase.*
 > **Crucial Perspective:** Budget Insertion is an Enemy boss. The camera is a
 > high top-down oblique above and behind the player's line, so it faces TOWARD
 > the camera as it bears down on the barrier. **ALL frames must be drawn from a
-> HIGH-ANGLE FRONT VIEW (top-front, front 3/4)** — top of head, plus face, the
+> HIGH-ANGLE FRONT VIEW (top-front, front view)** — top of head, plus face, the
 > ledger-belly, and the pen-fingers. Not a flat zenith, no side profiles, no low
 > angles.
 >

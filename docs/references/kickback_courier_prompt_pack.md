@@ -5,7 +5,7 @@ minion. This pack mirrors the **enemy template** in
 `docs/references/grunt_prompt_pack.md`. Enemies differ from heroes in two ways
 (see `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md`):
 
-- **Perspective is TOP-FRONT** (high-angle front 3/4) — anomalies face the camera
+- **Perspective is TOP-FRONT** (high-angle front view) — anomalies face the camera
   as they bear down on the barrier.
 - **State set is `march / attack / stunned / celebrate / death`** (5 rows). There
   is **no anime skill cut-in** for enemies. **Bosses** add a 6th **`cast`** row
@@ -71,12 +71,12 @@ slain) and its `balance.ts` color anchor `#10b981` (emerald) plus its
 > 2. **Side Profile:** 90-degree turn.
 > 3. **Rear View (straight back):** facing away — we see its back and the coin
 >    trail dribbling off the duffel behind it.
-> 4. **TOP-FRONT (high-angle front 3/4) — THE GAMEPLAY VIEW:** camera high above
+> 4. **TOP-FRONT (high-angle front view) — THE GAMEPLAY VIEW:** camera high above
 >    and in front, tilted (NOT flat zenith). We see the top of its head plus its
 >    face, the clutched duffel, and its grabby hands as it darts toward the viewer.
 >    This is the angle its in-game sprites are drawn from — make it clean and
 >    clear.
-> 5. **TOP-BEHIND (high-angle rear 3/4):** camera high above and behind, tilted;
+> 5. **TOP-BEHIND (high-angle back view):** camera high above and behind, tilted;
 >    top of head, hunched shoulders, and the leaking duffel from behind.
 >
 > Ensure the leaking money duffel, spilling coins, and grabby imp hands are
@@ -97,7 +97,7 @@ is the base reference for the next phase.*
 > **Crucial Perspective:** Kickback Courier is an Enemy. The camera is a high
 > top-down oblique above and behind the player's line, so it faces TOWARD the
 > camera as it bears down on the barrier. **ALL frames must be drawn from a
-> HIGH-ANGLE FRONT VIEW (top-front, front 3/4)** — top of head, plus face, chest,
+> HIGH-ANGLE FRONT VIEW (top-front, front view)** — top of head, plus face, chest,
 > the clutched duffel, and grabby hands. Not a flat zenith, no side profiles, no
 > low angles.
 >

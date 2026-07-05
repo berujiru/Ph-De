@@ -9,10 +9,10 @@ shield pushes the front forward, and anomalies stream in from ahead. The battle
 runs under a **fixed high top-down oblique camera** sitting above and behind the
 hero line — see `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` → *Camera & Perspective
 Model* for the canonical rules and the AI generation workflow.
-- **Hero Perspective**: **TOP-BEHIND** — high-angle rear 3/4. The camera is
+- **Hero Perspective**: **TOP-BEHIND** — high-angle back view. The camera is
   behind the heroes, so gameplay sprites show the tops of heads, shoulders, and
   backs. Never a flat zenith or a side profile.
-- **Enemy Perspective** (for contrast): **TOP-FRONT** — high-angle front 3/4,
+- **Enemy Perspective** (for contrast): **TOP-FRONT** — high-angle front view,
   facing the camera. Covered fully in `docs/ADDING_ENEMIES.md` /
   `ART_AND_AUDIO_GUIDELINES.md`.
 - **HUD Portrait exception**: front-facing headshot (see the face).
@@ -30,14 +30,14 @@ For every new hero, three assets must be created and placed in `public/assets/he
    - **Specs**: A transparent texture atlas (preferably exported from Aseprite using the "Aseprite JSON Array" or "Hash" format).
    - **Required Animations** — tag names must match the `UnitModel` states in
      `src/game/entities/models/UnitModel.ts` exactly, since
-     `createFromAseprite` keys animations as `${spriteKey}-${tag}`. All drawn
-     TOP-BEHIND (rear 3/4):
+     `createFromAseprite` keys animations as `${spriteKey}-${tag}`. Heroes draw
+     only THREE, all TOP-BEHIND (back view):
      - `idle`: Bouncing/breathing while standing still.
-     - `march`: Walk cycle advancing forward.
      - `attack`: Swinging weapon / throwing projectile; clear impact frame.
      - `cast`: Signature-skill wind-up pose (plays under the anime cut-in).
-     - `celebrate`: Victory — cheering, raising a fist (may turn head slightly).
-     - `defeat`: Morale broken — taking a knee, exhausted (heroes never die).
+   - `march`, `celebrate`, and `defeat` are **not drawn** (owner decision) — the
+     engine plays a tween placeholder for those states, so heroes still move and
+     react without dedicated frames.
 
 ---
 

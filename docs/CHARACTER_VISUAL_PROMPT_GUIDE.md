@@ -14,6 +14,13 @@ This section is the **single source of truth** for how every gameplay sprite is
 framed. All other docs (`ART_AND_AUDIO_GUIDELINES.md`, `ADDING_HEROES.md`) and
 the Phaser model layer (`src/game/entities/models/`) defer to it.
 
+> **THE RULE (owner decision — keep it simple):**
+> **Heroes are drawn from BEHIND (back view). Enemies are drawn from the FRONT
+> (front view).** Both at a high angle (tilted slightly from above so we see
+> the top of the head — *not* a flat, stiff, eye-level elevation), on a
+> transparent background. That's the whole convention; every hero pack and enemy
+> pack already follows it.
+
 **The camera.** The battle runs under a **fixed high top-down oblique camera**.
 It sits **above and behind the hero rally** and looks down the advance lane
 toward the incoming anomaly (enemy) horde. It is tilted — *not* a flat, straight-
@@ -26,8 +33,8 @@ facings**, and this is what makes the battlefield instantly readable — you are
 
 | Side | Faces… | Drawn as | You see |
 |---|---|---|---|
-| **Heroes** | *away* from camera, into the enemies | **TOP-BEHIND** (rear 3/4 high angle) | tops of heads, shoulders, backs |
-| **Enemies** | *toward* the camera, at the heroes | **TOP-FRONT** (front 3/4 high angle) | faces, chests, front of the body |
+| **Heroes** | *away* from camera, into the enemies | **TOP-BEHIND** (high-angle back view) | tops of heads, shoulders, backs |
+| **Enemies** | *toward* the camera, at the heroes | **TOP-FRONT** (high-angle front view) | faces, chests, front of the body |
 
 > **Axis note:** the current build is a horizontal scrolling rally — heroes hold
 > the rear (left) while the morale shield pushes forward (right) and anomalies
@@ -86,8 +93,8 @@ Once you have the Base Concept Sheet from Gemini, feed that image into Claude to
 
 ### Important Perspective Rules
 Per the **Camera & Perspective Model** above:
-- **Heroes** face into the enemy line → drawn **TOP-BEHIND (rear 3/4 high angle)**. We see their heads-from-above, shoulders, and backs.
-- **Enemies** face the heroes / the camera → drawn **TOP-FRONT (front 3/4 high angle)**. We see their faces and chests.
+- **Heroes** face into the enemy line → drawn **TOP-BEHIND (high-angle back view)**. We see their heads-from-above, shoulders, and backs.
+- **Enemies** face the heroes / the camera → drawn **TOP-FRONT (high-angle front view)**. We see their faces and chests.
 - The camera tilt is oblique, never a flat zenith. Never draw flat side profiles or low/ground-level angles.
 
 ### State ↔ sprite-sheet mapping (must match the engine)
@@ -106,7 +113,10 @@ names must match these exactly so `createFromAseprite` wires them up:
 | `defeat` | heroes | morale broken — take a knee (heroes never die) |
 | `death` | enemies | one-shot dissolve, then the entity is destroyed |
 
-> Heroes get `idle / march / attack / cast / celebrate / defeat`.
+> **Heroes get a DRAWN sheet of `idle / attack / cast` only** (owner decision).
+> Their `march`, `celebrate`, and `defeat` states still exist in the engine but
+> use the built-in tween placeholder — they are **not drawn**, so don't put them
+> in a hero sprite sheet.
 > Enemies get `idle / march / attack / stunned / celebrate / death`.
 
 ### The Sprite Sheet Prompt Template (For Claude)
@@ -116,26 +126,24 @@ Provide the Base Concept Sheet to Claude and use the following prompt, adjusting
 **Prompt for Claude (For Heroes):**
 > Attached is the base concept turnaround sheet for our character. I need you to generate a strictly formatted 2D sprite sheet for this character for a top-down auto-battler game.
 > 
-> **Crucial Perspective:** This character is a Hero. The camera is a high top-down oblique positioned above and BEHIND our own front line, so the hero faces AWAY from us into the enemy. Therefore, **ALL sprites in this sheet must be drawn from a HIGH-ANGLE REAR VIEW (Tilted Back / rear 3/4)**. You must be able to see the top of their head, their shoulders, and their back/body. Do not use a completely flat zenith angle, we need to see the body. (Do NOT draw flat side profiles or low/ground-level angles).
+> **Crucial Perspective:** This character is a Hero. The camera is a high top-down oblique positioned above and BEHIND our own front line, so the hero faces AWAY from us into the enemy. Therefore, **ALL sprites in this sheet must be drawn from a HIGH-ANGLE REAR VIEW (Tilted Back / back view)**. You must be able to see the top of their head, their shoulders, and their back/body. Do not use a completely flat zenith angle, we need to see the body. (Do NOT draw flat side profiles or low/ground-level angles).
 > 
 > **Style & Formatting:** Match the reference's exact style. Lay the animations out as horizontal rows, one animation per row, each frame in its own evenly-spaced cell, non-overlapping poses.
 > 
 > **OUTPUT RULES (critical — image models will otherwise draw these):** Fully **transparent** background (no white fill). Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere. Output ONLY the character art in evenly-spaced **invisible** cells.
 > 
-> **MANDATORY LAYOUT (Exactly 6 rows, one animation per row, in this top-to-bottom order — do NOT write the row names into the image):**
-> 1. **Row 1 — `idle`:** EXACTLY 3 frames, breathing/bouncing in place (Rear View).
-> 2. **Row 2 — `march`:** EXACTLY 4 frames, a full walk cycle advancing forward (Rear View).
-> 3. **Row 3 — `attack`:** EXACTLY 3 frames of the basic attack [Insert attack, e.g. swinging the ruler]. Frame 2 MUST be a clear impact frame (Rear View).
-> 4. **Row 4 — `cast`:** EXACTLY 3 frames winding up the signature skill [Insert skill, e.g. raising the megaphone], building energy (Rear View, dramatic).
-> 5. **Row 5 — `celebrate`:** EXACTLY 2 frames of a victory cheer, raised fist / jumping (Rear View, may turn head slightly toward camera).
-> 6. **Row 6 — `defeat`:** EXACTLY 2 frames of morale breaking — dropping their tool and taking a knee, slumped (Rear View). Heroes never die; this is exhaustion, not death.
+> **MANDATORY LAYOUT (Exactly 3 rows, one animation per row, in this top-to-bottom order — do NOT write the row names into the image):**
+> 1. **Row 1 — `idle`:** EXACTLY 3 frames, breathing/bouncing in place (Back View).
+> 2. **Row 2 — `attack`:** EXACTLY 3 frames of the basic attack [Insert attack, e.g. swinging the ruler]. Frame 2 MUST be a clear impact frame (Back View).
+> 3. **Row 3 — `cast`:** EXACTLY 3 frames winding up the signature skill [Insert skill, e.g. raising the megaphone], building energy (Back View, dramatic).
 > 
 > You must verify that every single frame listed above is present in the final image grid.
+> (Heroes no longer draw `march` / `celebrate` / `defeat` — those use engine placeholders.)
 
 **Prompt for Claude (For Enemies):**
 > Attached is the base concept turnaround sheet for our character. I need you to generate a strictly formatted 2D sprite sheet for this character for a top-down auto-battler game.
 > 
-> **Crucial Perspective:** This character is an Enemy (anomaly). The camera is a high top-down oblique above and behind the player's line, so this enemy faces TOWARD the camera as it bears down on the heroes. Therefore, **ALL sprites in this sheet must be drawn from a HIGH-ANGLE FRONT VIEW (Tilted Forward / front 3/4)**. You must be able to see the top of their head, their shoulders, and their chest/front body. Do not use a completely flat zenith angle, we need to see the body. (Do NOT draw flat side profiles or low/ground-level angles).
+> **Crucial Perspective:** This character is an Enemy (anomaly). The camera is a high top-down oblique above and behind the player's line, so this enemy faces TOWARD the camera as it bears down on the heroes. Therefore, **ALL sprites in this sheet must be drawn from a HIGH-ANGLE FRONT VIEW (Tilted Forward / front view)**. You must be able to see the top of their head, their shoulders, and their chest/front body. Do not use a completely flat zenith angle, we need to see the body. (Do NOT draw flat side profiles or low/ground-level angles).
 > 
 > **Style & Formatting:** Match the reference's exact style. Lay the animations out as horizontal rows, one animation per row, each frame in its own evenly-spaced cell, non-overlapping poses.
 > 
@@ -172,7 +180,7 @@ If generating the 2D Ultimate Skill cut-in for a Hero, you can use Claude to gen
 
 Since AI image generators can sometimes hallucinate or skip frames, QA and developers MUST verify the generated sprite sheet against this checklist before slicing it in Aseprite:
 
-- [ ] **Perspective Check:** Are Hero sprites strictly TOP-BEHIND (rear 3/4, facing *away* from camera)? Are Enemy sprites TOP-FRONT (front 3/4, facing *toward* camera)? No flat zenith, no side profiles.
+- [ ] **Perspective Check:** Are Hero sprites strictly TOP-BEHIND (back view, facing *away* from camera)? Are Enemy sprites TOP-FRONT (front view, facing *toward* camera)? No flat zenith, no side profiles.
 - [ ] **State Completeness:** Every required row present and correctly labelled — Heroes: `idle / march / attack / cast / celebrate / defeat`. Enemies: `march / attack / stunned / celebrate / death`. Tag names must match `UnitModel` states exactly.
 - [ ] **Animation Frame Count:** Count the individual frames. Does the sheet have the exact number of frames requested per row? (e.g., exactly 4 march frames, exactly 3 attack frames).
 - [ ] **Impact Frame:** Does the Attack row have a clear, distinct frame where the weapon hits the target or the projectile is released?

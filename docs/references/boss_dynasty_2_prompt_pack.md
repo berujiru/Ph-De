@@ -6,7 +6,7 @@ This pack mirrors the enemy template `grunt_prompt_pack.md`; the **boss
 differences** apply: draw it **larger, more detailed and more grotesque** than a
 minion.
 
-- **Perspective is TOP-FRONT** (high-angle front 3/4) — the anomaly faces the
+- **Perspective is TOP-FRONT** (high-angle front view) — the anomaly faces the
   camera as it bears down on the barrier. Never a flat zenith, never a side
   profile (`docs/CHARACTER_VISUAL_PROMPT_GUIDE.md`).
 - **State set is `march / attack / stunned / celebrate / death`** (5 rows — **NO
@@ -108,12 +108,12 @@ manipulator** — faster than the Bruiser, a schemer who pulls strings) and its
 > 2. **Side Profile:** 90-degree turn.
 > 3. **Rear View (straight back):** facing away — we see the back, sash, and
 >    trailing strings.
-> 4. **TOP-FRONT (high-angle front 3/4) — THE GAMEPLAY VIEW:** camera high above
+> 4. **TOP-FRONT (high-angle front view) — THE GAMEPLAY VIEW:** camera high above
 >    and in front, tilted (NOT flat zenith). We see the top of its head plus its
 >    face, lapel crest, and the string-fanned fingers reaching toward the viewer.
 >    This is the angle its in-game sprites are drawn from — make it clean and
 >    clear.
-> 5. **TOP-BEHIND (high-angle rear 3/4):** camera high above and behind, tilted;
+> 5. **TOP-BEHIND (high-angle back view):** camera high above and behind, tilted;
 >    top of head, shoulders, and the dangling strings behind it.
 >
 > Ensure the crest medallion, puppet-strings of contracts/envelopes, and
@@ -135,7 +135,7 @@ attach when generating Phase 3 (Heir).*
 > **Crucial Perspective:** The Dynasty (Schemer) is an Enemy boss. The camera is a
 > high top-down oblique above and behind the player's line, so it faces TOWARD the
 > camera as it bears down on the barrier. **ALL frames must be drawn from a
-> HIGH-ANGLE FRONT VIEW (top-front, front 3/4)** — top of head, plus face, lapel
+> HIGH-ANGLE FRONT VIEW (top-front, front view)** — top of head, plus face, lapel
 > crest, and reaching hands. Not a flat zenith, no side profiles, no low angles.
 >
 > **Style & Formatting:** Match the cel-shaded vector style of the reference

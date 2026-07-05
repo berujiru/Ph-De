@@ -62,12 +62,12 @@ Derived from her canonical HUD portrait (`eden_portrait.png`). Do not drift:
 > 2. **Side Profile:** 90-degree turn.
 > 3. **Rear View (straight back):** looking completely away from the camera — we
 >    see the back of her head, the bow, and her back.
-> 4. **TOP-BEHIND (high-angle rear 3/4) — THE GAMEPLAY VIEW:** camera high above
+> 4. **TOP-BEHIND (high-angle back view) — THE GAMEPLAY VIEW:** camera high above
 >    and behind her, tilted (NOT flat zenith). We see the top of her head, the
 >    bow from above, her shoulders and back as she faces away into the distance.
 >    This is the angle her in-game sprites are drawn from — make it clean and
 >    clear.
-> 5. **TOP-FRONT (high-angle front 3/4):** camera high above and in front,
+> 5. **TOP-FRONT (high-angle front view):** camera high above and in front,
 >    tilted. We see the top of her head plus her face and chest.
 >
 > Ensure the pink polka-dot bow and the red-and-white megaphone are clearly
@@ -87,35 +87,28 @@ reference for every following phase.*
 >
 > **Crucial Perspective:** Eden is a Hero. The camera is a high top-down oblique
 > above and BEHIND our front line, so Eden faces AWAY from us into the enemy.
-> **ALL frames must be drawn from a HIGH-ANGLE REAR VIEW (top-behind, rear 3/4)**
+> **ALL frames must be drawn from a HIGH-ANGLE REAR VIEW (top-behind, back view)**
 > — top of head, the pink bow from above, shoulders, and back. Not a flat
 > zenith, no side profiles, no low angles.
-> **This applies to EVERY row, no exceptions** — march is walking straight AWAY
-> from the camera (we see her back, NOT a side profile); attack is throwing the
-> megaphone forward *still seen from behind*; celebrate only turns her head
-> slightly. **If her face or a side silhouette is visible in any frame, that
-> frame is WRONG — redraw it from behind.**
+> **This applies to EVERY row, no exceptions** — idle stands facing away; attack
+> throws the megaphone forward *still seen from behind*; cast raises the megaphone
+> overhead, seen from behind. **If her face or a side silhouette is visible in any
+> frame, that frame is WRONG — redraw it from behind.**
 >
 > **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (pink tee, black hair, pink+blue polka-dot bow, red/white megaphone). Lay out as horizontal rows, one animation per row, each frame in its own evenly-spaced cell, non-overlapping, with consistent size and centering.
 >
 > **OUTPUT RULES (critical — the last generation drew these by mistake):** Fully **transparent** background — NO white fill. Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere in the image. Output ONLY the character art, arranged in evenly-spaced **invisible** cells.
 >
-> **MANDATORY LAYOUT — exactly 6 rows, in this exact top-to-bottom order:**
+> **MANDATORY LAYOUT — exactly 3 rows, in this exact top-to-bottom order:**
 > 1. **`idle`** — EXACTLY 3 frames: standing, gentle breathing/bounce, megaphone
 >    at her side (rear view).
-> 2. **`march`** — EXACTLY 4 frames: a full walk cycle advancing forward, marching
->    with purpose (rear view).
-> 3. **`attack`** — EXACTLY 3 frames: winding up and **hurling a megaphone
+> 2. **`attack`** — EXACTLY 3 frames: winding up and **hurling a megaphone
 >    forward** like a throw. Frame 2 is the clear release/impact frame, arm
 >    extended (rear view).
-> 4. **`cast`** — EXACTLY 3 frames: her signature skill **Rally** — planting her
+> 3. **`cast`** — EXACTLY 3 frames: her signature skill **Rally** — planting her
 >    feet, **raising the megaphone high** and shouting, building energy (rear
 >    view, dramatic).
-> 5. **`celebrate`** — EXACTLY 2 frames: victory cheer, **raised fist**, jumping,
->    head turned slightly so we catch her grin (rear-3/4 view).
-> 6. **`defeat`** — EXACTLY 2 frames: morale broken — lowering the megaphone and
->    **taking a knee**, slumped and exhausted (rear view). She is tired, NOT dead.
 >
 > **SELF-CHECK — before returning the image, verify each item; if any FAILS, fix it and regenerate:**
 > 1. **Consistent view** — every frame in every row uses the SAME camera angle stated above (heroes: rear / top-behind — we see the back; enemies: front / top-front — we see the face). No side profiles, no switching between front and back between frames.
@@ -124,7 +117,7 @@ reference for every following phase.*
 > 4. **On-model & separated** — outfit / hair / props identical in every frame; poses do not touch or overlap.
 
 *Export from Aseprite as `eden.png` + `eden.json` (JSON Hash or Array), with the
-tag names above spelled exactly: `idle march attack cast celebrate defeat`.*
+tag names above spelled exactly: `idle attack cast`.*
 
 ---
 

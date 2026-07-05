@@ -67,12 +67,12 @@ a specific real person's likeness, name, or voice. Do not drift:
 >    clearly).
 > 3. **Rear View (straight back):** looking completely away from the camera — we
 >    see the back of the head, the headset band, and the coiled cord.
-> 4. **TOP-BEHIND (high-angle rear 3/4) — THE GAMEPLAY VIEW:** camera high above
+> 4. **TOP-BEHIND (high-angle back view) — THE GAMEPLAY VIEW:** camera high above
 >    and behind them, tilted (NOT flat zenith). We see the top of the head, the
 >    headset band and boom mic from above, shoulders and back as they face away
 >    into the distance. This is the angle their in-game sprites are drawn from —
 >    make it clean and clear.
-> 5. **TOP-FRONT (high-angle front 3/4):** camera high above and in front,
+> 5. **TOP-FRONT (high-angle front view):** camera high above and in front,
 >    tilted. We see the top of the head plus the face, the boom mic, and the
 >    lanyard.
 >
@@ -94,7 +94,7 @@ is the base reference for every following phase.*
 > **Crucial Perspective:** Call Center Agent is a Hero. The camera is a high
 > top-down oblique above and BEHIND our front line, so they face AWAY from us into
 > the enemy. **ALL frames must be drawn from a HIGH-ANGLE REAR VIEW (top-behind,
-> rear 3/4)** — top of head, the headset band and boom mic from above, shoulders,
+> back view)** — top of head, the headset band and boom mic from above, shoulders,
 > and back. Not a flat zenith, no side profiles, no low angles.
 >
 > **Style & Formatting:** Match the anime cel-shaded style of the reference
@@ -102,23 +102,16 @@ is the base reference for every following phase.*
 >
 > **OUTPUT RULES (critical — the last generation drew these by mistake):** Fully **transparent** background — NO white fill. Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere in the image. Output ONLY the character art, arranged in evenly-spaced **invisible** cells.
 >
-> **MANDATORY LAYOUT — exactly 6 rows, in this exact top-to-bottom order:**
+> **MANDATORY LAYOUT — exactly 3 rows, in this exact top-to-bottom order:**
 > 1. **`idle`** — EXACTLY 3 frames: standing, gentle breathing/bounce, one hand
 >    resting on the headset ear-cup, faint electric flicker (rear view).
-> 2. **`march`** — EXACTLY 4 frames: a full walk cycle advancing forward, brisk
->    caffeinated stride (rear view).
-> 3. **`attack`** — EXACTLY 3 frames: pressing the boom mic and **firing a bolt of
+> 2. **`attack`** — EXACTLY 3 frames: pressing the boom mic and **firing a bolt of
 >    crackling "headset feedback" (Lightning) forward that forks/chains** toward
 >    the enemy. Frame 2 is the clear release/impact frame, arm forward, a jagged
 >    arc leaping away and branching (rear view).
-> 4. **`cast`** — EXACTLY 3 frames: their signature skill **Escalate to Manager**
+> 3. **`cast`** — EXACTLY 3 frames: their signature skill **Escalate to Manager**
 >    — squaring up and **pointing forward as a heavy targeted lightning strike
 >    charges down the lane**, building energy (rear view, dramatic).
-> 5. **`celebrate`** — EXACTLY 2 frames: victory cheer, **raised fist**, a small
->    hop, head turned slightly so we catch the smirk (rear-3/4 view).
-> 6. **`defeat`** — EXACTLY 2 frames: morale broken — the headset drooping and
->    **taking a knee**, slumped and exhausted (rear view). They are tired, NOT
->    dead.
 >
 > **SELF-CHECK — before returning the image, verify each item; if any FAILS, fix it and regenerate:**
 > 1. **Consistent view** — every frame in every row uses the SAME camera angle stated above (heroes: rear / top-behind — we see the back; enemies: front / top-front — we see the face). No side profiles, no switching between front and back between frames.
@@ -128,7 +121,7 @@ is the base reference for every following phase.*
 
 *Export from Aseprite as `call_center_agent.png` + `call_center_agent.json` (JSON
 Hash or Array), with the tag names above spelled exactly:
-`idle march attack cast celebrate defeat`.*
+`idle attack cast`.*
 
 ---
 

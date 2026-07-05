@@ -24,8 +24,13 @@ export class HeroModel extends UnitModel {
     const key = hasArt ? spriteKey! : 'hero-base';
     this.bodySprite = scene.add.sprite(0, 0, key);
     if (hasArt) {
-      this.baseW = 60;
-      this.baseH = 60;
+      // Scale the real sheet to a target height, preserving the frame's aspect
+      // ratio so non-square frames (e.g. 256x170) aren't squished into a box.
+      const targetH = 64;
+      const frameW = this.bodySprite.width || targetH;
+      const frameH = this.bodySprite.height || targetH;
+      this.baseH = targetH;
+      this.baseW = targetH * (frameW / frameH);
     } else {
       this.baseW = 40;
       this.baseH = 54;

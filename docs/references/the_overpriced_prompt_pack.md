@@ -5,7 +5,7 @@ budget" anomaly. This pack mirrors the **enemy template**
 (`docs/references/grunt_prompt_pack.md`). Enemies differ from heroes in two ways
 (see `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md`):
 
-- **Perspective is TOP-FRONT** (high-angle front 3/4) — anomalies face the camera
+- **Perspective is TOP-FRONT** (high-angle front view) — anomalies face the camera
   as they bear down on the barrier.
 - **State set is `march / attack / stunned / celebrate / death`** (5 rows). There
   is **no anime skill cut-in** for enemies. **Bosses** add a 6th **`cast`** row
@@ -78,12 +78,12 @@ scream "mostly hot air." Do not drift:
 > 2. **Side Profile:** 90-degree turn.
 > 3. **Rear View (straight back):** facing away — we see its ballooning back and
 >    the tethers trailing off it.
-> 4. **TOP-FRONT (high-angle front 3/4) — THE GAMEPLAY VIEW:** camera high above
+> 4. **TOP-FRONT (high-angle front view) — THE GAMEPLAY VIEW:** camera high above
 >    and in front, tilted (NOT flat zenith). We see the top of its bulging head
 >    plus its face, the price-tag-stamped balloon chest, and the stubby legs as it
 >    wobbles toward the viewer. This is the angle its in-game sprites are drawn
 >    from — make it clean and clear.
-> 5. **TOP-BEHIND (high-angle rear 3/4):** camera high above and behind, tilted;
+> 5. **TOP-BEHIND (high-angle back view):** camera high above and behind, tilted;
 >    top of head, the ballooning shoulders, and the tethered back.
 >
 > Ensure the overinflated glossy body, the oversized price tags with extra zeroes,
@@ -104,7 +104,7 @@ the base reference for the next phase.*
 > **Crucial Perspective:** The Overpriced is an Enemy. The camera is a high
 > top-down oblique above and behind the player's line, so it faces TOWARD the
 > camera as it bears down on the barrier. **ALL frames must be drawn from a
-> HIGH-ANGLE FRONT VIEW (top-front, front 3/4)** — top of head, plus face,
+> HIGH-ANGLE FRONT VIEW (top-front, front view)** — top of head, plus face,
 > balloon chest, and stubby legs. Not a flat zenith, no side profiles, no low
 > angles.
 >

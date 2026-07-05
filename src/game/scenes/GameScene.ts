@@ -58,6 +58,7 @@ export class GameScene extends Phaser.Scene {
     // create{Hero,Enemy}Animations() below wire whatever loaded. The atlas key
     // defaults to the unit's id (override via `spriteKey` in balance.ts).
     // Heroes → public/assets/heroes/, enemies → public/assets/enemies/.
+    // Re-enable once a corrected top-down, transparent eden sheet is generated:
     // this.load.aseprite('eden', '/assets/heroes/eden.png', '/assets/heroes/eden.json');
     // this.load.aseprite('grunt', '/assets/enemies/grunt.png', '/assets/enemies/grunt.json');
     // this.load.audio('sfx-btn-press', 'assets/sounds/btn-press.mp3');
@@ -663,14 +664,36 @@ export class GameScene extends Phaser.Scene {
     this.createAtlasAnimations(Object.values(ENEMY_DEFINITIONS).map(d => d.spriteKey ?? d.id));
   }
 
-  /** Wire tag animations for any of these atlas keys that actually loaded. */
+  /**
+   * Build **namespaced** tag animations (`${key}-<tag>`) for any of these atlas
+   * keys that loaded. We can't use `createFromAseprite`, which names animations
+   * by bare tag (`idle`, `march`…) — every character shares the tags `idle`,
+   * `attack`, etc., so those would collide, and the model plays `${key}-<tag>`.
+   * So we read the Aseprite JSON's frameTags and create one prefixed animation
+   * per tag from the atlas frames (named by their `filename`, e.g. `idle 0`).
+   */
   private createAtlasAnimations(keys: string[]): void {
     for (const key of keys) {
       if (!this.textures.exists(key)) continue;
-      try {
-        this.anims.createFromAseprite(key);
-      } catch {
-        /* texture exists but isn't an Aseprite atlas — leave it to the placeholder */
+      const data = this.cache.json.get(key) as {
+        frames?: { filename: string }[];
+        meta?: { frameTags?: { name: string; from: number; to: number }[] };
+      } | undefined;
+      const tags = data?.meta?.frameTags;
+      const frameList = data?.frames;
+      if (!tags || !frameList) continue; // plain image, not an Aseprite atlas
+
+      for (const tag of tags) {
+        const animKey = `${key}-${tag.name}`;
+        if (this.anims.exists(animKey)) continue;
+        const frames: Phaser.Types.Animations.AnimationFrame[] = [];
+        for (let i = tag.from; i <= tag.to; i++) {
+          const name = frameList[i]?.filename;
+          if (name !== undefined) frames.push({ key, frame: name });
+        }
+        if (frames.length === 0) continue;
+        // Loop by default; one-shot states (attack/cast/death) override repeat at play time.
+        this.anims.create({ key: animKey, frames, frameRate: 10, repeat: -1 });
       }
     }
   }

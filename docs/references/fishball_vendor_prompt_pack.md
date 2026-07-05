@@ -65,12 +65,12 @@ Synthesized from his profession + attack (no portrait exists yet). Do not drift:
 > 2. **Side Profile:** 90-degree turn.
 > 3. **Rear View (straight back):** looking completely away from the camera — we
 >    see the back of his cap/apron and his back, cart just behind.
-> 4. **TOP-BEHIND (high-angle rear 3/4) — THE GAMEPLAY VIEW:** camera high above
+> 4. **TOP-BEHIND (high-angle back view) — THE GAMEPLAY VIEW:** camera high above
 >    and behind him, tilted (NOT flat zenith). We see the top of his head/cap from
 >    above, his shoulders and back, cart at his side, as he faces away into the
 >    distance. This is the angle his in-game sprites are drawn from — make it clean
 >    and clear.
-> 5. **TOP-FRONT (high-angle front 3/4):** camera high above and in front,
+> 5. **TOP-FRONT (high-angle front view):** camera high above and in front,
 >    tilted. We see the top of his head plus his face and chest.
 >
 > Ensure the fishball cart and the loaded bamboo skewers are clearly readable in
@@ -91,7 +91,7 @@ is the base reference for every following phase.*
 > **Crucial Perspective:** Fishball Vendor is a Hero. The camera is a high
 > top-down oblique above and BEHIND our front line, so he faces AWAY from us into
 > the enemy. **ALL frames must be drawn from a HIGH-ANGLE REAR VIEW (top-behind,
-> rear 3/4)** — top of head/cap from above, shoulders, and back. Not a flat
+> back view)** — top of head/cap from above, shoulders, and back. Not a flat
 > zenith, no side profiles, no low angles.
 >
 > **Style & Formatting:** Match the anime cel-shaded style of the reference
@@ -99,21 +99,15 @@ is the base reference for every following phase.*
 >
 > **OUTPUT RULES (critical — the last generation drew these by mistake):** Fully **transparent** background — NO white fill. Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere in the image. Output ONLY the character art, arranged in evenly-spaced **invisible** cells.
 >
-> **MANDATORY LAYOUT — exactly 6 rows, in this exact top-to-bottom order:**
+> **MANDATORY LAYOUT — exactly 3 rows, in this exact top-to-bottom order:**
 > 1. **`idle`** — EXACTLY 3 frames: standing, gentle breathing/bounce, a skewer
 >    held ready at his side, cart beside him (rear view).
-> 2. **`march`** — EXACTLY 4 frames: a full walk cycle advancing forward, pushing
->    ahead with purpose (rear view).
-> 3. **`attack`** — EXACTLY 3 frames: winding up and **hurling a bamboo skewer
+> 2. **`attack`** — EXACTLY 3 frames: winding up and **hurling a bamboo skewer
 >    forward** like a dart/spear so it pierces the line. Frame 2 is the clear
 >    release/impact frame, arm fully extended (rear view).
-> 4. **`cast`** — EXACTLY 3 frames: his signature skill **Spicy Sauce** —
+> 3. **`cast`** — EXACTLY 3 frames: his signature skill **Spicy Sauce** —
 >    grabbing a sauce squeeze-bottle and **flinging a wide arc of spicy red sauce
 >    forward**, igniting the skewered line, building energy (rear view, dramatic).
-> 5. **`celebrate`** — EXACTLY 2 frames: victory cheer, **raised fist** with a
->    skewer, head turned slightly so we catch his grin (rear-3/4 view).
-> 6. **`defeat`** — EXACTLY 2 frames: morale broken — lowering the skewers and
->    **taking a knee**, slumped and exhausted (rear view). He is tired, NOT dead.
 >
 > **SELF-CHECK — before returning the image, verify each item; if any FAILS, fix it and regenerate:**
 > 1. **Consistent view** — every frame in every row uses the SAME camera angle stated above (heroes: rear / top-behind — we see the back; enemies: front / top-front — we see the face). No side profiles, no switching between front and back between frames.
@@ -123,7 +117,7 @@ is the base reference for every following phase.*
 
 *Export from Aseprite as `fishball_vendor.png` + `fishball_vendor.json` (JSON
 Hash or Array), with the tag names above spelled exactly:
-`idle march attack cast celebrate defeat`.*
+`idle attack cast`.*
 
 ---
 

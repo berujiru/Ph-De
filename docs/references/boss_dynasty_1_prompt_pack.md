@@ -5,7 +5,7 @@ three phases** of the Dynasty apex boss. This pack mirrors the enemy template
 `grunt_prompt_pack.md`; the **boss differences** apply: draw it **larger, more
 detailed and more grotesque** than a minion.
 
-- **Perspective is TOP-FRONT** (high-angle front 3/4) — the anomaly faces the
+- **Perspective is TOP-FRONT** (high-angle front view) — the anomaly faces the
   camera as it bears down on the barrier. Never a flat zenith, never a side
   profile (`docs/CHARACTER_VISUAL_PROMPT_GUIDE.md`).
 - **State set is `march / attack / stunned / celebrate / death`** (5 rows — **NO
@@ -106,12 +106,12 @@ anchor `#701a75` (deep royal purple). Do not drift:
 > 2. **Side Profile:** 90-degree turn.
 > 3. **Rear View (straight back):** facing away — we see the broad back and the
 >    ceremonial sash.
-> 4. **TOP-FRONT (high-angle front 3/4) — THE GAMEPLAY VIEW:** camera high above
+> 4. **TOP-FRONT (high-angle front view) — THE GAMEPLAY VIEW:** camera high above
 >    and in front, tilted (NOT flat zenith). We see the top of its head plus its
 >    face, chest crest medallion, and the gavel-fists as it lumbers toward the
 >    viewer. This is the angle its in-game sprites are drawn from — make it clean
 >    and clear.
-> 5. **TOP-BEHIND (high-angle rear 3/4):** camera high above and behind, tilted;
+> 5. **TOP-BEHIND (high-angle back view):** camera high above and behind, tilted;
 >    top of head, massive shoulders, and back sash.
 >
 > Ensure the crest medallion, gavel-fists, gold rings, and bursting purple barong
@@ -133,7 +133,7 @@ attach when generating Phases 2 and 3.*
 > **Crucial Perspective:** The Dynasty (Bruiser) is an Enemy boss. The camera is a
 > high top-down oblique above and behind the player's line, so it faces TOWARD the
 > camera as it bears down on the barrier. **ALL frames must be drawn from a
-> HIGH-ANGLE FRONT VIEW (top-front, front 3/4)** — top of head, plus face, chest
+> HIGH-ANGLE FRONT VIEW (top-front, front view)** — top of head, plus face, chest
 > crest, and gavel-fists. Not a flat zenith, no side profiles, no low angles.
 >
 > **Style & Formatting:** Match the cel-shaded vector style of the reference

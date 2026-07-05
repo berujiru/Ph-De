@@ -68,12 +68,12 @@ No portrait exists yet, so this bible is synthesized from the profession
 > 3. **Rear View (straight back):** looking completely away from the camera — we
 >    see the backwards cap from behind, the hose coil, and the coverall tied at
 >    his back.
-> 4. **TOP-BEHIND (high-angle rear 3/4) — THE GAMEPLAY VIEW:** camera high above
+> 4. **TOP-BEHIND (high-angle back view) — THE GAMEPLAY VIEW:** camera high above
 >    and behind him, tilted (NOT flat zenith). We see the top of his cap, his
 >    shoulders and back, the hose coil, and the pipe nozzle, as he faces away into
 >    the distance. This is the angle his in-game sprites are drawn from — make it
 >    clean and clear.
-> 5. **TOP-FRONT (high-angle front 3/4):** camera high above and in front, tilted.
+> 5. **TOP-FRONT (high-angle front view):** camera high above and in front, tilted.
 >    We see the top of his cap plus his smirking face, the wrench and gushing pipe.
 >
 > Ensure the coiled hose bandolier, the chrome wrench, and the high-pressure water
@@ -93,8 +93,7 @@ base reference for every following phase.*
 >
 > **Crucial Perspective:** Plumber is a Hero. The camera is a high top-down
 > oblique above and BEHIND our front line, so Plumber faces AWAY from us into the
-> enemy. **ALL frames must be drawn from a HIGH-ANGLE REAR VIEW (top-behind, rear
-> 3/4)** — top of the cap, hose coil, shoulders, and back. Not a flat zenith, no
+> enemy. **ALL frames must be drawn from a HIGH-ANGLE REAR VIEW (top-behind, back view)** — top of the cap, hose coil, shoulders, and back. Not a flat zenith, no
 > side profiles, no low angles.
 >
 > **Style & Formatting:** Match the anime cel-shaded style of the reference
@@ -102,24 +101,16 @@ base reference for every following phase.*
 >
 > **OUTPUT RULES (critical — the last generation drew these by mistake):** Fully **transparent** background — NO white fill. Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere in the image. Output ONLY the character art, arranged in evenly-spaced **invisible** cells.
 >
-> **MANDATORY LAYOUT — exactly 6 rows, in this exact top-to-bottom order:**
+> **MANDATORY LAYOUT — exactly 3 rows, in this exact top-to-bottom order:**
 > 1. **`idle`** — EXACTLY 3 frames: standing, gentle breathing/bounce, wrench
 >    resting on his shoulder, pipe at his hip (rear view).
-> 2. **`march`** — EXACTLY 4 frames: a full walk cycle advancing forward, hose coil
->    and tool belt swaying (rear view).
-> 3. **`attack`** — EXACTLY 3 frames: **bracing the pipe and unleashing a
+> 2. **`attack`** — EXACTLY 3 frames: **bracing the pipe and unleashing a
 >    horizontal high-pressure water blast wave** down the lane. Frame 2 is the
 >    clear impact frame — the pressurized water fan at full spread, his stance
 >    braced against the recoil (rear view).
-> 4. **`cast`** — EXACTLY 3 frames: his signature skill **Flush** — planting his
+> 3. **`cast`** — EXACTLY 3 frames: his signature skill **Flush** — planting his
 >    feet, hoisting the pipe overhead and cranking the valve to build a **massive
 >    surging wave of water** behind him (rear view, dramatic).
-> 5. **`celebrate`** — EXACTLY 2 frames: victory cheer, **raised fist** (wrench
->    thrust up), jumping, head turned slightly so we catch his grin (rear-3/4
->    view).
-> 6. **`defeat`** — EXACTLY 2 frames: morale broken — dropping the pipe and
->    **taking a knee**, slumped and exhausted, water pooling at his feet (rear
->    view). He is tired, NOT dead.
 >
 > **SELF-CHECK — before returning the image, verify each item; if any FAILS, fix it and regenerate:**
 > 1. **Consistent view** — every frame in every row uses the SAME camera angle stated above (heroes: rear / top-behind — we see the back; enemies: front / top-front — we see the face). No side profiles, no switching between front and back between frames.
@@ -128,7 +119,7 @@ base reference for every following phase.*
 > 4. **On-model & separated** — outfit / hair / props identical in every frame; poses do not touch or overlap.
 
 *Export from Aseprite as `plumber.png` + `plumber.json` (JSON Hash or Array), with
-the tag names above spelled exactly: `idle march attack cast celebrate defeat`.*
+the tag names above spelled exactly: `idle attack cast`.*
 
 ---
 

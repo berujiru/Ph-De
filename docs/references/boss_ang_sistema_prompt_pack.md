@@ -7,7 +7,7 @@ maxed out: draw it **the largest, most detailed and most grotesque of all**, and
 add a 6th **`cast`** row (EXACTLY 3 frames) between `attack` and `stunned` showing
 it channelling its signature `activeSkill`.
 
-- **Perspective is TOP-FRONT** (high-angle front 3/4) — the anomaly faces the
+- **Perspective is TOP-FRONT** (high-angle front view) — the anomaly faces the
   camera as it bears down on the barrier. Never a flat zenith, never a side
   profile (`docs/CHARACTER_VISUAL_PROMPT_GUIDE.md`).
 - **State set is `march / attack / cast / stunned / celebrate / death`** (6 rows —
@@ -96,12 +96,12 @@ ghost-faces of the fallen bosses, which pour out as reborn horde-echoes.
 > 2. **Side Profile:** 90-degree turn.
 > 3. **Rear View (straight back):** facing away — we see the back plating, cabling,
 >    and exhaust of the engine.
-> 4. **TOP-FRONT (high-angle front 3/4) — THE GAMEPLAY VIEW:** camera high above
+> 4. **TOP-FRONT (high-angle front view) — THE GAMEPLAY VIEW:** camera high above
 >    and in front, tilted (NOT flat zenith). We see the top of the idol's mass plus
 >    its ring of glowing eyes, gear-front, and stamp-pistons as it looms toward the
 >    viewer. This is the angle its in-game sprites are drawn from — make it clean
 >    and clear.
-> 5. **TOP-BEHIND (high-angle rear 3/4):** camera high above and behind, tilted;
+> 5. **TOP-BEHIND (high-angle back view):** camera high above and behind, tilted;
 >    top of the mass, shoulders of plating, and the cabling behind it.
 >
 > Ensure the ring of glowing institutional eyes, the tangled gear-and-stamp mass,
@@ -122,7 +122,7 @@ the base reference for the next phase.*
 > **Crucial Perspective:** Ang Sistema is an Enemy final boss. The camera is a high
 > top-down oblique above and behind the player's line, so it faces TOWARD the
 > camera as it bears down on the barrier. **ALL frames must be drawn from a
-> HIGH-ANGLE FRONT VIEW (top-front, front 3/4)** — top of the mass, plus the ring
+> HIGH-ANGLE FRONT VIEW (top-front, front view)** — top of the mass, plus the ring
 > of eyes, gear-front, and stamp-pistons. Not a flat zenith, no side profiles, no
 > low angles.
 >

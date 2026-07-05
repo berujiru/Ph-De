@@ -7,7 +7,7 @@ differences** apply: draw it **larger, more detailed and more grotesque** than a
 minion, and add a 6th **`cast`** row (EXACTLY 3 frames) between `attack` and
 `stunned`.
 
-- **Perspective is TOP-FRONT** (high-angle front 3/4) — the anomaly faces the
+- **Perspective is TOP-FRONT** (high-angle front view) — the anomaly faces the
   camera as it bears down on the barrier. Never a flat zenith, never a side
   profile (`docs/CHARACTER_VISUAL_PROMPT_GUIDE.md`).
 - **State set is `march / attack / cast / stunned / celebrate / death`** (6 rows).
@@ -119,12 +119,12 @@ HP but quick, wreathed in the accumulated power of the whole dynasty) and its
 > 2. **Side Profile:** 90-degree turn.
 > 3. **Rear View (straight back):** facing away — we see the back, sash, and aura
 >    trailing.
-> 4. **TOP-FRONT (high-angle front 3/4) — THE GAMEPLAY VIEW:** camera high above
+> 4. **TOP-FRONT (high-angle front view) — THE GAMEPLAY VIEW:** camera high above
 >    and in front, tilted (NOT flat zenith). We see the top of its coroneted head
 >    plus its face, crest chest-plate, and the fuchsia aura as it strides toward
 >    the viewer. This is the angle its in-game sprites are drawn from — make it
 >    clean and clear.
-> 5. **TOP-BEHIND (high-angle rear 3/4):** camera high above and behind, tilted;
+> 5. **TOP-BEHIND (high-angle back view):** camera high above and behind, tilted;
 >    top of coronet, shoulders, and the ancestor-ghosts behind it.
 >
 > Ensure the crest chest-plate, floating coronet, fuchsia aura, and ancestor-ghost
@@ -145,7 +145,7 @@ the base reference for the next phase.*
 > **Crucial Perspective:** The Dynasty (Heir) is an Enemy boss. The camera is a
 > high top-down oblique above and behind the player's line, so it faces TOWARD the
 > camera as it bears down on the barrier. **ALL frames must be drawn from a
-> HIGH-ANGLE FRONT VIEW (top-front, front 3/4)** — top of coroneted head, plus
+> HIGH-ANGLE FRONT VIEW (top-front, front view)** — top of coroneted head, plus
 > face, crest chest-plate, and aura. Not a flat zenith, no side profiles, no low
 > angles.
 >

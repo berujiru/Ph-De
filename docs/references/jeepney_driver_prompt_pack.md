@@ -69,12 +69,12 @@ No portrait exists yet — this bible is **synthesized** from his profession
 > 3. **Rear View (straight back):** looking completely away from the camera — we
 >    see the back of his head, the cap, the towel draped over his shoulder, and his
 >    back.
-> 4. **TOP-BEHIND (high-angle rear 3/4) — THE GAMEPLAY VIEW:** camera high above
+> 4. **TOP-BEHIND (high-angle back view) — THE GAMEPLAY VIEW:** camera high above
 >    and behind him, tilted (NOT flat zenith). We see the top of his cap, the towel
 >    and broad shoulders from above, his back and the exhaust pipe as he faces away
 >    into the distance. This is the angle his in-game sprites are drawn from — make
 >    it clean and clear.
-> 5. **TOP-FRONT (high-angle front 3/4):** camera high above and in front, tilted.
+> 5. **TOP-FRONT (high-angle front view):** camera high above and in front, tilted.
 >    We see the top of his cap plus his face, the coin pouch, and chest.
 >
 > Ensure the emerald sando, the face towel, the coin pouch, and the chrome exhaust
@@ -94,7 +94,7 @@ the base reference for every following phase.*
 >
 > **Crucial Perspective:** Jeepney Driver is a Hero. The camera is a high top-down
 > oblique above and BEHIND our front line, so he faces AWAY from us into the enemy.
-> **ALL frames must be drawn from a HIGH-ANGLE REAR VIEW (top-behind, rear 3/4)** —
+> **ALL frames must be drawn from a HIGH-ANGLE REAR VIEW (top-behind, back view)** —
 > top of the cap, the towel and shoulders from above, his back. Not a flat zenith,
 > no side profiles, no low angles.
 >
@@ -104,23 +104,16 @@ the base reference for every following phase.*
 >
 > **OUTPUT RULES (critical — the last generation drew these by mistake):** Fully **transparent** background — NO white fill. Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere in the image. Output ONLY the character art, arranged in evenly-spaced **invisible** cells.
 >
-> **MANDATORY LAYOUT — exactly 6 rows, in this exact top-to-bottom order:**
+> **MANDATORY LAYOUT — exactly 3 rows, in this exact top-to-bottom order:**
 > 1. **`idle`** — EXACTLY 3 frames: standing, gentle breathing/bounce, exhaust pipe
 >    resting on one shoulder (rear view).
-> 2. **`march`** — EXACTLY 4 frames: a full walk cycle advancing forward, a heavy
->    confident swagger (rear view).
-> 3. **`attack`** — EXACTLY 3 frames: his basic melee-cleave attack — **revving and
+> 2. **`attack`** — EXACTLY 3 frames: his basic melee-cleave attack — **revving and
 >    swinging the exhaust pipe in a wide horizontal arc**, belching smog. Frame 2 is
 >    the clear impact frame at the bottom of the swing with a smog-burst (rear
 >    view).
-> 4. **`cast`** — EXACTLY 3 frames: his signature skill **Barya Lang Po** — digging
+> 3. **`cast`** — EXACTLY 3 frames: his signature skill **Barya Lang Po** — digging
 >    into the coin pouch and **hurling a fistful of coin shrapnel forward like a
 >    shotgun blast**, a spreading cone of coins (rear view, dramatic).
-> 5. **`celebrate`** — EXACTLY 2 frames: victory cheer, **raised fist**, exhaust
->    pipe thrust up, head turned slightly so we catch his grin (rear-3/4 view).
-> 6. **`defeat`** — EXACTLY 2 frames: morale broken — lowering the exhaust pipe and
->    **taking a knee**, slumped and winded, wiping his brow with the towel (rear
->    view). He is tired, NOT dead.
 >
 > **SELF-CHECK — before returning the image, verify each item; if any FAILS, fix it and regenerate:**
 > 1. **Consistent view** — every frame in every row uses the SAME camera angle stated above (heroes: rear / top-behind — we see the back; enemies: front / top-front — we see the face). No side profiles, no switching between front and back between frames.
@@ -129,8 +122,7 @@ the base reference for every following phase.*
 > 4. **On-model & separated** — outfit / hair / props identical in every frame; poses do not touch or overlap.
 
 *Export from Aseprite as `jeepney_driver.png` + `jeepney_driver.json` (JSON Hash
-or Array), with the tag names above spelled exactly: `idle march attack cast
-celebrate defeat`.*
+or Array), with the tag names above spelled exactly: `idle attack cast`.*
 
 ---
 
