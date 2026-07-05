@@ -10,11 +10,15 @@ import { UnitModel } from './UnitModel';
 export class HeroModel extends UnitModel {
   private bodySprite: Phaser.GameObjects.Image;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, tint: number) {
+  constructor(scene: Phaser.Scene, x: number, y: number, tint: number, spriteKey?: string) {
     super(scene, x, y);
-    this.bodySprite = scene.add.image(0, 0, 'hero-base');
-    this.bodySprite.setDisplaySize(40, 54);
-    this.bodySprite.setTint(tint);
+    this.bodySprite = scene.add.image(0, 0, spriteKey || 'hero-base');
+    if (!spriteKey) {
+      this.bodySprite.setDisplaySize(40, 54);
+      this.bodySprite.setTint(tint);
+    } else {
+      this.bodySprite.setDisplaySize(60, 60);
+    }
     this.add(this.bodySprite);
     this.setState('idle');
   }
@@ -30,7 +34,11 @@ export class HeroModel extends UnitModel {
   protected resetPose(): void {
     this.bodySprite.setPosition(0, 0);
     this.bodySprite.setAngle(0);
-    this.bodySprite.setDisplaySize(40, 54);
+    if (this.bodySprite.texture.key === 'hero-base') {
+      this.bodySprite.setDisplaySize(40, 54);
+    } else {
+      this.bodySprite.setDisplaySize(60, 60);
+    }
     this.bodySprite.setAlpha(1);
   }
 

@@ -61,7 +61,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.rangeIndicator.setVisible(false);
     this.add(this.rangeIndicator);
 
-    this.model = new HeroModel(scene, 0, 0, def.color);
+    this.model = new HeroModel(scene, 0, 0, def.color, def.spriteKey);
     this.add(this.model);
 
     const nameLabel = scene.add.text(0, 25, def.name, {

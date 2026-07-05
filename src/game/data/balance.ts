@@ -383,6 +383,7 @@ export interface HeroDefinition {
   attackRateMs: number;
   color: number; // Hex color for the character placeholder
   portraitKey?: string; // Key for the character's portrait asset
+  spriteKey?: string; // Key for the in-game character sprite
   /**
    * One-line "what this hero DOES", shown on the summon drop card so the
    * player can judge a recruit at a glance (docs/VOICE_DROPS.md). Present on
@@ -452,6 +453,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     passive: { name: 'Voice of the People', description: 'Generates 1 Voice every 10 seconds.' },
     projectileColor: 0x60a5fa,
     portraitKey: 'eden_portrait',
+    spriteKey: 'eden_sprite',
   },
   teacher: {
     id: 'teacher',

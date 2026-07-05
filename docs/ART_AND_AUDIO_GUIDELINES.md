@@ -58,7 +58,17 @@ The enemies are personifications of bad governance (anomalies). They should look
 
 ---
 
-## 4. Audio & Sound Mapping (Tagalog First, Comedic Tone)
+## 4. Environment & Map Asset Requirements
+
+The battlefields are vertically aligned streets and paths. To ensure the world geometry matches the characters:
+
+- **Perspective**: Top-Down Oblique ("A little top view" / 3/4 Isometric). The ground plane must recede upward, showing the tops and faces of buildings, barricades, and environmental props to perfectly match the angles of the marching heroes and enemies.
+- **Orientation**: Vertically tall, designed for a portrait mobile screen where enemies spawn at the top and the Barrier is at the bottom.
+- **Style**: High-contrast, cel-shaded vector art. The ground should use muted or darker tones (deep slate, dark asphalt) so the bright characters and UI elements pop clearly.
+
+---
+
+## 5. Audio & Sound Mapping (Tagalog First, Comedic Tone)
 
 The audio landscape should feel like a busy Metro Manila street mixed with a loud protest rally.
 **Hero Voice Lines**: Every signature skill trigger must play a Tagalog voice line. The tone is **comedic, stressed, but fiercely defiant**.

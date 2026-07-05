@@ -28,6 +28,9 @@ over React Native.
 - `docs/ADDING_ENEMIES.md` — worked, step-by-step guide for adding a new
   enemy type: which stats are common vs. per-enemy, which files to touch,
   when a stats-only data edit is enough vs. when it needs real code
+- `docs/ADDING_HEROES.md` — worked, step-by-step guide for adding a new
+  hero, covering required art assets, sprite sheet animations, and technical
+  integration into the Phaser engine (balance.ts, Skills.ts).
 - `docs/DAMAGE_AND_AILMENTS.md` — design spec for damage types and ailments
   (jobs, per-ailment proc rules, enemy info card, data model, rollout
   phases). Read before implementing or extending anything combat-related
@@ -37,6 +40,9 @@ over React Native.
   and the **binding character-design rules** (communal archetypes only —
   never real persons, officials, or parties). Read before creating or
   touching any character, story, or enemy content
+- `docs/WAVE_ENGINE_SPEC.md` — technical blueprint for replacing the
+  prototype mob spawner with a data-driven WaveManager, including
+  specifications for UI warnings (bosses, swarms).
 - `docs/PROGRESSION.md` — campaign ladder (barangay → LGU → national
   agencies), reusable stage/wave/chassis content engine, per-run Hope
   currency and the Sari-Sari Store, squad-building rules (every hero

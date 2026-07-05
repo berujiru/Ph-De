@@ -7,14 +7,16 @@ import { Attack, ProjectileAttack, PierceAttack, MeleeCleaveAttack, VortexAttack
 import { gameToUiEvents, uiToGameEvents, type GameStateSnapshot, type DropOption } from '../core/GameEvents';
 import { BARRICADE_DEFAULTS, ENEMY_DEFINITIONS, HERO_DEFINITIONS, MAX_ACTIVE_HEROES, UPGRADE_DEFS, GLOBAL_DROP_DEFS, computeKillPool, voiceDropCost, type EnemyId, type HeroId, type UpgradeKind } from '../data/balance';
 import { rollDrops, makeRng, type DropContext } from '../core/Drops';
-import { GAME_HEIGHT, GAME_WIDTH, WORLD_WIDTH, RALLY, ENEMY_SPAWN_X_OFFSET } from '../data/level';
+import { GAME_HEIGHT, GAME_WIDTH, WORLD_WIDTH, RALLY, ENEMY_SPAWN_X_OFFSET, FX, PARALLAX } from '../data/level';
 import { formationTargetX, nextShieldX } from '../core/RallyMarch';
 import { applyHeroSkill, type SkillVisualEvent } from '../core/Skills';
 import { SkillCutIn } from '../entities/fx/SkillCutIn';
+import { ParallaxBackground } from '../entities/fx/ParallaxBackground';
+import { cameraPunch } from '../entities/fx/CameraPunch';
 
 export class GameScene extends Phaser.Scene {
   private shield!: MoraleShield;
-  private backgroundTiles: Phaser.GameObjects.Image[] = [];
+  private parallax!: ParallaxBackground;
   private enemies: Enemy[] = [];
   private heroes: Hero[] = [];
   private attacks: Attack[] = [];
@@ -45,9 +47,12 @@ export class GameScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('map-barangay', '/assets/backgrounds/map-barangay.svg');
+    for (const layer of PARALLAX.layers) {
+      this.load.image(layer.key, `/assets/backgrounds/${layer.key}.svg`);
+    }
     this.load.image('hero-base', '/assets/heroes/hero-base.svg');
     this.load.image('eden_portrait', '/assets/heroes/eden_portrait.png');
+    this.load.image('eden_sprite', '/assets/heroes/eden_sprite.png');
     this.load.image('enemy-base', '/assets/enemies/enemy-base.svg');
     // this.load.audio('sfx-btn-press', 'assets/sounds/btn-press.mp3');
     // this.load.audio('sfx-victory', 'assets/sounds/victory.mp3');
@@ -391,6 +396,11 @@ export class GameScene extends Phaser.Scene {
 
     // --- HERO SKILLS ---
     this.events.on('heroSkillTriggered', ({ hero, skillId }: { hero: Hero, skillId: HeroId }) => {
+      // Camera punch on the cast — layered on the follow camera via the shake
+      // effect (render-only, no scroll drift). It decays during the cut-in
+      // freeze that follows, reading as an impact.
+      cameraPunch(this, FX.cameraShake.skillCast, true);
+
       // Anime-style cut-in for every hero (Eden is the reference). Pauses
       // gameplay while it plays, reusing the system-pause pattern (no UI
       // events — the GameEvents contract stays unchanged). Skipped in sandbox
@@ -467,8 +477,7 @@ export class GameScene extends Phaser.Scene {
     for (const h of this.heroes) h.destroy();
     for (const a of this.attacks) a.destroy();
     for (const s of this.summons) s.destroy();
-    for (const bg of this.backgroundTiles) bg.destroy();
-    this.backgroundTiles = [];
+    if (this.parallax) this.parallax.destroy();
     if (this.shield) this.shield.destroy();
 
     this.buildGame();
@@ -495,13 +504,8 @@ export class GameScene extends Phaser.Scene {
     this.spawnTimer = 2000;
     this.lastSnapshot = '';
 
-    // Repeat the background across the whole rally route.
-    for (let x = 0; x < WORLD_WIDTH; x += GAME_WIDTH) {
-      const bg = this.add.image(x + GAME_WIDTH / 2, GAME_HEIGHT / 2, 'map-barangay');
-      bg.setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
-      bg.setAlpha(0.25);
-      this.backgroundTiles.push(bg);
-    }
+    // Layered parallax backdrop — sells forward motion as the rally marches.
+    this.parallax = new ParallaxBackground(this, GAME_WIDTH, GAME_HEIGHT);
 
     // Scrolling camera over the wide world (sandbox stays static at scroll 0).
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, GAME_HEIGHT);
@@ -575,6 +579,10 @@ export class GameScene extends Phaser.Scene {
       );
       cam.scrollX += (targetScroll - cam.scrollX) * Math.min(1, RALLY.cameraLerpPerSec * (delta / 1000));
     }
+
+    // Slide the parallax layers to match wherever the camera ended up (0 in
+    // sandbox's static camera, which still reads correctly).
+    this.parallax.update(this.cameras.main.scrollX);
 
     // Update entities
     for (const enemy of this.enemies) {

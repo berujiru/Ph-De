@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { FX } from '../../data/level';
 
 export type UnitModelState = 'idle' | 'walk' | 'run' | 'attack' | 'cast' | 'death';
 
@@ -81,15 +82,35 @@ export abstract class UnitModel extends Phaser.GameObjects.Container {
   playProjectileLaunch(): void {
     if (this.dead || !this.scene) return;
     const muzzle = this.muzzleOffset;
-    const flash = this.scene.add.circle(muzzle.x, muzzle.y, 5, 0xffffff, 0.9);
+    const dir = Math.sign(muzzle.x) || 1; // facing: +1 heroes (right), -1 enemies (left)
+
+    // Bright core pop.
+    const flash = this.scene.add.circle(muzzle.x, muzzle.y, 6, 0xffffff, 0.95);
     this.add(flash);
     this.scene.tweens.add({
       targets: flash,
-      scale: 2,
+      scale: 2.2,
       alpha: 0,
-      duration: 120,
+      duration: FX.muzzleFlash.durationMs,
       onComplete: () => flash.destroy(),
     });
+
+    // A few forward streaks fanning out along the firing direction.
+    for (let i = 0; i < FX.muzzleFlash.streaks; i++) {
+      const spread = (i - (FX.muzzleFlash.streaks - 1) / 2) * 0.35;
+      const streak = this.scene.add.rectangle(muzzle.x, muzzle.y, 12, 2, 0xfff2b0)
+        .setRotation(spread);
+      this.add(streak);
+      this.scene.tweens.add({
+        targets: streak,
+        x: muzzle.x + dir * 16,
+        scaleX: 0.2,
+        alpha: 0,
+        duration: FX.muzzleFlash.durationMs,
+        ease: 'Quad.easeOut',
+        onComplete: () => streak.destroy(),
+      });
+    }
   }
 
   /** Brief white blink used for absorbed / blocked hits. */

@@ -5,6 +5,10 @@ import type { MoraleShield } from './MoraleShield';
 import type { Summon } from './Summon';
 import type { ISkillEnemy } from '../core/Skills';
 import { EnemyModel } from './models/EnemyModel';
+import { spawnDamageNumber } from './fx/FloatingText';
+import { spawnHitSpark, spawnDeathBurst } from './fx/ImpactFx';
+import { cameraPunch } from './fx/CameraPunch';
+import { FX } from '../data/level';
 
 export type AilmentType = 'burn' | 'slow' | 'wet' | 'freeze' | 'stun' | 'poison' | 'bleed' | 'rot' | 'sleep' | 'curse' | 'knockback' | 'armorShred';
 
@@ -156,6 +160,9 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     if (amount > 0) {
       this.hp -= amount;
       try { this.scene.sound.play('sfx-enemy-hit'); } catch (e) {}
+      // Combat juice: floating damage number + spark burst at the impact point.
+      spawnDamageNumber(this.scene, this.x, this.y - 18, amount);
+      spawnHitSpark(this.scene, this.x, this.y, 0xffffff);
     }
 
     const pct = Math.max(0, this.hp / this.definition.maxHp);
@@ -164,6 +171,9 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     if (this.hp <= 0) {
       this.isDead = true;
       try { this.scene.sound.play('sfx-enemy-die'); } catch (e) {}
+      // Death pop on top of the model collapse + a subtle camera punch.
+      spawnDeathBurst(this.scene, this.x, this.y, this.definition.color);
+      cameraPunch(this.scene, FX.cameraShake.enemyDeath);
       this.hpBarBg.setVisible(false);
       this.hpBarFill.setVisible(false);
 
