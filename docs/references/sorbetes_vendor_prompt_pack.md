@@ -28,7 +28,7 @@ Synthesized from his profession + attack (no portrait exists yet). Do not drift:
   ice-cream puddles/traps** on the ground that freeze whatever steps on them. He
   can hold a stack of **sugar cones** for the read.
 - **Expression:** easygoing, cheerful, a little mischievous.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** candy **rose-pink** cart/apron anchored on `#f472b6` (his team
@@ -50,7 +50,7 @@ Synthesized from his profession + attack (no portrait exists yet). Do not drift:
 > Easygoing, cheerful, slightly mischievous expression. An everyday hardworking
 > Filipino worker, not a fantasy warrior.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -94,7 +94,7 @@ is the base reference for every following phase.*
 > rear 3/4)** — top of head/cap and cart lid from above, shoulders, and back. Not
 > a flat zenith, no side profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (rose-pink cart/apron, pastel ice-cream scoops, brass bell, scoop, sugar
 > cones). Clean grid, one animation per row, evenly spaced, non-overlapping poses,
 > on a transparent or solid white background. Consistent frame size and centering.

@@ -33,7 +33,7 @@ No portrait exists yet — this bible is **synthesized** from his profession
   **revs and swings in wide melee cleaves**, belching bursts of smog with each
   hit.
 - **Expression:** unbothered veteran cool — squinting, jaw working a toothpick.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** emerald sando (anchor `#10b981`), dark cap, white face towel,
@@ -57,7 +57,7 @@ No portrait exists yet — this bible is **synthesized** from his profession
 > of smog. Unbothered veteran-cool expression, squinting. An everyday hardworking
 > Filipino, not a fantasy warrior.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -98,7 +98,7 @@ the base reference for every following phase.*
 > top of the cap, the towel and shoulders from above, his back. Not a flat zenith,
 > no side profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (emerald sando, driver's cap, face towel, coin pouch, chrome exhaust
 > pipe). Clean grid, one animation per row, evenly spaced, non-overlapping poses,
 > on a transparent or solid white background. Consistent frame size and centering.

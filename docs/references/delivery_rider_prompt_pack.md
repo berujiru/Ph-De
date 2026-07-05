@@ -33,7 +33,7 @@ No portrait exists yet, so this bible is synthesized from the profession
   which he revs and summons for the skill. Draw a returning parcel arc with a
   motion trail.
 - **Expression:** eager, cheeky grin — the rider who's always in a rush.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** anchored on his engine color **green `#22c55e`** (jacket + delivery
@@ -57,7 +57,7 @@ No portrait exists yet, so this bible is synthesized from the profession
 > to throw. Eager, cheeky grin. An everyday hardworking Filipino rider, not a
 > fantasy biker; use plain generic team colors, no real brand logos.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -98,7 +98,7 @@ the base reference for every following phase.*
 > 3/4)** — top of the helmet, shoulders, the square delivery backpack, and back.
 > Not a flat zenith, no side profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (green jacket, green delivery backpack, dark helmet, light-green
 > parcels). Clean grid, one animation per row, evenly spaced, non-overlapping
 > poses, on a transparent or solid white background. Consistent frame size and

@@ -33,7 +33,7 @@ drift:
 - **Prop / weapon:** a Y-frame **slingshot (tirador)** loaded with a **pebble**;
   he fires straight, piercing shots.
 - **Expression:** tired but fiercely focused — cramming energy, jaw set.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** white polo, black hair, **amber lanyard/backpack accents**
@@ -57,7 +57,7 @@ drift:
 > fiercely focused expression. An everyday hardworking Filipino, not a fantasy
 > warrior.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -98,7 +98,7 @@ base reference for every following phase.*
 > 3/4)** — top of head, the backpack from above, shoulders, and back. Not a flat
 > zenith, no side profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (white polo, black hair, amber lanyard, school backpack, slingshot).
 > Clean grid, one animation per row, evenly spaced, non-overlapping poses, on a
 > transparent or solid white background. Consistent frame size and centering.

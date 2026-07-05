@@ -27,7 +27,7 @@ Synthesized from his profession + attack (no portrait exists yet). Do not drift:
   with a worn wooden handle and a bright steel crescent blade. He *cleaves* the
   grass and enemies in a short arc.
 - **Expression:** quietly determined, weather-lined, unshakeable.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** deep field-green shirt anchored on `#15803d` (his team tint),
@@ -50,7 +50,7 @@ Synthesized from his profession + attack (no portrait exists yet). Do not drift:
 > determined, weather-lined expression. An everyday hardworking Filipino worker,
 > not a fantasy warrior.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -92,7 +92,7 @@ base reference for every following phase.*
 > — top of the salakot from above, shoulders, and back. Not a flat zenith, no side
 > profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (green shirt, straw salakot, brown trousers, steel karit). Clean grid,
 > one animation per row, evenly spaced, non-overlapping poses, on a transparent or
 > solid white background. Consistent frame size and centering.

@@ -34,7 +34,7 @@ taupe/dust grey). Do not drift:
   the frontline.
 - **Expression:** determined, no-nonsense — "not on my street" glare over the
   bandana.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** taupe-grey work shirt (anchor `#a8a29e`), straw hat, warm-brown
@@ -57,7 +57,7 @@ taupe/dust grey). Do not drift:
 > bristly **stick broom (Walis Tingting)** like a staff. Determined, no-nonsense
 > expression. An everyday hardworking Filipino, not a fantasy warrior.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -98,7 +98,7 @@ the base reference for every following phase.*
 > 3/4)** — top of the straw hat, shoulders and back from above. Not a flat zenith,
 > no side profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (taupe-grey work shirt, straw hat, face bandana, stick broom). Clean
 > grid, one animation per row, evenly spaced, non-overlapping poses, on a
 > transparent or solid white background. Consistent frame size and centering.

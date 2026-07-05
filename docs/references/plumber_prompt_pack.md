@@ -32,7 +32,7 @@ No portrait exists yet, so this bible is synthesized from the profession
   **high-pressure water blast wave** down the lane — draw a fan of pressurized
   water streaming from the pipe.
 - **Expression:** easygoing, confident smirk — the "kaya ko 'to" tradesman look.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** anchored on his engine color **blue `#2563eb`** (coverall + cap +
@@ -56,7 +56,7 @@ No portrait exists yet, so this bible is synthesized from the profession
 > high-pressure pipe nozzle** gushing water. Easygoing confident smirk. An
 > everyday hardworking Filipino tradesman, not a fantasy water-mage.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -97,7 +97,7 @@ base reference for every following phase.*
 > 3/4)** — top of the cap, hose coil, shoulders, and back. Not a flat zenith, no
 > side profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (blue coverall, white sando, chrome wrench, cyan-white water). Clean
 > grid, one animation per row, evenly spaced, non-overlapping poses, on a
 > transparent or solid white background. Consistent frame size and centering.

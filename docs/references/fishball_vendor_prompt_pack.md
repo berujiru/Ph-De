@@ -28,7 +28,7 @@ Synthesized from his profession + attack (no portrait exists yet). Do not drift:
   fishballs/squidballs, which he *throws like darts* — a skewer pierces a whole
   line of enemies. He can carry a fan of spare skewers for the read.
 - **Expression:** grinning, salesman-friendly, unbothered.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** warm **rose-red** apron/shirt accents anchored on `#f43f5e` (his
@@ -50,7 +50,7 @@ Synthesized from his profession + attack (no portrait exists yet). Do not drift:
 > golden-fried fishballs, which he throws like darts. Grinning, salesman-friendly
 > expression. An everyday hardworking Filipino worker, not a fantasy warrior.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -94,7 +94,7 @@ is the base reference for every following phase.*
 > rear 3/4)** — top of head/cap from above, shoulders, and back. Not a flat
 > zenith, no side profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (rose-red apron, bandana/cap, bamboo skewers, stainless cart). Clean
 > grid, one animation per row, evenly spaced, non-overlapping poses, on a
 > transparent or solid white background. Consistent frame size and centering.

@@ -46,8 +46,14 @@ not on the battlefield.
 Before generating sprites, we need a consistent character reference that shows all angles. You will prompt Gemini (using its image generation capabilities) to create a turnaround sheet.
 
 ### Art Style Keywords
+The canonical hero look is **anime-style cel-shading** (owner decision) — dynamic
+anime key-art energy with the readability of bold, flat, mobile-first shapes.
 Always include these keywords in the Gemini prompt to match the game's aesthetic:
-> `High-contrast cel-shaded vector art, flat colors, bold clean outer strokes, 2D mobile game asset, plain white background, isolated character.`
+> `High-contrast anime-style cel-shading, expressive anime faces and proportions, flat cel-shaded colors, bold clean outer strokes, 2D mobile game asset, plain white background, isolated character.`
+
+**Heroes** are heroic-anime; **enemies** use the same anime cel-shaded language but
+lean **grotesque/exaggerated**. Keep it bold and readable at small mobile sizes —
+anime *energy*, not busy detail.
 
 ### The Complete Angle Prompt Template (For Gemini)
 Use this prompt template to generate the base concept sheet. Fill in the bracketed information.
@@ -57,7 +63,7 @@ Use this prompt template to generate the base concept sheet. Fill in the bracket
 > 
 > **Character Details:** [Insert Archetype, e.g., A stressed Filipino Teacher holding a wooden ruler and a megaphone].
 > **Color Palette:** [Insert Colors, e.g., Deep slate blue uniform, red accents, gold whistle].
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer strokes, similar to Persona 5 UI crossed with Hades silhouettes. Plain solid background.
+> **Style:** High-contrast anime-style cel-shading, expressive anime faces and proportions, flat colors, bold clean outer strokes, dynamic anime key-art energy crossed with Persona 5 UI pop and Hades silhouettes. Plain solid background.
 > 
 > **Required Layout:** Show the exact same character standing in a row from four specific angles:
 > 1. **Front View:** Looking directly at the camera.

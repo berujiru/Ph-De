@@ -28,7 +28,7 @@ specific real person's likeness, name, or voice. Do not drift:
 - **Outfit:** simple sando/undershirt, rolled-sleeve plaid overshirt, worn
   shorts, tsinelas (rubber slippers), a small sweat-rag or bucket hat.
 - **Expression:** friendly, singsong-hawker warmth with a determined squint.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** anchored on **`#e2e8f0` (cool off-white / brushed aluminum)** —
@@ -52,7 +52,7 @@ specific real person's likeness, name, or voice. Do not drift:
 > determined squint. An everyday hardworking Filipino vendor, not a fantasy
 > warrior.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -92,7 +92,7 @@ base reference for every following phase.*
 > 3/4)** — top of head, the shoulder yoke and canister lids from above,
 > shoulders, and back. Not a flat zenith, no side profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (brushed-aluminum canisters, plaid overshirt, caramel syrup, tan skin).
 > Clean grid, one animation per row, evenly spaced, non-overlapping poses, on a
 > transparent or solid white background. Consistent frame size and centering.

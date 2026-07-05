@@ -28,7 +28,7 @@ never a specific real person's likeness, name, or voice. Do not drift:
   fine ranged spritz that heals allies it passes through.
 - **Outfit:** white scrubs, comfortable rubber shoes, a lanyard ID clip.
 - **Expression:** calm, reassuring, quietly determined.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** anchored on **`#fca5a5` (soft healing rose/salmon)** for the red
@@ -52,7 +52,7 @@ never a specific real person's likeness, name, or voice. Do not drift:
 > belt. Calm, reassuring, quietly determined expression. An everyday hardworking
 > Filipino frontline health worker, not a fantasy warrior.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -93,7 +93,7 @@ reference for every following phase.*
 > — top of head, the red-cross cap from above, shoulders, and back. Not a flat
 > zenith, no side profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (white scrubs, red-cross cap, stethoscope, rose Holy glow). Clean grid,
 > one animation per row, evenly spaced, non-overlapping poses, on a transparent
 > or solid white background. Consistent frame size and centering.

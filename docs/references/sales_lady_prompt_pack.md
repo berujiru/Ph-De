@@ -26,7 +26,7 @@ Synthesized from her profession + attack (no portrait exists yet). Do not drift:
   attack is a rapid-fire verbal **"Ma'am/Sir!" sales pitch** — a fast hitscan of
   shouted sale words. She can also wave a **"SALE" flyer/tag** for the read.
 - **Expression:** bright customer-service smile, sharp eyes, unstoppable poise.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** vivid **magenta-pink** uniform anchored on `#ec4899` (her team
@@ -48,7 +48,7 @@ Synthesized from her profession + attack (no portrait exists yet). Do not drift:
 > **"SALE" flyer/tag**. Bright customer-service smile with sharp, confident eyes.
 > An everyday hardworking Filipina worker, not a fantasy warrior.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -90,7 +90,7 @@ base reference for every following phase.*
 > 3/4)** — top of head from above, shoulders, and back. Not a flat zenith, no side
 > profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (magenta uniform, white blouse, lanyard/name tag, chrome megaphone).
 > Clean grid, one animation per row, evenly spaced, non-overlapping poses, on a
 > transparent or solid white background. Consistent frame size and centering.

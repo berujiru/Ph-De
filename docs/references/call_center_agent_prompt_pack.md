@@ -30,7 +30,7 @@ a specific real person's likeness, name, or voice. Do not drift:
 - **Outfit:** smart-casual office wear — collared polo or hoodie over a company
   shirt, jeans, sneakers, a lanyard with an access card.
 - **Expression:** deadpan, unbothered, faint exhausted smirk.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** anchored on **`#fef08a` (electric pale-yellow)** for the crackling
@@ -55,7 +55,7 @@ a specific real person's likeness, name, or voice. Do not drift:
 > unbothered, faintly exhausted expression. An everyday hardworking Filipino BPO
 > worker, not a fantasy warrior.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -97,7 +97,7 @@ is the base reference for every following phase.*
 > rear 3/4)** — top of head, the headset band and boom mic from above, shoulders,
 > and back. Not a flat zenith, no side profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (glowing electric-yellow headset arcs, office blues/grays). Clean grid,
 > one animation per row, evenly spaced, non-overlapping poses, on a transparent or
 > solid white background. Consistent frame size and centering.

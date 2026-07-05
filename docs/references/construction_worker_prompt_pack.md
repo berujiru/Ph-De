@@ -29,7 +29,7 @@ real person's likeness, name, or voice. Do not drift:
 - **Outfit:** dirt-smudged tank top or open work shirt over a sando, sturdy
   work gloves, worn cargo pants, heavy boots, a rag tucked in the belt.
 - **Expression:** unbothered, focused, salt-of-the-earth grit.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** anchored on **`#d97706` (safety amber / construction orange)** for
@@ -52,7 +52,7 @@ real person's likeness, name, or voice. Do not drift:
 > Unbothered, focused, gritty expression. An everyday hardworking Filipino
 > laborer, not a fantasy warrior.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -93,7 +93,7 @@ This is the base reference for every following phase.*
 > rear 3/4)** — top of the hard hat, the yero sheets from above, shoulders, and
 > back. Not a flat zenith, no side profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (yellow hard hat, corrugated steel yero, denim, dust). Clean grid, one
 > animation per row, evenly spaced, non-overlapping poses, on a transparent or
 > solid white background. Consistent frame size and centering.

@@ -29,7 +29,7 @@ real person's likeness, name, or voice. Do not drift:
 - **Outfit:** buttoned navy uniform shirt with epaulettes, black slacks, black
   boots, a whistle on a lanyard.
 - **Expression:** stern, watchful, jaw set.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** anchored on **`#1e3a8a` (deep navy guard blue)** for the uniform
@@ -52,7 +52,7 @@ real person's likeness, name, or voice. Do not drift:
 > Stern, watchful, jaw-set expression. An everyday hardworking Filipino guard, not
 > a fantasy warrior.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -93,7 +93,7 @@ the base reference for every following phase.*
 > 3/4)** — top of the peaked cap, shoulders, and back. Not a flat zenith, no side
 > profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (navy uniform, shiny badge, wooden baton, flashlight beam). Clean grid,
 > one animation per row, evenly spaced, non-overlapping poses, on a transparent or
 > solid white background. Consistent frame size and centering.

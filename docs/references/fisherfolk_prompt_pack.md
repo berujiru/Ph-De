@@ -34,7 +34,7 @@ drift:
   inward and leaving them Wet.
 - **Expression:** quiet, watchful — reading the water, then a sharp focused snap
   on the cast.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** sea-blue sando (anchor `#0ea5e9`), tan woven salakot, off-white
@@ -57,7 +57,7 @@ drift:
 > with a beaded weighted rim gathered in his arms. Quiet, watchful expression. An
 > everyday hardworking Filipino, not a fantasy warrior.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -96,7 +96,7 @@ base reference for every following phase.*
 > top of the salakot, shoulders and back from above. Not a flat zenith, no side
 > profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (sea-blue sando, woven salakot, weighted cast net). Clean grid, one
 > animation per row, evenly spaced, non-overlapping poses, on a transparent or
 > solid white background. Consistent frame size and centering.

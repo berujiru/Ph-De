@@ -24,10 +24,13 @@ Derived from her canonical HUD portrait (`eden_portrait.png`). Do not drift:
   chest; simple, casual, streetwear.
 - **Prop / weapon:** a handheld **red-and-white megaphone (bullhorn)**. She
   *throws* megaphones as her attack, so she can carry a spare/holster read.
-- **Expression:** determined but optimistic — a slight confident smile.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
-  strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
-  solid/white background, isolated character.
+- **Expression:** determined but optimistic — a slight confident smile, with
+  **expressive anime eyes** (large, bright, bold highlights).
+- **Style:** **High-contrast anime-style cel-shading** (canonical hero look) —
+  expressive anime face and proportions, dynamic anime key-art energy, flat cel
+  colors, bold clean outer strokes, 2D mobile game asset (anime × Persona 5 UI
+  pop × Hades silhouette), plain solid/white background, isolated character.
+  Bold and readable at small mobile size — anime *energy*, not busy detail.
 - **Palette:** pink top, black hair, pink+blue bow, red/white megaphone. (The
   engine tint `#3b82f6` is only a fallback for missing sprites — the real sheet
   uses her true colors, no blue wash.)
@@ -47,8 +50,9 @@ Derived from her canonical HUD portrait (`eden_portrait.png`). Do not drift:
 > expression with a slight confident smile. An everyday hardworking Filipina, not
 > a fantasy warrior.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
-> strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
+> **Style:** High-contrast anime-style cel-shading — expressive anime face and
+> proportions, dynamic anime key-art energy, flat colors, bold clean outer
+> strokes, 2D mobile game asset (anime crossed with Persona 5 UI pop and Hades
 > silhouettes). Plain solid background, isolated character.
 >
 > **Required Layout:** Show the exact same character in a row from these angles.
@@ -87,7 +91,7 @@ reference for every following phase.*
 > — top of head, the pink bow from above, shoulders, and back. Not a flat
 > zenith, no side profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (pink tee, black hair, pink+blue polka-dot bow, red/white megaphone).
 > Clean grid, one animation per row, evenly spaced, non-overlapping poses, on a
 > transparent or solid white background. Consistent frame size and centering.
@@ -115,29 +119,18 @@ tag names above spelled exactly: `idle march attack cast celebrate defeat`.*
 
 ---
 
-## Phase 3 — Rally Skill Cut-In (anime-style)
+## Separate store assets — skill & cut-in (own packs)
 
-**Attach `eden_base_turnaround.png` (or the front view) first**, then:
+The signature **skill effect** and the anime **cut-in ("cut-out") animation** are
+authored as **standalone, individually customizable store assets** — each has its
+own pack so they can be swapped/sold independently of the base sprite sheet:
 
-> Using the attached Eden reference, generate a large high-resolution 2D portrait
-> sequence for her dramatic "Ultimate Skill" cut-in. Skill name: **RALLY**
-> (she screams into her megaphone to fire up the whole squad). Voice line:
-> *"Sugod, mga kababayan! Walang aatras!"*
->
-> **Style:** Dramatic anime action shot, intense lighting, comic-book halftone
-> overlays, dynamic speed lines. Close-up on upper body and face. Keep her pink
-> polka-dot bow, black hair, pink tee, and red/white megaphone on-model.
->
-> Generate 3 separate poses:
-> 1. **Anticipation:** inhaling, raising the megaphone toward her mouth, dramatic
->    shadow, coiled energy.
-> 2. **Action/Shout:** the climax — mouth wide open screaming into the megaphone,
->    the bullhorn foreshortened dramatically toward the camera, sound-blast rings.
-> 3. **Resolution:** a cool defiant post-shout pose, fist up or megaphone lowered,
->    exhaling.
+- **Skill VFX** → [`eden_skill_prompt_pack.md`](eden_skill_prompt_pack.md) — the
+  in-world Rally effect (buff aura / shockwave) that plays when the skill fires.
+- **Cut-in animation** → [`eden_cutin_prompt_pack.md`](eden_cutin_prompt_pack.md)
+  — the dramatic anime "Ultimate Skill" cut-out that slides across screen.
 
-*Export as `eden_cutin.png` + `eden_cutin.json` (texture atlas). The in-game
-`cast` body pose (Phase 2, row 4) plays underneath while this panel slides.*
+This base pack now covers **only the character sprite sheet** (Phase 1 + Phase 2).
 
 ---
 
@@ -146,8 +139,9 @@ tag names above spelled exactly: `idle march attack cast celebrate defeat`.*
 - Transparent background, consistent frame size, no clipped limbs/megaphone.
 - Tag names MUST match the engine states 1:1 — see the checklist in
   `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` (Phase 4).
-- Drop finished files in `public/assets/heroes/`:
-  `eden.png`, `eden.json`, `eden_cutin.png`, `eden_cutin.json`.
+- Drop finished sprite-sheet files in `public/assets/heroes/`:
+  `eden.png`, `eden.json`. (The `eden_cutin.*` files are covered by the cut-in
+  pack; the skill VFX by the skill pack.)
 
 ## Integration status
 
@@ -157,13 +151,11 @@ state routes through the sprite-sheet path with a tween fallback, Eden's
 hero atlas that loads. Until the art exists Eden renders the tinted `hero-base`
 placeholder (no broken texture) and still animates all six states via tweens.
 
-**To light up the real art, once you've generated the sheets:**
-1. Drop `eden.png` + `eden.json` (and `eden_cutin.png` + `eden_cutin.json`) into
-   `public/assets/heroes/`.
+**To light up the real art, once you've generated the sprite sheet:**
+1. Drop `eden.png` + `eden.json` into `public/assets/heroes/`.
 2. In `GameScene.preload()`, uncomment:
    `this.load.aseprite('eden', '/assets/heroes/eden.png', '/assets/heroes/eden.json');`
    That's it — the six states play from real frames automatically.
 
-**Still on the backlog (I do this when you're ready):** feed `eden_cutin` into
-`SkillCutIn` so the Rally cut-in plays real frames instead of the tinted
-silhouette. The `cast` body pose already plays underneath.
+The **cut-in** and **skill VFX** wiring lives in their own packs
+(`eden_cutin_prompt_pack.md`, `eden_skill_prompt_pack.md`).

@@ -31,7 +31,7 @@ drift:
   his attack, so keep a visible sack of glowing-hot rolls read at his side. A
   faint heat-shimmer / ember glow rises off the fresh bread.
 - **Expression:** cheerful and defiant — a broad, sweaty grin, "init pa!" energy.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** anchored on his engine color **red `#ef4444`** (bandana + apron
@@ -55,7 +55,7 @@ drift:
 > pandesal** that glows with faint orange embers. Cheerful, sweaty, broad grin.
 > An everyday hardworking Filipino, not a fantasy mage.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -95,7 +95,7 @@ reference for every following phase.*
 > — top of the cap, bandana knot, shoulders, and back. Not a flat zenith, no side
 > profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (white apron, red bandana, brown pandesal with orange ember glow). Clean
 > grid, one animation per row, evenly spaced, non-overlapping poses, on a
 > transparent or solid white background. Consistent frame size and centering.

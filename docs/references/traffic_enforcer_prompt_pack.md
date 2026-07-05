@@ -34,7 +34,7 @@ traffic enforcer), archetype, and weapon in `balance.ts` +
   swirling magnetic/vortex lines around the paddle.
 - **Expression:** stern, no-nonsense authority — furrowed brow, mouth set to blow
   the whistle.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** anchored on his engine color **slate `#475569`** (cap + uniform),
@@ -58,7 +58,7 @@ traffic enforcer), archetype, and weapon in `balance.ts` +
 > **red-and-white "STOP" traffic paddle baton**. Stern, no-nonsense expression. An
 > everyday hardworking Filipino traffic aide, not a fantasy soldier.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -98,7 +98,7 @@ the base reference for every following phase.*
 > rear 3/4)** — top of the cap, shoulders, hi-vis vest straps, and back. Not a
 > flat zenith, no side profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (slate uniform, neon-yellow vest, red/white STOP paddle, silver
 > whistle). Clean grid, one animation per row, evenly spaced, non-overlapping
 > poses, on a transparent or solid white background. Consistent frame size and

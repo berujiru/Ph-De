@@ -33,7 +33,7 @@ boomerang), and her `balance.ts` color anchor `#8b5cf6` (violet). Do not drift:
   throw.
 - **Expression:** stern-but-caring — the "settle down, class" look, one eyebrow
   raised.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** violet blouse (anchor `#8b5cf6`), dark hair, cream/pale-violet
@@ -56,7 +56,7 @@ boomerang), and her `balance.ts` color anchor `#8b5cf6` (violet). Do not drift:
 > ruler (Pamalo)** she can throw. Stern-but-caring "settle down, class"
 > expression. An everyday hardworking Filipina, not a fantasy warrior.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -95,7 +95,7 @@ base reference for every following phase.*
 > 3/4)** — top of head, the bun and lanyard strap from above, shoulders, and back.
 > Not a flat zenith, no side profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (violet polo, dark bun, name-tag lanyard, wooden ruler). Clean grid, one
 > animation per row, evenly spaced, non-overlapping poses, on a transparent or
 > solid white background. Consistent frame size and centering.

@@ -29,7 +29,7 @@ his `balance.ts` color anchor `#38bdf8` (electric sky-blue). Do not drift:
 - **Prop / weapon:** insulated **jumper cables / clamps** he snaps together so a
   crackling electric arc leaps out and bounces between targets (his chain attack).
 - **Expression:** focused and dry — the "I've fixed worse than this" look.
-- **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+- **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
   strokes, 2D mobile game asset (Persona 5 UI pop × Hades silhouette), plain
   solid/white background, isolated character.
 - **Palette:** sky-blue work shirt (anchor `#38bdf8`), yellow hard hat, black
@@ -52,7 +52,7 @@ his `balance.ts` color anchor `#38bdf8` (electric sky-blue). Do not drift:
 > clamps** with a crackling blue electric arc between them. Focused, dry
 > expression. An everyday hardworking Filipino, not a fantasy warrior.
 >
-> **Style:** High-contrast cel-shaded vector art, flat colors, bold clean outer
+> **Style:** High-contrast anime cel-shaded art, flat colors, bold clean outer
 > strokes, 2D mobile game asset (Persona 5 UI pop crossed with Hades
 > silhouettes). Plain solid background, isolated character.
 >
@@ -93,7 +93,7 @@ the base reference for every following phase.*
 > rear 3/4)** — top of the hard hat, the harness/tool belt from above, shoulders,
 > and back. Not a flat zenith, no side profiles, no low angles.
 >
-> **Style & Formatting:** Match the cel-shaded vector style of the reference
+> **Style & Formatting:** Match the anime cel-shaded style of the reference
 > exactly (sky-blue shirt, yellow hard hat, rubber gloves, arcing jumper cables).
 > Clean grid, one animation per row, evenly spaced, non-overlapping poses, on a
 > transparent or solid white background. Consistent frame size and centering.

@@ -7,7 +7,10 @@ This document serves as the master specification for creating visual and audio a
 ## 1. Global Visual Direction & Theme
 
 **Theme**: A Modern, Grassroots Street Protest. 
-**Style**: **High-Contrast, Cel-Shaded Vector Art** (Inspired by the UI pop of *Persona 5* crossed with the bold silhouettes of *Hades*).
+**Style**: **High-Contrast, Anime-Style Cel-Shading** (owner decision) — expressive
+anime faces and proportions with dynamic anime key-art energy, kept bold and flat
+for mobile readability (Persona 5 UI pop × Hades silhouettes). Heroes are
+heroic-anime; enemies use the same anime cel-shaded language but grotesque.
 
 - **Colors**: Rely heavily on the game's palette (`#0f172a` deep slate background, `#facc15` gold, `#ef4444` red, `#38bdf8` accent blue). Assets should pop against a dark background.
 - **Line Art**: Clean, bold outer strokes with flat cel-shading. Avoid messy textures. Readability on a small mobile screen is the highest priority.
