@@ -103,11 +103,11 @@ the base reference for the next phase.*
 > and the raised shield. Not a flat zenith, no side profiles, no low angles.
 >
 > **Style & Formatting:** Match the cel-shaded vector style of the reference
-> exactly (straining black suit, riot shield, coiled earpiece). Clean grid, one
-> animation per row, evenly spaced, non-overlapping poses, on a transparent or
-> solid white background. Consistent frame size and centering.
+> exactly (straining black suit, riot shield, coiled earpiece). Lay out as horizontal rows, one animation per row, each frame in its own evenly-spaced cell, non-overlapping, with consistent size and centering.
 >
-> **MANDATORY LAYOUT — exactly 5 labelled rows:**
+> **OUTPUT RULES (critical — the last generation drew these by mistake):** Fully **transparent** background — NO white fill. Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere in the image. Output ONLY the character art, arranged in evenly-spaced **invisible** cells.
+>
+> **MANDATORY LAYOUT — exactly 5 rows, in this exact top-to-bottom order:**
 > 1. **`march`** — EXACTLY 4 frames: a heavy, deliberate lumber toward the viewer,
 >    shield held up, shoulders rolling (front view).
 > 2. **`attack`** — EXACTLY 3 frames: **bashing the barrier with the shield edge**,

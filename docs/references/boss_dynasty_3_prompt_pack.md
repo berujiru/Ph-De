@@ -150,13 +150,11 @@ the base reference for the next phase.*
 > angles.
 >
 > **Style & Formatting:** Match the cel-shaded vector style of the reference
-> exactly (fuchsia aura, floating coronet, crest chest-plate, ancestor-ghosts).
-> Draw it at boss scale — sleeker but grander than its forebears, more grotesque
-> than a minion. Clean grid, one animation per row, evenly spaced, non-overlapping
-> poses, on a transparent or solid white background. Consistent frame size and
-> centering.
+> exactly (fuchsia aura, floating coronet, crest chest-plate, ancestor-ghosts). Lay out as horizontal rows, one animation per row, each frame in its own evenly-spaced cell, non-overlapping, with consistent size and centering.
 >
-> **MANDATORY LAYOUT — exactly 6 labelled rows:**
+> **OUTPUT RULES (critical — the last generation drew these by mistake):** Fully **transparent** background — NO white fill. Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere in the image. Output ONLY the character art, arranged in evenly-spaced **invisible** cells.
+>
+> **MANDATORY LAYOUT — exactly 6 rows, in this exact top-to-bottom order:**
 > 1. **`march`** — EXACTLY 4 frames: a quick, entitled strut toward the viewer,
 >    aura pulsing, coronet bobbing (front view).
 > 2. **`attack`** — EXACTLY 3 frames: **lashing out with an aura-charged fuchsia

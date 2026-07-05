@@ -105,11 +105,11 @@ the base reference for the next phase.*
 > log-torso, and chainsaw arm. Not a flat zenith, no side profiles, no low angles.
 >
 > **Style & Formatting:** Match the cel-shaded vector style of the reference
-> exactly (chainsaw arm, stolen-log body, oozing sap, filthy hard-hat). Clean grid,
-> one animation per row, evenly spaced, non-overlapping poses, on a transparent or
-> solid white background. Consistent frame size and centering.
+> exactly (chainsaw arm, stolen-log body, oozing sap, filthy hard-hat). Lay out as horizontal rows, one animation per row, each frame in its own evenly-spaced cell, non-overlapping, with consistent size and centering.
 >
-> **MANDATORY LAYOUT — exactly 5 labelled rows:**
+> **OUTPUT RULES (critical — the last generation drew these by mistake):** Fully **transparent** background — NO white fill. Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere in the image. Output ONLY the character art, arranged in evenly-spaced **invisible** cells.
+>
+> **MANDATORY LAYOUT — exactly 5 rows, in this exact top-to-bottom order:**
 > 1. **`march`** — EXACTLY 4 frames: a slow, heavy plod toward the viewer,
 >    log-body swaying, chainsaw idling with a puff of exhaust (front view).
 > 2. **`attack`** — EXACTLY 3 frames: **revving the chainsaw and sawing it hard

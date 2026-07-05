@@ -128,13 +128,11 @@ the base reference for the next phase.*
 >
 > **Style & Formatting:** Match the cel-shaded vector style of the reference
 > exactly (obsidian-black machine mass, ring of glowing institutional eyes, red-tape
-> cabling, embedded boss ghost-faces). Draw it at final-boss scale — the largest
-> and most grotesque of all, silhouette bold, black mass kept legible with
-> rim-light. Clean grid, one animation per row, evenly spaced, non-overlapping
-> poses, on a transparent or solid white background. Consistent frame size and
-> centering.
+> cabling, embedded boss ghost-faces). Lay out as horizontal rows, one animation per row, each frame in its own evenly-spaced cell, non-overlapping, with consistent size and centering.
 >
-> **MANDATORY LAYOUT — exactly 6 labelled rows:**
+> **OUTPUT RULES (critical — the last generation drew these by mistake):** Fully **transparent** background — NO white fill. Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere in the image. Output ONLY the character art, arranged in evenly-spaced **invisible** cells.
+>
+> **MANDATORY LAYOUT — exactly 6 rows, in this exact top-to-bottom order:**
 > 1. **`march`** — EXACTLY 4 frames: a slow, grinding, ground-quaking advance toward
 >    the viewer, gears turning, pistons pumping (front view).
 > 2. **`attack`** — EXACTLY 3 frames: **slamming a giant stamp-piston / filing-plate

@@ -99,11 +99,11 @@ base reference for every following phase.*
 > zenith, no side profiles, no low angles.
 >
 > **Style & Formatting:** Match the anime cel-shaded style of the reference
-> exactly (white polo, black hair, amber lanyard, school backpack, slingshot).
-> Clean grid, one animation per row, evenly spaced, non-overlapping poses, on a
-> transparent or solid white background. Consistent frame size and centering.
+> exactly (white polo, black hair, amber lanyard, school backpack, slingshot). Lay out as horizontal rows, one animation per row, each frame in its own evenly-spaced cell, non-overlapping, with consistent size and centering.
 >
-> **MANDATORY LAYOUT — exactly 6 labelled rows:**
+> **OUTPUT RULES (critical — the last generation drew these by mistake):** Fully **transparent** background — NO white fill. Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere in the image. Output ONLY the character art, arranged in evenly-spaced **invisible** cells.
+>
+> **MANDATORY LAYOUT — exactly 6 rows, in this exact top-to-bottom order:**
 > 1. **`idle`** — EXACTLY 3 frames: standing, gentle breathing/bounce, slingshot
 >    held low at his side (rear view).
 > 2. **`march`** — EXACTLY 4 frames: a full walk cycle advancing forward, the

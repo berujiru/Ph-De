@@ -109,11 +109,11 @@ the base reference for the next phase.*
 >
 > **Style & Formatting:** Match the cel-shaded vector style of the reference
 > exactly (translucent glowing body, smoke-tail, blank ID lanyard, phantom time
-> card). Keep the crisp glowing outline so the see-through poses still read. Clean
-> grid, one animation per row, evenly spaced, non-overlapping poses, on a
-> transparent or solid white background. Consistent frame size and centering.
+> card). Lay out as horizontal rows, one animation per row, each frame in its own evenly-spaced cell, non-overlapping, with consistent size and centering.
 >
-> **MANDATORY LAYOUT — exactly 5 labelled rows:**
+> **OUTPUT RULES (critical — the last generation drew these by mistake):** Fully **transparent** background — NO white fill. Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere in the image. Output ONLY the character art, arranged in evenly-spaced **invisible** cells.
+>
+> **MANDATORY LAYOUT — exactly 5 rows, in this exact top-to-bottom order:**
 > 1. **`march`** — EXACTLY 4 frames: a slow, eerie **drifting float** toward the
 >    viewer, smoke-tail undulating, body bobbing weightlessly (front view).
 > 2. **`attack`** — EXACTLY 3 frames: **thrusting the phantom time card / a cold

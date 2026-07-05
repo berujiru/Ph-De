@@ -118,9 +118,11 @@ Provide the Base Concept Sheet to Claude and use the following prompt, adjusting
 > 
 > **Crucial Perspective:** This character is a Hero. The camera is a high top-down oblique positioned above and BEHIND our own front line, so the hero faces AWAY from us into the enemy. Therefore, **ALL sprites in this sheet must be drawn from a HIGH-ANGLE REAR VIEW (Tilted Back / rear 3/4)**. You must be able to see the top of their head, their shoulders, and their back/body. Do not use a completely flat zenith angle, we need to see the body. (Do NOT draw flat side profiles or low/ground-level angles).
 > 
-> **Style & Formatting:** Match the cel-shaded vector art style exactly. The output MUST be a clean grid layout on a solid white or transparent background. Do not overlap the character poses.
+> **Style & Formatting:** Match the reference's exact style. Lay the animations out as horizontal rows, one animation per row, each frame in its own evenly-spaced cell, non-overlapping poses.
 > 
-> **MANDATORY LAYOUT (Exactly 6 Rows — one animation per row, label each row):**
+> **OUTPUT RULES (critical — image models will otherwise draw these):** Fully **transparent** background (no white fill). Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere. Output ONLY the character art in evenly-spaced **invisible** cells.
+> 
+> **MANDATORY LAYOUT (Exactly 6 rows, one animation per row, in this top-to-bottom order — do NOT write the row names into the image):**
 > 1. **Row 1 — `idle`:** EXACTLY 3 frames, breathing/bouncing in place (Rear View).
 > 2. **Row 2 — `march`:** EXACTLY 4 frames, a full walk cycle advancing forward (Rear View).
 > 3. **Row 3 — `attack`:** EXACTLY 3 frames of the basic attack [Insert attack, e.g. swinging the ruler]. Frame 2 MUST be a clear impact frame (Rear View).
@@ -135,9 +137,11 @@ Provide the Base Concept Sheet to Claude and use the following prompt, adjusting
 > 
 > **Crucial Perspective:** This character is an Enemy (anomaly). The camera is a high top-down oblique above and behind the player's line, so this enemy faces TOWARD the camera as it bears down on the heroes. Therefore, **ALL sprites in this sheet must be drawn from a HIGH-ANGLE FRONT VIEW (Tilted Forward / front 3/4)**. You must be able to see the top of their head, their shoulders, and their chest/front body. Do not use a completely flat zenith angle, we need to see the body. (Do NOT draw flat side profiles or low/ground-level angles).
 > 
-> **Style & Formatting:** Match the cel-shaded vector art style exactly. The output MUST be a clean grid layout on a solid white or transparent background. Do not overlap the character poses.
+> **Style & Formatting:** Match the reference's exact style. Lay the animations out as horizontal rows, one animation per row, each frame in its own evenly-spaced cell, non-overlapping poses.
 > 
-> **MANDATORY LAYOUT (Exactly 5 Rows — one animation per row, label each row):**
+> **OUTPUT RULES (critical — image models will otherwise draw these):** Fully **transparent** background (no white fill). Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere. Output ONLY the character art in evenly-spaced **invisible** cells.
+> 
+> **MANDATORY LAYOUT (Exactly 5 rows, one animation per row, in this top-to-bottom order — do NOT write the row names into the image):**
 > 1. **Row 1 — `march`:** EXACTLY 4 frames of a confident walk cycle advancing toward the viewer (Front View).
 > 2. **Row 2 — `attack`:** EXACTLY 3 frames clawing/lunging forward at the barrier. Frame 2 MUST be a clear impact frame (Front View).
 > 3. **Row 3 — `stunned`:** EXACTLY 2 frames looking dazed with spinning stars above their head (Front View).
@@ -172,6 +176,7 @@ Since AI image generators can sometimes hallucinate or skip frames, QA and devel
 - [ ] **State Completeness:** Every required row present and correctly labelled — Heroes: `idle / march / attack / cast / celebrate / defeat`. Enemies: `march / attack / stunned / celebrate / death`. Tag names must match `UnitModel` states exactly.
 - [ ] **Animation Frame Count:** Count the individual frames. Does the sheet have the exact number of frames requested per row? (e.g., exactly 4 march frames, exactly 3 attack frames).
 - [ ] **Impact Frame:** Does the Attack row have a clear, distinct frame where the weapon hits the target or the projectile is released?
+- [ ] **No baked-in grid/labels/background:** The sheet must be character art ONLY on a transparent background — **no drawn grid lines, cell borders, row-name text, numbers, or a white fill**. Image models love to draw these; if present, re-generate with the OUTPUT RULES (they can't be reliably erased). This is the single most common failure.
 - [ ] **Clean Silhouettes:** Are the character poses overlapping? (If yes, it will be impossible to slice. Prompt the AI to space them out).
 - [ ] **Consistency:** Did the character's colors or clothing randomly change in one of the frames?
 - [ ] **Cropping:** Are any of the character's limbs or weapons cut off by the edge of the generated image bounds?

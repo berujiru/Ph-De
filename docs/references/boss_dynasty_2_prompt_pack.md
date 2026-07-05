@@ -140,12 +140,11 @@ attach when generating Phase 3 (Heir).*
 >
 > **Style & Formatting:** Match the cel-shaded vector style of the reference
 > exactly (magenta-purple suit, puppet-strings of contracts/envelopes, family
-> crest medallion). Draw it at boss scale — taller and leaner than the Bruiser,
-> more grotesque than a minion. Clean grid, one animation per row, evenly spaced,
-> non-overlapping poses, on a transparent or solid white background. Consistent
-> frame size and centering.
+> crest medallion). Lay out as horizontal rows, one animation per row, each frame in its own evenly-spaced cell, non-overlapping, with consistent size and centering.
 >
-> **MANDATORY LAYOUT — exactly 5 labelled rows (NO cast row):**
+> **OUTPUT RULES (critical — the last generation drew these by mistake):** Fully **transparent** background — NO white fill. Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere in the image. Output ONLY the character art, arranged in evenly-spaced **invisible** cells.
+>
+> **MANDATORY LAYOUT — exactly 5 rows (NO cast row), in this exact top-to-bottom order:**
 > 1. **`march`** — EXACTLY 4 frames: a smooth, gliding advance toward the viewer,
 >    strings swaying, deliberate and unhurried (front view).
 > 2. **`attack`** — EXACTLY 3 frames: **whipping its contract-strings forward** to

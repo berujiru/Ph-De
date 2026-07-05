@@ -108,11 +108,11 @@ is the base reference for the next phase.*
 > menacing than a minion.
 >
 > **Style & Formatting:** Match the cel-shaded vector style of the reference
-> exactly (hog head, wooden barrel belly, iron hoops, overflowing cash). Clean
-> grid, one animation per row, evenly spaced, non-overlapping poses, on a
-> transparent or solid white background. Consistent frame size and centering.
+> exactly (hog head, wooden barrel belly, iron hoops, overflowing cash). Lay out as horizontal rows, one animation per row, each frame in its own evenly-spaced cell, non-overlapping, with consistent size and centering.
 >
-> **MANDATORY LAYOUT — exactly 6 labelled rows:**
+> **OUTPUT RULES (critical — the last generation drew these by mistake):** Fully **transparent** background — NO white fill. Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere in the image. Output ONLY the character art, arranged in evenly-spaced **invisible** cells.
+>
+> **MANDATORY LAYOUT — exactly 6 rows, in this exact top-to-bottom order:**
 > 1. **`march`** — EXACTLY 4 frames: a heavy, waddling walk cycle lumbering toward
 >    the viewer, the barrel belly sloshing, coins jangling (front view).
 > 2. **`attack`** — EXACTLY 3 frames: **body-slamming its barrel belly into the
