@@ -382,6 +382,28 @@ export interface HeroDefinition {
   damage: number;
   attackRateMs: number;
   color: number; // Hex color for the character placeholder
+  portraitKey?: string; // Key for the character's portrait asset
+  /**
+   * One-line "what this hero DOES", shown on the summon drop card so the
+   * player can judge a recruit at a glance (docs/VOICE_DROPS.md). Present on
+   * every recruitable hero; omitted on sandbox testers (UI falls back to
+   * profession).
+   */
+  purpose?: string;
+  /**
+   * Pierce heroes only: how many enemies a single straight-line shot passes
+   * THROUGH before expiring, before +pierce upgrades. Total hits =
+   * basePierce + bonusPierce (AttackModifiers). See the pierce spec in
+   * docs/VOICE_DROPS.md — engineer replaces the current homing-projectile
+   * stand-in with a non-homing line shot that reads this field.
+   */
+  basePierce?: number;
+  /**
+   * Chain heroes only: how many targets a bolt arcs to, before +chain
+   * upgrades. Engineer: ChainAttack maxJumps = baseChain + bonusChain
+   * (replaces the hardcoded 3 in Attacks.ts).
+   */
+  baseChain?: number;
   signatureSkill: {
     name: string;
     description: string;
@@ -421,13 +443,15 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'projectile',
-    range: 1000,
-    damage: 15,
-    attackRateMs: 1500,
+    range: 320,
+    damage: 14,
+    attackRateMs: 1300,
     color: 0x3b82f6,
+    purpose: 'Reliable all-rounder — hurls megaphones at the frontmost anomaly. Always deployed, she is your steady damage floor.',
     signatureSkill: { name: 'Rally', description: 'Massive attack speed buff to all deployed heroes.' },
     passive: { name: 'Voice of the People', description: 'Generates 1 Voice every 10 seconds.' },
     projectileColor: 0x60a5fa,
+    portraitKey: 'eden_portrait',
   },
   teacher: {
     id: 'teacher',
@@ -436,10 +460,11 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'boomerang',
-    range: 250,
-    damage: 15,
-    attackRateMs: 1500,
+    range: 260,
+    damage: 12,
+    attackRateMs: 1400,
     color: 0x8b5cf6,
+    purpose: 'Two-hit boomerang ruler (out and back) that marks anomalies for bonus damage — strong against single tough targets.',
     signatureSkill: { name: 'Recess', description: 'Silences enemy auras in a radius.' },
     passive: { name: 'Fact Check', description: 'Instantly pops and destroys Fake HP padding.' },
     projectileColor: 0xddd6fe,
@@ -451,10 +476,12 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'pierce',
-    range: 250,
-    damage: 10,
-    attackRateMs: 1200,
+    range: 240,
+    damage: 9,
+    attackRateMs: 1100,
+    basePierce: 2,
     color: 0xf59e0b,
+    purpose: 'Slingshot pebbles punch through a line of 2 enemies — and every enhancement you feed the squad lands at 1.5x on his picks.',
     signatureSkill: { name: 'Cramming', description: 'Instantly resets the active skill cooldown of 1 random adjacent hero.' },
     passive: { name: 'Overachiever', description: 'Enhancement drops apply at 1.5x potency.' },
     projectileColor: 0xfcd34d,
@@ -466,10 +493,11 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Wind',
     attackKind: 'melee',
     attackStyle: 'melee-cleave',
-    range: 50,
-    damage: 25,
+    range: 90,
+    damage: 20,
     attackRateMs: 1200,
     color: 0x10b981,
+    purpose: 'Frontline cleaver — revs into clustered enemies and hits Bosses extra hard. A durable bruiser, not a sniper.',
     signatureSkill: { name: 'Barya Lang Po', description: 'Tosses coin shrapnel for massive shotgun AoE damage.' },
     passive: { name: 'Hari ng Kalsada', description: 'Deals bonus damage to Bosses.' },
   },
@@ -481,9 +509,10 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackKind: 'ranged',
     attackStyle: 'vortex',
     range: 200,
-    damage: 10,
-    attackRateMs: 4000,
+    damage: 8,
+    attackRateMs: 3500,
     color: 0x0ea5e9,
+    purpose: 'Support net — clumps enemies and soaks them Wet, setting up Lightning and Freeze combos. Low direct damage by design.',
     signatureSkill: { name: 'Lambat', description: 'Casts a net dragging enemies from off-lanes into the center.' },
     passive: { name: 'Deep Water', description: 'Attacks apply Wet (amplifies lightning damage).' },
     projectileColor: 0x7dd3fc,
@@ -495,10 +524,11 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Earth',
     attackKind: 'melee',
     attackStyle: 'linear-wave',
-    range: 50,
-    damage: 20,
-    attackRateMs: 2500,
+    range: 110,
+    damage: 16,
+    attackRateMs: 2200,
     color: 0xa8a29e,
+    purpose: 'Sweeps a debris wave across the whole frontline, hitting everything in the lane; shreds Obstacles and Traps.',
     signatureSkill: { name: 'Dust Storm', description: 'Blinds enemies, reducing speed and damage by 50%.' },
     passive: { name: 'Clean Sweep', description: 'Deals 10x damage to Obstacles and Traps.' },
   },
@@ -509,10 +539,11 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Frost',
     attackKind: 'ranged',
     attackStyle: 'lobbed',
-    range: 150,
+    range: 180,
     damage: 12,
-    attackRateMs: 1800,
+    attackRateMs: 1700,
     color: 0xe2e8f0,
+    purpose: 'Lobs scalding syrup that slows and splashes a small area; strips enemy speed buffs off whatever it hits.',
     signatureSkill: { name: 'Hot Syrup', description: 'Sticky puddle that permanently strips enemy speed buffs.' },
     passive: { name: 'Sweet Tooth', description: 'Drops 1 extra Voice when killing an Elite/Boss.' },
     projectileColor: 0xffffff,
@@ -524,10 +555,11 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Holy',
     attackKind: 'ranged',
     attackStyle: 'projectile',
-    range: 200,
+    range: 220,
     damage: 8,
-    attackRateMs: 1600,
+    attackRateMs: 1500,
     color: 0xfca5a5,
+    purpose: 'Support striker — alcohol sprays heal any ally summon they pass through, and hit undead anomalies for +50%.',
     signatureSkill: { name: 'Vaccine Drive', description: 'Grants all heroes immunity to debuffs for 5 seconds.' },
     passive: { name: 'Triage', description: 'Projectiles passing through ally summons heal them.' },
     projectileColor: 0xfecaca,
@@ -539,10 +571,11 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'summoner',
-    range: 100,
+    range: 110,
     damage: 15,
     attackRateMs: 5000,
     color: 0xd97706,
+    purpose: 'Builds Yero barricades that body-block the path (wall HP scales with his damage). Buys time, not damage.',
     signatureSkill: { name: 'Yero Barricade', description: 'Summons an indestructible wall blocking enemies for 5 seconds.' },
     passive: { name: 'Heavy Stance', description: 'Completely immune to knockback effects.' },
   },
@@ -554,9 +587,11 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackKind: 'ranged',
     attackStyle: 'chain',
     range: 300,
-    damage: 18,
+    damage: 16,
     attackRateMs: 1400,
+    baseChain: 3,
     color: 0xfef08a,
+    purpose: 'Headset feedback arcs to 3 enemies at once and can target Stealth; excellent against Wet clumps.',
     signatureSkill: { name: 'Escalate to Manager', description: 'Deals massive single-target damage (15% Max HP).' },
     passive: { name: 'Graveyard Shift', description: 'Can see and directly target Stealthed enemies.' },
   },
@@ -567,10 +602,11 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'melee',
     attackStyle: 'melee-cleave',
-    range: 200,
-    damage: 22,
+    range: 100,
+    damage: 20,
     attackRateMs: 1300,
     color: 0x1e3a8a,
+    purpose: 'Batuta bruiser who holds the frontline and cleaves enemies in front; deals double damage to Stealth anomalies.',
     signatureSkill: { name: 'Shining Flashlight', description: 'Casts a wide cone that heavily slows all enemies.' },
     passive: { name: 'Night Watch', description: 'Deals double damage to Stealthed enemies.' },
   },
@@ -581,10 +617,11 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Earth',
     attackKind: 'melee',
     attackStyle: 'melee-cleave',
-    range: 200,
-    damage: 18,
-    attackRateMs: 1600,
+    range: 100,
+    damage: 17,
+    attackRateMs: 1500,
     color: 0x15803d,
+    purpose: 'Scythe cleaver that periodically Roots enemies in place; his Harvest skill detonates their stacked ailments.',
     signatureSkill: { name: 'Harvest', description: 'Deals massive burst damage based on enemy ailments.' },
     passive: { name: 'Deep Roots', description: 'Attacks have a 20% chance to Root (freeze) enemies.' },
   },
@@ -595,10 +632,12 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'pierce',
-    range: 200,
-    damage: 15,
-    attackRateMs: 1400,
+    range: 220,
+    damage: 12,
+    attackRateMs: 1300,
+    basePierce: 5,
     color: 0xf43f5e,
+    purpose: 'Skewers a whole line — one Tuhog throw pierces up to 5 anomalies. The squad\'s premier line-clearer.',
     signatureSkill: { name: 'Spicy Sauce', description: 'Ignites all pierced enemies, causing panic.' },
     passive: { name: 'Tuhog', description: 'Attacks pierce up to 5 enemies in a line.' },
     projectileColor: 0xfca5a5,
@@ -621,10 +660,11 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Wind',
     attackKind: 'ranged',
     attackStyle: 'beam',
-    range: 250,
+    range: 240,
     damage: 5,
-    attackRateMs: 500, // Very fast
+    attackRateMs: 500, // Very fast — fastest attacker in the game
     color: 0xec4899,
+    purpose: 'Machine-gun sales pitch — the fastest attack in the game, chipping the whole line and executing low-HP stragglers.',
     signatureSkill: { name: 'Closing Sale', description: 'Instantly executes any enemy below 15% HP.' },
     passive: { name: 'Relentless Pitch', description: 'Fastest base attack speed in the game.' },
   },
@@ -635,10 +675,11 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Frost',
     attackKind: 'ranged',
     attackStyle: 'trap',
-    range: 150,
-    damage: 10,
+    range: 160,
+    damage: 12,
     attackRateMs: 3000,
     color: 0xf472b6,
+    purpose: 'Drops sticky ice puddles that freeze whatever steps on them — zone control that punishes tight lanes.',
     signatureSkill: { name: 'Dirty Ice Cream', description: 'Drops 3 explosive ice cream traps on the path.' },
     passive: { name: 'Brain Freeze', description: 'Attacks apply stacking Freeze.' },
   },
@@ -649,10 +690,12 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Lightning',
     attackKind: 'ranged',
     attackStyle: 'chain',
-    range: 220,
-    damage: 16,
-    attackRateMs: 1700,
+    range: 240,
+    damage: 15,
+    attackRateMs: 1600,
+    baseChain: 3,
     color: 0x38bdf8,
+    purpose: 'Jumper cables that always bounce to 3 nearby targets — reliable, steady horde clear.',
     signatureSkill: { name: 'Rolling Blackout', description: 'Stuns the entire screen for 3 seconds.' },
     passive: { name: 'Live Wire', description: 'Attacks automatically bounce to 3 nearby targets.' },
   },
@@ -663,10 +706,11 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Fire',
     attackKind: 'ranged',
     attackStyle: 'lobbed',
-    range: 180,
+    range: 190,
     damage: 14,
-    attackRateMs: 1900,
+    attackRateMs: 1800,
     color: 0xef4444,
+    purpose: 'Lobs hot pandesal that explodes in fire splash and leaves a burning zone — sustained AoE against packed waves.',
     signatureSkill: { name: 'Dough Knead', description: 'Flattens enemies, reducing their armor and damage by 50%.' },
     passive: { name: 'Fresh out the Oven', description: 'Attacks leave a burning zone on the ground.' },
   },
@@ -677,10 +721,11 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'vortex',
-    range: 150,
-    damage: 8,
-    attackRateMs: 4000,
+    range: 160,
+    damage: 7,
+    attackRateMs: 3800,
     color: 0x475569,
+    purpose: 'Whistle-and-STOP crowd control — magnetically pulls enemies into a tight clump for the squad to blast. Low damage, high setup.',
     signatureSkill: { name: 'STOP!', description: 'Hard stuns a wide radius and cancels channeling Boss Skills.' },
     passive: { name: 'Right of Way', description: 'Magnetically pulls enemies into tight clumps.' },
   },
@@ -692,9 +737,10 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackKind: 'ranged',
     attackStyle: 'linear-wave',
     range: 200,
-    damage: 12,
-    attackRateMs: 2500,
+    damage: 11,
+    attackRateMs: 2400,
     color: 0x2563eb,
+    purpose: 'High-pressure wave that hits the whole line, nudges enemies back, and soaks them Wet for combo setups.',
     signatureSkill: { name: 'Flush', description: 'Sends a massive wave that instantly washes away all enemy Summons.' },
     passive: { name: 'High Pressure', description: 'Normal attacks push enemies backward slightly.' },
   },
@@ -705,12 +751,195 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Wind',
     attackKind: 'ranged',
     attackStyle: 'boomerang',
-    range: 250,
-    damage: 15,
-    attackRateMs: 1600,
+    range: 260,
+    damage: 13,
+    attackRateMs: 1500,
     color: 0x22c55e,
+    purpose: 'Returning parcels hit twice and ramp up the longer they focus one target — a single-target melter that grows mid-fight.',
     signatureSkill: { name: 'Kamote Riders', description: 'Summons 3 AI riders that crash into the horde and explode.' },
     passive: { name: 'Rush Hour', description: 'Attack speed ramps up the longer they attack the same target.' },
     projectileColor: 0x86efac,
   }
+};
+
+// ============================================================================
+// VOICE-DROP PROGRESSION  (design: docs/VOICE_DROPS.md)
+// ----------------------------------------------------------------------------
+// Kills fill the Voices meter; a full meter triggers one RNG drop, then the
+// requirement scales up. The cadence is derived from the run's TOTAL kill pool
+// so a full clear always yields ~targetDropsPerRun drops, and it re-scales for
+// free if wave counts change. Replaces the old "start at 3, +1 forever" rule,
+// which was decoupled from how many kills a run actually offers.
+// ============================================================================
+
+/**
+ * Max heroes deployed at once (Eden + 4 recruited slots). Gates the `newHero`
+ * drop: once full, recruit drops stop being offered (docs/VOICE_DROPS.md).
+ */
+export const MAX_ACTIVE_HEROES = 5;
+
+export const VOICE_DROP_TUNING = {
+  /** Kills required for the very first drop. Small, so a companion arrives fast. */
+  firstDropCost: 2,
+  /** How many drop EVENTS a full clear should yield (4 fill Eden's squad, ~2 are enhancements). */
+  targetDropsPerRun: 6,
+  /** Floor on the per-drop increment so late drops never get cheaper than this. */
+  minIncrement: 1,
+} as const;
+
+/**
+ * Total kills a run offers, from the wave structure. Base prototype:
+ * wave N spawns N * baseWaveSize enemies, so pool = baseWaveSize * T(T+1)/2.
+ * (T=3, baseWaveSize=5 -> 30.) Split/summon spawns are bonus on top — the
+ * pool is intentionally the *authored* kill count, not the runtime maximum.
+ */
+export function computeKillPool(totalWaves: number, baseWaveSize = 5): number {
+  return (baseWaveSize * totalWaves * (totalWaves + 1)) / 2;
+}
+
+/**
+ * Incremental voices required before drop #dropIndex (0-based) fires, given
+ * the run's kill pool. Linear-growth thresholds tuned so exactly
+ * targetDropsPerRun drops land across the pool.
+ *
+ *   step = 2 * (pool - D * firstDropCost) / (D * (D - 1))
+ *   cost(k) = round(firstDropCost + k * step)
+ *
+ * Engineer: track a `dropIndex` counter in GameScene; set the next
+ * `maxVoicesCount` to `voiceDropCost(dropIndex, computeKillPool(totalWaves))`
+ * after each drop instead of the current `maxVoicesCount += 1`.
+ */
+export function voiceDropCost(dropIndex: number, killPool: number): number {
+  const { firstDropCost, targetDropsPerRun: drops, minIncrement } = VOICE_DROP_TUNING;
+  const step = Math.max(minIncrement, (2 * (killPool - drops * firstDropCost)) / (drops * (drops - 1)));
+  return Math.max(1, Math.round(firstDropCost + dropIndex * step));
+}
+
+// ============================================================================
+// UPGRADE MATRIX  (design: docs/VOICE_DROPS.md)
+// ----------------------------------------------------------------------------
+// What the Voices RNG is allowed to offer. Two buckets:
+//   1. Hero-targeted upgrades — applied to ONE active hero. Which kinds are
+//      eligible depends on that hero's attackStyle (UPGRADE_MATRIX).
+//   2. Global drops — recruit a new hero, or patch the Barrier.
+// Magnitudes/rarity/copy live here; the RNG (core/Drops.ts, engineer) reads
+// this, filters out anything that can't apply ("no dead drops"), weights by
+// rarity, and applies via `apply`.
+// ============================================================================
+
+/** DropRarity mirrors the union in core/GameEvents.ts (kept in sync deliberately). */
+export type DropRarity = 'common' | 'rare' | 'epic';
+
+export type UpgradeKind =
+  // universal — every attackStyle can roll these (hero-targeted stat sticks)
+  | 'damage' | 'attackSpeed' | 'range'
+  // behavior — style-specific; map onto the AttackModifiers already in Attacks.ts
+  | 'pierce' | 'chain' | 'radius';
+
+export interface UpgradeSpec {
+  kind: UpgradeKind;
+  /** Card title shown to the player. */
+  title: string;
+  /** "what this improves and by how much" — the drop card body copy. */
+  purpose: string;
+  rarity: DropRarity;
+  /** Per-pick magnitude. Interpretation depends on `apply`. */
+  magnitude: number;
+  /**
+   * How the engineer applies one pick:
+   *  - 'flatDamage'      -> hero.damage += magnitude
+   *  - 'attackSpeedMult' -> hero.attackRateMs = max(200, hero.attackRateMs * magnitude)
+   *  - 'flatRange'       -> hero.range += magnitude
+   *  - 'bonusPierce'     -> hero AttackModifiers.bonusPierce += magnitude
+   *  - 'bonusChain'      -> hero AttackModifiers.bonusChain += magnitude
+   *  - 'bonusRadius'     -> hero AttackModifiers.bonusRadius += magnitude
+   * NOTE (engineer): behavior mods must be stored ON the Hero and passed into
+   * every Attack it spawns. Today GameScene builds Attacks with no persisted
+   * modifiers, so pierce/chain/radius upgrades have nowhere to land yet.
+   */
+  apply: 'flatDamage' | 'attackSpeedMult' | 'flatRange' | 'bonusPierce' | 'bonusChain' | 'bonusRadius';
+  /** Cap on how many times this can stack on a single hero (feeds "no dead drops"). */
+  maxStacks: number;
+}
+
+export const UPGRADE_DEFS: Record<UpgradeKind, UpgradeSpec> = {
+  damage: {
+    kind: 'damage', title: 'Damage Up', purpose: '+6 damage to this hero\'s attacks.',
+    rarity: 'common', magnitude: 6, apply: 'flatDamage', maxStacks: 5,
+  },
+  attackSpeed: {
+    kind: 'attackSpeed', title: 'Attack Speed Up', purpose: 'This hero attacks 15% faster.',
+    rarity: 'common', magnitude: 0.85, apply: 'attackSpeedMult', maxStacks: 5,
+  },
+  range: {
+    kind: 'range', title: 'Range Up', purpose: '+40 reach up the lane for this hero.',
+    rarity: 'rare', magnitude: 40, apply: 'flatRange', maxStacks: 3,
+  },
+  pierce: {
+    kind: 'pierce', title: 'Piercing Shot', purpose: 'This hero\'s shots punch through 1 more enemy.',
+    rarity: 'rare', magnitude: 1, apply: 'bonusPierce', maxStacks: 3,
+  },
+  chain: {
+    kind: 'chain', title: 'Extra Arc', purpose: 'This hero\'s bolt jumps to 1 more target.',
+    rarity: 'rare', magnitude: 1, apply: 'bonusChain', maxStacks: 3,
+  },
+  radius: {
+    kind: 'radius', title: 'Wider Blast', purpose: '+15 area radius on this hero\'s attacks.',
+    rarity: 'rare', magnitude: 15, apply: 'bonusRadius', maxStacks: 3,
+  },
+};
+
+/**
+ * Which upgrade kinds each attackStyle can be offered. Universal stats
+ * (damage/attackSpeed/range) are on every list; behavior mods only where the
+ * style actually consumes them in Attacks.ts.
+ */
+export const UPGRADE_MATRIX: Record<HeroDefinition['attackStyle'], UpgradeKind[]> = {
+  projectile:    ['damage', 'attackSpeed', 'range', 'pierce'],
+  pierce:        ['damage', 'attackSpeed', 'range', 'pierce'],
+  chain:         ['damage', 'attackSpeed', 'range', 'chain'],
+  boomerang:     ['damage', 'attackSpeed', 'range', 'radius'],
+  beam:          ['damage', 'attackSpeed', 'range', 'radius'],
+  'melee-cleave':['damage', 'attackSpeed', 'range', 'radius'],
+  lobbed:        ['damage', 'attackSpeed', 'range', 'radius'],
+  vortex:        ['damage', 'attackSpeed', 'range', 'radius'],
+  trap:          ['damage', 'attackSpeed', 'range', 'radius'],
+  'linear-wave': ['damage', 'attackSpeed', 'range', 'radius'],
+  // Summoner damage = wall HP; no behavior mod, stats only.
+  summoner:      ['damage', 'attackSpeed', 'range'],
+};
+
+export type GlobalDropKind = 'newHero' | 'moraleHeal';
+
+export interface GlobalDropSpec {
+  kind: GlobalDropKind;
+  title: string;
+  purpose: string;
+  rarity: DropRarity;
+  /** Barrier HP restored for 'moraleHeal'; unused otherwise. */
+  magnitude: number;
+}
+
+export const GLOBAL_DROP_DEFS: Record<GlobalDropKind, GlobalDropSpec> = {
+  newHero: {
+    kind: 'newHero', title: 'New Worker',
+    purpose: 'Recruit an unlocked worker into an open squad slot.',
+    rarity: 'common', magnitude: 0,
+  },
+  moraleHeal: {
+    kind: 'moraleHeal', title: 'Barrier Patch',
+    purpose: 'Restore 50 Barrier integrity instantly.',
+    rarity: 'common', magnitude: 50,
+  },
+};
+
+/**
+ * Base pull weight per rarity. Later waves should multiply rare/epic weights
+ * (docs/WORLD_AND_HEROES.md rule 6, "rarity scales with waves") — the RNG owns
+ * that scaling; these are the wave-1 baselines.
+ */
+export const DROP_RARITY_WEIGHTS: Record<DropRarity, number> = {
+  common: 100,
+  rare: 35,
+  epic: 10,
 };

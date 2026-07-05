@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import type { Enemy } from './Enemy';
-import { ATTACK_STYLE_BADGES, type HeroDefinition } from '../data/balance';
+import type { AttackModifiers } from './Attacks';
+import { ATTACK_STYLE_BADGES, type HeroDefinition, type UpgradeKind } from '../data/balance';
 import { RALLY } from '../data/level';
 import { formationTargetX, stepTowardFormation } from '../core/RallyMarch';
 import { applyHeroPassive, type ISkillHero } from '../core/Skills';
@@ -14,6 +15,17 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   public damage: number;
   public range: number;
   private onAttack: (hero: Hero, target: Enemy) => void;
+
+  /**
+   * Persistent behavior mods from Voice-drop upgrades (bonusPierce/bonusChain/
+   * bonusRadius). Passed into every Attack this hero spawns so pierce/chain/
+   * radius upgrades reach future shots. Starts at zero. See docs/VOICE_DROPS.md.
+   */
+  public modifiers: AttackModifiers = { bonusDamage: 0, bonusPierce: 0, bonusRadius: 0, bonusChain: 0 };
+
+  /** How many times each upgrade kind has been applied — feeds the "no dead
+   *  drops" / maxStacks filter in core/Drops.ts. */
+  public upgradeStacks: Partial<Record<UpgradeKind, number>> = {};
 
   public skillCooldownMs = 5000;
   public currentSkillCooldown = 5000; // start on cooldown

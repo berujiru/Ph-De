@@ -121,6 +121,77 @@ export class ProjectileAttack extends Attack {
   }
 }
 
+/**
+ * Straight-line, non-homing pass-through shot (docs/VOICE_DROPS.md pierce spec).
+ * Unlike ProjectileAttack it snapshots the hero->target vector at spawn and
+ * never re-homes: it flies that fixed heading, damaging each enemy body it
+ * overlaps once, until it has hit `basePierce + bonusPierce` enemies or leaves
+ * the world bounds.
+ */
+export class PierceAttack extends Attack {
+  private speed = 500;
+  private vx = 0;
+  private vy = 0;
+  private visual: Phaser.GameObjects.Arc;
+  private hitCount = 0;
+  private maxHits: number;
+  private hitEnemies = new Set<Enemy>();
+
+  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy, damage: number, color: number, basePierce: number, modifiers?: Partial<AttackModifiers>) {
+    super(scene, 'PierceAttack', damage, modifiers);
+    // Total pass-throughs = basePierce + bonusPierce (guard against bad data).
+    this.maxHits = Math.max(1, basePierce + this.modifiers.bonusPierce);
+    this.visual = scene.add.circle(x, y, 6, color);
+
+    // Snapshot the firing vector ONCE; the shot never curves after this.
+    const dx = target.x - x;
+    const dy = target.y - y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > 0) {
+      this.vx = (dx / dist) * this.speed;
+      this.vy = (dy / dist) * this.speed;
+    } else {
+      this.vx = this.speed; // degenerate case: fire straight up-lane
+    }
+  }
+
+  update(_time: number, delta: number) {
+    if (this.isDead) return;
+    const dt = delta / 1000;
+    this.visual.x += this.vx * dt;
+    this.visual.y += this.vy * dt;
+
+    const enemies = (this.scene as any).enemies as Enemy[];
+    if (enemies) {
+      for (const enemy of enemies) {
+        if (!enemy.isDead && !this.hitEnemies.has(enemy)) {
+          const dx = enemy.x - this.visual.x;
+          const dy = enemy.y - this.visual.y;
+          const collisionRadius = 20;
+          if (dx * dx + dy * dy < collisionRadius * collisionRadius) {
+            enemy.takeDamage(this.totalDamage);
+            this.hitEnemies.add(enemy);
+            this.hitCount++;
+            if (this.hitCount >= this.maxHits) {
+              this.die();
+              return;
+            }
+          }
+        }
+      }
+    }
+    if (this.visual.x > WORLD_WIDTH + 100 || this.visual.x < -100 || this.visual.y > 1500 || this.visual.y < -100) {
+      this.die();
+    }
+  }
+
+  private die() {
+    this.isDead = true;
+    this.visual.destroy();
+    this.destroy();
+  }
+}
+
 export class MeleeCleaveAttack extends Attack {
   private visual: Phaser.GameObjects.Arc;
   private lifeTimeMs = 150;
@@ -312,14 +383,15 @@ export class ChainAttack extends Attack {
   private ageMs = 0;
   private lines: Phaser.GameObjects.Line[] = [];
   
-  constructor(scene: Phaser.Scene, startX: number, startY: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
+  constructor(scene: Phaser.Scene, startX: number, startY: number, target: Enemy, damage: number, color: number, baseChain: number, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'ChainAttack', damage, modifiers);
-    
+
     let currentTarget = target;
     let currentX = startX;
     let currentY = startY;
-    
-    const maxJumps = 3 + this.modifiers.bonusChain;
+
+    // Arc count comes from the hero's baseChain + any bonusChain upgrades.
+    const maxJumps = Math.max(1, baseChain + this.modifiers.bonusChain);
     let jumps = 0;
     const hitEnemies = new Set<Enemy>();
     const enemies = (scene as any).enemies as Enemy[];
@@ -411,6 +483,11 @@ export class BeamAttack extends Attack {
     this.visual = scene.add.line(0, 0, startX, startY, endX, endY, color).setOrigin(0, 0);
     this.visual.setLineWidth(4 + this.modifiers.bonusRadius);
 
+    // Hit half-width grows with bonusRadius so the `radius` upgrade actually
+    // changes what the beam catches (not just its drawn thickness).
+    const hitHalfWidth = 20 + this.modifiers.bonusRadius;
+    const hitHalfWidthSq = hitHalfWidth * hitHalfWidth;
+
     const enemies = (scene as any).enemies as Enemy[];
     if (enemies) {
       for (const enemy of enemies) {
@@ -420,10 +497,10 @@ export class BeamAttack extends Attack {
           t = Math.max(0, Math.min(1, t));
           const projX = startX + t * (endX - startX);
           const projY = startY + t * (endY - startY);
-          
+
           const edx = enemy.x - projX;
           const edy = enemy.y - projY;
-          if (edx * edx + edy * edy < 400) {
+          if (edx * edx + edy * edy < hitHalfWidthSq) {
             enemy.takeDamage(this.totalDamage);
           }
         }

@@ -34,6 +34,16 @@ built" vs. "what's planned," not the commit history.
 - [ ] **In-battle hero upgrades** — kills earn gold; gold buys per-battle
       hero tiers (Lv1→Lv3), the core session economy per
       `docs/PROGRESSION.md` (replaces tower placement/upgrade/sell)
+- [ ] **Voice-drop economy — data + spec done, engine pending** — full design
+      in `docs/VOICE_DROPS.md`. `balance.ts` now carries: calibrated hero stat
+      bands, `basePierce`/`baseChain`, the pool-derived drop cadence
+      (`VOICE_DROP_TUNING`, `computeKillPool`, `voiceDropCost` — target 6 drops
+      per full clear), the `UPGRADE_MATRIX`/`UPGRADE_DEFS`/`GLOBAL_DROP_DEFS`
+      the drop RNG reads, and per-hero/upgrade `purpose` card copy. Engineer
+      TODOs (all flagged `ENGINEER:` in the doc): non-homing `PierceAttack`,
+      data-driven chain jumps, persisted `AttackModifiers` on `Hero`, the
+      `core/Drops.ts` seeded RNG, and the `voiceDropCost` cadence wiring in
+      `GameScene`
 - [ ] **Range indicator on tap/hold** (touch) and hover (desktop) for
       deployed heroes, per `docs/DESIGN_GUIDELINES.md`
 - [ ] **Wave preview** — show upcoming wave composition before the player

@@ -4,12 +4,15 @@ import { theme } from '../theme';
 import {
   gameToUiEvents,
   uiToGameEvents,
+  type DropKind,
   type DropOption,
   type DropRarity,
   type GameStateSnapshot,
 } from '../../game/core/GameEvents';
 import {
   BarrierIcon,
+  BarricadeIcon,
+  ChestIcon,
   HeroCardIcon,
   HopeCoinIcon,
   MegaphoneIcon,
@@ -27,7 +30,16 @@ import {
   damageTypeIcons,
   BrainIcon,
 } from '../icons';
-import { battleCss, cautionTape, fab, glass, glassPanel, withAlpha } from '../mockups/battleStyles';
+import {
+  battleCss,
+  cautionTape,
+  fab,
+  glass,
+  glassPanel,
+  hudPill,
+  stampLabel,
+  withAlpha,
+} from '../mockups/battleStyles';
 import { IntelModal } from './IntelModal';
 
 interface RallyScreenProps {
@@ -52,6 +64,19 @@ const RARITY_META: Record<DropRarity, { label: string; stars: number; border: st
     border: theme.colors.accent,
     glow: `0 0 26px ${withAlpha(theme.colors.accent, 0.55)}`,
   },
+};
+
+/* ------------------------------------------------------------------ */
+/* Kind framing — what the drop IS (recruit / hero upgrade / global    */
+/* boon / high-risk pact). Colors map to token meaning, never new hex: */
+/* accent = recruit/primary, success = positive boon, danger = risk.   */
+/* ------------------------------------------------------------------ */
+
+const KIND_META: Record<DropKind, { ribbon: string; tint: string }> = {
+  hero: { ribbon: 'New Recruit', tint: theme.colors.accent },
+  heroUpgrade: { ribbon: 'Hero Upgrade', tint: theme.colors.accent },
+  generalUpgrade: { ribbon: 'Rally Boon', tint: theme.colors.success },
+  buhisBuhay: { ribbon: 'Buhis-Buhay', tint: theme.colors.danger },
 };
 
 /* ------------------------------------------------------------------ */
@@ -97,66 +122,130 @@ interface DropCardProps {
 function DropCard({ option, index, onSelect }: DropCardProps) {
   const rarity: DropRarity = option.rarity ?? 'common';
   const meta = RARITY_META[rarity];
-  const kind = option.kind ?? (option.type === 'spawn' ? 'hero' : 'generalUpgrade');
+  const kind: DropKind = option.kind ?? (option.type === 'spawn' ? 'hero' : 'generalUpgrade');
+  const kindMeta = KIND_META[kind];
   const isBuhis = kind === 'buhisBuhay';
   const DamageIcon = option.damageType ? damageTypeIcons[option.damageType] : undefined;
 
+  /* The emblem art differs per kind so the three drop types are unmistakable
+     at a glance: a portrait for a recruit, a damage chip for a hero upgrade,
+     a solidarity fist for a global boon, a hazard mark for a Buhis-Buhay pact. */
   let visual: ReactNode;
   if (kind === 'hero') {
+    // Polaroid / lanyard-ID framing (ART guidelines §2A).
     visual = (
-      <div style={{ position: 'relative', width: 72, height: 72 }}>
-        <img
-          src="/assets/heroes/hero-placeholder.svg"
-          alt=""
-          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-        />
+      <div
+        style={{
+          position: 'relative',
+          width: 76,
+          height: 82,
+          padding: 4,
+          paddingBottom: 12,
+          backgroundColor: theme.materials.paper,
+          borderRadius: 3,
+          boxShadow: `0 6px 14px ${withAlpha(theme.colors.background, 0.6)}`,
+          transform: 'rotate(-2deg)',
+        }}
+      >
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            borderRadius: 2,
+            backgroundColor: withAlpha(theme.colors.background, 0.9),
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <img
+            src="/assets/heroes/hero-placeholder.svg"
+            alt=""
+            style={{ width: '90%', height: '90%', objectFit: 'contain' }}
+          />
+        </div>
         <span
           style={{
             position: 'absolute',
             right: -8,
-            bottom: -6,
-            width: 26,
-            height: 26,
+            bottom: 2,
+            width: 28,
+            height: 28,
             borderRadius: '50%',
             backgroundColor: glass.surface,
-            border: `1px solid ${withAlpha(theme.colors.accent, 0.5)}`,
+            backdropFilter: 'blur(6px)',
+            WebkitBackdropFilter: 'blur(6px)',
+            border: `1px solid ${withAlpha(theme.colors.accent, 0.6)}`,
+            boxShadow: `0 0 10px ${withAlpha(theme.colors.accent, 0.4)}`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             color: theme.colors.accent,
           }}
         >
-          {DamageIcon ? <DamageIcon size={14} /> : <RaisedFistIcon size={14} />}
+          {DamageIcon ? <DamageIcon size={15} /> : <RaisedFistIcon size={15} />}
         </span>
       </div>
     );
   } else {
     const Icon =
-      option.type === 'speed'
-        ? SpeedIcon
-        : (DamageIcon ?? (option.type === 'damage' ? damageTypeIcons.Physical : PlusIcon));
+      isBuhis
+        ? SkullIcon
+        : kind === 'generalUpgrade'
+          ? (option.type === 'speed' ? SpeedIcon : RaisedFistIcon)
+          : (option.type === 'speed'
+              ? SpeedIcon
+              : (DamageIcon ?? (option.type === 'damage' ? damageTypeIcons.Physical : PlusIcon)));
+    const emblemTint = kindMeta.tint;
     visual = (
       <div
         style={{
-          width: 64,
-          height: 64,
+          position: 'relative',
+          width: 70,
+          height: 70,
           borderRadius: '50%',
-          border: `1px solid ${isBuhis ? withAlpha(theme.colors.danger, 0.5) : glass.border}`,
-          backgroundColor: withAlpha(theme.colors.background, 0.5),
+          border: `2px solid ${withAlpha(emblemTint, isBuhis ? 0.6 : 0.5)}`,
+          background: `radial-gradient(circle at 50% 40%, ${withAlpha(emblemTint, 0.22)}, ${withAlpha(theme.colors.background, 0.6)})`,
+          boxShadow: `inset 0 0 12px ${withAlpha(emblemTint, 0.25)}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: isBuhis ? theme.colors.danger : theme.colors.accent,
+          color: emblemTint,
         }}
       >
         <Icon size={32} />
+        {kind === 'heroUpgrade' && (
+          // Small "up" chevron badge to read as an *upgrade* to a hero, not a fresh recruit.
+          <span
+            style={{
+              position: 'absolute',
+              right: -6,
+              top: -6,
+              width: 22,
+              height: 22,
+              borderRadius: '50%',
+              backgroundColor: theme.colors.background,
+              border: `1px solid ${withAlpha(emblemTint, 0.7)}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: emblemTint,
+              fontSize: 13,
+              fontWeight: 900,
+              lineHeight: 1,
+            }}
+          >
+            ▲
+          </span>
+        )}
       </div>
     );
   }
 
   const frame: CSSProperties = isBuhis
-    ? { background: cautionTape(theme.colors.danger), padding: 4, borderRadius: 18 }
-    : { padding: 4, borderRadius: 18 };
+    ? { background: cautionTape(theme.colors.danger), padding: 3, borderRadius: 18 }
+    : { padding: 3, borderRadius: 18 };
 
   return (
     <div style={frame}>
@@ -166,32 +255,53 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
         onClick={() => onSelect(option.id)}
         style={{
           ...glassPanel,
-          backgroundColor: 'rgba(15, 23, 42, 0.85)',
-          border: `${rarity === 'epic' ? 2 : 1}px solid ${meta.border}`,
-          boxShadow: meta.glow,
-          borderRadius: 14,
-          width: 'min(200px, 44vw)',
-          minHeight: 240,
-          padding: '14px 12px',
+          overflow: 'hidden',
+          backgroundColor: 'rgba(15, 23, 42, 0.88)',
+          border: `${rarity === 'epic' ? 2 : 1}px solid ${isBuhis ? withAlpha(theme.colors.danger, 0.7) : meta.border}`,
+          boxShadow: isBuhis
+            ? `0 10px 26px ${withAlpha(theme.colors.background, 0.7)}`
+            : `${meta.glow}${meta.glow === 'none' ? '' : ', '}0 10px 26px ${withAlpha(theme.colors.background, 0.7)}`,
+          borderRadius: 15,
+          width: 'min(210px, 44vw)',
+          minHeight: 264,
+          padding: 0,
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
-          gap: 10,
+          alignItems: 'stretch',
           color: theme.colors.textPrimary,
           cursor: 'pointer',
           textAlign: 'center',
-          animationDelay: `${index * 70}ms`,
+          animationDelay: `${index * 80}ms`,
         }}
       >
+        {/* Kind ribbon — the loud "what is this?" banner across the top. */}
         <span
           style={{
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: 6,
+            padding: '7px 8px',
+            backgroundColor: withAlpha(kindMeta.tint, 0.16),
+            borderBottom: `1px solid ${withAlpha(kindMeta.tint, 0.4)}`,
+            color: kindMeta.tint,
+            ...stampLabel,
             fontSize: 10,
-            fontWeight: 800,
-            letterSpacing: 1,
-            textTransform: 'uppercase',
+          }}
+        >
+          {kind === 'hero' ? <RaisedFistIcon size={13} /> : isBuhis ? <SkullIcon size={13} /> : <PlusIcon size={13} />}
+          {kindMeta.ribbon}
+        </span>
+
+        <span
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            marginTop: 12,
+            ...stampLabel,
+            fontSize: 10,
             color: rarity === 'common' ? theme.colors.textMuted : theme.colors.accent,
           }}
         >
@@ -199,28 +309,35 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
           {meta.label}
         </span>
 
-        {visual}
+        <div style={{ display: 'flex', justifyContent: 'center', margin: '12px 0 10px' }}>{visual}</div>
 
-        <span style={{ fontSize: 16, fontWeight: 800, lineHeight: 1.15 }}>{option.title}</span>
-        <span style={{ fontSize: 12, color: theme.colors.textMuted, lineHeight: 1.4 }}>
-          {option.description}
-        </span>
-
-        {isBuhis && (
-          <span
-            style={{
-              marginTop: 'auto',
-              fontSize: 10,
-              fontWeight: 800,
-              letterSpacing: 0.5,
-              textTransform: 'uppercase',
-              color: theme.colors.danger,
-              lineHeight: 1.4,
-            }}
-          >
-            Buhis-Buhay — high risk: {option.risk ?? 'a heavy toll follows'}
+        <div style={{ padding: '0 14px 16px', display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
+          <span style={{ fontSize: 17, fontWeight: 900, lineHeight: 1.15, letterSpacing: 0.2 }}>
+            {option.title}
           </span>
-        )}
+          {/* The PURPOSE copy — the thing the player is meant to read. */}
+          <span style={{ fontSize: 12.5, color: theme.colors.textPrimary, opacity: 0.9, lineHeight: 1.45 }}>
+            {option.description}
+          </span>
+
+          {isBuhis && (
+            <span
+              style={{
+                marginTop: 'auto',
+                paddingTop: 8,
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: 0.4,
+                textTransform: 'uppercase',
+                color: theme.colors.danger,
+                lineHeight: 1.4,
+                borderTop: `1px dashed ${withAlpha(theme.colors.danger, 0.4)}`,
+              }}
+            >
+              Buhis-Buhay — high risk: {option.risk ?? 'a heavy toll follows'}
+            </span>
+          )}
+        </div>
       </button>
     </div>
   );
@@ -262,6 +379,98 @@ function SpoilRow({ icon, iconColor, label, value, valueColor, prefix = '+', suf
         <CountUp value={value} />
         {suffix}
       </span>
+    </div>
+  );
+}
+
+/**
+ * A "vital sign" HUD pill — Morale and Voices are the two readings the player
+ * must never miss, so they share a bold framed treatment: an icon chip, a
+ * stamped label, a live numeric read-out, and a thick gradient track.
+ */
+function VitalPill({
+  icon,
+  color,
+  label,
+  value,
+  ratio,
+  ariaLabel,
+  alarm = false,
+  pulse = false,
+  glowTrack = false,
+  trackWidth = 88,
+}: {
+  icon: ReactNode;
+  color: string;
+  label: string;
+  value: ReactNode;
+  ratio: number;
+  ariaLabel: string;
+  alarm?: boolean;
+  pulse?: boolean;
+  glowTrack?: boolean;
+  trackWidth?: number;
+}) {
+  const pct = Math.max(0, Math.min(1, ratio)) * 100;
+  const active = alarm || pulse;
+  return (
+    <div
+      aria-label={ariaLabel}
+      style={{
+        ...hudPill,
+        border: `1px solid ${active ? withAlpha(color, 0.6) : glass.border}`,
+        animation: alarm
+          ? 'morale-alarm 0.9s ease-in-out infinite'
+          : pulse
+            ? 'voices-pulse 1s ease-in-out infinite'
+            : undefined,
+      }}
+    >
+      <span
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 30,
+          height: 30,
+          borderRadius: 8,
+          flexShrink: 0,
+          backgroundColor: withAlpha(color, 0.16),
+          border: `1px solid ${withAlpha(color, 0.4)}`,
+          color,
+        }}
+      >
+        {icon}
+      </span>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
+          <span style={{ ...stampLabel, fontSize: 9, color: theme.colors.textMuted }}>{label}</span>
+          <span style={{ fontSize: 12, fontWeight: 800, color, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+            {value}
+          </span>
+        </div>
+        <div
+          style={{
+            width: trackWidth,
+            height: 7,
+            borderRadius: 4,
+            backgroundColor: withAlpha(theme.colors.background, 0.7),
+            border: `1px solid ${withAlpha(theme.colors.background, 0.9)}`,
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              width: `${pct}%`,
+              height: '100%',
+              borderRadius: 4,
+              background: `linear-gradient(90deg, ${withAlpha(color, 0.75)}, ${color})`,
+              boxShadow: glowTrack ? `0 0 8px ${withAlpha(color, 0.8)}` : undefined,
+              transition: 'width 0.3s ease, background 0.3s ease',
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
@@ -378,10 +587,10 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
   ];
 
   return (
-    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+    <div className="rally-screen" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
       <style>{battleCss}</style>
 
-      {/* ---------- Top HUD: slim floating pills + edge FABs ---------- */}
+      {/* ---------- Top HUD: vital-sign pills + edge FABs ---------- */}
       <div
         style={{
           display: 'flex',
@@ -391,66 +600,46 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
           padding: '12px 12px 0',
         }}
       >
-        {/* Left: Morale + wave pills */}
+        {/* Left: Morale (vital sign) + wave placard chip */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, pointerEvents: 'auto' }}>
-          <div
-            aria-label={`Morale ${state.barrierHp} of ${state.maxBarrierHp}`}
-            style={{
-              ...glassPanel,
-              borderRadius: 999,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '8px 14px',
-            }}
-          >
-            <span style={{ color: moraleLow ? theme.colors.danger : theme.colors.success, display: 'flex', alignItems: 'center', gap: 4 }}>
-              <BarrierIcon size={18} />
-              <span style={{ fontSize: 12, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-                {state.barrierHp}
-              </span>
-            </span>
-            <div
-              style={{
-                width: 84,
-                height: 6,
-                borderRadius: 3,
-                backgroundColor: withAlpha(theme.colors.background, 0.6),
-                overflow: 'hidden',
-              }}
-            >
-              <div
-                style={{
-                  width: `${Math.max(0, Math.min(1, moraleRatio)) * 100}%`,
-                  height: '100%',
-                  borderRadius: 3,
-                  backgroundColor: moraleLow ? theme.colors.danger : theme.colors.success,
-                  transition: 'width 0.3s ease, background-color 0.3s ease',
-                }}
-              />
-            </div>
-          </div>
+          <VitalPill
+            ariaLabel={`Morale ${state.barrierHp} of ${state.maxBarrierHp}`}
+            icon={<BarrierIcon size={18} />}
+            color={moraleLow ? theme.colors.danger : theme.colors.success}
+            label="Morale"
+            value={state.barrierHp}
+            ratio={moraleRatio}
+            alarm={moraleLow}
+          />
 
           <div
             style={{
-              ...glassPanel,
-              borderRadius: 999,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '6px 12px',
+              ...hudPill,
+              gap: 7,
+              padding: '5px 12px 5px 5px',
               alignSelf: 'flex-start',
             }}
           >
-            <span style={{ color: theme.colors.textMuted, display: 'flex' }}>
-              <WaveIcon size={14} />
+            <span
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 26,
+                height: 26,
+                borderRadius: 7,
+                backgroundColor: withAlpha(theme.materials.cautionYellow, 0.16),
+                border: `1px solid ${withAlpha(theme.materials.cautionYellow, 0.4)}`,
+                color: theme.materials.cautionYellow,
+              }}
+            >
+              {state.waveActive ? <WaveIcon size={15} /> : <BarricadeIcon size={15} />}
             </span>
             <span
               style={{
+                ...stampLabel,
                 fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: 0.5,
-                textTransform: 'uppercase',
+                letterSpacing: 0.8,
                 color: theme.colors.textPrimary,
               }}
             >
@@ -459,45 +648,19 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
           </div>
         </div>
 
-        {/* Center: Voices meter — pulses when a drop is close */}
+        {/* Center: Voices (vital sign) — pulses when a drop is close */}
         <div style={{ flex: 1, display: 'flex', justifyContent: 'center', pointerEvents: 'auto' }}>
-          <div
-            aria-label={`Voices ${state.voicesCount} of ${state.maxVoicesCount}`}
-            style={{
-              ...glassPanel,
-              borderRadius: 999,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '8px 14px',
-              border: `1px solid ${voicesNearFull ? withAlpha(theme.colors.accent, 0.6) : glass.border}`,
-              animation: voicesNearFull ? 'voices-pulse 1s ease-in-out infinite' : undefined,
-            }}
-          >
-            <span style={{ color: theme.colors.accent, display: 'flex' }}>
-              <VoicesIcon size={18} />
-            </span>
-            <div
-              style={{
-                width: 72,
-                height: 6,
-                borderRadius: 3,
-                backgroundColor: withAlpha(theme.colors.background, 0.6),
-                overflow: 'hidden',
-              }}
-            >
-              <div
-                style={{
-                  width: `${Math.max(0, Math.min(1, voicesRatio)) * 100}%`,
-                  height: '100%',
-                  borderRadius: 3,
-                  backgroundColor: theme.colors.accent,
-                  boxShadow: `0 0 8px ${withAlpha(theme.colors.accent, 0.8)}`,
-                  transition: 'width 0.3s ease',
-                }}
-              />
-            </div>
-          </div>
+          <VitalPill
+            ariaLabel={`Voices ${state.voicesCount} of ${state.maxVoicesCount}`}
+            icon={<VoicesIcon size={18} />}
+            color={theme.colors.accent}
+            label="Voices"
+            value={`${state.voicesCount}/${state.maxVoicesCount}`}
+            ratio={voicesRatio}
+            pulse={voicesNearFull}
+            glowTrack
+            trackWidth={80}
+          />
         </div>
 
         {/* Right: circular FABs (pause / speed / corner menu) */}
@@ -570,42 +733,53 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
         style={{
           position: 'absolute',
           left: '50%',
-          bottom: 24,
+          bottom: 22,
           transform: 'translateX(-50%)',
           display: 'flex',
           pointerEvents: 'auto',
           zIndex: 10,
         }}
       >
-        <button
-          type="button"
-          className="hud-btn"
-          disabled={gameOver}
-          title="Ultimate Ready!"
+        {/* Caution-tape ring around the megaphone — the rally's focal CTA. */}
+        <div
           style={{
-            ...fab,
-            width: 72,
-            height: 72,
+            padding: 3,
             borderRadius: '50%',
-            backgroundColor: withAlpha(theme.colors.background, 0.85),
-            border: `2px solid ${theme.colors.accent}`,
-            color: theme.colors.accent,
-            boxShadow: `0 0 20px ${withAlpha(theme.colors.accent, 0.7)}, inset 0 0 10px ${withAlpha(theme.colors.accent, 0.4)}`,
-            animation: 'pulse-glow 2s infinite',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 4,
-          }}
-          onClick={() => {
-            playBtnSound();
-            // In the future: emit bayanihan act event
+            background: cautionTape(theme.colors.accent),
+            boxShadow: `0 8px 22px ${withAlpha(theme.colors.background, 0.7)}`,
           }}
         >
-          <MegaphoneIcon size={28} />
-          <span style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.5 }}>Act</span>
-        </button>
+          <button
+            type="button"
+            className="hud-btn"
+            disabled={gameOver}
+            aria-label="Bayanihan Act"
+            title="Bayanihan Act — Ready!"
+            style={{
+              ...fab,
+              width: 72,
+              height: 72,
+              borderRadius: '50%',
+              backgroundColor: withAlpha(theme.colors.background, 0.92),
+              border: `2px solid ${theme.colors.accent}`,
+              color: theme.colors.accent,
+              boxShadow: `0 0 20px ${withAlpha(theme.colors.accent, 0.7)}, inset 0 0 10px ${withAlpha(theme.colors.accent, 0.4)}`,
+              animation: 'pulse-glow 2s infinite',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 2,
+            }}
+            onClick={() => {
+              playBtnSound();
+              // In the future: emit bayanihan act event
+            }}
+          >
+            <MegaphoneIcon size={26} />
+            <span style={{ ...stampLabel, fontSize: 9 }}>Act</span>
+          </button>
+        </div>
       </div>
 
       {/* ---------- Abandon Rally Confirmation ---------- */}
@@ -630,18 +804,36 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
             style={{
               ...glassPanel,
               borderRadius: 16,
+              overflow: 'hidden',
               width: 'min(360px, 92vw)',
-              padding: 24,
+              padding: 0,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: 16,
               boxShadow: `0 18px 40px ${withAlpha(theme.colors.background, 0.8)}`,
-              border: `1px solid ${withAlpha(theme.colors.danger, 0.3)}`,
+              border: `1px solid ${withAlpha(theme.colors.danger, 0.35)}`,
+              transform: 'rotate(-0.5deg)',
+              animation: 'placard-drop 0.3s ease both',
             }}
           >
-            <span style={{ color: theme.colors.danger, display: 'flex' }}>
-              <SkullIcon size={36} />
+            {/* Caution-tape header — same rally motif as the Spoils placard. */}
+            <div style={{ width: '100%', height: 8, background: cautionTape(theme.colors.danger), opacity: 0.9 }} />
+
+            <div style={{ padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, width: '100%' }}>
+            <span
+              style={{
+                color: theme.colors.danger,
+                display: 'flex',
+                width: 56,
+                height: 56,
+                borderRadius: '50%',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: withAlpha(theme.colors.danger, 0.14),
+                border: `1px solid ${withAlpha(theme.colors.danger, 0.4)}`,
+              }}
+            >
+              <SkullIcon size={32} />
             </span>
             <div style={{ textAlign: 'center' }}>
               <h2 style={{ margin: '0 0 8px', fontSize: 20, fontWeight: 900, color: theme.colors.danger, textTransform: 'uppercase', letterSpacing: 1 }}>
@@ -690,6 +882,7 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
                 Surrender
               </button>
             </div>
+            </div>
           </div>
         </div>
       )}
@@ -701,37 +894,57 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
             position: 'fixed',
             inset: 0,
             zIndex: 100,
-            backgroundColor: withAlpha(theme.colors.background, 0.72),
-            backdropFilter: 'blur(6px)',
-            WebkitBackdropFilter: 'blur(6px)',
+            // Accent vignette rising from the centre — spotlight on the choice.
+            background: `radial-gradient(120% 80% at 50% 42%, ${withAlpha(theme.colors.accent, 0.18)}, ${withAlpha(theme.colors.background, 0.82)} 60%)`,
+            backdropFilter: 'blur(7px)',
+            WebkitBackdropFilter: 'blur(7px)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 22,
+            gap: 20,
             padding: 16,
             pointerEvents: 'auto',
             animation: 'overlay-fade 0.2s ease both',
           }}
         >
-          <div style={{ textAlign: 'center' }}>
+          <div style={{ textAlign: 'center', animation: 'drop-title-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2) both' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, color: theme.colors.accent }}>
-              <MegaphoneIcon size={28} />
+              <span
+                style={{
+                  display: 'flex',
+                  transformOrigin: 'center',
+                  animation: 'megaphone-shout 0.6s ease-in-out 3',
+                }}
+              >
+                <MegaphoneIcon size={30} />
+              </span>
               <h1
                 style={{
                   margin: 0,
-                  fontSize: 'clamp(22px, 6vw, 30px)',
+                  fontSize: 'clamp(22px, 6vw, 32px)',
                   fontWeight: 900,
                   letterSpacing: 2,
                   textTransform: 'uppercase',
                   color: theme.colors.textPrimary,
-                  textShadow: `0 0 18px ${withAlpha(theme.colors.accent, 0.5)}`,
+                  textShadow: `0 0 18px ${withAlpha(theme.colors.accent, 0.55)}`,
                 }}
               >
                 A Voice Rises!
               </h1>
             </div>
-            <div style={{ marginTop: 6, fontSize: 13, color: theme.colors.textMuted }}>
+            {/* Caution-tape underline — DIY protest signage. */}
+            <div
+              style={{
+                margin: '10px auto 0',
+                width: 'min(240px, 60vw)',
+                height: 5,
+                borderRadius: 3,
+                background: cautionTape(theme.colors.accent),
+                opacity: 0.9,
+              }}
+            />
+            <div style={{ marginTop: 10, ...stampLabel, fontSize: 11, letterSpacing: 1.2, color: theme.colors.textMuted }}>
               The crowd answers — choose your boon
             </div>
           </div>
@@ -841,17 +1054,23 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
               )}
 
               <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <div
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 800,
-                    letterSpacing: 2,
-                    textTransform: 'uppercase',
-                    textAlign: 'center',
-                    color: theme.colors.textMuted,
-                  }}
-                >
-                  Spoils of War
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%' }}>
+                  <span style={{ flex: 1, height: 1, background: `linear-gradient(90deg, transparent, ${glass.border})` }} />
+                  <span
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      ...stampLabel,
+                      fontSize: 11,
+                      letterSpacing: 2,
+                      color: theme.colors.textMuted,
+                    }}
+                  >
+                    <ChestIcon size={15} />
+                    Spoils of War
+                  </span>
+                  <span style={{ flex: 1, height: 1, background: `linear-gradient(90deg, ${glass.border}, transparent)` }} />
                 </div>
                 <SpoilRow
                   icon={<HopeCoinIcon size={20} />}
@@ -862,13 +1081,28 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
                   valueColor={theme.colors.gold}
                 />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', marginTop: 4 }}>
-                  <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: 'uppercase', color: theme.colors.textMuted }}>
+                  <div style={{ ...stampLabel, fontSize: 11, color: theme.colors.textMuted }}>
                     Hero Card Drops
                   </div>
                   <div style={{ display: 'flex', gap: 8 }}>
                     {heroCardDrops > 0 ? Array.from({ length: heroCardDrops }).map((_, i) => (
-                      <div key={i} style={{ width: 44, height: 60, borderRadius: 6, border: `1px solid ${theme.colors.accent}`, backgroundColor: withAlpha(theme.colors.accent, 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ color: theme.colors.accent, display: 'flex' }}><HeroCardIcon size={24} /></span>
+                      <div
+                        key={i}
+                        style={{
+                          width: 46,
+                          height: 62,
+                          borderRadius: 8,
+                          border: `1px solid ${withAlpha(theme.colors.accent, 0.7)}`,
+                          background: `linear-gradient(160deg, ${withAlpha(theme.colors.accent, 0.22)}, ${withAlpha(theme.colors.background, 0.5)})`,
+                          boxShadow: `0 4px 12px ${withAlpha(theme.colors.background, 0.6)}, inset 0 0 8px ${withAlpha(theme.colors.accent, 0.2)}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: theme.colors.accent,
+                          animation: `star-pop 0.3s ease ${0.35 + i * 0.12}s both`,
+                        }}
+                      >
+                        <HeroCardIcon size={26} />
                       </div>
                     )) : (
                       <div style={{ fontSize: 13, color: theme.colors.textMuted }}>None</div>

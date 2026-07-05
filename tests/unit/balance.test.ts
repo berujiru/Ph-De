@@ -1,5 +1,23 @@
 import { describe, expect, it } from 'vitest';
-import { ENEMY_DEFINITIONS, HERO_DEFINITIONS } from '../../src/game/data/balance';
+import {
+  ENEMY_DEFINITIONS,
+  HERO_DEFINITIONS,
+  VOICE_DROP_TUNING,
+  computeKillPool,
+  voiceDropCost,
+} from '../../src/game/data/balance';
+
+/** How many drops actually land as kills accumulate across a pool of `pool`. */
+function dropsInPool(pool: number): number {
+  let cumulative = 0;
+  let drops = 0;
+  for (let k = 0; k < 1000; k++) {
+    cumulative += voiceDropCost(k, pool);
+    if (cumulative <= pool) drops++;
+    else break;
+  }
+  return drops;
+}
 
 /**
  * Guards the invariants docs/ADDING_ENEMIES.md and docs/TESTING.md promise:
@@ -33,4 +51,55 @@ describe('balance data invariants', () => {
     }
   });
 
+});
+
+describe('voice-drop cadence (docs/VOICE_DROPS.md)', () => {
+  it('computeKillPool follows baseWaveSize * T(T+1)/2', () => {
+    // T=3, baseWaveSize=5 -> 5*3*4/2 = 30 (base prototype).
+    expect(computeKillPool(3)).toBe(30);
+    expect(computeKillPool(3, 5)).toBe(30);
+    // Doubling waves scales the pool.
+    expect(computeKillPool(6)).toBe(105);
+    // baseWaveSize is a lever.
+    expect(computeKillPool(3, 10)).toBe(60);
+  });
+
+  it('the first drop costs firstDropCost', () => {
+    expect(voiceDropCost(0, 30)).toBe(VOICE_DROP_TUNING.firstDropCost);
+    expect(voiceDropCost(0, 60)).toBe(VOICE_DROP_TUNING.firstDropCost);
+  });
+
+  it('lands ~targetDropsPerRun (6) drops across pool=30', () => {
+    expect(dropsInPool(30)).toBe(VOICE_DROP_TUNING.targetDropsPerRun);
+  });
+
+  it('re-scales to still land 6 drops when the pool doubles (pool=60)', () => {
+    expect(dropsInPool(60)).toBe(VOICE_DROP_TUNING.targetDropsPerRun);
+  });
+
+  it('matches the worked incremental costs for pool=30', () => {
+    // docs: 2, 3, 4, 6, 7, 8 -> cumulative 2, 5, 9, 15, 22, 30.
+    const costs = [0, 1, 2, 3, 4, 5].map((k) => voiceDropCost(k, 30));
+    expect(costs).toEqual([2, 3, 4, 6, 7, 8]);
+  });
+
+  it('matches the worked incremental costs for pool=60', () => {
+    // docs: 2, 5, 8, 12, 15, 18.
+    const costs = [0, 1, 2, 3, 4, 5].map((k) => voiceDropCost(k, 60));
+    expect(costs).toEqual([2, 5, 8, 12, 15, 18]);
+  });
+
+  it('thresholds are monotonically non-decreasing', () => {
+    for (const pool of [30, 60, 105]) {
+      for (let k = 1; k < 12; k++) {
+        expect(voiceDropCost(k, pool)).toBeGreaterThanOrEqual(voiceDropCost(k - 1, pool));
+      }
+    }
+  });
+
+  it('never returns a non-positive threshold, even for a tiny pool', () => {
+    for (let k = 0; k < 8; k++) {
+      expect(voiceDropCost(k, 4)).toBeGreaterThanOrEqual(1);
+    }
+  });
 });

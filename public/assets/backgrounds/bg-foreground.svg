@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="540" viewBox="0 0 256 540">
+  <!--
+    Parallax layer 3 (nearest scenery, still behind the units): a caution-tape
+    hazard band over a barricade base. The tape stripes have horizontal period
+    32 and are drawn past both edges, so the 256px tile crops to a seamless
+    repeat. Caution-tape / barricade motif per ART_AND_AUDIO_GUIDELINES.md.
+  -->
+  <!-- barricade base -->
+  <rect x="0" y="502" width="256" height="38" fill="#0b1322"/>
+  <rect x="0" y="500" width="256" height="4" fill="#1e293b"/>
+
+  <!-- caution tape band (slate backing) -->
+  <rect x="0" y="470" width="256" height="30" fill="#111c30"/>
+  <!-- gold hazard stripes, period 32, drawn beyond edges then cropped -->
+  <g fill="#facc15" opacity="0.85">
+    <path d="M-32 500 l16 0 l14 -30 l-16 0 z"/>
+    <path d="M0   500 l16 0 l14 -30 l-16 0 z"/>
+    <path d="M32  500 l16 0 l14 -30 l-16 0 z"/>
+    <path d="M64  500 l16 0 l14 -30 l-16 0 z"/>
+    <path d="M96  500 l16 0 l14 -30 l-16 0 z"/>
+    <path d="M128 500 l16 0 l14 -30 l-16 0 z"/>
+    <path d="M160 500 l16 0 l14 -30 l-16 0 z"/>
+    <path d="M192 500 l16 0 l14 -30 l-16 0 z"/>
+    <path d="M224 500 l16 0 l14 -30 l-16 0 z"/>
+    <path d="M256 500 l16 0 l14 -30 l-16 0 z"/>
+  </g>
+  <rect x="0" y="470" width="256" height="2" fill="#0f172a"/>
+  <rect x="0" y="498" width="256" height="2" fill="#0f172a"/>
+
+  <!-- barricade posts (one per tile -> seamless) -->
+  <g fill="#0f172a">
+    <rect x="118" y="486" width="20" height="54" rx="2"/>
+  </g>
+  <rect x="118" y="490" width="20" height="4" fill="#facc15" opacity="0.35"/>
+</svg>

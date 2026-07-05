@@ -3,9 +3,10 @@ import { MoraleShield } from '../entities/MoraleShield';
 import { Hero } from '../entities/Hero';
 import { Enemy } from '../entities/Enemy';
 import { Summon } from '../entities/Summon';
-import { Attack, ProjectileAttack, MeleeCleaveAttack, VortexAttack, BoomerangAttack, ChainAttack, SummonAttack, BeamAttack, LobbedAttack, LinearWaveAttack, TrapAttack } from '../entities/Attacks';
+import { Attack, ProjectileAttack, PierceAttack, MeleeCleaveAttack, VortexAttack, BoomerangAttack, ChainAttack, SummonAttack, BeamAttack, LobbedAttack, LinearWaveAttack, TrapAttack } from '../entities/Attacks';
 import { gameToUiEvents, uiToGameEvents, type GameStateSnapshot, type DropOption } from '../core/GameEvents';
-import { BARRICADE_DEFAULTS, ENEMY_DEFINITIONS, HERO_DEFINITIONS, type EnemyId, type HeroId } from '../data/balance';
+import { BARRICADE_DEFAULTS, ENEMY_DEFINITIONS, HERO_DEFINITIONS, MAX_ACTIVE_HEROES, UPGRADE_DEFS, GLOBAL_DROP_DEFS, computeKillPool, voiceDropCost, type EnemyId, type HeroId, type UpgradeKind } from '../data/balance';
+import { rollDrops, makeRng, type DropContext } from '../core/Drops';
 import { GAME_HEIGHT, GAME_WIDTH, WORLD_WIDTH, RALLY, ENEMY_SPAWN_X_OFFSET } from '../data/level';
 import { formationTargetX, nextShieldX } from '../core/RallyMarch';
 import { applyHeroSkill, type SkillVisualEvent } from '../core/Skills';
@@ -21,7 +22,11 @@ export class GameScene extends Phaser.Scene {
   
   private voicesCount = 0;
   private maxVoicesCount = 5; // Drops a hero when full
-  
+  /** 0-based count of drops taken this run — drives the voices threshold cadence. */
+  private dropIndex = 0;
+  /** Monotonic counter so each drop roll gets a fresh deterministic seed. */
+  private dropRollSeed = 0;
+
   private spawnTimer = 0;
   private waveActive = false;
   private currentWave = 1;
@@ -42,6 +47,7 @@ export class GameScene extends Phaser.Scene {
   preload() {
     this.load.image('map-barangay', '/assets/backgrounds/map-barangay.svg');
     this.load.image('hero-base', '/assets/heroes/hero-base.svg');
+    this.load.image('eden_portrait', '/assets/heroes/eden_portrait.png');
     this.load.image('enemy-base', '/assets/enemies/enemy-base.svg');
     // this.load.audio('sfx-btn-press', 'assets/sounds/btn-press.mp3');
     // this.load.audio('sfx-victory', 'assets/sounds/victory.mp3');
@@ -394,6 +400,7 @@ export class GameScene extends Phaser.Scene {
         this.skillCutIn.play({
           skillName: hero.definition.signatureSkill.name,
           tint: hero.definition.color,
+          portraitKey: hero.definition.portraitKey,
           onComplete: () => {
             if (!this.sys) return;
             this.isPaused = false;
@@ -474,11 +481,14 @@ export class GameScene extends Phaser.Scene {
     this.attacks = [];
     this.summons = [];
     this.voicesCount = 0;
-    this.maxVoicesCount = 3;
     this.waveActive = false;
     this.currentWave = 1;
     this.totalWaves = 3;
     this.enemiesToSpawn = 5;
+    // First drop threshold is derived from the run's kill pool, not hard-coded.
+    this.dropIndex = 0;
+    this.dropRollSeed = 0;
+    this.maxVoicesCount = voiceDropCost(0, computeKillPool(this.totalWaves));
     this.isPaused = false;
     this.gameSpeed = 1;
     this.status = 'playing';
@@ -634,30 +644,35 @@ export class GameScene extends Phaser.Scene {
     const hero = new Hero(this, x, y, def, (h, target) => {
       let attack: Attack;
       const color = h.definition.projectileColor || h.definition.color;
+      // Persisted per-hero upgrade mods land on every Attack this hero spawns.
+      const mods = h.modifiers;
 
       if (h.definition.attackStyle === 'melee-cleave') {
-        attack = new MeleeCleaveAttack(this, h.x, h.y, target, h.damage, h.range, color);
+        attack = new MeleeCleaveAttack(this, h.x, h.y, target, h.damage, h.range, color, mods);
       } else if (h.definition.attackStyle === 'vortex') {
-        attack = new VortexAttack(this, h.x, h.y, target, h.damage, color);
+        attack = new VortexAttack(this, h.x, h.y, target, h.damage, color, mods);
       } else if (h.definition.attackStyle === 'boomerang') {
-        attack = new BoomerangAttack(this, h, target, h.damage, color);
+        attack = new BoomerangAttack(this, h, target, h.damage, color, mods);
         h.playProjectileLaunch();
       } else if (h.definition.attackStyle === 'chain') {
-        attack = new ChainAttack(this, h.muzzleX, h.muzzleY, target, h.damage, color);
+        attack = new ChainAttack(this, h.muzzleX, h.muzzleY, target, h.damage, color, h.definition.baseChain ?? 1, mods);
       } else if (h.definition.attackStyle === 'summoner') {
-        attack = new SummonAttack(this, h.x, h.y, target, h.damage, color);
+        attack = new SummonAttack(this, h.x, h.y, target, h.damage, color, mods);
       } else if (h.definition.attackStyle === 'beam') {
-        attack = new BeamAttack(this, h.muzzleX, h.muzzleY, target, h.damage, color);
+        attack = new BeamAttack(this, h.muzzleX, h.muzzleY, target, h.damage, color, mods);
       } else if (h.definition.attackStyle === 'lobbed') {
-        attack = new LobbedAttack(this, h.muzzleX, h.muzzleY, target, h.damage, color);
+        attack = new LobbedAttack(this, h.muzzleX, h.muzzleY, target, h.damage, color, mods);
         h.playProjectileLaunch();
       } else if (h.definition.attackStyle === 'linear-wave') {
-        attack = new LinearWaveAttack(this, h.muzzleX, h.muzzleY, h.damage, color);
+        attack = new LinearWaveAttack(this, h.muzzleX, h.muzzleY, h.damage, color, mods);
       } else if (h.definition.attackStyle === 'trap') {
-        attack = new TrapAttack(this, h.x, h.y, target, h.damage, color);
+        attack = new TrapAttack(this, h.x, h.y, target, h.damage, color, mods);
+      } else if (h.definition.attackStyle === 'pierce') {
+        // Non-homing straight-line shot; pass-throughs = basePierce + bonusPierce.
+        attack = new PierceAttack(this, h.muzzleX, h.muzzleY, target, h.damage, color, h.definition.basePierce ?? 1, mods);
+        h.playProjectileLaunch();
       } else {
-        // Fallback to projectile (or pierce)
-        const mods = h.definition.attackStyle === 'pierce' ? { bonusPierce: 2 } : undefined;
+        // Plain projectile — homes, expires on first hit (+bonusPierce).
         attack = new ProjectileAttack(this, h.muzzleX, h.muzzleY, target, h.damage, color, mods);
         h.playProjectileLaunch();
       }
@@ -686,51 +701,83 @@ export class GameScene extends Phaser.Scene {
       // Pause game
       this.isPaused = true;
       this.emitState(true);
-      
-      // Generate options
-      const options: DropOption[] = [
-        { id: 'spawn', title: 'New Worker', description: 'Deploy a new hero to the barricade', type: 'spawn' },
-        { id: 'damage', title: 'Damage Up', description: 'Global +5 hero damage', type: 'damage' },
-        { id: 'speed', title: 'Attack Speed Up', description: 'Global 20% attack speed boost', type: 'speed' }
-      ];
-      
-      // If hero cap reached, remove spawn option
-      if (this.heroes.length >= 5) {
-        options[0] = { id: 'heal', title: 'Barrier Patch', description: 'Restore 50 Barrier HP', type: 'spawn' };
-      } else {
-        const availableIds = Object.keys(HERO_DEFINITIONS).filter(
-          id => !this.heroes.some(h => h.id === id)
-        ) as HeroId[];
-        if (availableIds.length > 0) {
-          const randomId = Phaser.Math.RND.pick(availableIds);
-          const def = HERO_DEFINITIONS[randomId];
-          options[0] = { id: `spawn_${randomId}`, title: def.name, description: `Deploy ${def.name} to the barricade`, type: 'spawn' };
-        } else {
-          options[0] = { id: 'heal', title: 'Barrier Patch', description: 'Restore 50 Barrier HP', type: 'spawn' };
-        }
-      }
 
+      const options = this.rollDropOptions();
       gameToUiEvents.emit('voicesFull', { options });
     }
   }
 
-  private applyDrop(dropId: string) {
-    this.maxVoicesCount += 1; // scale up requirement (was 2)
+  /** Assemble live battle state and roll 3 drop options via the pure roller. */
+  private rollDropOptions(): DropOption[] {
+    const activeIds = new Set(this.heroes.map(h => h.id));
+    const availableRecruits = (Object.keys(HERO_DEFINITIONS) as HeroId[])
+      .filter(id => !id.startsWith('sandbox_') && !activeIds.has(id))
+      .map(id => ({ id, name: HERO_DEFINITIONS[id].name, purpose: HERO_DEFINITIONS[id].purpose }));
 
-    if (dropId.startsWith('spawn_')) {
-      const heroId = dropId.replace('spawn_', '') as HeroId;
+    const ctx: DropContext = {
+      activeHeroes: this.heroes
+        .filter(h => !h.id.startsWith('sandbox_'))
+        .map(h => ({
+          id: h.id,
+          name: h.definition.name,
+          attackStyle: h.definition.attackStyle,
+          stacks: h.upgradeStacks,
+        })),
+      availableRecruits,
+      hasOpenSlot: this.heroes.length < MAX_ACTIVE_HEROES,
+      barrierHp: this.shield.hp,
+      barrierMaxHp: this.shield.maxHp,
+    };
+
+    const rng = makeRng((Date.now() ^ (this.dropRollSeed++ * 0x9e3779b1)) >>> 0);
+    return rollDrops(ctx, rng, 3);
+  }
+
+  private applyDrop(dropId: string) {
+    // Advance the drop cadence: next threshold derives from the run's kill pool.
+    this.dropIndex += 1;
+    this.maxVoicesCount = voiceDropCost(this.dropIndex, computeKillPool(this.totalWaves));
+
+    if (dropId.startsWith('hero:')) {
+      const heroId = dropId.slice('hero:'.length) as HeroId;
       this.spawnHero(heroId);
-    } else if (dropId === 'heal') {
-      this.shield.hp = Math.min(this.shield.maxHp, this.shield.hp + 50);
-    } else if (dropId === 'damage') {
-      for (const hero of this.heroes) {
-        hero.damage += 5;
-      }
-    } else if (dropId === 'speed') {
-      for (const hero of this.heroes) {
-        hero.attackRateMs = Math.max(200, hero.attackRateMs * 0.8);
-      }
+    } else if (dropId === 'global:moraleHeal') {
+      this.shield.hp = Math.min(this.shield.maxHp, this.shield.hp + GLOBAL_DROP_DEFS.moraleHeal.magnitude);
+    } else if (dropId.startsWith('upgrade:')) {
+      const [, heroId, kind] = dropId.split(':');
+      this.applyHeroUpgrade(heroId, kind as UpgradeKind);
     }
+  }
+
+  /** Apply one hero-targeted upgrade pick per UpgradeSpec.apply, and track the
+   *  stack count so the roller stops offering it once maxed. */
+  private applyHeroUpgrade(heroId: string, kind: UpgradeKind) {
+    const hero = this.heroes.find(h => h.id === heroId);
+    const spec = UPGRADE_DEFS[kind];
+    if (!hero || !spec) return;
+
+    switch (spec.apply) {
+      case 'flatDamage':
+        hero.damage += spec.magnitude;
+        break;
+      case 'attackSpeedMult':
+        hero.attackRateMs = Math.max(200, hero.attackRateMs * spec.magnitude);
+        break;
+      case 'flatRange':
+        hero.range += spec.magnitude;
+        break;
+      case 'bonusPierce':
+        hero.modifiers.bonusPierce += spec.magnitude;
+        break;
+      case 'bonusChain':
+        hero.modifiers.bonusChain += spec.magnitude;
+        break;
+      case 'bonusRadius':
+        hero.modifiers.bonusRadius += spec.magnitude;
+        break;
+    }
+
+    hero.upgradeStacks[kind] = (hero.upgradeStacks[kind] ?? 0) + 1;
   }
 
   private emitState(force = false): void {

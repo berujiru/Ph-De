@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="540" viewBox="0 0 512 540">
+  <!--
+    Parallax layer 2 (mid): the street the rally marches down, plus nearer
+    building bases and protest placards/flags. Ground band is full-width and
+    horizontally uniform; discrete props sit inside the tile so it repeats
+    without seams. Placard motif per docs/ART_AND_AUDIO_GUIDELINES.md.
+  -->
+  <!-- ground plane -->
+  <rect x="0" y="430" width="512" height="110" fill="#0e1930"/>
+  <!-- sidewalk curb highlight -->
+  <rect x="0" y="430" width="512" height="6" fill="#1e293b"/>
+  <rect x="0" y="440" width="512" height="2" fill="#38bdf8" opacity="0.12"/>
+  <!-- faint lane ticks (period 64 -> seamless) -->
+  <g fill="#94a3b8" opacity="0.10">
+    <rect x="24"  y="486" width="26" height="5"/>
+    <rect x="88"  y="486" width="26" height="5"/>
+    <rect x="152" y="486" width="26" height="5"/>
+    <rect x="216" y="486" width="26" height="5"/>
+    <rect x="280" y="486" width="26" height="5"/>
+    <rect x="344" y="486" width="26" height="5"/>
+    <rect x="408" y="486" width="26" height="5"/>
+    <rect x="472" y="486" width="26" height="5"/>
+  </g>
+
+  <!-- nearer building bases flanking the street -->
+  <g fill="#0b1322">
+    <rect x="0"   y="360" width="86"  height="80"/>
+    <rect x="120" y="386" width="60"  height="54"/>
+    <rect x="340" y="378" width="70"  height="62"/>
+    <rect x="446" y="360" width="66"  height="80"/>
+  </g>
+  <g fill="#facc15" opacity="0.16">
+    <rect x="18" y="384" width="12" height="14"/><rect x="46" y="384" width="12" height="14"/>
+    <rect x="460" y="384" width="12" height="14"/><rect x="488" y="384" width="12" height="14"/>
+  </g>
+
+  <!-- protest placards / flags rising over the crowd (silhouettes) -->
+  <g stroke="#0b1322" stroke-width="6" stroke-linecap="round">
+    <path d="M214 430V372"/>
+    <path d="M300 430V360"/>
+  </g>
+  <rect x="196" y="344" width="52" height="30" rx="3" fill="#ef4444" opacity="0.55"/>
+  <rect x="286" y="330" width="52" height="30" rx="3" fill="#facc15" opacity="0.5"/>
+  <!-- a waving flag -->
+  <path d="M300 360h44l-8 10 8 10h-44z" fill="#38bdf8" opacity="0.4"/>
+</svg>

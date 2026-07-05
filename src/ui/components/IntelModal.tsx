@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { theme } from '../theme';
-import { BrainIcon, SkullIcon } from '../icons';
-import { glassPanel, glass, withAlpha } from '../mockups/battleStyles';
+import { BrainIcon, CloseIcon } from '../icons';
+import { cautionTape, glassPanel, glass, withAlpha } from '../mockups/battleStyles';
 import { HERO_DEFINITIONS, ENEMY_DEFINITIONS } from '../../game/data/balance';
 import type { ActiveHeroInfo, ActiveEnemyInfo } from '../../game/core/GameEvents';
 
@@ -36,19 +36,36 @@ export function IntelModal({ heroes, enemies, onClose }: IntelModalProps) {
         style={{
           ...glassPanel,
           borderRadius: 16,
+          overflow: 'hidden',
           width: 'min(500px, 92vw)',
           maxHeight: '85vh',
           display: 'flex',
           flexDirection: 'column',
           boxShadow: `0 18px 40px ${withAlpha(theme.colors.background, 0.8)}`,
           border: `1px solid ${withAlpha(theme.colors.accent, 0.3)}`,
+          animation: 'placard-drop 0.28s ease both',
         }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Caution-tape header strip — same rally motif as the battle placards. */}
+        <div style={{ height: 8, background: cautionTape(theme.colors.accent), opacity: 0.85 }} />
+
         {/* Header */}
-        <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: `1px solid ${glass.border}` }}>
-          <span style={{ color: theme.colors.accent, display: 'flex' }}>
-            <BrainIcon size={24} />
+        <div style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: `1px solid ${glass.border}` }}>
+          <span
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 34,
+              height: 34,
+              borderRadius: 9,
+              color: theme.colors.accent,
+              backgroundColor: withAlpha(theme.colors.accent, 0.15),
+              border: `1px solid ${withAlpha(theme.colors.accent, 0.4)}`,
+            }}
+          >
+            <BrainIcon size={20} />
           </span>
           <h2 style={{ margin: 0, fontSize: 18, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.5, color: theme.colors.textPrimary }}>
             Battle Intel
@@ -61,14 +78,20 @@ export function IntelModal({ heroes, enemies, onClose }: IntelModalProps) {
             title="Close intel"
             style={{
               marginLeft: 'auto',
-              background: 'transparent',
-              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 34,
+              height: 34,
+              borderRadius: '50%',
+              background: withAlpha(theme.colors.background, 0.5),
+              border: `1px solid ${glass.border}`,
               color: theme.colors.textMuted,
               cursor: 'pointer',
-              padding: 4,
+              padding: 0,
             }}
           >
-            <SkullIcon size={18} />
+            <CloseIcon size={18} />
           </button>
         </div>
 
@@ -177,7 +200,7 @@ export function IntelModal({ heroes, enemies, onClose }: IntelModalProps) {
                     {def.barrierDamageMultiplier && <div style={{ fontSize: 12, color: theme.colors.textPrimary }}><span style={{ fontWeight: 700, color: theme.colors.danger }}>Breacher:</span> <span style={{ color: theme.colors.textMuted }}>Deals massive damage to the barricade.</span></div>}
                     {def.moraleAura && <div style={{ fontSize: 12, color: theme.colors.textPrimary }}><span style={{ fontWeight: 700, color: '#f97316' }}>Morale Aura:</span> <span style={{ color: theme.colors.textMuted }}>Boosts speed of nearby enemies.</span></div>}
                     {def.fakeHpPadding && <div style={{ fontSize: 12, color: theme.colors.textPrimary }}><span style={{ fontWeight: 700, color: '#818cf8' }}>Fake HP:</span> <span style={{ color: theme.colors.textMuted }}>Protected by a huge shield of red tape.</span></div>}
-                    {def.tauntAura && <div style={{ fontSize: 12, color: theme.colors.textPrimary }}><span style={{ fontWeight: 700, color: '#0f172a' }}>Taunt:</span> <span style={{ color: theme.colors.textMuted }}>Forces nearby heroes to attack them.</span></div>}
+                    {def.tauntAura && <div style={{ fontSize: 12, color: theme.colors.textPrimary }}><span style={{ fontWeight: 700, color: theme.colors.accent }}>Taunt:</span> <span style={{ color: theme.colors.textMuted }}>Forces nearby heroes to attack them.</span></div>}
                     {def.activeSkill && <div style={{ fontSize: 12, color: theme.colors.textPrimary }}><span style={{ fontWeight: 700, color: '#facc15' }}>Skill ({def.activeSkill.name}):</span> <span style={{ color: theme.colors.textMuted }}>Dangerous active ability.</span></div>}
                     
                     {!def.stealth && !def.barrierDamageMultiplier && !def.moraleAura && !def.fakeHpPadding && !def.tauntAura && !def.activeSkill && (

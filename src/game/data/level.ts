@@ -62,3 +62,61 @@ export const RALLY = {
     settleDistancePx: 2,
   },
 } as const;
+
+/**
+ * Layered parallax backdrop for the marching rally. Each layer is a
+ * viewport-pinned TileSprite whose texture scrolls at `factor` of the camera's
+ * scrollX — smaller = farther away. All layers stay BEHIND the units (negative
+ * depth) so gameplay reads cleanly on the dark background. Textures live under
+ * public/assets/backgrounds/ and are 540px tall (no vertical tiling) with
+ * seam-safe horizontal repeats. Factor 0 (sandbox, static camera) still looks
+ * right because tilePositionX is just 0.
+ */
+export const PARALLAX = {
+  layers: [
+    { key: 'bg-sky',        factor: 0.05, depth: -40 },
+    { key: 'bg-skyline',    factor: 0.25, depth: -30 },
+    { key: 'bg-street',     factor: 0.55, depth: -20 },
+    { key: 'bg-foreground', factor: 0.85, depth: -10 },
+  ],
+} as const;
+
+/**
+ * Combat-juice tunables (Phaser-side only — no gameplay math here). Kept as
+ * data so the visual feel is tweaked in one place, not buried as magic numbers
+ * in entity/scene code. Shake intensity is Phaser's fraction-of-viewport value,
+ * deliberately subtle so it layers on top of the follow-camera without nausea.
+ */
+export const FX = {
+  damageNumber: {
+    risePx: 34,
+    driftPx: 22,
+    durationMs: 650,
+    fontSizePx: 15,
+    critFontSizePx: 20,
+    normalColor: '#f8fafc',
+    critColor: '#facc15',
+  },
+  hitSpark: {
+    shardCount: 4,
+    spreadPx: 18,
+    durationMs: 220,
+  },
+  deathBurst: {
+    shardCount: 8,
+    spreadPx: 40,
+    ringRadiusPx: 34,
+    durationMs: 360,
+  },
+  muzzleFlash: {
+    streaks: 3,
+    durationMs: 130,
+  },
+  cameraShake: {
+    enemyDeath: { durationMs: 90,  intensity: 0.0028 },
+    shieldHit:  { durationMs: 130, intensity: 0.006 },
+    skillCast:  { durationMs: 220, intensity: 0.009 },
+  },
+} as const;
+
+export type CameraShakeConfig = { durationMs: number; intensity: number };
