@@ -26,9 +26,10 @@ and you always label them as placeholder-quality.
 
 - `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` — **the authority**: landscape (16:9)
   battlefield, high top-down oblique camera above and behind the rally, heroes
-  TOP-BEHIND (backs to camera) / enemies TOP-FRONT (facing camera), the required
-  animation-state set, the two-phase (base → sheets) workflow, and the Phase 4
-  QA checklist.
+  TOP-BEHIND (backs to camera) / enemies TOP-FRONT (facing camera), the
+  **Animation Standards** (canonical per-row frame counts, 10 FPS timing, sizing
+  — for characters, enemies, skill VFX, and cut-ins), the two-phase (base →
+  sheets) workflow, and the Phase 4 QA checklist.
 - `docs/ADDING_HEROES.md` / `docs/ADDING_ENEMIES.md` — asset filenames, the
   `spriteKey`↔atlas-key rule, and the (now automatic) integration steps.
 - `docs/ART_AND_AUDIO_GUIDELINES.md` — style, palette, per-character animation

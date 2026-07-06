@@ -38,22 +38,26 @@ For each of the 20 Heroes, the following visual assets are required:
 ### B. In-Game Base Model (Sprite Sheet)
 - **Specs**: TOP-BEHIND (high-angle back view). Tag names must match the
   `UnitModel` states exactly (`src/game/entities/models/UnitModel.ts`).
+- **Frame counts & timing are canonical in
+  `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` → *Animation Standards*** — the counts
+  below are copied from there; if they ever disagree, that guide wins.
 - **Animations Required** (heroes draw only THREE — owner decision):
-  1. **`idle`**: Breathing/bouncing in place.
-  2. **`attack`**: The primary attack motion (e.g., throwing a fishball, waving a broom, shouting into a headset). Must have a clear "impact" frame.
-  3. **`cast`**: Signature-skill wind-up pose, played under the anime cut-in.
+  1. **`idle`** — **8 frames**, looping. Breathing/bouncing in place.
+  2. **`attack`** — **8 frames**, one-shot. The primary attack motion (e.g., throwing a fishball, waving a broom, shouting into a headset). **Frame 4 is the clear impact frame.**
+  3. **`cast`** — **10 frames**, one-shot. Signature-skill wind-up pose, energy building across the ramp, played under the anime cut-in.
   - `march`, `celebrate`, `defeat` are **not drawn** — the engine plays a tween
     placeholder for those, so heroes still move and react without frames.
-  5. **`celebrate`**: Victory — cheering, raising a fist, or wiping sweat off the brow.
-  6. **`defeat`**: Morale broken — since heroes don't die, they take a knee, drop their equipment, or look exhausted.
 
 ### C. Skill Cut-In Overlays (Anime-Style)
-When a hero casts their signature skill, the game pauses, and a large 2D sprite slides across the screen (similar to an anime or fighting game super-move).
-- **Style**: Dramatic perspective, intense lighting, comic-book halftone overlays, dynamic speed lines in the background.
-- **Poses Required (3 variations per hero)**:
+When a hero casts their signature skill, the game pauses, and a large 2D sprite slides across the screen (similar to an anime or fighting game super-move). The panel slides in, holds, and slides out in ~1.1 s (`src/game/entities/fx/SkillCutIn.ts`).
+- **Style**: Dramatic front-facing perspective, intense lighting, comic-book halftone overlays, dynamic speed lines in the background. High-res (~1024 px tall). This is the one place we see the hero's face instead of their back.
+- **Poses Required — exactly 3 variations per hero** (canonical in `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` → *Animation Standards → Skill cut-in*):
   1. **Anticipation**: Winding up the attack, deep breath, or preparing the tool.
   2. **Action/Shout**: The climax of the move, mouth wide open shouting their voice line, dynamic foreshortening of their weapon/tool toward the camera.
   3. **Resolution**: A cool post-action pose, exhaling, or resetting their stance.
+
+### D. Skill VFX Effect Sheet (on-field)
+The effect the skill spawns on the lane, separate from the character sheet. **Standard: one `fx` row, 10 frames, one-shot (~1.0 s)** — full spec in `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` → *Animation Standards → Skill VFX*. Compose as a **flat ground element** (ring/scorch/wave on the lane) **plus a vertical flourish** (uplift/column/spray) so it reads under the oblique camera; transparent background, sized to the skill's gameplay radius.
 
 ---
 
@@ -66,13 +70,16 @@ The enemies are personifications of bad governance (anomalies). They should look
 
 ### B. In-Game Base Model (Sprite Sheet)
 - **Specs**: TOP-FRONT (high-angle front view) — facing the camera as they bear
-  down. Tag names must match the `UnitModel` states exactly.
+  down. Tag names must match the `UnitModel` states exactly. **Frame counts &
+  timing are canonical in `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` → *Animation
+  Standards*.**
 - **Animations Required**:
-  1. **`march`**: Plodding, sneaking, or confidently strutting toward the line.
-  2. **`attack`**: Clawing/lunging at the morale shield; clear impact frame.
-  3. **`stunned`**: Dazed, spinning stars, or frozen mid-step (freeze/stun CC).
-  4. **`celebrate`**: Overrunning the barrier and violently tearing at it (plays when the player loses).
-  5. **`death`**: Shattering into piles of paperwork, dissolving into mud, or exploding into gold coins.
+  1. **`march`** — **8 frames**, looping. Plodding, sneaking, or confidently strutting toward the line.
+  2. **`attack`** — **8 frames**, one-shot. Clawing/lunging at the morale shield; **frame 4 is the impact frame.**
+  3. **`stunned`** — **6 frames**, looping. Simple dazed / spinning-stars loop (freeze/stun CC).
+  4. **`celebrate`** — **6 frames**, looping. Short triumph loop — overrunning the barrier and tearing at it (plays when the player loses).
+  5. **`death`** — **8 frames**, one-shot. Shattering into piles of paperwork, dissolving into mud, or exploding into gold coins.
+  - **Bosses / casters** additionally draw **`cast`** — **10 frames**, one-shot: an in-world channel/wind-up pose for a boss skill. Minions never cast.
 
 ---
 
