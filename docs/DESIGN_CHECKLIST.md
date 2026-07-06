@@ -26,8 +26,10 @@ doc; it does not mean numbers are tuned or code exists.
 
 ## Missing — needs a decision (owner) ⚠️
 
-1. **Portrait barrier-defense layout** — recommended, blocks `level.ts`
-   templates, pedestal design, and `DESIGN_GUIDELINES.md` layout update.
+1. **Landscape barrier-defense layout** — **confirmed** (heroes on fixed
+   pedestals with their backs to the camera; anomalies advance from the far
+   side toward the barrier). Unblocks `level.ts` templates, pedestal design,
+   and the `DESIGN_GUIDELINES.md` layout section.
 2. **Ang Sistema finale** (horde-convergence gauntlet) — proposed.
 3. **Heroes never sold for real money** — proposed binding rule.
 
@@ -49,15 +51,17 @@ doc; it does not mean numbers are tuned or code exists.
 - **Eden's full kit** — Rally skill numbers and adjacency anchor rules.
 - **UI screen inventory** — squad select, enemy card, Sari-Sari, campaign
   map, codex: rough wireframes/flows (ui-engineer, after layout confirm).
-- **`DESIGN_GUIDELINES.md` refresh** — layout section still describes the
-  landscape prototype; update after the portrait decision.
+- **`DESIGN_GUIDELINES.md` refresh** — keep the layout section in sync with the
+  locked landscape rally (near-side pedestal row, far-side anomaly spawn) as
+  `level.ts` templates land.
 - **Audio direction** — barks/music style guide (original compositions
   only, per content rules).
 
 ## Code gap (design far ahead of build) 🔧
 
 The implemented game is still the foundation prototype (3 towers, 3
-enemies, 5 waves, landscape path). Implementation ladder once layout is
-confirmed: portrait pivot → damage plumbing phase 1 → `core/Drops.ts` +
+enemies, 5 waves, landscape path). Implementation ladder now that the
+landscape layout is confirmed: landscape rally templates (pedestal row +
+near/far lane) → damage plumbing phase 1 → `core/Drops.ts` +
 enhancements → Acts/Voices → Act 1 content. Waves, economy, targeting,
 and test infrastructure all carry forward.

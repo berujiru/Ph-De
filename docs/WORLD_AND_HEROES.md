@@ -116,9 +116,9 @@ adding new ones: an enhancement must either *change how a hero plays*
 (behaviors, infusions) or *change what the player watches* (instants,
 meta) — flat stat sticks are filler and stay rare.
 
-### Field layout — portrait rally march (confirmed)
+### Field layout — landscape rally march (confirmed)
 
-The game is a **Vertical Auto-Battler**. Enemies descend from the top. Players summon heroes at the bottom of the screen. Summoned heroes automatically march upwards to form the "Rally Frontline". The player does not place static towers; they manage the economy and the timing of summoning workers. "Melee" workers walk directly up to enemies to brawl, while ranged workers stop behind the melee line to fire projectiles. Portrait, one-handed, thumb-friendly; sessions 3–5 minutes.
+The game is a **Landscape Auto-Battler**. Anomalies stream in from the far side of the lane and bear down on the rally. Players summon heroes at the near side of the screen; summoned heroes automatically march forward to form the "Rally Frontline". The player does not place static towers; they manage the economy and the timing of summoning workers. "Melee" workers walk directly up to enemies to brawl, while ranged workers stop behind the melee line to fire projectiles. The camera sits above and behind the rally, so **heroes are drawn from behind — backs to the camera, facing into the enemies — while enemies face the camera** as they advance. Landscape (16:9), held-sideways and thumb-friendly; sessions 3–5 minutes.
 
 ## The heroes — workers with skills
 
@@ -326,7 +326,7 @@ interface BossDefinition {
 
 1. Damage/ailment phases 1–2 (`docs/DAMAGE_AND_AILMENTS.md`) — heroes
    are the type carriers now.
-2. Portrait layout confirmation → `level.ts` templates + pedestal row.
+2. Landscape layout confirmation → `level.ts` templates + pedestal row.
 3. In-battle upgrade economy (`core/` module, unit-tested) — replaces
    the tower-placement economy.
 4. Enemy info card — squad selection depends on it.

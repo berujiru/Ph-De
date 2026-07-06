@@ -18,14 +18,23 @@ the Phaser model layer (`src/game/entities/models/`) defer to it.
 > **Heroes are drawn from BEHIND (back view). Enemies are drawn from the FRONT
 > (front view).** Both at a high angle (tilted slightly from above so we see
 > the top of the head — *not* a flat, stiff, eye-level elevation), on a
-> transparent background. That's the whole convention; every hero pack and enemy
-> pack already follows it.
+> transparent background. That's the whole convention.
+
+> **Prompt-pack status (2026-07):** the per-character and per-enemy prompt packs
+> that previously lived in `docs/references/` have been removed and are being
+> **re-authored for the landscape pivot** in a future iteration. This guide
+> remains the authoritative workflow; regenerate packs from it when that work
+> begins.
+
+**The battlefield is landscape (16:9).** The rally holds the near (left) end of a
+horizontal lane; anomalies stream in from the far (right) end and bear down on
+the barrier.
 
 **The camera.** The battle runs under a **fixed high top-down oblique camera**.
-It sits **above and behind the hero rally** and looks down the advance lane
-toward the incoming anomaly (enemy) horde. It is tilted — *not* a flat, straight-
-down zenith — so you always read bodies, shoulders, weapons, and silhouettes.
-Think "drone hovering just behind your own front line."
+It sits **above and behind the hero rally** and looks down the landscape advance
+lane toward the incoming anomaly (enemy) horde. It is tilted — *not* a flat,
+straight-down zenith — so you always read bodies, shoulders, weapons, and
+silhouettes. Think "drone hovering just behind your own front line."
 
 Because of where that camera sits, the two sides are drawn from **opposite
 facings**, and this is what makes the battlefield instantly readable — you are
@@ -36,11 +45,11 @@ facings**, and this is what makes the battlefield instantly readable — you are
 | **Heroes** | *away* from camera, into the enemies | **TOP-BEHIND** (high-angle back view) | tops of heads, shoulders, backs |
 | **Enemies** | *toward* the camera, at the heroes | **TOP-FRONT** (high-angle front view) | faces, chests, front of the body |
 
-> **Axis note:** the current build is a horizontal scrolling rally — heroes hold
-> the rear (left) while the morale shield pushes forward (right) and anomalies
-> stream in from ahead. The **rear-hero / front-enemy** rule is *facing-relative*
-> and holds no matter which screen axis the march runs along. Draw to the facing,
-> not to a screen direction.
+> **Axis note:** the build is a **landscape** horizontal-scrolling rally — heroes
+> hold the rear (left) while the morale shield pushes forward (right) and
+> anomalies stream in from ahead. The **rear-hero / front-enemy** rule is
+> *facing-relative* and holds no matter which screen axis the march runs along.
+> Draw to the facing, not to a screen direction.
 
 **HUD portraits are the exception:** portraits (`*_portrait.png`) are always a
 tight **front-facing** headshot/bust (see the face), because they live in the UI,
@@ -82,8 +91,9 @@ Use this prompt template to generate the base concept sheet. Fill in the bracket
 
 *Save the generated image. This is your "Base Concept Sheet."*
 
-**Example Outcome (Eden):**
-![Eden Turnaround Reference](references/eden_base_turnaround.png)
+**Example Outcome (Eden):** _(worked example pending — the old reference art and
+prompt packs were removed for the landscape pivot and will be re-authored next
+iteration.)_
 
 ---
 

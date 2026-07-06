@@ -51,10 +51,11 @@ sprite from `Enemy.ts` / `Hero.ts` / `GameScene.ts` directly:
 When real Aseprite sprite sheets replace the placeholders, you reimplement the
 `play*` methods inside the subclass only; entity/scene logic stays untouched.
 Animation tags map 1:1 to these state names (`${spriteKey}-${state}`) — the
-required set and the top-behind (hero) / top-front (enemy) camera perspective
-are specified in `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md`. If a mechanic needs a
-new visual state, add it to `UnitModel` (with abstract `play*` + subclass
-impls), not an ad-hoc tween.
+required set and the landscape (16:9) top-behind (hero, backs to camera) /
+top-front (enemy, facing camera) perspective are specified in
+`docs/CHARACTER_VISUAL_PROMPT_GUIDE.md`. If a mechanic needs a new visual state,
+add it to `UnitModel` (with abstract `play*` + subclass impls), not an ad-hoc
+tween.
 
 ## Workflow & Contract-Driven Development
 

@@ -78,10 +78,10 @@ The enemies are personifications of bad governance (anomalies). They should look
 
 ## 4. Environment & Map Asset Requirements
 
-The battlefields are vertically aligned streets and paths. To ensure the world geometry matches the characters:
+The battlefields are **landscape** streets and paths — a horizontal lane that runs across the screen. To ensure the world geometry matches the characters:
 
 - **Perspective**: The same high top-down oblique the characters use ("a little top view"). The ground plane recedes toward the enemy end, showing the tops and faces of buildings, barricades, and environmental props so the world matches the top-behind heroes and top-front enemies.
-- **Orientation**: The rally advances down a lane toward the incoming anomalies while the morale shield holds the near end; the current build scrolls this lane horizontally, but props are authored to read correctly under the shared oblique camera regardless of march axis.
+- **Orientation**: Landscape (16:9). The rally holds the near (left) end while anomalies stream in from the far (right) end of the lane; the lane scrolls horizontally, and props are authored to read correctly under the shared oblique camera.
 - **Style**: High-contrast, cel-shaded vector art. The ground should use muted or darker tones (deep slate, dark asphalt) so the bright characters and UI elements pop clearly.
 
 ---

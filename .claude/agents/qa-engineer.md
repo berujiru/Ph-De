@@ -51,10 +51,10 @@ Phaser tween internals, but when gameplay touches these, manually verify the
 transitions actually fire: enemies enter `stunned` under freeze/stun, heroes
 `celebrate` on victory and `defeat` on loss/surrender, enemies `celebrate` when
 the barrier falls, and a terminal outcome pose isn't stomped by a stray
-march/attack. Perspective (top-behind heroes / top-front enemies) and the
-required state-tag set are defined in `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` —
-flag generated sprite sheets that are missing a state or drawn from the wrong
-facing.
+march/attack. The landscape (16:9) perspective (top-behind heroes with backs to
+the camera / top-front enemies facing the camera) and the required state-tag set
+are defined in `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` — flag generated sprite
+sheets that are missing a state or drawn from the wrong facing.
 
 ## Bug report format when handing off
 

@@ -22,11 +22,14 @@ over React Native.
 - `docs/ART_AND_AUDIO_GUIDELINES.md` — visual style, anime-style skill cut-ins,
   animations, and comedic Tagalog sound/foley mappings for heroes and enemies.
 - `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` — **canonical camera & sprite
-  perspective** (high top-down oblique; heroes top-behind / enemies top-front),
-  the required per-character animation-state set (idle/march/attack/cast/
-  stunned/celebrate/defeat/death, matching `UnitModel`), and the Gemini→Claude
-  workflow for generating turnarounds and animated sprite sheets. Read before
-  creating or wiring any character art.
+  perspective** (landscape 16:9 lane; high top-down oblique camera above and
+  behind the rally; heroes top-behind with their backs to the camera / enemies
+  top-front facing the camera), the required per-character animation-state set
+  (idle/march/attack/cast/stunned/celebrate/defeat/death, matching `UnitModel`),
+  and the Gemini→Claude workflow for generating turnarounds and animated sprite
+  sheets. Read before creating or wiring any character art. (The per-character
+  prompt packs under `docs/references/` were removed and are being re-authored
+  for the landscape pivot.)
 - `docs/FEATURES.md` — what's built, what's next, what's explicitly out of
   scope. Check before proposing something that might already be
   planned/rejected.

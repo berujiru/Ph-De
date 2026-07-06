@@ -24,8 +24,9 @@ and you always label them as placeholder-quality.
 
 ## Canonical sources (read before any character work)
 
-- `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` — **the authority**: high top-down
-  oblique camera, heroes TOP-BEHIND / enemies TOP-FRONT, the required
+- `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` — **the authority**: landscape (16:9)
+  battlefield, high top-down oblique camera above and behind the rally, heroes
+  TOP-BEHIND (backs to camera) / enemies TOP-FRONT (facing camera), the required
   animation-state set, the two-phase (base → sheets) workflow, and the Phase 4
   QA checklist.
 - `docs/ADDING_HEROES.md` / `docs/ADDING_ENEMIES.md` — asset filenames, the
@@ -35,15 +36,23 @@ and you always label them as placeholder-quality.
 - `docs/WORLD_AND_HEROES.md` — the **binding character-design rules**: communal
   parody archetypes only, never a specific real person's likeness/name/voice.
   These are non-negotiable without project-owner sign-off.
-- `docs/references/eden_prompt_pack.md` — the worked example to mirror.
+
+> **Prompt packs are being re-authored (2026-07).** The per-character/enemy packs
+> that used to live in `docs/references/` (the old `eden_prompt_pack.md` worked
+> example included) have been **removed** and will be re-planned for the landscape
+> pivot in a future iteration. Until then there is no worked example to mirror —
+> derive packs directly from `CHARACTER_VISUAL_PROMPT_GUIDE.md`.
 
 ## What you own
 
-1. **Prompt packs.** For each character, produce a self-contained pack like
-   `eden_prompt_pack.md`: a locked "visual bible", Phase 1 (base + camera
-   angles), Phase 2 (the animated sheet, correct state rows and facing), Phase 3
-   (skill cut-in). Fill in that character's real attack, skill, palette, and
-   props from `balance.ts` + `WORLD_AND_HEROES.md`. Save under `docs/references/`.
+1. **Prompt packs.** For each character, produce a self-contained pack: a locked
+   "visual bible", Phase 1 (base + camera angles), Phase 2 (the animated sheet,
+   correct state rows and landscape back-view/front-view facing), Phase 3 (skill
+   cut-in). Fill in that character's real attack, skill, palette, and props from
+   `balance.ts` + `WORLD_AND_HEROES.md`. Save under `docs/references/`. **Note:**
+   the previous pack set was removed for the landscape pivot re-plan — only
+   author new packs when that iteration is greenlit, and follow the current
+   `CHARACTER_VISUAL_PROMPT_GUIDE.md` orientation exactly.
 2. **Atlas + integration.** Once art lands in `public/assets/heroes/` (or
    `enemies/`), verify/author the `.json` atlas, confirm tag names match the
    `UnitModel` states exactly, add the `this.load.aseprite(...)` line in

@@ -217,9 +217,9 @@ Guardrails:
 
 ## Proposed and pending owner confirmation
 
-- **Portrait barrier-defense field layout** (enemies descend to a bottom
-  barrier; heroes on fixed pedestals behind it) — **Locked and confirmed**. Detailed
-  in `WORLD_AND_HEROES.md`
+- **Landscape barrier-defense field layout** (anomalies stream in from the far
+  side toward a barrier; heroes on fixed pedestals behind it, backs to the
+  camera) — **Locked and confirmed**. Detailed in `WORLD_AND_HEROES.md`
 - ~~In-battle upgrade tiers~~ — superseded (2026-07-03): the owner
   restored and refined the drop system. **Locked**: kills fill the Voices meter, which drops an RNG reward when full (heroes from your unlocked pool while squad slots remain, then enhancements only). The meter cost scales up per drop. No dead drops. Full rules in `WORLD_AND_HEROES.md` "Drops & enhancements"
 - **Ang Sistema** as the finale (horde-convergence gauntlet, The Dynasty

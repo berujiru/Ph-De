@@ -27,6 +27,8 @@ Read `docs/DESIGN_GUIDELINES.md` before making visual changes — it enforces mi
 - Colors come from `theme.ts` tokens by meaning (gold = currency, danger =
   loss, success = valid/positive, accent = primary action) — no new hex
   values invented ad hoc.
+- The battlefield is **landscape (16:9)** — design the overlay HUD for a
+  held-sideways phone, not a portrait column.
 - Character art perspective is not yours to redefine: HUD **portraits** are
   front-facing headshots (UI only), while on-battlefield sprites and the
   anime **skill cut-in** are top-behind/top-front Phaser assets rendered in the
@@ -42,9 +44,9 @@ Read `docs/DESIGN_GUIDELINES.md` before making visual changes — it enforces mi
 1. `npm run typecheck`
 2. `npm run test` — add a component test for new conditional rendering /
    disabled-state logic that a bug could silently break
-3. Actually look at it: `npm run dev` and check the change at a mobile
-   viewport width (375px) as well as desktop, since this ships as a phone
-   app first.
+3. Actually look at it: `npm run dev` and check the change at a **landscape**
+   phone viewport (e.g. 812×375) as well as desktop, since this ships as a
+   held-sideways phone app first.
 
 ## Automated Handoff Summary
 Whenever you finish a task, output a structured JSON summary at the end of your response to allow seamless routing to the next agent.
