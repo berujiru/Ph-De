@@ -91,6 +91,7 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
   const [selectedAilment, setSelectedAilment] = useState<string>('poison');
   const [gameSpeed, setGameSpeed] = useState<number>(1);
   const [intelOpen, setIntelOpen] = useState(false);
+  const [rigOpen, setRigOpen] = useState(false);
   const [gameState, setGameState] = useState<GameStateSnapshot | null>(null);
 
   useEffect(() => {
@@ -211,235 +212,274 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
         </div>
       </div>
 
-      {/* Right rail: floating rig sections (scrolls on small screens) */}
-      <div
+      {/* Toggle button — always visible */}
+      <button
+        type="button"
+        className="hud-btn"
+        onClick={() => { setRigOpen((v) => !v); playBtnSound(); }}
+        aria-label={rigOpen ? 'Close sandbox rig' : 'Open sandbox rig'}
+        title={rigOpen ? 'Close rig' : 'Open rig'}
         style={{
+          ...fab,
           position: 'absolute',
           top: 12,
           right: 12,
-          bottom: 12,
-          width: 'min(240px, 62vw)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 8,
-          overflowY: 'auto',
           pointerEvents: 'auto',
+          zIndex: 20,
+          width: 36,
+          height: 36,
+          backgroundColor: rigOpen ? theme.colors.accent : glass.surface,
+          color: rigOpen ? theme.colors.background : theme.colors.accent,
+          border: `1px solid ${rigOpen ? theme.colors.accent : glass.border}`,
+          boxShadow: rigOpen ? `0 0 14px ${withAlpha(theme.colors.accent, 0.5)}` : `0 4px 16px rgba(0,0,0,0.4)`,
+          fontSize: 18,
+          transition: 'background-color 0.15s, color 0.15s',
         }}
       >
-        <RigSection label="Hero Rig">
-          <select
-            value={selectedHero}
-            onChange={(e) => setSelectedHero(e.target.value)}
-            aria-label="Hero to spawn"
-            style={glassSelect}
-          >
-            <optgroup label="Real Heroes">
+        {rigOpen ? '✕' : '⚙'}
+      </button>
+
+      {/* Right rail: floating rig sections — toggleable */}
+      {rigOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 56,
+            right: 12,
+            bottom: 52,
+            width: 'min(240px, 62vw)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+            overflowY: 'auto',
+            pointerEvents: 'auto',
+          }}
+        >
+          <RigSection label="Hero Rig">
+            <select
+              value={selectedHero}
+              onChange={(e) => setSelectedHero(e.target.value)}
+              aria-label="Hero to spawn"
+              style={glassSelect}
+            >
+              <optgroup label="Real Heroes">
+                {realHeroes.map(([id, def]) => (
+                  <option key={id} value={id}>
+                    {def.name} ({def.attackStyle})
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Test Mocks">
+                {sandboxHeroes.map(([id, def]) => (
+                  <option key={id} value={id}>
+                    {def.attackStyle.toUpperCase()}
+                  </option>
+                ))}
+              </optgroup>
+            </select>
+
+            <select
+              value={selectedHeroPassive}
+              onChange={(e) => setSelectedHeroPassive(e.target.value)}
+              aria-label="Hero passive override"
+              style={glassSelect}
+            >
+              <option value="none">No Passive Override</option>
               {realHeroes.map(([id, def]) => (
                 <option key={id} value={id}>
-                  {def.name} ({def.attackStyle})
+                  {def.passive?.name} ({def.name})
                 </option>
               ))}
-            </optgroup>
-            <optgroup label="Test Mocks">
-              {sandboxHeroes.map(([id, def]) => (
-                <option key={id} value={id}>
-                  {def.attackStyle.toUpperCase()}
-                </option>
-              ))}
-            </optgroup>
-          </select>
-
-          <select
-            value={selectedHeroPassive}
-            onChange={(e) => setSelectedHeroPassive(e.target.value)}
-            aria-label="Hero passive override"
-            style={glassSelect}
-          >
-            <option value="none">No Passive Override</option>
-            {realHeroes.map(([id, def]) => (
-              <option key={id} value={id}>
-                {def.passive?.name} ({def.name})
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={selectedHeroSkill}
-            onChange={(e) => setSelectedHeroSkill(e.target.value)}
-            aria-label="Hero skill override"
-            style={glassSelect}
-          >
-            <option value="none">No Skill Override</option>
-            {realHeroes.map(([id, def]) => (
-              <option key={id} value={id}>
-                {def.signatureSkill.name} ({def.name})
-              </option>
-            ))}
-          </select>
-
-          <div style={{ display: 'flex', gap: 6 }}>
-            <button type="button" className="hud-btn" onClick={handleSpawnDummy} style={primaryBtn}>
-              <PlusIcon size={14} />
-              Spawn
-            </button>
-            <button type="button" className="hud-btn" onClick={handleTriggerHeroSkill} style={secondaryBtn}>
-              <LightningIcon size={14} />
-              Skill
-            </button>
-          </div>
-        </RigSection>
-
-        <RigSection label="Anomaly Rig">
-          <select
-            value={selectedEnemy}
-            onChange={(e) => setSelectedEnemy(e.target.value)}
-            aria-label="Anomaly to spawn"
-            style={glassSelect}
-          >
-            <option value="grunt">Grunt</option>
-            <option value="runner">Runner</option>
-            <option value="brute">Brute</option>
-            <option value="ghost_employee">Ghost Employee (Stealth)</option>
-            <option value="epal">Epal (Morale Aura)</option>
-            <option value="the_overpriced">The Overpriced (Fake HP)</option>
-            <option value="kickback_courier">Kickback Courier (Thief)</option>
-            <option value="shell_company">Shell Company (Splitter)</option>
-            <option value="crony_bodyguard">Crony (Taunt)</option>
-            <option value="hoarder">Hoarder (Obstacle Drop)</option>
-            <option value="illegal_logger">Illegal Logger (Destructor)</option>
-            <option value="land_grabber">Land Grabber (Knockback)</option>
-            <option value="tender_rigger">Tender Rigger (Immunity)</option>
-            <option value="boss_flood_control">Ghost Flood Control</option>
-            <option value="boss_pork_barrel">Pork Barrel</option>
-            <option value="boss_troll_farm">Troll Farm</option>
-            <option value="boss_vote_buying">Vote Buying</option>
-            <option value="boss_nepotism">Nepotism</option>
-            <option value="boss_wang_wang">Wang-Wang</option>
-            <option value="boss_budget_insertion">Budget Insertion</option>
-            <option value="boss_smuggling">Smuggling</option>
-            <option value="boss_dynasty_1">The Dynasty (Bruiser)</option>
-            <option value="boss_ang_sistema">Ang Sistema</option>
-          </select>
-
-          <select
-            value={selectedPassive}
-            onChange={(e) => setSelectedPassive(e.target.value)}
-            aria-label="Anomaly passive override"
-            style={glassSelect}
-          >
-            <option value="none">No Passive</option>
-            <option value="stealth">Stealth</option>
-            <option value="barrierShred">Barrier Shred (x10)</option>
-            <option value="moraleAura">Morale Aura</option>
-            <option value="fakeHp">Fake HP (150)</option>
-            <option value="stealVoices">Steal Voices</option>
-            <option value="splitOnDeath">Split On Death (x3)</option>
-            <option value="taunt">Taunt Aura</option>
-            <option value="dropObstacle">Drop Obstacle</option>
-            <option value="knockback">Knockback Pulse</option>
-            <option value="hitImmunity">Hit Immunity (5)</option>
-          </select>
-
-          <select
-            value={selectedSkill}
-            onChange={(e) => setSelectedSkill(e.target.value)}
-            aria-label="Anomaly skill override"
-            style={glassSelect}
-          >
-            <option value="none">No Skill</option>
-            <option value="flood">Flood</option>
-            <option value="devour">Devour</option>
-            <option value="summonSwarm">Deploy Trolls</option>
-            <option value="summonShieldbearer">Appoint Shieldbearer</option>
-            <option value="scatterFakeGold">Bribe (Fake Gold)</option>
-            <option value="smuggleHp">Smuggle Funds (HP)</option>
-            <option value="economyHeist">Economy Heist</option>
-            <option value="sirenBurst">VIP Convoy (Siren)</option>
-            <option value="resurrectAll">Horde Convergence</option>
-          </select>
-
-          <div style={{ display: 'flex', gap: 6 }}>
-            <button type="button" className="hud-btn" onClick={handleSpawnSpecificEnemy} style={primaryBtn}>
-              <PlusIcon size={14} />
-              Spawn
-            </button>
-            <button type="button" className="hud-btn" onClick={handleTriggerEnemySkill} style={secondaryBtn}>
-              <LightningIcon size={14} />
-              Skill
-            </button>
-          </div>
-
-          <button type="button" className="hud-btn" onClick={handleSpawnTarget} style={dangerBtn}>
-            <SkullIcon size={14} />
-            Drop Punching Bag
-          </button>
-        </RigSection>
-
-        <RigSection label="Ailment Rig">
-          <div style={{ display: 'flex', gap: 6 }}>
-            <select
-              value={selectedAilment}
-              onChange={(e) => setSelectedAilment(e.target.value)}
-              aria-label="Ailment to apply"
-              style={{ ...glassSelect, flex: 1, minWidth: 0 }}
-            >
-              <option value="poison">Poison</option>
-              <option value="burn">Burn</option>
-              <option value="freeze">Freeze</option>
-              <option value="stun">Stun</option>
-              <option value="slow">Slow</option>
-              <option value="wet">Wet</option>
-              <option value="bleed">Bleed</option>
-              <option value="rot">Rot</option>
-              <option value="sleep">Sleep</option>
-              <option value="curse">Curse</option>
-              <option value="knockback">Knockback</option>
-              <option value="armorShred">Armor Shred</option>
             </select>
-            <button type="button" className="hud-btn" onClick={handleApplyAilment} style={{ ...dangerBtn, flex: 'none' }}>
-              +35%
-            </button>
-          </div>
-        </RigSection>
 
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-          {speedFab(0, 'Pause', <PauseIcon size={18} />)}
-          {speedFab(1, 'Normal speed', <PlayIcon size={18} />)}
-          {speedFab(2, 'Fast forward', <SpeedIcon size={18} />)}
-          
-          <button
-            type="button"
-            className="hud-btn"
-            onClick={() => setIntelOpen(true)}
-            style={{
-              ...actionBtn,
-              ...glassPanel,
-              flex: 'none',
-              color: '#38bdf8', // accent color
-            }}
-          >
-            <BrainIcon size={14} />
-            Intel
-          </button>
-          
-          <button
-            type="button"
-            className="hud-btn"
-            onClick={() => {
-              onReturnToMenu();
-              playBtnSound();
-            }}
-            style={{
-              ...actionBtn,
-              ...glassPanel,
-              flex: 'none',
-              color: theme.colors.textPrimary,
-            }}
-          >
-            <BackIcon size={14} />
-            Leave Sandbox
-          </button>
+            <select
+              value={selectedHeroSkill}
+              onChange={(e) => setSelectedHeroSkill(e.target.value)}
+              aria-label="Hero skill override"
+              style={glassSelect}
+            >
+              <option value="none">No Skill Override</option>
+              {realHeroes.map(([id, def]) => (
+                <option key={id} value={id}>
+                  {def.signatureSkill.name} ({def.name})
+                </option>
+              ))}
+            </select>
+
+            <div style={{ display: 'flex', gap: 6 }}>
+              <button type="button" className="hud-btn" onClick={handleSpawnDummy} style={primaryBtn}>
+                <PlusIcon size={14} />
+                Spawn
+              </button>
+              <button type="button" className="hud-btn" onClick={handleTriggerHeroSkill} style={secondaryBtn}>
+                <LightningIcon size={14} />
+                Skill
+              </button>
+            </div>
+          </RigSection>
+
+          <RigSection label="Anomaly Rig">
+            <select
+              value={selectedEnemy}
+              onChange={(e) => setSelectedEnemy(e.target.value)}
+              aria-label="Anomaly to spawn"
+              style={glassSelect}
+            >
+              <option value="grunt">Grunt</option>
+              <option value="runner">Runner</option>
+              <option value="brute">Brute</option>
+              <option value="ghost_employee">Ghost Employee (Stealth)</option>
+              <option value="epal">Epal (Morale Aura)</option>
+              <option value="the_overpriced">The Overpriced (Fake HP)</option>
+              <option value="kickback_courier">Kickback Courier (Thief)</option>
+              <option value="shell_company">Shell Company (Splitter)</option>
+              <option value="crony_bodyguard">Crony (Taunt)</option>
+              <option value="hoarder">Hoarder (Obstacle Drop)</option>
+              <option value="illegal_logger">Illegal Logger (Destructor)</option>
+              <option value="land_grabber">Land Grabber (Knockback)</option>
+              <option value="tender_rigger">Tender Rigger (Immunity)</option>
+              <option value="boss_flood_control">Ghost Flood Control</option>
+              <option value="boss_pork_barrel">Pork Barrel</option>
+              <option value="boss_troll_farm">Troll Farm</option>
+              <option value="boss_vote_buying">Vote Buying</option>
+              <option value="boss_nepotism">Nepotism</option>
+              <option value="boss_wang_wang">Wang-Wang</option>
+              <option value="boss_budget_insertion">Budget Insertion</option>
+              <option value="boss_smuggling">Smuggling</option>
+              <option value="boss_dynasty_1">The Dynasty (Bruiser)</option>
+              <option value="boss_ang_sistema">Ang Sistema</option>
+            </select>
+
+            <select
+              value={selectedPassive}
+              onChange={(e) => setSelectedPassive(e.target.value)}
+              aria-label="Anomaly passive override"
+              style={glassSelect}
+            >
+              <option value="none">No Passive</option>
+              <option value="stealth">Stealth</option>
+              <option value="barrierShred">Barrier Shred (x10)</option>
+              <option value="moraleAura">Morale Aura</option>
+              <option value="fakeHp">Fake HP (150)</option>
+              <option value="stealVoices">Steal Voices</option>
+              <option value="splitOnDeath">Split On Death (x3)</option>
+              <option value="taunt">Taunt Aura</option>
+              <option value="dropObstacle">Drop Obstacle</option>
+              <option value="knockback">Knockback Pulse</option>
+              <option value="hitImmunity">Hit Immunity (5)</option>
+            </select>
+
+            <select
+              value={selectedSkill}
+              onChange={(e) => setSelectedSkill(e.target.value)}
+              aria-label="Anomaly skill override"
+              style={glassSelect}
+            >
+              <option value="none">No Skill</option>
+              <option value="flood">Flood</option>
+              <option value="devour">Devour</option>
+              <option value="summonSwarm">Deploy Trolls</option>
+              <option value="summonShieldbearer">Appoint Shieldbearer</option>
+              <option value="scatterFakeGold">Bribe (Fake Gold)</option>
+              <option value="smuggleHp">Smuggle Funds (HP)</option>
+              <option value="economyHeist">Economy Heist</option>
+              <option value="sirenBurst">VIP Convoy (Siren)</option>
+              <option value="resurrectAll">Horde Convergence</option>
+            </select>
+
+            <div style={{ display: 'flex', gap: 6 }}>
+              <button type="button" className="hud-btn" onClick={handleSpawnSpecificEnemy} style={primaryBtn}>
+                <PlusIcon size={14} />
+                Spawn
+              </button>
+              <button type="button" className="hud-btn" onClick={handleTriggerEnemySkill} style={secondaryBtn}>
+                <LightningIcon size={14} />
+                Skill
+              </button>
+            </div>
+
+            <button type="button" className="hud-btn" onClick={handleSpawnTarget} style={dangerBtn}>
+              <SkullIcon size={14} />
+              Drop Punching Bag
+            </button>
+          </RigSection>
+
+          <RigSection label="Ailment Rig">
+            <div style={{ display: 'flex', gap: 6 }}>
+              <select
+                value={selectedAilment}
+                onChange={(e) => setSelectedAilment(e.target.value)}
+                aria-label="Ailment to apply"
+                style={{ ...glassSelect, flex: 1, minWidth: 0 }}
+              >
+                <option value="poison">Poison</option>
+                <option value="burn">Burn</option>
+                <option value="freeze">Freeze</option>
+                <option value="stun">Stun</option>
+                <option value="slow">Slow</option>
+                <option value="wet">Wet</option>
+                <option value="bleed">Bleed</option>
+                <option value="rot">Rot</option>
+                <option value="sleep">Sleep</option>
+                <option value="curse">Curse</option>
+                <option value="knockback">Knockback</option>
+                <option value="armorShred">Armor Shred</option>
+              </select>
+              <button type="button" className="hud-btn" onClick={handleApplyAilment} style={{ ...dangerBtn, flex: 'none' }}>
+                +35%
+              </button>
+            </div>
+          </RigSection>
         </div>
+      )}
+
+      {/* Bottom-right: speed controls + intel + leave — always visible */}
+      <div style={{
+        position: 'absolute',
+        bottom: 12,
+        right: 12,
+        display: 'flex',
+        gap: 8,
+        flexWrap: 'wrap',
+        justifyContent: 'flex-end',
+        pointerEvents: 'auto',
+      }}>
+        {speedFab(0, 'Pause', <PauseIcon size={18} />)}
+        {speedFab(1, 'Normal speed', <PlayIcon size={18} />)}
+        {speedFab(2, 'Fast forward', <SpeedIcon size={18} />)}
+
+        <button
+          type="button"
+          className="hud-btn"
+          onClick={() => setIntelOpen(true)}
+          style={{
+            ...actionBtn,
+            ...glassPanel,
+            flex: 'none',
+            color: '#38bdf8',
+          }}
+        >
+          <BrainIcon size={14} />
+          Intel
+        </button>
+
+        <button
+          type="button"
+          className="hud-btn"
+          onClick={() => {
+            onReturnToMenu();
+            playBtnSound();
+          }}
+          style={{
+            ...actionBtn,
+            ...glassPanel,
+            flex: 'none',
+            color: theme.colors.textPrimary,
+          }}
+        >
+          <BackIcon size={14} />
+          Leave
+        </button>
       </div>
       
       {intelOpen && gameState && (
