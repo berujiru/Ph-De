@@ -1,17 +1,36 @@
 .app {
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  min-height: 100svh;
-  padding: 12px;
-  gap: 12px;
+  justify-content: center;
+  /* Letterbox bars around the portrait play area on wide screens. */
+  background: #000;
+}
+
+/*
+ * The 9:16 portrait play area. Computed as the largest 9:16 box that fits the
+ * viewport, so it matches Phaser's Scale.FIT letterboxing exactly. Both the
+ * canvas and the React overlays are children, keeping the UI anchored to the
+ * game rather than spread across a wide desktop.
+ *
+ * The `transform` is load-bearing: it makes this box the containing block for
+ * descendant `position: fixed` HUD bars/modals (deploy bar, dossier modals,
+ * drop overlay), so those anchor to the portrait box instead of the full
+ * browser viewport.
+ */
+.portrait-stage {
+  position: relative;
+  width: min(100vw, calc(100dvh * 9 / 16));
+  height: min(100dvh, calc(100vw * 16 / 9));
+  overflow: hidden;
+  transform: translateZ(0);
+  background: var(--bg);
 }
 
 .game-canvas {
-  width: 100%;
-  height: 100%;
-  max-width: 100vw;
-  max-height: 100vh;
   line-height: 0;
   position: absolute;
   inset: 0;

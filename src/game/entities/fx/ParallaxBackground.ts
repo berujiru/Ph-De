@@ -6,11 +6,11 @@ import { PARALLAX } from '../../data/level';
  *
  * Each PARALLAX layer is a viewport-pinned TileSprite (setScrollFactor(0)) that
  * always covers the whole viewport. Depth comes from scrolling each layer's
- * texture at a different fraction of the camera's scrollX via tilePositionX —
+ * texture at a different fraction of the camera's scrollY via tilePositionY —
  * far layers barely move, near layers nearly track the world. Because
  * TileSprites tile infinitely there are never seams or gaps regardless of how
- * far the camera has scrolled, and at scrollX 0 (sandbox's static camera) every
- * layer simply sits at tilePositionX 0, which still reads correctly.
+ * far the camera has scrolled, and at scrollY 0 (sandbox's static camera) every
+ * layer simply sits at tilePositionY 0, which still reads correctly.
  */
 export class ParallaxBackground {
   private readonly layers: { sprite: Phaser.GameObjects.TileSprite; factor: number }[] = [];
@@ -26,10 +26,10 @@ export class ParallaxBackground {
     }
   }
 
-  /** Call every frame with the camera's current scrollX (world px). */
-  update(scrollX: number): void {
+  /** Call every frame with the camera's current scrollY (world px). */
+  update(scrollY: number): void {
     for (const layer of this.layers) {
-      layer.sprite.tilePositionX = scrollX * layer.factor;
+      layer.sprite.tilePositionY = scrollY * layer.factor;
     }
   }
 

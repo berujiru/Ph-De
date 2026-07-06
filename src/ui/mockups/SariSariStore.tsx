@@ -41,7 +41,7 @@ const CATALOG: CatalogItem[] = [
     title: 'Hero Card Pack',
     description: '3 random Hero Cards to level up the roster.',
     cost: 300,
-    icon: <HeroCardIcon size={40} />,
+    icon: <HeroCardIcon size={30} />,
   },
   {
     id: 'eden_bundle',
@@ -49,7 +49,7 @@ const CATALOG: CatalogItem[] = [
     title: 'Eden Card Bundle',
     description: 'Guaranteed 5 Eden Cards for the organizer herself.',
     cost: 500,
-    icon: <HeroCardIcon size={40} />,
+    icon: <HeroCardIcon size={30} />,
   },
   {
     id: 'unlock_electrician',
@@ -61,7 +61,7 @@ const CATALOG: CatalogItem[] = [
       <img
         src="/assets/heroes/hero-placeholder.svg"
         alt=""
-        style={{ width: 44, height: 44, filter: 'brightness(0.4)' }}
+        style={{ width: 34, height: 34, filter: 'brightness(0.4)' }}
       />
     ),
   },
@@ -75,7 +75,7 @@ const CATALOG: CatalogItem[] = [
       <img
         src="/assets/heroes/hero-placeholder.svg"
         alt=""
-        style={{ width: 44, height: 44, filter: 'brightness(0.4)' }}
+        style={{ width: 34, height: 34, filter: 'brightness(0.4)' }}
       />
     ),
   },
@@ -85,7 +85,7 @@ const CATALOG: CatalogItem[] = [
     title: 'Rally Permit',
     description: 'Energy for 1 campaign run. Papers in order!',
     cost: 100,
-    icon: <RallyPermitIcon size={40} />,
+    icon: <RallyPermitIcon size={30} />,
   },
   {
     id: 'permit_bundle',
@@ -93,7 +93,7 @@ const CATALOG: CatalogItem[] = [
     title: 'Permit Bundle ×5',
     description: 'A whole week of marches, pre-approved.',
     cost: 450,
-    icon: <RallyPermitIcon size={40} />,
+    icon: <RallyPermitIcon size={30} />,
   },
   {
     id: 'act_baha',
@@ -101,7 +101,7 @@ const CATALOG: CatalogItem[] = [
     title: 'Act: Baha ng Tulong',
     description: 'Flood of aid — large Barrier heal ultimate.',
     cost: 800,
-    icon: <RaisedFistIcon size={40} />,
+    icon: <RaisedFistIcon size={30} />,
   },
   {
     id: 'act_salu',
@@ -109,7 +109,7 @@ const CATALOG: CatalogItem[] = [
     title: 'Act: Salu-Salo',
     description: 'Community feast — gold windfall ultimate.',
     cost: 800,
-    icon: <RaisedFistIcon size={40} />,
+    icon: <RaisedFistIcon size={30} />,
   },
   {
     id: 'cosmetic_sinulog',
@@ -117,7 +117,7 @@ const CATALOG: CatalogItem[] = [
     title: 'Sinulog Map Skin',
     description: 'Festival re-dress for Act 1 streets. Pit Senyor!',
     cost: 600,
-    icon: <VictoryIcon size={40} />,
+    icon: <VictoryIcon size={30} />,
   },
   {
     id: 'cosmetic_voices',
@@ -125,7 +125,7 @@ const CATALOG: CatalogItem[] = [
     title: 'Voice-Line Pack',
     description: 'New skill barks and chants for the squad.',
     cost: 400,
-    icon: <PlacardIcon size={40} />,
+    icon: <PlacardIcon size={30} />,
   },
 ];
 
@@ -161,14 +161,14 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
     <div
       className="rally-sway"
       style={{
-        width: 210,
+        width: 'min(158px, 43vw)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         position: 'relative',
         transformOrigin: 'top center',
         transform: `rotate(${swing}deg)`,
-        marginTop: 34,
+        marginTop: 30,
       }}
     >
       {/* Clothespin clip on the wire */}
@@ -193,9 +193,9 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
           backgroundColor: 'rgba(248, 250, 252, 0.96)',
           border: '2px solid #e2e8f0',
           borderRadius: 8,
-          padding: '18px 14px',
+          padding: '12px 10px',
           width: '100%',
-          minHeight: 172,
+          minHeight: 118,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -207,7 +207,7 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
       >
         <div
           style={{
-            marginBottom: 10,
+            marginBottom: 6,
             color: theme.materials.ink,
             filter: affordable ? 'none' : 'grayscale(60%)',
             display: 'flex',
@@ -217,30 +217,30 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
         </div>
         <div
           style={{
-            fontSize: 10,
-            letterSpacing: 1.5,
+            fontSize: 8.5,
+            letterSpacing: 1,
             fontWeight: 900,
             color: theme.materials.tarpRed,
             textTransform: 'uppercase',
-            marginBottom: 4,
+            marginBottom: 3,
           }}
         >
           {item.category}
         </div>
         <h3
           style={{
-            margin: '0 0 8px 0',
-            fontSize: 15,
+            margin: '0 0 5px 0',
+            fontSize: 12.5,
             color: theme.materials.ink,
             textAlign: 'center',
             fontWeight: 900,
             textTransform: 'uppercase',
-            lineHeight: 1.15,
+            lineHeight: 1.1,
           }}
         >
           {item.title}
         </h3>
-        <p style={{ margin: 0, fontSize: 11.5, color: '#475569', textAlign: 'center', lineHeight: 1.4 }}>
+        <p style={{ margin: 0, fontSize: 10, color: '#475569', textAlign: 'center', lineHeight: 1.35 }}>
           {item.description}
         </p>
       </div>
@@ -258,19 +258,19 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
           position: 'relative',
           marginTop: -14,
           alignSelf: 'flex-end',
-          marginRight: -8,
+          marginRight: -6,
           minHeight: 44,
-          minWidth: 96,
+          minWidth: 84,
           backgroundColor: theme.materials.cardboard,
           backgroundImage:
             'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px)',
           color: theme.materials.ink,
           border: `1px solid ${theme.materials.cardboardEdge}`,
-          padding: '8px 16px',
+          padding: '6px 12px',
           borderRadius: 2,
           fontWeight: 900,
           fontFamily: MARKER_FONT,
-          fontSize: 18,
+          fontSize: 15,
           cursor: affordable ? 'pointer' : 'not-allowed',
           display: 'flex',
           flexDirection: 'column',
@@ -447,11 +447,12 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
                   'repeating-linear-gradient(0deg, transparent, transparent 22px, rgba(0,0,0,0.15) 22px, rgba(0,0,0,0.15) 24px)',
                 border: `6px solid ${theme.materials.woodDark}`,
                 borderRadius: 4,
-                padding: '14px 32px',
+                padding: '14px clamp(16px, 5vw, 32px)',
                 boxShadow: '0 10px 20px rgba(0,0,0,0.5), inset 0 0 24px rgba(0,0,0,0.35)',
                 display: 'inline-block',
                 position: 'relative',
                 transform: 'rotate(-1deg)',
+                maxWidth: '100%',
               }}
             >
               {/* Nail heads */}
@@ -600,9 +601,9 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
             style={{
               display: 'flex',
               flexWrap: 'wrap',
-              gap: '10px 28px',
+              gap: '6px 14px',
               justifyContent: 'center',
-              padding: '0 0 44px',
+              padding: '0 0 32px',
               position: 'relative',
               zIndex: 10,
             }}

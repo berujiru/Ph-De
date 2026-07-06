@@ -7,8 +7,8 @@ import { Attack, ProjectileAttack, PierceAttack, MeleeCleaveAttack, VortexAttack
 import { gameToUiEvents, uiToGameEvents, type GameStateSnapshot, type DropOption } from '../core/GameEvents';
 import { BARRICADE_DEFAULTS, ENEMY_DEFINITIONS, HERO_DEFINITIONS, MAX_ACTIVE_HEROES, UPGRADE_DEFS, GLOBAL_DROP_DEFS, computeKillPool, voiceDropCost, type EnemyId, type HeroId, type UpgradeKind } from '../data/balance';
 import { rollDrops, makeRng, type DropContext } from '../core/Drops';
-import { GAME_HEIGHT, GAME_WIDTH, WORLD_WIDTH, RALLY, ENEMY_SPAWN_X_OFFSET, FX, PARALLAX } from '../data/level';
-import { formationTargetX, nextShieldX } from '../core/RallyMarch';
+import { GAME_HEIGHT, GAME_WIDTH, WORLD_HEIGHT, RALLY, ENEMY_SPAWN_Y_OFFSET, FX, PARALLAX } from '../data/level';
+import { formationTargetY, nextShieldY } from '../core/RallyMarch';
 import { applyHeroSkill, type SkillVisualEvent } from '../core/Skills';
 import { SkillCutIn } from '../entities/fx/SkillCutIn';
 import { ParallaxBackground } from '../entities/fx/ParallaxBackground';
@@ -160,8 +160,9 @@ export class GameScene extends Phaser.Scene {
 
     const unsubSpawnSpecificEnemy = uiToGameEvents.on('spawnSpecificEnemy', ({ enemyId, passive, skill }) => {
       if (!this.sys) return;
-      const y = Phaser.Math.Between(100, GAME_HEIGHT - 100);
-      
+      // Scatter across the lane (X); the spawn line is on the march axis (Y).
+      const x = Phaser.Math.Between(100, GAME_WIDTH - 100);
+
       // Clone definition to avoid polluting base definitions
       const def = { ...ENEMY_DEFINITIONS[enemyId as EnemyId] };
       
@@ -208,8 +209,11 @@ export class GameScene extends Phaser.Scene {
         def.activeSkill = { name: 'Sandbox Horde', effect: 'resurrectAll' };
       }
 
-      // Sandbox keeps the static camera and old spawn edge; live battles spawn ahead of the formation.
-      const x = this.isSandbox ? GAME_WIDTH + ENEMY_SPAWN_X_OFFSET : this.shield.x + RALLY.enemySpawnAheadPx;
+      // Sandbox keeps the static camera and spawns just above the visible top;
+      // live battles spawn ahead of (above) the advancing formation.
+      const y = this.isSandbox
+        ? this.cameras.main.scrollY - ENEMY_SPAWN_Y_OFFSET
+        : this.shield.y - RALLY.enemySpawnAheadPx;
       const enemy = new Enemy(this, x, y, def);
       this.enemies.push(enemy);
     });
@@ -365,8 +369,8 @@ export class GameScene extends Phaser.Scene {
       def.name = 'Smuggled Budget';
       def.color = 0x14b8a6;
       
-      const y = Math.random() > 0.5 ? 50 : GAME_HEIGHT - 50; // Top or bottom edge
-      const enemy = new Enemy(this, source.x, y, def);
+      const x = Math.random() > 0.5 ? 50 : GAME_WIDTH - 50; // Left or right lane edge
+      const enemy = new Enemy(this, x, source.y, def);
       this.enemies.push(enemy);
     });
 
@@ -428,10 +432,11 @@ export class GameScene extends Phaser.Scene {
       }
 
       applyHeroSkill(skillId, hero, {
-        // Skills treat GAME_WIDTH as "the right edge of what the player sees";
-        // with a scrolling camera that's the camera's right edge in world coords.
-        GAME_WIDTH: this.cameras.main.scrollX + GAME_WIDTH,
-        GAME_HEIGHT,
+        // Lane width is static (no horizontal scroll). Skills treat GAME_HEIGHT
+        // as "the bottom edge of what the player sees" — the front line — which
+        // with a scrolling camera is scrollY + viewport height in world coords.
+        GAME_WIDTH,
+        GAME_HEIGHT: this.cameras.main.scrollY + GAME_HEIGHT,
         heroes: this.heroes,
         enemies: this.enemies,
         onVisual: (evt: SkillVisualEvent) => {
@@ -443,7 +448,7 @@ export class GameScene extends Phaser.Scene {
               if (evt.target) evt.target.attackRateMs = evt.amount;
             });
           } else if (evt.type === 'dragTo') {
-            this.tweens.add({ targets: evt.target, y: evt.y, duration: evt.duration || 500 });
+            this.tweens.add({ targets: evt.target, x: evt.x, duration: evt.duration || 500 });
           } else if (evt.type === 'spawnObstacle') {
             const block = this.add.rectangle(evt.x, evt.y, evt.width, evt.height, parseInt((evt.color || '#000').replace('#', '0x')));
             this.time.delayedCall(evt.duration || 5000, () => block.destroy());
@@ -457,7 +462,7 @@ export class GameScene extends Phaser.Scene {
             const rider = this.add.circle(evt.x, evt.y, 8, 0x22c55e);
             this.tweens.add({
               targets: rider,
-              x: evt.targetX,
+              y: evt.targetY,
               duration: evt.duration || 1000,
               onComplete: () => {
                 rider.destroy();
@@ -516,12 +521,22 @@ export class GameScene extends Phaser.Scene {
     // Layered parallax backdrop — sells forward motion as the rally marches.
     this.parallax = new ParallaxBackground(this, GAME_WIDTH, GAME_HEIGHT);
 
-    // Scrolling camera over the wide world (sandbox stays static at scroll 0).
-    this.cameras.main.setBounds(0, 0, WORLD_WIDTH, GAME_HEIGHT);
+    // Scrolling camera over the tall world (scrolls vertically along the march
+    // axis; X is pinned since bounds width == viewport width).
+    this.cameras.main.setBounds(0, 0, GAME_WIDTH, WORLD_HEIGHT);
     this.cameras.main.scrollX = 0;
 
-    // The morale shield — the crowd's front line, advances as the rally marches.
-    this.shield = new MoraleShield(this, RALLY.shieldStartX, GAME_HEIGHT / 2, BARRICADE_DEFAULTS.width, GAME_HEIGHT, BARRICADE_DEFAULTS.maxHp);
+    // The morale shield — the crowd's front line, a horizontal bar spanning the
+    // lane near the bottom. Advances UP (decreasing y) as the rally marches.
+    this.shield = new MoraleShield(this, GAME_WIDTH / 2, RALLY.shieldStartY, GAME_WIDTH, BARRICADE_DEFAULTS.width, BARRICADE_DEFAULTS.maxHp);
+
+    // Start the camera trailing the shield near the bottom of the view (clamps
+    // to the world bottom at battle start, so both modes show the formation).
+    this.cameras.main.scrollY = Phaser.Math.Clamp(
+      this.shield.y - GAME_HEIGHT * RALLY.cameraAnchorRatio,
+      0,
+      WORLD_HEIGHT - GAME_HEIGHT,
+    );
 
     // Initial fixed hero (Eden)
     this.spawnHero('eden');
@@ -570,28 +585,28 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
-    // The rally marches forward while the field ahead is clear; halts to fight.
+    // The rally marches forward (up) while the field ahead is clear; halts to fight.
     if (!this.isSandbox) {
-      const livingEnemyXs = this.enemies.filter(e => !e.isDead).map(e => e.x);
-      this.shield.x = nextShieldX(this.shield.x, delta, livingEnemyXs, {
+      const livingEnemyYs = this.enemies.filter(e => !e.isDead).map(e => e.y);
+      this.shield.y = nextShieldY(this.shield.y, delta, livingEnemyYs, {
         marchSpeedPxPerSec: RALLY.marchSpeedPxPerSec,
         engageRangePx: RALLY.engageRangePx,
-        shieldMaxX: RALLY.shieldMaxX,
+        shieldMaxY: RALLY.shieldMaxY,
       });
 
       // Camera keeps the shield at a fixed screen position, easing toward it.
       const cam = this.cameras.main;
       const targetScroll = Phaser.Math.Clamp(
-        this.shield.x - GAME_WIDTH * RALLY.cameraAnchorRatio,
+        this.shield.y - GAME_HEIGHT * RALLY.cameraAnchorRatio,
         0,
-        WORLD_WIDTH - GAME_WIDTH,
+        WORLD_HEIGHT - GAME_HEIGHT,
       );
-      cam.scrollX += (targetScroll - cam.scrollX) * Math.min(1, RALLY.cameraLerpPerSec * (delta / 1000));
+      cam.scrollY += (targetScroll - cam.scrollY) * Math.min(1, RALLY.cameraLerpPerSec * (delta / 1000));
     }
 
-    // Slide the parallax layers to match wherever the camera ended up (0 in
+    // Slide the parallax layers to match wherever the camera ended up (fixed in
     // sandbox's static camera, which still reads correctly).
-    this.parallax.update(this.cameras.main.scrollX);
+    this.parallax.update(this.cameras.main.scrollY);
 
     // Update entities
     for (const enemy of this.enemies) {
@@ -608,7 +623,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     for (const hero of this.heroes) {
-      hero.update(delta, this.enemies, this.shield.x);
+      hero.update(delta, this.enemies, this.shield.y);
     }
     
     for (const atk of this.attacks) {
@@ -699,27 +714,28 @@ export class GameScene extends Phaser.Scene {
   }
 
   private spawnEnemy() {
-    const y = Phaser.Math.Between(50, GAME_HEIGHT - 50);
-    // Ahead of the advancing formation, off-camera to the right.
-    const enemy = new Enemy(this, this.shield.x + RALLY.enemySpawnAheadPx, y, ENEMY_DEFINITIONS['grunt']);
+    // Scatter across the lane (X); spawn ahead of (above) the formation, off-camera at the top.
+    const x = Phaser.Math.Between(50, GAME_WIDTH - 50);
+    const enemy = new Enemy(this, x, this.shield.y - RALLY.enemySpawnAheadPx, ENEMY_DEFINITIONS['grunt']);
     this.enemies.push(enemy);
   }
 
   public spawnSandboxTarget() {
     if (!this.sys) return;
-    const y = 300 + (Math.random() - 0.5) * 100;
-    const dummy = new Enemy(this, 700, y, ENEMY_DEFINITIONS['sandbox_target']);
+    const x = GAME_WIDTH / 2 + (Math.random() - 0.5) * 100;
+    // Above the shield so heroes can shoot up at it, within the static sandbox view.
+    const dummy = new Enemy(this, x, this.shield.y - 450, ENEMY_DEFINITIONS['sandbox_target']);
     this.enemies.push(dummy);
   }
 
   private spawnHero(id: HeroId, passiveOverride?: string, _skillOverride?: string) {
-    // Spread heroes vertically to prevent overlapping (center out)
+    // Spread heroes horizontally across the lane to prevent overlapping (center out)
     const offset = this.heroes.length === 0 ? 0 : (this.heroes.length % 2 === 0 ? 1 : -1) * Math.ceil(this.heroes.length / 2) * RALLY.formation.rowSpacingPx;
-    const y = GAME_HEIGHT / 2 + offset;
+    const x = GAME_WIDTH / 2 + offset;
     const def = HERO_DEFINITIONS[id];
 
-    // Heroes join directly at their formation slot behind the shield.
-    const x = formationTargetX(this.shield.x, { attackKind: def.attackKind, rangePx: def.range }, RALLY.formation);
+    // Heroes join directly at their formation slot behind (below) the shield.
+    const y = formationTargetY(this.shield.y, { attackKind: def.attackKind, rangePx: def.range }, RALLY.formation);
 
     const hero = new Hero(this, x, y, def, (h, target) => {
       let attack: Attack;

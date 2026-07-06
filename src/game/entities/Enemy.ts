@@ -422,7 +422,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     // Check if in range of any summon
     let targetSummon: Summon | null = null;
     for (const summon of summons) {
-      if (!summon.isDead && Math.abs(this.x - summon.x) < 20 && Math.abs(this.y - summon.y) < 30) {
+      if (!summon.isDead && Math.abs(this.x - summon.x) < 30 && Math.abs(this.y - summon.y) < 20) {
         targetSummon = summon;
         break;
       }
@@ -439,10 +439,10 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
         this.attackCooldown = this.definition.attackRateMs;
         this.model.setState('attack');
       }
-    } else if (this.x <= shield.x + shield.width / 2) {
-      // Reached the morale shield's front edge, stop moving and start attacking.
+    } else if (this.y >= shield.y - shield.height / 2) {
+      // Reached the morale shield's front (top) edge, stop moving and attack.
       // Fixed contact point — RALLY.formation.enemyContactAheadPx relies on it.
-      this.x = shield.x + shield.width / 2;
+      this.y = shield.y - shield.height / 2;
 
       this.model.setState('idle');
       this.attackCooldown -= delta;
@@ -453,8 +453,8 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
         this.model.setState('attack');
       }
     } else if (moveSpeed > 0) {
-      // Move left toward the rally
-      this.x -= moveSpeed * (delta / 1000);
+      // Move down toward the rally
+      this.y += moveSpeed * (delta / 1000);
       this.model.setState(moveSpeed >= ENEMY_VISUALS.runSpeedThresholdPxPerSec ? 'run' : 'walk');
     } else {
       this.model.setState('idle');

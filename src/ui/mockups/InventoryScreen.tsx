@@ -101,7 +101,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
       backgroundPosition: '0 0, 10px 10px',
       display: 'flex',
       flexDirection: 'column',
-      padding: '40px',
+      padding: 'clamp(16px, 4vw, 40px)',
       color: theme.colors.textPrimary,
       overflowY: 'auto',
       boxShadow: 'inset 0 0 100px rgba(0,0,0,0.8)'
@@ -127,11 +127,12 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
           <div style={{
             backgroundColor: '#fef08a',
             color: '#000',
-            padding: '10px 30px',
+            padding: '10px clamp(14px, 5vw, 30px)',
             transform: 'rotate(-2deg)',
             boxShadow: '2px 4px 10px rgba(0,0,0,0.3)',
             display: 'inline-block',
-            position: 'relative'
+            position: 'relative',
+            maxWidth: '100%'
           }}>
             <div style={{
               position: 'absolute',
@@ -143,7 +144,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
               backgroundColor: 'rgba(255,255,255,0.7)',
               boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
             }} /> {/* Masking tape */}
-            <h1 style={{ margin: 0, fontSize: '32px', fontFamily: TYPEWRITER_FONT, fontWeight: '900', textTransform: 'uppercase' }}>
+            <h1 style={{ margin: 0, fontSize: 'clamp(20px, 6vw, 32px)', fontFamily: TYPEWRITER_FONT, fontWeight: '900', textTransform: 'uppercase', lineHeight: 1.1 }}>
               The Movement Archive
             </h1>
           </div>
@@ -231,7 +232,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
 
       {/* HEROES: Grid of Polaroid Cards */}
       {tab === 'heroes' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '40px', padding: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(138px, 1fr))', gap: '16px 12px', padding: '12px 2px' }}>
           {roster.map((hero, idx) => {
             // Mock unlocking and leveling logic
             const isUnlocked = idx < 12;
@@ -246,7 +247,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 onClick={() => isUnlocked && setSelectedHero(hero)}
                 style={{
                   backgroundColor: '#f8fafc',
-                  padding: '10px 10px 30px 10px', // Extra padding at bottom for polaroid look
+                  padding: '6px 6px 16px 6px', // Extra padding at bottom for polaroid look
                   boxShadow: '2px 5px 15px rgba(0,0,0,0.5)',
                   display: 'flex',
                   flexDirection: 'column',
@@ -292,7 +293,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                   justifyContent: 'center',
                   alignItems: 'flex-end',
                   border: '1px solid #e2e8f0',
-                  marginBottom: '15px',
+                  marginBottom: '8px',
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
@@ -332,20 +333,20 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
 
                 {/* Text Area */}
                 <div style={{ width: '100%', textAlign: 'center' }}>
-                  <h3 style={{ margin: '0 0 5px 0', fontSize: '18px', color: '#0f172a', fontFamily: '"Marker Felt", "Comic Sans MS", fantasy' }}>
+                  <h3 style={{ margin: '0 0 3px 0', fontSize: '13.5px', color: '#0f172a', fontFamily: '"Marker Felt", "Comic Sans MS", fantasy', lineHeight: 1.1 }}>
                     {isUnlocked ? hero.name : 'REDACTED'}
                   </h3>
-                  <div style={{ fontSize: '12px', color: '#475569', fontWeight: 'bold', marginBottom: '10px', fontStyle: isUnlocked ? 'normal' : 'italic' }}>
+                  <div style={{ fontSize: '10px', color: '#475569', fontWeight: 'bold', marginBottom: '7px', fontStyle: isUnlocked ? 'normal' : 'italic', lineHeight: 1.25 }}>
                     {isUnlocked ? hero.profession : `A ${hero.profession.toLowerCase()} waits for the movement to reach them…`}
                   </div>
 
                   {isUnlocked && (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', borderTop: '1px dashed #cbd5e1', paddingTop: '10px' }}>
-                      <span style={{ fontSize: '10px', padding: '2px 6px', backgroundColor: '#e2e8f0', color: '#334155', border: '1px solid #cbd5e1', fontWeight: 'bold' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', borderTop: '1px dashed #cbd5e1', paddingTop: '7px' }}>
+                      <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#e2e8f0', color: '#334155', border: '1px solid #cbd5e1', fontWeight: 'bold' }}>
                         {hero.damageType.toUpperCase()}
                       </span>
                       <div style={{
-                        fontSize: '11px',
+                        fontSize: '10px',
                         fontWeight: 'bold',
                         color: mockCards >= mockCardsNeeded ? '#166534' : '#b91c1c',
                         backgroundColor: mockCards >= mockCardsNeeded ? '#bbf7d0' : '#fecaca',
@@ -374,7 +375,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
             <InfoIcon size={16} />
             Every anomaly you face in the field is filed here — a lie debunked.
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', gap: '24px', padding: '4px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '14px', padding: '4px' }}>
             {CODEX_ENEMIES.map((def, idx) => {
               const faced = FACED_ENEMY_IDS.has(def.id);
               const tier = enemyTier(def);
@@ -396,7 +397,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                     backgroundColor: faced ? '#e5d5b5' : '#4b5563',
                     color: '#1c1917',
                     borderRadius: 4,
-                    padding: '16px 16px 18px',
+                    padding: '10px 10px 12px',
                     position: 'relative',
                     transform: `rotate(${rotation}deg)`,
                     boxShadow: '2px 6px 16px rgba(0,0,0,0.5)',
@@ -424,7 +425,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
 
                   {/* Mugshot */}
                   <div style={{
-                    width: '100%', height: 96, borderRadius: 3, marginBottom: 12,
+                    width: '100%', height: 60, borderRadius: 3, marginBottom: 8,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     background: faced
                       ? `radial-gradient(circle at 50% 40%, ${hexColor(def.color)} 0%, #1e293b 78%)`
@@ -432,43 +433,43 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                     border: '2px solid rgba(0,0,0,0.35)'
                   }}>
                     {faced ? (
-                      <span style={{ color: '#e2e8f0', display: 'flex' }}><SkullIcon size={40} /></span>
+                      <span style={{ color: '#e2e8f0', display: 'flex' }}><SkullIcon size={28} /></span>
                     ) : (
-                      <span style={{ fontFamily: TYPEWRITER_FONT, fontSize: 44, fontWeight: 900, color: '#94a3b8' }}>?</span>
+                      <span style={{ fontFamily: TYPEWRITER_FONT, fontSize: 30, fontWeight: 900, color: '#94a3b8' }}>?</span>
                     )}
                   </div>
 
                   {/* Tier tag */}
                   <span style={{
-                    display: 'inline-block', fontSize: 9, fontWeight: 900, letterSpacing: 1,
-                    textTransform: 'uppercase', padding: '2px 8px', borderRadius: 4, marginBottom: 6,
+                    display: 'inline-block', fontSize: 8.5, fontWeight: 900, letterSpacing: 1,
+                    textTransform: 'uppercase', padding: '2px 7px', borderRadius: 4, marginBottom: 5,
                     color: '#fff', backgroundColor: TIER_COLOR[tier]
                   }}>
                     {tier}
                   </span>
 
-                  <h3 style={{ margin: '0 0 6px 0', fontSize: 16, fontWeight: 900, textTransform: 'uppercase', fontFamily: TYPEWRITER_FONT }}>
+                  <h3 style={{ margin: '0 0 4px 0', fontSize: 13, fontWeight: 900, textTransform: 'uppercase', fontFamily: TYPEWRITER_FONT, lineHeight: 1.1 }}>
                     {faced ? def.name : '████████'}
                   </h3>
-                  <p style={{ margin: 0, fontSize: 12, lineHeight: 1.4, color: '#44403c', fontStyle: 'italic' }}>
+                  <p style={{ margin: 0, fontSize: 10.5, lineHeight: 1.35, color: '#44403c', fontStyle: 'italic' }}>
                     {faced ? enemyMechanic(def) : 'Not yet debunked — face this anomaly in the field to file its case.'}
                   </p>
 
                   {faced ? (
                     <>
-                      <div style={{ display: 'flex', gap: 6, marginTop: 12, flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', gap: 5, marginTop: 10, flexWrap: 'wrap' }}>
                         {[
                           { label: 'HP', value: def.maxHp.toLocaleString() },
                           { label: 'Speed', value: metersPerSecondLabel(def.speed) },
                           { label: 'Barrier Dmg', value: `${def.damage}` },
                         ].map((stat) => (
                           <div key={stat.label} style={{
-                            flex: '1 1 auto', minWidth: 58, textAlign: 'center',
+                            flex: '1 1 auto', minWidth: 40, textAlign: 'center',
                             backgroundColor: 'rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.15)',
-                            borderRadius: 3, padding: '4px 6px'
+                            borderRadius: 3, padding: '4px 5px'
                           }}>
-                            <div style={{ fontSize: 8.5, fontWeight: 900, letterSpacing: 0.5, color: '#57534e', textTransform: 'uppercase' }}>{stat.label}</div>
-                            <div style={{ fontSize: 13, fontWeight: 900, fontFamily: TYPEWRITER_FONT }}>{stat.value}</div>
+                            <div style={{ fontSize: 8, fontWeight: 900, letterSpacing: 0.3, color: '#57534e', textTransform: 'uppercase' }}>{stat.label}</div>
+                            <div style={{ fontSize: 12, fontWeight: 900, fontFamily: TYPEWRITER_FONT }}>{stat.value}</div>
                           </div>
                         ))}
                       </div>

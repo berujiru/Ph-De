@@ -92,12 +92,13 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       }
     }
   } else if (skillId === 'fisherfolk') {
-    // Lambat: Drag enemies to center
+    // Lambat: Drag enemies to the lane's horizontal center (collapses their
+    // spread across X into a line so follow-up AoE lands cleanly).
     for (const e of enemies) {
       if (!e.isDead) {
-        onVisual({ type: 'dragTo', target: e, y: GAME_HEIGHT / 2, duration: 500 });
+        onVisual({ type: 'dragTo', target: e, x: GAME_WIDTH / 2, duration: 500 });
         // Update pure state (tests will read this)
-        e.y = GAME_HEIGHT / 2;
+        e.x = GAME_WIDTH / 2;
       }
     }
   } else if (skillId === 'street_sweeper') {
@@ -121,8 +122,9 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       onVisual({ type: 'text', x: h.x, y: h.y - 20, text: 'IMMUNE!', color: '#10b981' });
     }
   } else if (skillId === 'construction_worker') {
-    // Yero Barricade: Fake Obstacle
-    onVisual({ type: 'spawnObstacle', x: GAME_WIDTH - 150, y: GAME_HEIGHT / 2, width: 20, height: 200, color: '#d97706', duration: 5000 });
+    // Yero Barricade: Fake Obstacle — a horizontal wall across the lane, just
+    // above the visible bottom front line.
+    onVisual({ type: 'spawnObstacle', x: GAME_WIDTH / 2, y: GAME_HEIGHT - 150, width: 200, height: 20, color: '#d97706', duration: 5000 });
   } else if (skillId === 'call_center_agent') {
     // Escalate: 15% Max HP to lowest HP enemy
     const lowestHp = enemies.filter(e => !e.isDead).sort((a, b) => a.hp - b.hp)[0];
@@ -130,9 +132,9 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       lowestHp.takeDamage(lowestHp.definition.maxHp * 0.15);
     }
   } else if (skillId === 'security_guard') {
-    // Flashlight: Wide cone slow
+    // Flashlight: Wide cone slow — enemies ahead of (above) the hero.
     for (const e of enemies) {
-      if (!e.isDead && e.x > hero.x && e.x - hero.x < 400) {
+      if (!e.isDead && e.y < hero.y && hero.y - e.y < 400) {
         e.activeAilments['slow'] = 100;
       }
     }
@@ -147,9 +149,9 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       }
     }
   } else if (skillId === 'fishball_vendor') {
-    // Spicy Sauce: Ignite in front
+    // Spicy Sauce: Ignite in front — a narrow column directly ahead (above) the hero.
     for (const e of enemies) {
-      if (!e.isDead && Math.abs(e.y - hero.y) < 50 && e.x > hero.x) {
+      if (!e.isDead && Math.abs(e.x - hero.x) < 50 && e.y < hero.y) {
         e.activeAilments['burn'] = 100;
       }
     }
@@ -161,9 +163,9 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       }
     }
   } else if (skillId === 'sorbetes_vendor') {
-    // Dirty Ice Cream: drop traps
+    // Dirty Ice Cream: drop traps spread across the lane, just above the bottom front line.
     for(let i=0; i<3; i++) {
-      onVisual({ type: 'spawnTrap', x: GAME_WIDTH - 200 - (i*50), y: GAME_HEIGHT / 2 + (Math.random()-0.5)*100, radius: 10, color: '#f472b6', duration: 3000 });
+      onVisual({ type: 'spawnTrap', x: GAME_WIDTH / 2 + (i-1)*120 + (Math.random()-0.5)*40, y: GAME_HEIGHT - 200, radius: 10, color: '#f472b6', duration: 3000 });
     }
   } else if (skillId === 'electrician') {
     // Rolling Blackout: Stun all
@@ -191,9 +193,9 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       }
     }
   } else if (skillId === 'delivery_rider') {
-    // Kamote Riders
+    // Kamote Riders — sweep UP the lane toward the enemies, spread across X.
     for(let i=0; i<3; i++) {
-      onVisual({ type: 'spawnRider', x: hero.x, y: hero.y + (i-1)*30, targetX: GAME_WIDTH, duration: 1000, damage: hero.damage * 2 });
+      onVisual({ type: 'spawnRider', x: hero.x + (i-1)*30, y: hero.y, targetY: hero.y - 1500, duration: 1000, damage: hero.damage * 2 });
     }
   }
 }

@@ -30,14 +30,21 @@ function App() {
   };
 
   return (
-    <div className="app" style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden' }}>
-      {/* Background Game Canvas is always rendered, to simulate it running underneath */}
-      <GameCanvas />
+    <div className="app">
+      {/*
+        Portrait play area (9:16). The Phaser canvas and every React overlay
+        live inside this centered box so the UI sits ON the game, matching the
+        canvas's Scale.FIT letterboxing. On a wide screen the sides letterbox
+        to black — expected and correct for a phone-first portrait game.
+      */}
+      <div className="portrait-stage">
+        {/* Background Game Canvas is always rendered, to simulate it running underneath */}
+        <GameCanvas />
 
-      {/* Conditionally render UI screens */}
-      {currentView === 'loading' && (
-        <LoadingScreen onComplete={() => setCurrentView('main')} />
-      )}
+        {/* Conditionally render UI screens */}
+        {currentView === 'loading' && (
+          <LoadingScreen onComplete={() => setCurrentView('main')} />
+        )}
 
       {currentView === 'main' && (
         <MainMenu 
@@ -77,6 +84,7 @@ function App() {
       {currentView === 'inventory' && (
         <InventoryScreen onBack={() => setCurrentView('main')} />
       )}
+      </div>
     </div>
   );
 }

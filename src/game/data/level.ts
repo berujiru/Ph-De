@@ -1,58 +1,75 @@
 import { BARRICADE_DEFAULTS } from './balance';
 
-export const GAME_WIDTH = 960;
-export const GAME_HEIGHT = 540;
+// Portrait (9:16) internal resolution. The battle now runs on a VERTICAL axis:
+// enemies march DOWN from the top, the rally pushes UP from the bottom.
+export const GAME_WIDTH = 1080;
+export const GAME_HEIGHT = 1920;
 
-/** Scrolling rally world — the viewport stays 960x540, the battlefield is wider. */
-export const WORLD_WIDTH = GAME_WIDTH * 4;
+/**
+ * Scrolling rally world — the viewport stays 1080x1920, the battlefield is
+ * TALLER. The scroll axis is Y (the march axis); X is a static lane the width
+ * of the viewport.
+ */
+export const WORLD_HEIGHT = GAME_HEIGHT * 4;
 
-// Constants for horizontal Rally layout
-export const ENEMY_SPAWN_X_OFFSET = 50; // Sandbox spawns at GAME_WIDTH + ENEMY_SPAWN_X_OFFSET
+// Constant for the vertical Rally layout. Sandbox spawns just above the top of
+// the visible viewport (scrollY - ENEMY_SPAWN_Y_OFFSET) so enemies walk in.
+export const ENEMY_SPAWN_Y_OFFSET = 50;
 
 /**
  * The marching-rally formation. The morale shield is the FRONT of the crowd;
  * everything else (heroes, camera, enemy spawns) is positioned relative to it.
+ * The rally advances UP the world (toward smaller y / the enemy spawns at the
+ * top); enemies march DOWN (toward larger y) to meet it near the bottom.
  * All distances in px, speeds in px/sec.
  */
 export const RALLY = {
-  /** Where the shield front starts the battle. */
-  shieldStartX: 200,
-  /** The shield never advances past this point (leaves room for spawns ahead). */
-  shieldMaxX: WORLD_WIDTH - 700,
+  /**
+   * Where the shield front starts the battle — near the BOTTOM of the world.
+   * The rally advances up (decreasing y) from here.
+   */
+  shieldStartY: WORLD_HEIGHT - 200,
+  /**
+   * The shield never advances past this point (smallest y it can reach — leaves
+   * room for spawns ahead, above the top edge).
+   */
+  shieldMaxY: 700,
   /** Formation advance speed while the field ahead is clear. */
   marchSpeedPxPerSec: 55,
-  /** A living enemy within this distance ahead of the shield halts the march. */
+  /** A living enemy within this distance ahead of (above) the shield halts the march. */
   engageRangePx: 240,
-  /** Enemies spawn this far ahead of the shield (off-camera to the right). */
+  /** Enemies spawn this far ahead of (above) the shield (off-camera at the top). */
   enemySpawnAheadPx: 750,
   /**
-   * Horizontal screen position the camera keeps the shield at (0..1 of viewport).
-   * Kept at or below shieldStartX / GAME_WIDTH (~0.208) so the start-of-battle
-   * target scroll clamps to 0 and the camera picks up the formation without a pop.
+   * Vertical screen position the camera keeps the shield at (0..1 of viewport,
+   * measured from the top). ~0.78 holds the shield near the BOTTOM of the view.
+   * Kept high enough that the start-of-battle target scroll clamps to the world
+   * bottom, so the camera picks up the formation without a pop.
    */
-  cameraAnchorRatio: 0.22,
+  cameraAnchorRatio: 0.78,
   /** Camera scroll smoothing — higher catches up faster (per-second lerp rate). */
   cameraLerpPerSec: 4,
   formation: {
     /**
-     * Preferred hold offsets relative to the shield front. formationTargetX
-     * pulls a hero forward past its preferred offset whenever its attack
-     * range demands it — see enemyContactAheadPx / rangeSlackPx below.
+     * Preferred hold offsets relative to the shield front. formationTargetY
+     * pulls a hero forward (up, toward the enemies) past its preferred offset
+     * whenever its attack range demands it — see enemyContactAheadPx /
+     * rangeSlackPx below. Positive = behind the shield (below, toward the crowd).
      */
-    /** Melee heroes hold just behind the shield front. */
-    meleeOffsetX: -45,
-    /** Ranged heroes hold further back in the crowd. */
-    rangedOffsetX: -150,
+    /** Melee heroes hold just behind (below) the shield front. */
+    meleeOffsetY: 45,
+    /** Ranged heroes hold further back in the crowd (further below). */
+    rangedOffsetY: 150,
     /**
-     * Enemies halt and attack this far ahead of the shield's center x
+     * Enemies halt and attack this far ahead of (above) the shield's center y
      * (the wall's front edge — must match the stop rule in Enemy.update).
      */
     enemyContactAheadPx: BARRICADE_DEFAULTS.width / 2,
     /** Safety margin kept between a hero's slot and the edge of its range. */
     rangeSlackPx: 20,
-    /** Ranged heroes scatter up to ±half this so they don't stack on one pixel. */
+    /** Ranged heroes scatter up to ±half this (along the march axis) so they don't stack on one pixel. */
     rangedJitterPx: 24,
-    /** Vertical spacing between heroes in the column. */
+    /** Horizontal spacing between heroes across the lane. */
     rowSpacingPx: 55,
     /** Heroes out of position catch up faster than the march itself. */
     catchUpSpeedMultiplier: 2.2,
@@ -66,11 +83,10 @@ export const RALLY = {
 /**
  * Layered parallax backdrop for the marching rally. Each layer is a
  * viewport-pinned TileSprite whose texture scrolls at `factor` of the camera's
- * scrollX — smaller = farther away. All layers stay BEHIND the units (negative
+ * scrollY — smaller = farther away. All layers stay BEHIND the units (negative
  * depth) so gameplay reads cleanly on the dark background. Textures live under
- * public/assets/backgrounds/ and are 540px tall (no vertical tiling) with
- * seam-safe horizontal repeats. Factor 0 (sandbox, static camera) still looks
- * right because tilePositionX is just 0.
+ * public/assets/backgrounds/ and tile seam-free vertically. Factor 0 (sandbox,
+ * static camera) still looks right because tilePositionY is just 0.
  */
 export const PARALLAX = {
   layers: [

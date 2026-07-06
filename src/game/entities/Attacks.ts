@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import type { Enemy } from './Enemy';
 import { Summon } from './Summon';
-import { WORLD_WIDTH } from '../data/level';
+import { GAME_WIDTH, WORLD_HEIGHT } from '../data/level';
 import { MotionTrail } from './fx/MotionTrail';
 import { spawnHitSpark } from './fx/ImpactFx';
 
@@ -118,7 +118,7 @@ export class ProjectileAttack extends Attack {
         }
       }
     }
-    if (this.visual.x > WORLD_WIDTH + 100 || this.visual.x < -100 || this.visual.y > 1500 || this.visual.y < -100) {
+    if (this.visual.x > GAME_WIDTH + 100 || this.visual.x < -100 || this.visual.y > WORLD_HEIGHT + 100 || this.visual.y < -100) {
       this.die();
     }
   }
@@ -198,7 +198,7 @@ export class PierceAttack extends Attack {
         }
       }
     }
-    if (this.visual.x > WORLD_WIDTH + 100 || this.visual.x < -100 || this.visual.y > 1500 || this.visual.y < -100) {
+    if (this.visual.x > GAME_WIDTH + 100 || this.visual.x < -100 || this.visual.y > WORLD_HEIGHT + 100 || this.visual.y < -100) {
       this.die();
     }
   }

@@ -4,13 +4,14 @@ import { FX } from '../data/level';
 
 /**
  * The crowd's morale, made visible: a glowing shield-WALL of light that travels
- * at the FRONT of the rally formation. Built as layered energy — a soft outer
- * bloom, a translucent core fill with a drifting shimmer, and a bright leading
- * edge facing the enemies — so it reads as a rallying crowd's barrier rather
- * than a flat rectangle. Gameplay-wise it keeps the old Barrier semantics: it is
- * the single thing enemies attack, and its hp/maxHp are reported as
- * barrierHp/maxBarrierHp in the snapshot ("Morale" in the HUD). The scene moves
- * it via `x` as the formation advances.
+ * at the FRONT of the rally formation. In portrait it is a HORIZONTAL bar
+ * spanning the lane, its bright leading edge facing UP toward the enemies. Built
+ * as layered energy — a soft outer bloom, a translucent core fill with a
+ * drifting shimmer, and a bright leading edge — so it reads as a rallying
+ * crowd's barrier rather than a flat rectangle. Gameplay-wise it keeps the old
+ * Barrier semantics: it is the single thing enemies attack, and its hp/maxHp are
+ * reported as barrierHp/maxBarrierHp in the snapshot ("Morale" in the HUD). The
+ * scene moves it via `y` as the formation advances up.
  */
 export class MoraleShield extends Phaser.GameObjects.Container {
   public hp: number;
@@ -30,17 +31,17 @@ export class MoraleShield extends Phaser.GameObjects.Container {
     this.width = width;
     this.height = height;
 
-    // Soft outer bloom — the light bleeding past the wall.
-    this.bloom = scene.add.rectangle(0, 0, width + 18, height, 0x38bdf8, 0.08);
+    // Soft outer bloom — the light bleeding past the wall (vertically).
+    this.bloom = scene.add.rectangle(0, 0, width, height + 18, 0x38bdf8, 0.08);
     // Translucent energy core.
     this.wall = scene.add.rectangle(0, 0, width, height, 0x38bdf8, 0.18);
-    // A bright vertical shimmer band that drifts up the wall, suggesting flowing
-    // energy without a texture asset.
-    this.shimmer = scene.add.rectangle(0, -height / 4, width - 4, height / 3, 0x7dd3fc, 0.12);
-    // Leading edge (facing the enemies), brightened in place rather than drawn
-    // ahead of the wall (playtesters read a detached arc as a second shield).
-    this.edgeGlow = scene.add.rectangle(width / 2 - 5, 0, 10, height, 0x38bdf8, 0.3);
-    this.edge = scene.add.rectangle(width / 2 - 2, 0, 4, height, 0x7dd3fc, 0.9);
+    // A bright horizontal shimmer band that drifts across the wall, suggesting
+    // flowing energy without a texture asset.
+    this.shimmer = scene.add.rectangle(-width / 4, 0, width / 3, height - 4, 0x7dd3fc, 0.12);
+    // Leading edge (top, facing the enemies), brightened in place rather than
+    // drawn ahead of the wall (playtesters read a detached arc as a second shield).
+    this.edgeGlow = scene.add.rectangle(0, -height / 2 + 5, width, 10, 0x38bdf8, 0.3);
+    this.edge = scene.add.rectangle(0, -height / 2 + 2, width, 4, 0x7dd3fc, 0.9);
     this.add([this.bloom, this.wall, this.shimmer, this.edgeGlow, this.edge]);
 
     // Idle morale pulse.
@@ -53,10 +54,10 @@ export class MoraleShield extends Phaser.GameObjects.Container {
       ease: 'Sine.easeInOut',
     });
 
-    // Slow shimmer drift up the wall.
+    // Slow shimmer drift across the wall.
     scene.tweens.add({
       targets: this.shimmer,
-      y: height / 4,
+      x: width / 4,
       alpha: 0.2,
       yoyo: true,
       repeat: -1,
@@ -106,16 +107,16 @@ export class MoraleShield extends Phaser.GameObjects.Container {
     });
   }
 
-  /** A short jagged crack of light at the impacted point on the leading edge. */
+  /** A short jagged crack of light at the impacted point on the leading (top) edge. */
   private spawnCrack(): void {
-    const edgeX = this.width / 2 - 2;
-    const cy = Phaser.Math.Between(-this.height / 2 + 20, this.height / 2 - 20);
-    let px = edgeX;
-    let py = cy;
+    const edgeY = -this.height / 2 + 2;
+    const cx = Phaser.Math.Between(-this.width / 2 + 20, this.width / 2 - 20);
+    let px = cx;
+    let py = edgeY;
     const crackLines: Phaser.GameObjects.Line[] = [];
     for (let i = 0; i < 3; i++) {
-      const nx = px - Phaser.Math.Between(6, 14);
-      const ny = py + Phaser.Math.Between(-16, 16);
+      const nx = px + Phaser.Math.Between(-16, 16);
+      const ny = py + Phaser.Math.Between(6, 14);
       const line = this.scene.add.line(0, 0, px, py, nx, ny, 0xffffff, 0.9).setOrigin(0, 0);
       line.setLineWidth(2);
       this.add(line);

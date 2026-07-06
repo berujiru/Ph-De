@@ -13,8 +13,8 @@ export class Summon extends Phaser.GameObjects.Container {
     this.maxHp = maxHp;
     this.hp = maxHp;
 
-    // The barricade shape (taller than wide, blocking the path)
-    this.shape = scene.add.rectangle(0, 0, 16, 40, color);
+    // The barricade shape (wider than tall, blocking the vertical lane)
+    this.shape = scene.add.rectangle(0, 0, 40, 16, color);
     this.add(this.shape);
 
     // HP Bar

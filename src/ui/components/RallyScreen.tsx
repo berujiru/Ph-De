@@ -398,7 +398,7 @@ function VitalPill({
   alarm = false,
   pulse = false,
   glowTrack = false,
-  trackWidth = 88,
+  trackWidth = 64,
 }: {
   icon: ReactNode;
   color: string;
@@ -596,8 +596,8 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
-          gap: 8,
-          padding: '12px 12px 0',
+          gap: 6,
+          padding: '10px 8px 0',
         }}
       >
         {/* Left: Morale (vital sign) + wave placard chip */}
@@ -659,7 +659,7 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
             ratio={voicesRatio}
             pulse={voicesNearFull}
             glowTrack
-            trackWidth={80}
+            trackWidth={64}
           />
         </div>
 

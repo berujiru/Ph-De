@@ -3,7 +3,7 @@ import type { Enemy } from './Enemy';
 import type { AttackModifiers } from './Attacks';
 import { ATTACK_STYLE_BADGES, type HeroDefinition, type UpgradeKind } from '../data/balance';
 import { RALLY } from '../data/level';
-import { formationTargetX, stepTowardFormation } from '../core/RallyMarch';
+import { formationTargetY, stepTowardFormation } from '../core/RallyMarch';
 import { applyHeroPassive, type ISkillHero } from '../core/Skills';
 import { HeroModel } from './models/HeroModel';
 
@@ -33,8 +33,8 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
 
   public passiveOverride?: string;
 
-  /** Small per-hero stagger so ranged heroes don't stack on one pixel. */
-  private formationJitterX: number;
+  /** Small per-hero stagger (along the march axis) so ranged heroes don't stack on one pixel. */
+  private formationJitterY: number;
 
   private model: HeroModel;
   private skillHighlight: Phaser.GameObjects.Text;
@@ -53,7 +53,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.attackRateMs = def.attackRateMs;
     this.range = def.range;
     this.onAttack = onAttack;
-    this.formationJitterX = def.attackKind === 'ranged' ? (Math.random() - 0.5) * RALLY.formation.rangedJitterPx : 0;
+    this.formationJitterY = def.attackKind === 'ranged' ? (Math.random() - 0.5) * RALLY.formation.rangedJitterPx : 0;
 
     // Range indicator (added first so it's behind the body)
     this.rangeIndicator = scene.add.circle(0, 0, def.range, def.color, 0.1);
@@ -133,47 +133,48 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.model.setState(outcome);
   }
 
-  update(delta: number, enemies: Enemy[], shieldX: number) {
+  update(delta: number, enemies: Enemy[], shieldY: number) {
     // Hold formation relative to the advancing morale shield.
-    const targetX = formationTargetX(shieldX, { attackKind: this.definition.attackKind, rangePx: this.range }, RALLY.formation) + this.formationJitterX;
-    const step = stepTowardFormation(this.x, targetX, delta, {
+    const targetY = formationTargetY(shieldY, { attackKind: this.definition.attackKind, rangePx: this.range }, RALLY.formation) + this.formationJitterY;
+    const step = stepTowardFormation(this.y, targetY, delta, {
       marchSpeedPxPerSec: RALLY.marchSpeedPxPerSec,
       catchUpSpeedMultiplier: RALLY.formation.catchUpSpeedMultiplier,
       runDistancePx: RALLY.formation.runDistancePx,
       settleDistancePx: RALLY.formation.settleDistancePx,
     });
-    this.x = step.x;
+    this.y = step.y;
     this.model.setState(step.locomotion);
 
     // Auto-attack
     this.attackCooldown = Math.max(0, this.attackCooldown - delta);
     if (this.attackCooldown === 0) {
-      // Find lowest-X enemy (closest to the shield), prioritizing tauntAura
+      // Find the most-advanced enemy (largest y, closest to the shield below),
+      // among those ahead of (above) the hero. Prioritize tauntAura.
       let target: Enemy | null = null;
-      let minEnemyX = Infinity;
+      let maxEnemyY = -Infinity;
       let foundTaunt = false;
 
       for (const enemy of enemies) {
-        if (!enemy.isDead && enemy.x > this.x) {
+        if (!enemy.isDead && enemy.y < this.y) {
           // Ignore stealthed enemies unless hero has canSeeStealth
           if (enemy.isStealthed && !this.definition.canSeeStealth) continue;
 
-          if (enemy.definition.tauntAura && enemy.x - this.x <= this.range) {
+          if (enemy.definition.tauntAura && this.y - enemy.y <= this.range) {
             // Found a taunting enemy in range. Prioritize it immediately.
-            // If multiple taunt, attack the closest one.
-            if (!foundTaunt || enemy.x < minEnemyX) {
-              minEnemyX = enemy.x;
+            // If multiple taunt, attack the most-advanced one.
+            if (!foundTaunt || enemy.y > maxEnemyY) {
+              maxEnemyY = enemy.y;
               target = enemy;
               foundTaunt = true;
             }
-          } else if (!foundTaunt && enemy.x < minEnemyX) {
-            minEnemyX = enemy.x;
+          } else if (!foundTaunt && enemy.y > maxEnemyY) {
+            maxEnemyY = enemy.y;
             target = enemy;
           }
         }
       }
 
-      if (target && target.x - this.x <= this.range) {
+      if (target && this.y - target.y <= this.range) {
         this.onAttack(this, target);
 
         // Passives applied on attack
