@@ -135,14 +135,14 @@ function Awning() {
     <div aria-hidden="true" style={{ position: 'relative', zIndex: 6 }}>
       <div
         style={{
-          height: 30,
+          height: 22,
           backgroundImage: `repeating-linear-gradient(90deg, ${theme.materials.tarpRed}, ${theme.materials.tarpRed} 42px, ${theme.materials.paper} 42px, ${theme.materials.paper} 84px)`,
           boxShadow: '0 6px 16px rgba(0,0,0,0.6), inset 0 -6px 10px rgba(0,0,0,0.35)',
         }}
       />
       <div
         style={{
-          height: 14,
+          height: 10,
           backgroundImage: `radial-gradient(circle at 21px -2px, ${theme.materials.tarpRed} 20px, transparent 21px), radial-gradient(circle at 63px -2px, ${theme.materials.paper} 20px, transparent 21px)`,
           backgroundSize: '84px 14px',
           filter: 'drop-shadow(0 3px 3px rgba(0,0,0,0.4))',
@@ -161,14 +161,14 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
     <div
       className="rally-sway"
       style={{
-        width: 'min(116px, 22vw)',
+        width: 'min(100px, 20vw)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         position: 'relative',
         transformOrigin: 'top center',
         transform: `rotate(${swing}deg)`,
-        marginTop: 30,
+        marginTop: 22,
       }}
     >
       {/* Clothespin clip on the wire */}
@@ -193,9 +193,9 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
           backgroundColor: 'rgba(248, 250, 252, 0.96)',
           border: '2px solid #e2e8f0',
           borderRadius: 8,
-          padding: '8px 6px',
+          padding: '6px 5px',
           width: '100%',
-          minHeight: 92,
+          minHeight: 72,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -259,18 +259,18 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
           marginTop: -14,
           alignSelf: 'flex-end',
           marginRight: -6,
-          minHeight: 44,
-          minWidth: 84,
+          minHeight: 38,
+          minWidth: 72,
           backgroundColor: theme.materials.cardboard,
           backgroundImage:
             'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px)',
           color: theme.materials.ink,
           border: `1px solid ${theme.materials.cardboardEdge}`,
-          padding: '6px 12px',
+          padding: '5px 10px',
           borderRadius: 2,
           fontWeight: 900,
           fontFamily: MARKER_FONT,
-          fontSize: 15,
+          fontSize: 13,
           cursor: affordable ? 'pointer' : 'not-allowed',
           display: 'flex',
           flexDirection: 'column',
@@ -422,7 +422,7 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
         }}
       />
 
-      <div style={{ padding: 'clamp(16px, 4vw, 36px)', position: 'relative', zIndex: 5 }}>
+      <div style={{ padding: 'clamp(12px, 3vw, 24px)', position: 'relative', zIndex: 5 }}>
         {/* Header: back + wooden signboard + Hope jar */}
         <div
           style={{
@@ -431,7 +431,7 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
             alignItems: 'flex-start',
             gap: 16,
             flexWrap: 'wrap',
-            marginBottom: 36,
+            marginBottom: 20,
           }}
         >
           <div>
@@ -601,9 +601,9 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
             style={{
               display: 'flex',
               flexWrap: 'wrap',
-              gap: '6px 8px',
+              gap: '4px 6px',
               justifyContent: 'center',
-              padding: '0 0 32px',
+              padding: '0 0 20px',
               position: 'relative',
               zIndex: 10,
             }}
@@ -626,10 +626,10 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
             marginTop: 8,
           }}
         >
-          <div style={{ width: 70, height: 110, backgroundColor: '#000', clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 100%, 0% 100%, 0% 20%)' }} />
-          <div style={{ width: 140, height: 74, backgroundColor: '#000', borderRadius: '10px 10px 0 0' }} />
-          <div style={{ width: 54, height: 140, backgroundColor: '#000', borderRadius: '5px 5px 0 0' }} />
-          <div style={{ width: 92, height: 92, backgroundColor: '#000', borderRadius: '10px 10px 0 0' }} />
+          <div style={{ width: 60, height: 80, backgroundColor: '#000', clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 100%, 0% 100%, 0% 20%)' }} />
+          <div style={{ width: 120, height: 56, backgroundColor: '#000', borderRadius: '10px 10px 0 0' }} />
+          <div style={{ width: 44, height: 100, backgroundColor: '#000', borderRadius: '5px 5px 0 0' }} />
+          <div style={{ width: 76, height: 72, backgroundColor: '#000', borderRadius: '10px 10px 0 0' }} />
         </div>
 
         <div

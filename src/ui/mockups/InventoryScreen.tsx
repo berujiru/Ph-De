@@ -101,7 +101,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
       backgroundPosition: '0 0, 10px 10px',
       display: 'flex',
       flexDirection: 'column',
-      padding: 'clamp(16px, 4vw, 40px)',
+      padding: 'clamp(12px, 3vw, 24px)',
       color: theme.colors.textPrimary,
       overflowY: 'auto',
       boxShadow: 'inset 0 0 100px rgba(0,0,0,0.8)'
@@ -112,7 +112,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
-        marginBottom: '24px',
+        marginBottom: '16px',
         position: 'relative',
         zIndex: 10,
         gap: 16,
@@ -193,7 +193,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
       </div>
 
       {/* Tabs: Roster vs Truth Codex */}
-      <div style={{ display: 'flex', gap: 10, marginBottom: 28, flexWrap: 'wrap', zIndex: 10 }}>
+      <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap', zIndex: 10 }}>
         {([
           { id: 'heroes' as const, label: 'The Roster', count: `${roster.length} workers` },
           { id: 'codex' as const, label: 'The Truth Codex', count: `${facedCount}/${CODEX_ENEMIES.length} debunked` },
@@ -232,7 +232,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
 
       {/* HEROES: Grid of Polaroid Cards */}
       {tab === 'heroes' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(82px, 1fr))', gap: '12px 8px', padding: '12px 2px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(68px, 1fr))', gap: '8px 6px', padding: '6px 2px' }}>
           {roster.map((hero, idx) => {
             // Mock unlocking and leveling logic
             const isUnlocked = idx < 12;
@@ -247,12 +247,13 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 onClick={() => isUnlocked && setSelectedHero(hero)}
                 style={{
                   backgroundColor: '#f8fafc',
-                  padding: '6px 6px 16px 6px', // Extra padding at bottom for polaroid look
+                  padding: '5px 5px 10px 5px', // Extra padding at bottom for polaroid look
                   boxShadow: '2px 5px 15px rgba(0,0,0,0.5)',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  filter: isUnlocked ? 'none' : 'sepia(80%) grayscale(80%)',
+                  filter: isUnlocked ? 'none' : 'grayscale(100%)',
+                  opacity: isUnlocked ? 1 : 0.7,
                   cursor: isUnlocked ? 'pointer' : 'default',
                   transition: 'transform 0.2s, box-shadow 0.2s',
                   position: 'relative',
@@ -293,7 +294,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                   justifyContent: 'center',
                   alignItems: 'flex-end',
                   border: '1px solid #e2e8f0',
-                  marginBottom: '8px',
+                  marginBottom: '5px',
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
@@ -304,12 +305,12 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                       width: '92%',
                       height: '92%',
                       objectFit: 'contain',
-                      filter: isUnlocked ? 'none' : 'brightness(0.35)',
+                      filter: isUnlocked ? 'none' : 'brightness(0)',
                     }}
                   />
                   {!isUnlocked && (
-                    <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#e2e8f0', display: 'flex' }}>
-                      <LockIcon size={32} />
+                    <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#94a3b8', display: 'flex' }}>
+                      <LockIcon size={22} />
                     </span>
                   )}
 
@@ -333,24 +334,24 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
 
                 {/* Text Area */}
                 <div style={{ width: '100%', textAlign: 'center' }}>
-                  <h3 style={{ margin: '0 0 3px 0', fontSize: '11px', color: '#0f172a', fontFamily: '"Marker Felt", "Comic Sans MS", fantasy', lineHeight: 1.1 }}>
+                  <h3 style={{ margin: '0 0 3px 0', fontSize: '9.5px', color: '#0f172a', fontFamily: '"Marker Felt", "Comic Sans MS", fantasy', lineHeight: 1.1 }}>
                     {isUnlocked ? hero.name : 'REDACTED'}
                   </h3>
-                  <div style={{ fontSize: '8.5px', color: '#475569', fontWeight: 'bold', marginBottom: '6px', fontStyle: isUnlocked ? 'normal' : 'italic', lineHeight: 1.2 }}>
+                  <div style={{ fontSize: '7.5px', color: '#475569', fontWeight: 'bold', marginBottom: '4px', fontStyle: isUnlocked ? 'normal' : 'italic', lineHeight: 1.2 }}>
                     {isUnlocked ? hero.profession : `A ${hero.profession.toLowerCase()} waits for the movement to reach them…`}
                   </div>
 
                   {isUnlocked && (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', borderTop: '1px dashed #cbd5e1', paddingTop: '6px' }}>
-                      <span style={{ fontSize: '8px', padding: '2px 5px', backgroundColor: '#e2e8f0', color: '#334155', border: '1px solid #cbd5e1', fontWeight: 'bold' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', borderTop: '1px dashed #cbd5e1', paddingTop: '4px' }}>
+                      <span style={{ fontSize: '7px', padding: '1px 4px', backgroundColor: '#e2e8f0', color: '#334155', border: '1px solid #cbd5e1', fontWeight: 'bold' }}>
                         {hero.damageType.toUpperCase()}
                       </span>
                       <div style={{
-                        fontSize: '8.5px',
+                        fontSize: '7.5px',
                         fontWeight: 'bold',
                         color: mockCards >= mockCardsNeeded ? '#166534' : '#b91c1c',
                         backgroundColor: mockCards >= mockCardsNeeded ? '#bbf7d0' : '#fecaca',
-                        padding: '2px 7px',
+                        padding: '1px 5px',
                         borderRadius: '10px'
                       }}>
                         CARDS: {mockCards} / {mockCardsNeeded}
@@ -375,7 +376,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
             <InfoIcon size={16} />
             Every anomaly you face in the field is filed here — a lie debunked.
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 1fr))', gap: '10px 8px', padding: '4px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(72px, 1fr))', gap: '8px 6px', padding: '4px' }}>
             {CODEX_ENEMIES.map((def, idx) => {
               const faced = FACED_ENEMY_IDS.has(def.id);
               const tier = enemyTier(def);
@@ -397,7 +398,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                     backgroundColor: faced ? '#e5d5b5' : '#4b5563',
                     color: '#1c1917',
                     borderRadius: 4,
-                    padding: '8px 7px 10px',
+                    padding: '6px 5px 8px',
                     position: 'relative',
                     transform: `rotate(${rotation}deg)`,
                     boxShadow: '2px 6px 16px rgba(0,0,0,0.5)',
@@ -425,7 +426,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
 
                   {/* Mugshot */}
                   <div style={{
-                    width: '100%', height: 44, borderRadius: 3, marginBottom: 6,
+                    width: '100%', height: 36, borderRadius: 3, marginBottom: 6,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     background: faced
                       ? `radial-gradient(circle at 50% 40%, ${hexColor(def.color)} 0%, #1e293b 78%)`
@@ -442,44 +443,23 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                   {/* Tier tag */}
                   <span style={{
                     display: 'inline-block', fontSize: 7, fontWeight: 900, letterSpacing: 0.5,
-                    textTransform: 'uppercase', padding: '2px 5px', borderRadius: 4, marginBottom: 4,
+                    textTransform: 'uppercase', padding: '2px 5px', borderRadius: 4, marginBottom: 3,
                     color: '#fff', backgroundColor: TIER_COLOR[tier]
                   }}>
                     {tier}
                   </span>
 
-                  <h3 style={{ margin: '0 0 4px 0', fontSize: 10.5, fontWeight: 900, textTransform: 'uppercase', fontFamily: TYPEWRITER_FONT, lineHeight: 1.1 }}>
+                  <h3 style={{ margin: '0 0 2px 0', fontSize: 9, fontWeight: 900, textTransform: 'uppercase', fontFamily: TYPEWRITER_FONT, lineHeight: 1.1 }}>
                     {faced ? def.name : '██████'}
                   </h3>
-                  <p style={{ margin: 0, fontSize: 8.5, lineHeight: 1.3, color: '#44403c', fontStyle: 'italic' }}>
-                    {faced ? enemyMechanic(def) : 'Not yet debunked — face this anomaly in the field to file its case.'}
-                  </p>
 
                   {faced ? (
-                    <>
-                      <div style={{ display: 'flex', gap: 4, marginTop: 8, flexWrap: 'wrap' }}>
-                        {[
-                          { label: 'HP', value: def.maxHp.toLocaleString() },
-                          { label: 'Speed', value: metersPerSecondLabel(def.speed) },
-                          { label: 'Barrier Dmg', value: `${def.damage}` },
-                        ].map((stat) => (
-                          <div key={stat.label} style={{
-                            flex: '1 1 auto', minWidth: 24, textAlign: 'center',
-                            backgroundColor: 'rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.15)',
-                            borderRadius: 3, padding: '3px 4px'
-                          }}>
-                            <div style={{ fontSize: 7, fontWeight: 900, letterSpacing: 0.3, color: '#57534e', textTransform: 'uppercase' }}>{stat.label}</div>
-                            <div style={{ fontSize: 10, fontWeight: 900, fontFamily: TYPEWRITER_FONT }}>{stat.value}</div>
-                          </div>
-                        ))}
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8, color: '#78350f', fontSize: 8.5, fontWeight: 800, letterSpacing: 0.3, textTransform: 'uppercase' }}>
-                        <InfoIcon size={11} /> Tap to open file
-                      </div>
-                    </>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 4, color: '#78350f', fontSize: 7.5, fontWeight: 800, letterSpacing: 0.3, textTransform: 'uppercase' }}>
+                      <InfoIcon size={9} /> Tap to open
+                    </div>
                   ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 8, color: '#e2e8f0', fontSize: 9, fontWeight: 700 }}>
-                      <LockIcon size={12} /> SEALED
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4, color: '#e2e8f0', fontSize: 8, fontWeight: 700 }}>
+                      <LockIcon size={10} /> SEALED
                     </div>
                   )}
                 </div>
@@ -500,7 +480,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
             display: 'flex',
             zIndex: 1000,
             backdropFilter: 'blur(5px)',
-            padding: '48px 20px',
+            padding: '32px 14px',
             overflowY: 'auto'
           }}>
           {/* Dossier Folder */}
@@ -511,7 +491,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
               backgroundColor: '#e5d5b5', // Manila folder color
               border: '1px solid #c2b291',
               borderRadius: '4px 20px 4px 4px',
-              padding: 'clamp(20px, 4vw, 40px)',
+              padding: 'clamp(14px, 3vw, 28px)',
               width: '100%',
               maxWidth: '550px',
               position: 'relative',
@@ -521,17 +501,17 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
             {/* Top Tab — compact so it fits on short/landscape viewports */}
             <div style={{
               position: 'absolute',
-              top: '-26px',
+              top: '-22px',
               left: '0',
               maxWidth: '100%',
               backgroundColor: '#e5d5b5',
-              padding: '4px 16px',
+              padding: '3px 10px',
               border: '1px solid #c2b291',
               borderBottom: 'none',
               borderRadius: '8px 8px 0 0',
               color: '#000',
               fontWeight: 'bold',
-              fontSize: '11px',
+              fontSize: '9px',
               letterSpacing: 1,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
@@ -568,12 +548,12 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
               ×
             </button>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '18px', flexWrap: 'wrap' }}>
               {/* Paper-clipped photo */}
               <div style={{
                 position: 'relative',
-                width: '120px',
-                height: '120px',
+                width: '80px',
+                height: '80px',
                 background: PORTRAIT_BG,
                 border: `4px solid ${hexColor(selectedHero.color)}`,
                 display: 'flex',
@@ -602,11 +582,11 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 />
               </div>
 
-              <div style={{ flex: 1, minWidth: 180, color: '#000' }}>
-                <h2 style={{ margin: 0, fontSize: 'clamp(22px, 5vw, 32px)', fontFamily: TYPEWRITER_FONT, textTransform: 'uppercase', borderBottom: '2px solid #000', paddingBottom: '5px' }}>
+              <div style={{ flex: 1, minWidth: 140, color: '#000' }}>
+                <h2 style={{ margin: 0, fontSize: 'clamp(16px, 4.5vw, 24px)', fontFamily: TYPEWRITER_FONT, textTransform: 'uppercase', borderBottom: '2px solid #000', paddingBottom: '4px' }}>
                   {selectedHero.name}
                 </h2>
-                <div style={{ fontSize: '18px', fontWeight: 'bold', marginTop: '5px', color: '#334155' }}>
+                <div style={{ fontSize: '13px', fontWeight: 'bold', marginTop: '4px', color: '#334155' }}>
                   ROLE: {selectedHero.profession.toUpperCase()}
                 </div>
                 <div style={{ marginTop: '10px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
@@ -625,7 +605,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
               backgroundColor: 'rgba(255,255,255,0.5)',
               border: '1px dashed #000',
               padding: '15px',
-              marginBottom: '20px',
+              marginBottom: '14px',
               display: 'grid',
               gridTemplateColumns: '1fr 1fr 1fr',
               textAlign: 'center',
@@ -633,28 +613,28 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
               color: '#000'
             }}>
               <div>
-                <div style={{ fontSize: '12px', fontWeight: 'bold' }}>DMG OUTPUT</div>
-                <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{selectedHero.damage}</div>
+                <div style={{ fontSize: '10px', fontWeight: 'bold' }}>DMG OUTPUT</div>
+                <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{selectedHero.damage}</div>
               </div>
               <div>
-                <div style={{ fontSize: '12px', fontWeight: 'bold' }}>ATK SPD</div>
-                <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{(selectedHero.attackRateMs / 1000).toFixed(1)}s</div>
+                <div style={{ fontSize: '10px', fontWeight: 'bold' }}>ATK SPD</div>
+                <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{(selectedHero.attackRateMs / 1000).toFixed(1)}s</div>
               </div>
               <div>
-                <div style={{ fontSize: '12px', fontWeight: 'bold' }}>RANGE</div>
-                <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{metersLabel(selectedHero.range)}</div>
+                <div style={{ fontSize: '10px', fontWeight: 'bold' }}>RANGE</div>
+                <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{metersLabel(selectedHero.range)}</div>
               </div>
             </div>
 
             <div style={{ marginBottom: '20px', color: '#000' }}>
-              <h3 style={{ margin: '0 0 5px 0', fontSize: '16px', borderBottom: '1px solid #000', display: 'inline-block' }}>SIGNATURE SKILL: {selectedHero.signatureSkill.name}</h3>
-              <p style={{ margin: '5px 0 0 0', fontSize: '14px', fontFamily: TYPEWRITER_FONT }}>{selectedHero.signatureSkill.description}</p>
+              <h3 style={{ margin: '0 0 4px 0', fontSize: '13px', borderBottom: '1px solid #000', display: 'inline-block' }}>SIGNATURE SKILL: {selectedHero.signatureSkill.name}</h3>
+              <p style={{ margin: '4px 0 0 0', fontSize: '11px', fontFamily: TYPEWRITER_FONT }}>{selectedHero.signatureSkill.description}</p>
             </div>
 
             {selectedHero.passive && (
-              <div style={{ marginBottom: '30px', color: '#000' }}>
-                <h3 style={{ margin: '0 0 5px 0', fontSize: '16px', borderBottom: '1px solid #000', display: 'inline-block' }}>PASSIVE: {selectedHero.passive.name}</h3>
-                <p style={{ margin: '5px 0 0 0', fontSize: '14px', fontFamily: TYPEWRITER_FONT }}>{selectedHero.passive.description}</p>
+              <div style={{ marginBottom: '18px', color: '#000' }}>
+                <h3 style={{ margin: '0 0 4px 0', fontSize: '13px', borderBottom: '1px solid #000', display: 'inline-block' }}>PASSIVE: {selectedHero.passive.name}</h3>
+                <p style={{ margin: '4px 0 0 0', fontSize: '11px', fontFamily: TYPEWRITER_FONT }}>{selectedHero.passive.description}</p>
               </div>
             )}
 

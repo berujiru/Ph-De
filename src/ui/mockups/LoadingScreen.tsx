@@ -59,12 +59,14 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
           to { transform: translateX(-24px); }
         }
         /* The "first ripple" — concentric rings spreading from the megaphone.
-           Max scale is 1 (ring base = 220px) so the outermost ring always stays
-           inside the 9:16 portrait frame and never clips at the edges. */
+           translate(-50%,-50%) lives on the element style so rings stay centred
+           even between animation cycles. The keyframes only animate scale +
+           opacity. Max scale is 1 (ring base = 220px) so the outermost ring
+           always stays inside the 9:16 portrait frame. */
         @keyframes ripple-out {
-          0% { transform: translate(-50%, -50%) scale(0.1); opacity: 0.6; }
-          80% { opacity: 0.12; }
-          100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+          0%   { transform: translate(-50%, -50%) scale(0.1); opacity: 0.55; }
+          70%  { opacity: 0.10; }
+          100% { transform: translate(-50%, -50%) scale(1);   opacity: 0; }
         }
         @media (prefers-reduced-motion: reduce) {
           .ripple-ring { animation: none !important; opacity: 0.12; }
@@ -120,10 +122,10 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
           transform: 'translateX(-50%)'
         }} />
         <h1 style={{
-          fontSize: 'clamp(30px, 9vw, 48px)',
+          fontSize: 'clamp(22px, 6.5vw, 36px)',
           color: theme.colors.textPrimary,
           margin: 0,
-          letterSpacing: 'clamp(2px, 1vw, 4px)',
+          letterSpacing: 'clamp(1px, 0.6vw, 3px)',
           fontWeight: 900,
           textTransform: 'uppercase',
           textShadow: `0 0 20px ${theme.colors.accent}`,
@@ -146,7 +148,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
         pointerEvents: 'none'
       }}>
         {/* Concentric ripple rings — contained within this square box */}
-        {[0, 1].map((i) => (
+        {[0, 1, 2].map((i) => (
           <span
             key={i}
             aria-hidden="true"
@@ -159,7 +161,11 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
               height: '100%',
               borderRadius: '50%',
               border: `2px solid ${theme.colors.accent}`,
-              animation: `ripple-out 2.4s ease-out ${i * 0.8}s infinite`,
+              /* Base transform keeps the ring centred; the animation
+                 overrides the full transform property each frame. */
+              transform: 'translate(-50%, -50%) scale(0.1)',
+              opacity: 0,
+              animation: `ripple-out 2.8s ease-out ${i * 0.7}s infinite`,
             }}
           />
         ))}

@@ -57,8 +57,8 @@ export function RewardReveal({ heading, rewards, onClose, closeLabel = 'Collect'
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 26,
-        padding: 20,
+        gap: 18,
+        padding: 16,
         backgroundColor: 'rgba(9, 12, 22, 0.86)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
@@ -72,9 +72,9 @@ export function RewardReveal({ heading, rewards, onClose, closeLabel = 'Collect'
         <h1
           style={{
             margin: 0,
-            fontSize: 'clamp(22px, 6vw, 30px)',
+            fontSize: 'clamp(18px, 5vw, 24px)',
             fontWeight: 900,
-            letterSpacing: 2,
+            letterSpacing: 1,
             textTransform: 'uppercase',
             color: theme.colors.textPrimary,
             textShadow: `0 0 20px rgba(56, 189, 248, 0.5)`,
@@ -84,7 +84,7 @@ export function RewardReveal({ heading, rewards, onClose, closeLabel = 'Collect'
         </h1>
       </div>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, justifyContent: 'center', maxWidth: 720 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center', maxWidth: 720 }}>
         {rewards.map((reward, index) => {
           const rarity = reward.rarity ?? 'common';
           const frame = RARITY_FRAME[rarity];
@@ -94,17 +94,17 @@ export function RewardReveal({ heading, rewards, onClose, closeLabel = 'Collect'
               className="reward-card"
               style={{
                 position: 'relative',
-                width: 'min(190px, 42vw)',
-                minHeight: 244,
-                padding: '16px 14px',
+                width: 'min(120px, 28vw)',
+                minHeight: 140,
+                padding: '10px 8px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 10,
+                gap: 6,
                 textAlign: 'center',
                 backgroundColor: 'rgba(15, 23, 42, 0.9)',
                 border: `${rarity === 'epic' ? 2 : 1}px solid ${frame.border}`,
-                borderRadius: 14,
+                borderRadius: 10,
                 boxShadow: `0 0 26px ${frame.glow}`,
                 animationDelay: `${index * 140}ms`,
               }}
@@ -117,8 +117,8 @@ export function RewardReveal({ heading, rewards, onClose, closeLabel = 'Collect'
                   position: 'absolute',
                   top: '42%',
                   left: '50%',
-                  width: 120,
-                  height: 120,
+                  width: 80,
+                  height: 80,
                   borderRadius: '50%',
                   background: `radial-gradient(circle, ${frame.glow} 0%, transparent 70%)`,
                   animation: `reward-burst 0.7s ease-out ${index * 140 + 180}ms both`,
@@ -128,12 +128,12 @@ export function RewardReveal({ heading, rewards, onClose, closeLabel = 'Collect'
               <RarityStars rarity={rarity} />
               <div
                 style={{
-                  width: 96,
-                  height: 96,
+                  width: 64,
+                  height: 64,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  borderRadius: 12,
+                  borderRadius: 8,
                   backgroundColor: 'rgba(56, 189, 248, 0.08)',
                   border: `1px solid ${theme.colors.borderGlass}`,
                   color: theme.colors.accent,
@@ -150,11 +150,11 @@ export function RewardReveal({ heading, rewards, onClose, closeLabel = 'Collect'
                   reward.icon
                 )}
               </div>
-              <span style={{ fontSize: 16, fontWeight: 800, color: theme.colors.textPrimary, lineHeight: 1.2 }}>
+              <span style={{ fontSize: 11, fontWeight: 800, color: theme.colors.textPrimary, lineHeight: 1.2 }}>
                 {reward.title}
               </span>
               {reward.subtitle && (
-                <span style={{ fontSize: 12, color: theme.colors.textMuted, lineHeight: 1.4 }}>{reward.subtitle}</span>
+                <span style={{ fontSize: 9, color: theme.colors.textMuted, lineHeight: 1.3 }}>{reward.subtitle}</span>
               )}
             </div>
           );
@@ -169,13 +169,13 @@ export function RewardReveal({ heading, rewards, onClose, closeLabel = 'Collect'
           alignItems: 'center',
           justifyContent: 'center',
           gap: 10,
-          minHeight: 52,
-          padding: '14px 40px',
+          minHeight: 44,
+          padding: '10px 32px',
           borderRadius: 999,
           border: 'none',
           backgroundColor: theme.colors.accent,
           color: theme.colors.background,
-          fontSize: 17,
+          fontSize: 14,
           fontWeight: 900,
           letterSpacing: 1,
           textTransform: 'uppercase',
