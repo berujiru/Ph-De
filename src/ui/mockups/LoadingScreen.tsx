@@ -146,7 +146,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
         pointerEvents: 'none'
       }}>
         {/* Concentric ripple rings — contained within this square box */}
-        {[0, 1, 2].map((i) => (
+        {[0, 1].map((i) => (
           <span
             key={i}
             aria-hidden="true"

@@ -16,10 +16,10 @@ describe('LoadingScreen', () => {
     expect(screen.getByText('0%')).toBeInTheDocument();
   });
 
-  it('renders exactly three concentric ripple rings, contained in a bounded box', () => {
+  it('renders exactly two concentric ripple rings, contained in a bounded box', () => {
     const { container } = render(<LoadingScreen onComplete={vi.fn()} />);
     const rings = container.querySelectorAll('.ripple-ring');
-    expect(rings).toHaveLength(3);
+    expect(rings).toHaveLength(2);
     // The ring box must be a percentage of a bounded parent (never a raw vw/vh
     // that could overflow the portrait frame) so the outermost ring stays in view.
     rings.forEach((ring) => {

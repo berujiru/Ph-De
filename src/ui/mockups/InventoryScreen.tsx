@@ -232,7 +232,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
 
       {/* HEROES: Grid of Polaroid Cards */}
       {tab === 'heroes' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(138px, 1fr))', gap: '16px 12px', padding: '12px 2px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(82px, 1fr))', gap: '12px 8px', padding: '12px 2px' }}>
           {roster.map((hero, idx) => {
             // Mock unlocking and leveling logic
             const isUnlocked = idx < 12;
@@ -321,8 +321,8 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                       backgroundColor: theme.materials.cautionYellow,
                       color: '#000',
                       fontWeight: '900',
-                      padding: '2px 6px',
-                      fontSize: '12px',
+                      padding: '2px 5px',
+                      fontSize: '10px',
                       border: '1px solid #000',
                       transform: 'rotate(-5deg)'
                     }}>
@@ -333,24 +333,24 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
 
                 {/* Text Area */}
                 <div style={{ width: '100%', textAlign: 'center' }}>
-                  <h3 style={{ margin: '0 0 3px 0', fontSize: '13.5px', color: '#0f172a', fontFamily: '"Marker Felt", "Comic Sans MS", fantasy', lineHeight: 1.1 }}>
+                  <h3 style={{ margin: '0 0 3px 0', fontSize: '11px', color: '#0f172a', fontFamily: '"Marker Felt", "Comic Sans MS", fantasy', lineHeight: 1.1 }}>
                     {isUnlocked ? hero.name : 'REDACTED'}
                   </h3>
-                  <div style={{ fontSize: '10px', color: '#475569', fontWeight: 'bold', marginBottom: '7px', fontStyle: isUnlocked ? 'normal' : 'italic', lineHeight: 1.25 }}>
+                  <div style={{ fontSize: '8.5px', color: '#475569', fontWeight: 'bold', marginBottom: '6px', fontStyle: isUnlocked ? 'normal' : 'italic', lineHeight: 1.2 }}>
                     {isUnlocked ? hero.profession : `A ${hero.profession.toLowerCase()} waits for the movement to reach them…`}
                   </div>
 
                   {isUnlocked && (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', borderTop: '1px dashed #cbd5e1', paddingTop: '7px' }}>
-                      <span style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: '#e2e8f0', color: '#334155', border: '1px solid #cbd5e1', fontWeight: 'bold' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', borderTop: '1px dashed #cbd5e1', paddingTop: '6px' }}>
+                      <span style={{ fontSize: '8px', padding: '2px 5px', backgroundColor: '#e2e8f0', color: '#334155', border: '1px solid #cbd5e1', fontWeight: 'bold' }}>
                         {hero.damageType.toUpperCase()}
                       </span>
                       <div style={{
-                        fontSize: '10px',
+                        fontSize: '8.5px',
                         fontWeight: 'bold',
                         color: mockCards >= mockCardsNeeded ? '#166534' : '#b91c1c',
                         backgroundColor: mockCards >= mockCardsNeeded ? '#bbf7d0' : '#fecaca',
-                        padding: '2px 8px',
+                        padding: '2px 7px',
                         borderRadius: '10px'
                       }}>
                         CARDS: {mockCards} / {mockCardsNeeded}
@@ -375,7 +375,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
             <InfoIcon size={16} />
             Every anomaly you face in the field is filed here — a lie debunked.
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '14px', padding: '4px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 1fr))', gap: '10px 8px', padding: '4px' }}>
             {CODEX_ENEMIES.map((def, idx) => {
               const faced = FACED_ENEMY_IDS.has(def.id);
               const tier = enemyTier(def);
@@ -397,7 +397,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                     backgroundColor: faced ? '#e5d5b5' : '#4b5563',
                     color: '#1c1917',
                     borderRadius: 4,
-                    padding: '10px 10px 12px',
+                    padding: '8px 7px 10px',
                     position: 'relative',
                     transform: `rotate(${rotation}deg)`,
                     boxShadow: '2px 6px 16px rgba(0,0,0,0.5)',
@@ -425,7 +425,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
 
                   {/* Mugshot */}
                   <div style={{
-                    width: '100%', height: 60, borderRadius: 3, marginBottom: 8,
+                    width: '100%', height: 44, borderRadius: 3, marginBottom: 6,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     background: faced
                       ? `radial-gradient(circle at 50% 40%, ${hexColor(def.color)} 0%, #1e293b 78%)`
@@ -433,53 +433,53 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                     border: '2px solid rgba(0,0,0,0.35)'
                   }}>
                     {faced ? (
-                      <span style={{ color: '#e2e8f0', display: 'flex' }}><SkullIcon size={28} /></span>
+                      <span style={{ color: '#e2e8f0', display: 'flex' }}><SkullIcon size={22} /></span>
                     ) : (
-                      <span style={{ fontFamily: TYPEWRITER_FONT, fontSize: 30, fontWeight: 900, color: '#94a3b8' }}>?</span>
+                      <span style={{ fontFamily: TYPEWRITER_FONT, fontSize: 24, fontWeight: 900, color: '#94a3b8' }}>?</span>
                     )}
                   </div>
 
                   {/* Tier tag */}
                   <span style={{
-                    display: 'inline-block', fontSize: 8.5, fontWeight: 900, letterSpacing: 1,
-                    textTransform: 'uppercase', padding: '2px 7px', borderRadius: 4, marginBottom: 5,
+                    display: 'inline-block', fontSize: 7, fontWeight: 900, letterSpacing: 0.5,
+                    textTransform: 'uppercase', padding: '2px 5px', borderRadius: 4, marginBottom: 4,
                     color: '#fff', backgroundColor: TIER_COLOR[tier]
                   }}>
                     {tier}
                   </span>
 
-                  <h3 style={{ margin: '0 0 4px 0', fontSize: 13, fontWeight: 900, textTransform: 'uppercase', fontFamily: TYPEWRITER_FONT, lineHeight: 1.1 }}>
-                    {faced ? def.name : '████████'}
+                  <h3 style={{ margin: '0 0 4px 0', fontSize: 10.5, fontWeight: 900, textTransform: 'uppercase', fontFamily: TYPEWRITER_FONT, lineHeight: 1.1 }}>
+                    {faced ? def.name : '██████'}
                   </h3>
-                  <p style={{ margin: 0, fontSize: 10.5, lineHeight: 1.35, color: '#44403c', fontStyle: 'italic' }}>
+                  <p style={{ margin: 0, fontSize: 8.5, lineHeight: 1.3, color: '#44403c', fontStyle: 'italic' }}>
                     {faced ? enemyMechanic(def) : 'Not yet debunked — face this anomaly in the field to file its case.'}
                   </p>
 
                   {faced ? (
                     <>
-                      <div style={{ display: 'flex', gap: 5, marginTop: 10, flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', gap: 4, marginTop: 8, flexWrap: 'wrap' }}>
                         {[
                           { label: 'HP', value: def.maxHp.toLocaleString() },
                           { label: 'Speed', value: metersPerSecondLabel(def.speed) },
                           { label: 'Barrier Dmg', value: `${def.damage}` },
                         ].map((stat) => (
                           <div key={stat.label} style={{
-                            flex: '1 1 auto', minWidth: 40, textAlign: 'center',
+                            flex: '1 1 auto', minWidth: 24, textAlign: 'center',
                             backgroundColor: 'rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.15)',
-                            borderRadius: 3, padding: '4px 5px'
+                            borderRadius: 3, padding: '3px 4px'
                           }}>
-                            <div style={{ fontSize: 8, fontWeight: 900, letterSpacing: 0.3, color: '#57534e', textTransform: 'uppercase' }}>{stat.label}</div>
-                            <div style={{ fontSize: 12, fontWeight: 900, fontFamily: TYPEWRITER_FONT }}>{stat.value}</div>
+                            <div style={{ fontSize: 7, fontWeight: 900, letterSpacing: 0.3, color: '#57534e', textTransform: 'uppercase' }}>{stat.label}</div>
+                            <div style={{ fontSize: 10, fontWeight: 900, fontFamily: TYPEWRITER_FONT }}>{stat.value}</div>
                           </div>
                         ))}
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 10, color: '#78350f', fontSize: 10, fontWeight: 800, letterSpacing: 0.5, textTransform: 'uppercase' }}>
-                        <InfoIcon size={13} /> Tap to open file
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8, color: '#78350f', fontSize: 8.5, fontWeight: 800, letterSpacing: 0.3, textTransform: 'uppercase' }}>
+                        <InfoIcon size={11} /> Tap to open file
                       </div>
                     </>
                   ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 10, color: '#e2e8f0', fontSize: 11, fontWeight: 700 }}>
-                      <LockIcon size={14} /> SEALED
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 8, color: '#e2e8f0', fontSize: 9, fontWeight: 700 }}>
+                      <LockIcon size={12} /> SEALED
                     </div>
                   )}
                 </div>

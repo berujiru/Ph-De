@@ -161,7 +161,7 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
     <div
       className="rally-sway"
       style={{
-        width: 'min(158px, 43vw)',
+        width: 'min(116px, 22vw)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -193,9 +193,9 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
           backgroundColor: 'rgba(248, 250, 252, 0.96)',
           border: '2px solid #e2e8f0',
           borderRadius: 8,
-          padding: '12px 10px',
+          padding: '8px 6px',
           width: '100%',
-          minHeight: 118,
+          minHeight: 92,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -207,7 +207,7 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
       >
         <div
           style={{
-            marginBottom: 6,
+            marginBottom: 4,
             color: theme.materials.ink,
             filter: affordable ? 'none' : 'grayscale(60%)',
             display: 'flex',
@@ -217,20 +217,20 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
         </div>
         <div
           style={{
-            fontSize: 8.5,
-            letterSpacing: 1,
+            fontSize: 7,
+            letterSpacing: 0.5,
             fontWeight: 900,
             color: theme.materials.tarpRed,
             textTransform: 'uppercase',
-            marginBottom: 3,
+            marginBottom: 2,
           }}
         >
           {item.category}
         </div>
         <h3
           style={{
-            margin: '0 0 5px 0',
-            fontSize: 12.5,
+            margin: '0 0 3px 0',
+            fontSize: 10,
             color: theme.materials.ink,
             textAlign: 'center',
             fontWeight: 900,
@@ -240,7 +240,7 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
         >
           {item.title}
         </h3>
-        <p style={{ margin: 0, fontSize: 10, color: '#475569', textAlign: 'center', lineHeight: 1.35 }}>
+        <p style={{ margin: 0, fontSize: 8, color: '#475569', textAlign: 'center', lineHeight: 1.3 }}>
           {item.description}
         </p>
       </div>
@@ -601,7 +601,7 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
             style={{
               display: 'flex',
               flexWrap: 'wrap',
-              gap: '6px 14px',
+              gap: '6px 8px',
               justifyContent: 'center',
               padding: '0 0 32px',
               position: 'relative',
