@@ -10,6 +10,7 @@ import {
   damageTypeIcons,
 } from '../icons';
 import { BackButton } from '../components/BackButton';
+import { EnemyCaseCard, HeroPolaroidCard } from '../components/ArchiveCards';
 import { HERO_DEFINITIONS, type HeroDefinition, type HeroId } from '../../game/data/balance';
 
 interface PreparationScreenProps {
@@ -153,6 +154,7 @@ interface CompanionHint {
 
 export function PreparationScreen({ onBack, onDeploy }: PreparationScreenProps) {
   const [selectedAct, setSelectedAct] = useState<string>('people_power');
+  const [actPickerOpen, setActPickerOpen] = useState(false);
 
   const roster = UNLOCKED_HERO_IDS.map((id) => HERO_DEFINITIONS[id]);
 
@@ -314,57 +316,51 @@ export function PreparationScreen({ onBack, onDeploy }: PreparationScreenProps) 
               </div>
             </div>
 
-            {/* Enemy intel cards — manifesto sheets */}
-            <div style={{ flex: 1, minWidth: 220, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {/* Enemy intel — the same pinned case-file cards as the Archive */}
+            <div
+              style={{
+                flex: 1,
+                minWidth: 220,
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 1fr))',
+                gap: '10px 8px',
+                alignContent: 'start',
+                padding: '6px 2px',
+              }}
+            >
               {ENEMY_INTEL.map((intel, i) => (
-                <div
+                <EnemyCaseCard
                   key={intel.name}
-                  style={{
-                    backgroundColor: theme.materials.paper,
-                    color: theme.materials.ink,
-                    borderRadius: 3,
-                    padding: '10px 14px',
-                    transform: `rotate(${i % 2 === 0 ? 0.6 : -0.8}deg)`,
-                    boxShadow: '0 6px 14px rgba(0,0,0,0.45)',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: 10,
-                    flexWrap: 'wrap',
-                  }}
+                  name={intel.name}
+                  colorHex={theme.colors.danger}
+                  tag={{ label: intel.count, color: theme.materials.tarpRed }}
+                  rotation={(i % 2 === 0 ? 1 : -1) * (1 + (i % 2))}
                 >
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontWeight: 900, fontSize: 14, textTransform: 'uppercase', letterSpacing: 1 }}>
-                      {intel.name}{' '}
-                      <span style={{ fontFamily: MARKER_FONT, fontWeight: 400, fontSize: 12, color: '#57534e' }}>
-                        {intel.count}
-                      </span>
-                    </div>
-                    <div style={{ fontSize: 11.5, color: '#44403c' }}>{intel.form}</div>
-                    <div style={{ fontFamily: MARKER_FONT, fontSize: 12, marginTop: 2 }}>{intel.note}</div>
-                  </div>
                   <div
                     style={{
-                      display: 'flex',
+                      display: 'inline-flex',
                       alignItems: 'center',
-                      gap: 6,
+                      gap: 3,
+                      marginTop: 3,
                       fontWeight: 900,
-                      fontSize: 12,
+                      fontSize: 8,
                       color: theme.materials.tarpRed,
-                      border: `2px solid ${theme.materials.tarpRed}`,
-                      borderRadius: 4,
-                      padding: '4px 8px',
-                      transform: 'rotate(-3deg)',
+                      border: `1px solid ${theme.materials.tarpRed}`,
+                      borderRadius: 3,
+                      padding: '2px 4px',
                       whiteSpace: 'nowrap',
                     }}
                   >
                     {(() => {
                       const Icon = damageTypeIcons[intel.weakTo];
-                      return Icon ? <Icon size={16} /> : null;
+                      return Icon ? <Icon size={10} /> : null;
                     })()}
                     WEAK: {intel.weakTo.toUpperCase()}
                   </div>
-                </div>
+                  <div style={{ fontFamily: MARKER_FONT, fontSize: 8.5, marginTop: 3, lineHeight: 1.25, color: '#44403c' }}>
+                    {intel.note}
+                  </div>
+                </EnemyCaseCard>
               ))}
             </div>
           </div>
@@ -419,39 +415,29 @@ export function PreparationScreen({ onBack, onDeploy }: PreparationScreenProps) 
             Hope for these recruited workers from your drops — they counter this stage:
           </div>
 
-          {/* Recommended companion hint cards (non-interactive) */}
+          {/* Recommended companion hints — same pinned polaroid as the Archive */}
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-              gap: 8,
+              gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 1fr))',
+              gap: '10px 8px',
+              padding: '6px 2px',
             }}
           >
-            {recommended.map(({ hero, counters }) => (
-              <div
+            {recommended.map(({ hero, counters }, i) => (
+              <HeroPolaroidCard
                 key={hero.id}
-                style={{
-                  borderRadius: 10,
-                  border: `1px solid ${theme.colors.borderGlass}`,
-                  borderLeft: `4px solid ${theme.colors.success}`,
-                  backgroundColor: theme.colors.surfaceGlass,
-                  padding: 10,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                }}
+                name={hero.name}
+                subtitle={hero.profession}
+                rotation={(i % 2 === 0 ? 1 : -1) * (2 + (i % 3))}
               >
-                <img src="/assets/heroes/hero-placeholder.svg" alt="" style={{ width: 42, height: 42, flexShrink: 0 }} />
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 12.5, fontWeight: 800, lineHeight: 1.2 }}>{hero.name}</div>
-                  <div style={{ margin: '3px 0' }}>
-                    <DamageTypeChip type={hero.damageType} emphasized />
-                  </div>
-                  <div style={{ fontSize: 10.5, color: theme.colors.success, fontWeight: 700 }}>
-                    Counters {counters.join(', ')}
-                  </div>
+                <span style={{ fontSize: '7px', padding: '1px 4px', backgroundColor: '#dbeafe', color: '#1e3a8a', border: '1px solid #93c5fd', fontWeight: 'bold' }}>
+                  {hero.damageType.toUpperCase()}
+                </span>
+                <div style={{ fontSize: '7.5px', fontWeight: 800, color: '#166534', backgroundColor: '#bbf7d0', padding: '1px 5px', borderRadius: 10, lineHeight: 1.2 }}>
+                  Counters {counters.join(', ')}
                 </div>
-              </div>
+              </HeroPolaroidCard>
             ))}
           </div>
 
@@ -487,73 +473,152 @@ export function PreparationScreen({ onBack, onDeploy }: PreparationScreenProps) 
           )}
         </div>
 
-        {/* Bayanihan Act selector — compact chip rail so the section stays
-            short on mobile; the selected act's effect reads out on one line. */}
+        {/* Bayanihan Act — a single button that opens a popup selector, so the
+            section stays compact on mobile. */}
         <div>
           <SectionLabel>Bayanihan Act — the barrier's ultimate</SectionLabel>
-          <div
-            style={{
-              display: 'flex',
-              gap: 8,
-              overflowX: 'auto',
-              paddingBottom: 8,
-              WebkitOverflowScrolling: 'touch',
-            }}
-          >
-            {BAYANIHAN_ACTS.map((act) => {
-              const selected = selectedAct === act.id;
-              return (
-                <button
-                  key={act.id}
-                  onClick={() => act.unlocked && setSelectedAct(act.id)}
-                  disabled={!act.unlocked}
-                  aria-pressed={selected}
-                  title={act.unlocked ? act.effect : 'Locked — earn it on the march or at the store.'}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    flexShrink: 0,
-                    minHeight: 40,
-                    padding: '8px 12px',
-                    borderRadius: 999,
-                    whiteSpace: 'nowrap',
-                    border: `2px solid ${selected ? theme.colors.accent : theme.colors.borderGlass}`,
-                    backgroundColor: selected ? 'rgba(56, 189, 248, 0.1)' : theme.colors.surfaceGlass,
-                    color: 'inherit',
-                    cursor: act.unlocked ? 'pointer' : 'not-allowed',
-                    opacity: act.unlocked ? 1 : 0.45,
-                    boxShadow: selected ? '0 0 14px rgba(56, 189, 248, 0.25)' : 'none',
-                    fontFamily: 'inherit',
-                  }}
-                >
-                  <span
-                    style={{
-                      color: selected ? theme.colors.accent : theme.colors.textMuted,
-                      display: 'flex',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {act.unlocked ? (selected ? <CheckIcon size={16} /> : <MegaphoneIcon size={16} />) : <LockIcon size={16} />}
+          {(() => {
+            const act = BAYANIHAN_ACTS.find((a) => a.id === selectedAct);
+            return (
+              <button
+                onClick={() => setActPickerOpen(true)}
+                aria-haspopup="dialog"
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  minHeight: 60,
+                  padding: '12px 16px',
+                  borderRadius: 12,
+                  textAlign: 'left',
+                  border: `2px solid ${theme.colors.accent}`,
+                  backgroundColor: 'rgba(56, 189, 248, 0.08)',
+                  color: 'inherit',
+                  cursor: 'pointer',
+                  boxShadow: '0 0 14px rgba(56, 189, 248, 0.2)',
+                  fontFamily: 'inherit',
+                }}
+              >
+                <span style={{ color: theme.colors.accent, display: 'flex', flexShrink: 0 }}>
+                  <MegaphoneIcon size={24} />
+                </span>
+                <span style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
+                  <span style={{ fontWeight: 900, fontSize: 15 }}>{act?.name ?? 'Choose an Act'}</span>
+                  <span style={{ fontSize: 11.5, color: theme.colors.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {act?.effect ?? 'Tap to pick the barrier ultimate'}
                   </span>
-                  <span style={{ fontWeight: 900, fontSize: 13 }}>{act.name}</span>
-                </button>
-              );
-            })}
-          </div>
-          {/* Selected act effect — single line instead of per-card descriptions */}
-          <div style={{ fontSize: 12, color: theme.colors.textSecondary, minHeight: 18, marginTop: 2 }}>
-            {(() => {
-              const act = BAYANIHAN_ACTS.find((a) => a.id === selectedAct);
-              return act ? (
-                <>
-                  <strong style={{ color: theme.colors.accent }}>{act.name}:</strong> {act.effect}
-                </>
-              ) : null;
-            })()}
-          </div>
+                </span>
+                <span style={{ fontSize: 10, letterSpacing: 1.5, fontWeight: 900, color: theme.colors.accent, flexShrink: 0 }}>
+                  CHANGE
+                </span>
+              </button>
+            );
+          })()}
         </div>
       </div>
+
+      {/* Bayanihan Act picker — popup dialog */}
+      {actPickerOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Choose a Bayanihan Act"
+          onClick={() => setActPickerOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 200,
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(6, 10, 21, 0.72)',
+            backdropFilter: 'blur(6px)',
+            padding: 16,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: 560,
+              maxHeight: '80vh',
+              overflowY: 'auto',
+              backgroundColor: theme.colors.surface,
+              border: `1px solid ${theme.colors.borderGlass}`,
+              borderRadius: 16,
+              padding: 'clamp(16px, 4vw, 24px)',
+              boxShadow: '0 -12px 50px rgba(0,0,0,0.6)',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+              <h2 style={{ margin: 0, fontSize: 18, textTransform: 'uppercase', letterSpacing: 2 }}>
+                Bayanihan Act
+              </h2>
+              <button
+                onClick={() => setActPickerOpen(false)}
+                aria-label="Close"
+                style={{
+                  width: 36,
+                  height: 36,
+                  minHeight: 36,
+                  borderRadius: 8,
+                  border: `1px solid ${theme.colors.borderGlass}`,
+                  backgroundColor: 'transparent',
+                  color: theme.colors.textPrimary,
+                  fontSize: 18,
+                  cursor: 'pointer',
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 8 }}>
+              {BAYANIHAN_ACTS.map((act) => {
+                const selected = selectedAct === act.id;
+                return (
+                  <button
+                    key={act.id}
+                    onClick={() => {
+                      if (!act.unlocked) return;
+                      setSelectedAct(act.id);
+                      setActPickerOpen(false);
+                    }}
+                    disabled={!act.unlocked}
+                    aria-pressed={selected}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      minHeight: 56,
+                      padding: '10px 12px',
+                      borderRadius: 10,
+                      textAlign: 'left',
+                      border: `2px solid ${selected ? theme.colors.accent : theme.colors.borderGlass}`,
+                      backgroundColor: selected ? 'rgba(56, 189, 248, 0.1)' : theme.colors.surfaceGlass,
+                      color: 'inherit',
+                      cursor: act.unlocked ? 'pointer' : 'not-allowed',
+                      opacity: act.unlocked ? 1 : 0.45,
+                      boxShadow: selected ? '0 0 14px rgba(56, 189, 248, 0.25)' : 'none',
+                      fontFamily: 'inherit',
+                    }}
+                  >
+                    <span style={{ color: selected ? theme.colors.accent : theme.colors.textMuted, display: 'flex', flexShrink: 0 }}>
+                      {act.unlocked ? (selected ? <CheckIcon size={20} /> : <MegaphoneIcon size={20} />) : <LockIcon size={20} />}
+                    </span>
+                    <span style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                      <span style={{ fontWeight: 900, fontSize: 14 }}>{act.name}</span>
+                      <span style={{ fontSize: 11.5, color: theme.colors.textMuted }}>
+                        {act.unlocked ? act.effect : 'Locked — earn it on the march or at the store.'}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Deploy bar — floating, megaphone-styled primary CTA */}
       <div

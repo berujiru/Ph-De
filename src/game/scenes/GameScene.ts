@@ -60,6 +60,7 @@ export class GameScene extends Phaser.Scene {
     // Heroes → public/assets/heroes/, enemies → public/assets/enemies/.
     // Re-enable once a corrected top-down, transparent eden sheet is generated:
     // this.load.aseprite('eden', '/assets/heroes/eden.png', '/assets/heroes/eden.json');
+    this.load.spritesheet('eden_attack_sheet', '/assets/heroes/eden_attack.png', { frameWidth: 256, frameHeight: 256 });
     
     // Dynamically load all hero portraits (static or animated)
     Object.values(HERO_DEFINITIONS).forEach((hero) => {
@@ -692,6 +693,15 @@ export class GameScene extends Phaser.Scene {
    */
   private createHeroAnimations(): void {
     this.createAtlasAnimations(Object.values(HERO_DEFINITIONS).map(d => d.spriteKey ?? d.id));
+
+    // Manually wire Eden's attack since it's a standalone spritesheet for now
+    if (this.textures.exists('eden_attack_sheet') && !this.anims.exists('eden-attack')) {
+      this.anims.create({
+        key: 'eden-attack',
+        frames: this.anims.generateFrameNumbers('eden_attack_sheet', { start: 0, end: 21 }),
+        frameRate: 30, // Fast 30 FPS playback for snappy attack (~0.7s)
+      });
+    }
   }
 
   /** Same as createHeroAnimations(), for enemies (top-front sprite sheets). */

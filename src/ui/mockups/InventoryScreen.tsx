@@ -11,58 +11,23 @@ import {
 } from '../../game/data/balance';
 import { HopeCoinIcon, RallyPermitIcon, LockIcon, SkullIcon, InfoIcon } from '../icons';
 import { BackButton } from '../components/BackButton';
+import {
+  EnemyCaseCard,
+  HeroPolaroidCard,
+  HERO_PLACEHOLDER_SRC,
+  PORTRAIT_BG,
+  TIER_COLOR,
+  TYPEWRITER_FONT,
+  enemyMechanic,
+  enemyTier,
+  hexColor,
+} from '../components/ArchiveCards';
 
 interface InventoryScreenProps {
   onBack: () => void;
 }
 
-const HERO_PLACEHOLDER_SRC = '/assets/heroes/hero-placeholder.svg';
-const TYPEWRITER_FONT = '"Courier New", Courier, monospace';
-
 type ArchiveTab = 'heroes' | 'codex';
-
-/** Photo-studio backdrop so the dark hero silhouette reads as a portrait. */
-const PORTRAIT_BG = 'radial-gradient(circle at 50% 34%, #e2e8f0 0%, #94a3b8 52%, #475569 100%)';
-const PORTRAIT_BG_LOCKED = 'radial-gradient(circle at 50% 34%, #64748b 0%, #334155 55%, #1e293b 100%)';
-
-// ---- Enemy tiering + data-driven "lie debunked" blurbs ---------------------
-
-const MINI_BOSS_IDS = new Set<EnemyId>([
-  'ghost_employee', 'illegal_logger', 'epal', 'the_overpriced', 'kickback_courier',
-  'shell_company', 'crony_bodyguard', 'hoarder', 'land_grabber', 'tender_rigger',
-]);
-
-type EnemyTier = 'Minion' | 'Mini-Boss' | 'Boss';
-
-function enemyTier(def: EnemyDefinition): EnemyTier {
-  if (def.id.startsWith('boss_')) return 'Boss';
-  if (MINI_BOSS_IDS.has(def.id)) return 'Mini-Boss';
-  return 'Minion';
-}
-
-const TIER_COLOR: Record<EnemyTier, string> = {
-  Minion: theme.colors.textMuted,
-  'Mini-Boss': theme.colors.accent,
-  Boss: theme.colors.danger,
-};
-
-/** Derive the mechanic blurb from the enemy's data flags — no hardcoded table. */
-function enemyMechanic(def: EnemyDefinition): string {
-  if (def.activeSkill) return `Boss skill — ${def.activeSkill.name}.`;
-  if (def.stealth) return 'Untargetable until revealed or splashed.';
-  if (def.moraleAura) return 'Buffs nearby anomalies with a morale aura.';
-  if (def.fakeHpPadding) return 'Padded with fake HP — popped by an Audit.';
-  if (def.splitOnDeathCount) return `Shatters into ${def.splitOnDeathCount} on death.`;
-  if (def.tauntAura) return 'Redirects your projectiles onto itself.';
-  if (def.dropObstacleOnDeath) return 'Drops a barricade blocking your shots on death.';
-  if (def.barrierDamageMultiplier) return `Tears through barricades ${def.barrierDamageMultiplier}× faster.`;
-  if (def.knockbackPulseCooldown) return 'Shoves your frontline back down the path.';
-  if (def.hitImmunityCount) return `Shrugs off its first ${def.hitImmunityCount} hits.`;
-  if (def.stealVoicesPerSecond) return 'Drains your Voices while it lives.';
-  if (def.maxHp >= 140 && def.speed <= 45) return 'A slow, bloated tank of a lie.';
-  if (def.speed >= 100) return 'Fast — rushes the Barrier before you can react.';
-  return 'Swarms in raw numbers to drown out the rally.';
-}
 
 // Real anomalies only (drop the sandbox punching bag).
 const CODEX_ENEMIES = Object.values(ENEMY_DEFINITIONS).filter((def) => def.id !== 'sandbox_target');
@@ -71,8 +36,6 @@ const CODEX_ENEMIES = Object.values(ENEMY_DEFINITIONS).filter((def) => def.id !=
 const FACED_ENEMY_IDS = new Set<EnemyId>([
   'grunt', 'runner', 'brute', 'ghost_employee', 'epal', 'the_overpriced', 'kickback_courier',
 ]);
-
-const hexColor = (color: number) => `#${color.toString(16).padStart(6, '0')}`;
 
 export function InventoryScreen({ onBack }: InventoryScreenProps) {
   const [tab, setTab] = useState<ArchiveTab>('heroes');
@@ -242,124 +205,29 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
             const rotation = (idx % 2 === 0 ? 1 : -1) * (2 + (idx % 3)); // slight, stable rotation
 
             return (
-              <div
+              <HeroPolaroidCard
                 key={hero.id}
-                onClick={() => isUnlocked && setSelectedHero(hero)}
-                style={{
-                  backgroundColor: '#f8fafc',
-                  padding: '5px 5px 10px 5px', // Extra padding at bottom for polaroid look
-                  boxShadow: '2px 5px 15px rgba(0,0,0,0.5)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  filter: isUnlocked ? 'none' : 'grayscale(100%)',
-                  opacity: isUnlocked ? 1 : 0.7,
-                  cursor: isUnlocked ? 'pointer' : 'default',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  position: 'relative',
-                  transform: `rotate(${rotation}deg)`,
-                  zIndex: 1
-                }}
-                onMouseOver={(e) => {
-                  if (isUnlocked) {
-                    e.currentTarget.style.transform = 'scale(1.1) rotate(0deg)';
-                    e.currentTarget.style.zIndex = '10';
-                    e.currentTarget.style.boxShadow = '5px 15px 25px rgba(0,0,0,0.6)';
-                  }
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.transform = `scale(1) rotate(${rotation}deg)`;
-                  e.currentTarget.style.zIndex = '1';
-                  e.currentTarget.style.boxShadow = '2px 5px 15px rgba(0,0,0,0.5)';
-                }}
+                name={hero.name}
+                subtitle={isUnlocked ? hero.profession : `A ${hero.profession.toLowerCase()} waits for the movement to reach them…`}
+                unlocked={isUnlocked}
+                level={mockLevel}
+                rotation={rotation}
+                onClick={() => setSelectedHero(hero)}
               >
-                {/* Push Pin */}
+                <span style={{ fontSize: '7px', padding: '1px 4px', backgroundColor: '#e2e8f0', color: '#334155', border: '1px solid #cbd5e1', fontWeight: 'bold' }}>
+                  {hero.damageType.toUpperCase()}
+                </span>
                 <div style={{
-                  position: 'absolute',
-                  top: '-5px',
-                  width: '10px',
-                  height: '10px',
-                  backgroundColor: idx % 3 === 0 ? '#ef4444' : (idx % 2 === 0 ? '#3b82f6' : '#22c55e'),
-                  borderRadius: '50%',
-                  boxShadow: 'inset -2px -2px 3px rgba(0,0,0,0.3), 1px 2px 3px rgba(0,0,0,0.5)',
-                  zIndex: 2
-                }} />
-
-                {/* Photo Area */}
-                <div style={{
-                  width: '100%',
-                  aspectRatio: '1',
-                  background: isUnlocked ? PORTRAIT_BG : PORTRAIT_BG_LOCKED,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'flex-end',
-                  border: '1px solid #e2e8f0',
-                  marginBottom: '5px',
-                  position: 'relative',
-                  overflow: 'hidden'
+                  fontSize: '7.5px',
+                  fontWeight: 'bold',
+                  color: mockCards >= mockCardsNeeded ? '#166534' : '#b91c1c',
+                  backgroundColor: mockCards >= mockCardsNeeded ? '#bbf7d0' : '#fecaca',
+                  padding: '1px 5px',
+                  borderRadius: '10px'
                 }}>
-                  <img
-                    src={HERO_PLACEHOLDER_SRC}
-                    alt={isUnlocked ? hero.name : 'Locked hero silhouette'}
-                    style={{
-                      width: '92%',
-                      height: '92%',
-                      objectFit: 'contain',
-                      filter: isUnlocked ? 'none' : 'brightness(0)',
-                    }}
-                  />
-                  {!isUnlocked && (
-                    <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#94a3b8', display: 'flex' }}>
-                      <LockIcon size={22} />
-                    </span>
-                  )}
-
-                  {isUnlocked && (
-                    <div style={{
-                      position: 'absolute',
-                      bottom: '5px',
-                      right: '5px',
-                      backgroundColor: theme.materials.cautionYellow,
-                      color: '#000',
-                      fontWeight: '900',
-                      padding: '2px 5px',
-                      fontSize: '10px',
-                      border: '1px solid #000',
-                      transform: 'rotate(-5deg)'
-                    }}>
-                      LVL {mockLevel}
-                    </div>
-                  )}
+                  CARDS: {mockCards} / {mockCardsNeeded}
                 </div>
-
-                {/* Text Area */}
-                <div style={{ width: '100%', textAlign: 'center' }}>
-                  <h3 style={{ margin: '0 0 3px 0', fontSize: '9.5px', color: '#0f172a', fontFamily: '"Marker Felt", "Comic Sans MS", fantasy', lineHeight: 1.1 }}>
-                    {isUnlocked ? hero.name : 'REDACTED'}
-                  </h3>
-                  <div style={{ fontSize: '7.5px', color: '#475569', fontWeight: 'bold', marginBottom: '4px', fontStyle: isUnlocked ? 'normal' : 'italic', lineHeight: 1.2 }}>
-                    {isUnlocked ? hero.profession : `A ${hero.profession.toLowerCase()} waits for the movement to reach them…`}
-                  </div>
-
-                  {isUnlocked && (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', borderTop: '1px dashed #cbd5e1', paddingTop: '4px' }}>
-                      <span style={{ fontSize: '7px', padding: '1px 4px', backgroundColor: '#e2e8f0', color: '#334155', border: '1px solid #cbd5e1', fontWeight: 'bold' }}>
-                        {hero.damageType.toUpperCase()}
-                      </span>
-                      <div style={{
-                        fontSize: '7.5px',
-                        fontWeight: 'bold',
-                        color: mockCards >= mockCardsNeeded ? '#166534' : '#b91c1c',
-                        backgroundColor: mockCards >= mockCardsNeeded ? '#bbf7d0' : '#fecaca',
-                        padding: '1px 5px',
-                        borderRadius: '10px'
-                      }}>
-                        CARDS: {mockCards} / {mockCardsNeeded}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+              </HeroPolaroidCard>
             );
           })}
         </div>
@@ -382,77 +250,15 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
               const tier = enemyTier(def);
               const rotation = (idx % 2 === 0 ? -1 : 1) * (1 + (idx % 2));
               return (
-                <div
+                <EnemyCaseCard
                   key={def.id}
-                  onClick={() => faced && setSelectedEnemy(def)}
-                  role={faced ? 'button' : undefined}
-                  tabIndex={faced ? 0 : undefined}
-                  aria-label={faced ? `Open case file: ${def.name}` : undefined}
-                  onKeyDown={(e) => {
-                    if (faced && (e.key === 'Enter' || e.key === ' ')) {
-                      e.preventDefault();
-                      setSelectedEnemy(def);
-                    }
-                  }}
-                  style={{
-                    backgroundColor: faced ? '#e5d5b5' : '#4b5563',
-                    color: '#1c1917',
-                    borderRadius: 4,
-                    padding: '6px 5px 8px',
-                    position: 'relative',
-                    transform: `rotate(${rotation}deg)`,
-                    boxShadow: '2px 6px 16px rgba(0,0,0,0.5)',
-                    backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(0,0,0,0.03) 20px, rgba(0,0,0,0.03) 21px)',
-                    cursor: faced ? 'pointer' : 'default',
-                    transition: 'transform 0.15s, box-shadow 0.15s',
-                  }}
-                  onMouseOver={(e) => {
-                    if (faced) {
-                      e.currentTarget.style.transform = 'rotate(0deg) scale(1.04)';
-                      e.currentTarget.style.boxShadow = '4px 10px 22px rgba(0,0,0,0.6)';
-                    }
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.transform = `rotate(${rotation}deg)`;
-                    e.currentTarget.style.boxShadow = '2px 6px 16px rgba(0,0,0,0.5)';
-                  }}
+                  name={def.name}
+                  colorHex={hexColor(def.color)}
+                  tag={{ label: tier, color: TIER_COLOR[tier] }}
+                  faced={faced}
+                  rotation={rotation}
+                  onClick={() => setSelectedEnemy(def)}
                 >
-                  {/* Pin */}
-                  <div style={{
-                    position: 'absolute', top: -6, left: '50%', transform: 'translateX(-50%)',
-                    width: 12, height: 12, borderRadius: '50%', backgroundColor: '#ef4444',
-                    boxShadow: 'inset -2px -2px 4px rgba(0,0,0,0.3), 1px 2px 4px rgba(0,0,0,0.5)'
-                  }} />
-
-                  {/* Mugshot */}
-                  <div style={{
-                    width: '100%', height: 36, borderRadius: 3, marginBottom: 6,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: faced
-                      ? `radial-gradient(circle at 50% 40%, ${hexColor(def.color)} 0%, #1e293b 78%)`
-                      : 'radial-gradient(circle at 50% 40%, #334155 0%, #1e293b 80%)',
-                    border: '2px solid rgba(0,0,0,0.35)'
-                  }}>
-                    {faced ? (
-                      <span style={{ color: '#e2e8f0', display: 'flex' }}><SkullIcon size={22} /></span>
-                    ) : (
-                      <span style={{ fontFamily: TYPEWRITER_FONT, fontSize: 24, fontWeight: 900, color: '#94a3b8' }}>?</span>
-                    )}
-                  </div>
-
-                  {/* Tier tag */}
-                  <span style={{
-                    display: 'inline-block', fontSize: 7, fontWeight: 900, letterSpacing: 0.5,
-                    textTransform: 'uppercase', padding: '2px 5px', borderRadius: 4, marginBottom: 3,
-                    color: '#fff', backgroundColor: TIER_COLOR[tier]
-                  }}>
-                    {tier}
-                  </span>
-
-                  <h3 style={{ margin: '0 0 2px 0', fontSize: 9, fontWeight: 900, textTransform: 'uppercase', fontFamily: TYPEWRITER_FONT, lineHeight: 1.1 }}>
-                    {faced ? def.name : '██████'}
-                  </h3>
-
                   {faced ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 4, color: '#78350f', fontSize: 7.5, fontWeight: 800, letterSpacing: 0.3, textTransform: 'uppercase' }}>
                       <InfoIcon size={9} /> Tap to open
@@ -462,7 +268,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                       <LockIcon size={10} /> SEALED
                     </div>
                   )}
-                </div>
+                </EnemyCaseCard>
               );
             })}
           </div>

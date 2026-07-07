@@ -17,6 +17,11 @@ export interface EnemyDefinition {
   damage: number;
   /** How often the enemy attacks the barrier (ms). */
   attackRateMs: number;
+  /**
+   * Fixed attack range (px): the enemy halts and attacks once the barrier's
+   * front edge is within this distance. 0 / omitted = melee contact.
+   */
+  attackRangePx?: number;
   /** Body tint, 0xRRGGBB. */
   color: number;
   /** Aseprite atlas key for this enemy's sprite sheet. Defaults to `id` when
@@ -88,6 +93,15 @@ export const UNIT_RENDER_SIZES: Record<UnitSizeClass, number> = {
 export function enemySizeClass(def: EnemyDefinition): UnitSizeClass {
   return def.sizeClass ?? (def.id.startsWith('boss_') ? 'boss' : 'minion');
 }
+
+/**
+ * "Global" range for the portrait battlefield — covers the full 1080×1920
+ * viewport, so a hero with this range can hit anything on screen. Eden's
+ * anchor value; other heroes ladder below it (melee ≈180-220, short ≈550-700,
+ * long ≈780-1100). Mirrors GAME_HEIGHT (level.ts imports balance, so the
+ * literal lives here to avoid a circular import).
+ */
+export const GLOBAL_RANGE_PX = 1920;
 
 /**
  * Display scale: gameplay positions, ranges (px) and speeds (px/sec) live in
@@ -497,7 +511,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'projectile',
-    range: 480,
+    range: GLOBAL_RANGE_PX, // Eden — global, hits anywhere on screen
     damage: 14,
     attackRateMs: 1300,
     color: 0x3b82f6,
@@ -527,7 +541,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'boomerang',
-    range: 390,
+    range: 950,
     damage: 12,
     attackRateMs: 1400,
     color: 0x8b5cf6,
@@ -543,7 +557,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'pierce',
-    range: 360,
+    range: 850,
     damage: 9,
     attackRateMs: 1100,
     basePierce: 2,
@@ -560,7 +574,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Wind',
     attackKind: 'melee',
     attackStyle: 'melee-cleave',
-    range: 135,
+    range: 180,
     damage: 20,
     attackRateMs: 1200,
     color: 0x10b981,
@@ -575,7 +589,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Water',
     attackKind: 'ranged',
     attackStyle: 'vortex',
-    range: 300,
+    range: 700,
     damage: 8,
     attackRateMs: 3500,
     color: 0x0ea5e9,
@@ -591,7 +605,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Earth',
     attackKind: 'melee',
     attackStyle: 'linear-wave',
-    range: 165,
+    range: 220,
     damage: 16,
     attackRateMs: 2200,
     color: 0xa8a29e,
@@ -606,7 +620,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Frost',
     attackKind: 'ranged',
     attackStyle: 'lobbed',
-    range: 270,
+    range: 620,
     damage: 12,
     attackRateMs: 1700,
     color: 0xe2e8f0,
@@ -622,7 +636,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Holy',
     attackKind: 'ranged',
     attackStyle: 'projectile',
-    range: 330,
+    range: 780,
     damage: 8,
     attackRateMs: 1500,
     color: 0xfca5a5,
@@ -638,7 +652,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'summoner',
-    range: 165,
+    range: 220,
     damage: 15,
     attackRateMs: 5000,
     color: 0xd97706,
@@ -653,7 +667,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Lightning',
     attackKind: 'ranged',
     attackStyle: 'chain',
-    range: 450,
+    range: 1100,
     damage: 16,
     attackRateMs: 1400,
     baseChain: 3,
@@ -669,7 +683,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'melee',
     attackStyle: 'melee-cleave',
-    range: 150,
+    range: 200,
     damage: 20,
     attackRateMs: 1300,
     color: 0x1e3a8a,
@@ -684,7 +698,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Earth',
     attackKind: 'melee',
     attackStyle: 'melee-cleave',
-    range: 150,
+    range: 200,
     damage: 17,
     attackRateMs: 1500,
     color: 0x15803d,
@@ -699,7 +713,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'pierce',
-    range: 330,
+    range: 780,
     damage: 12,
     attackRateMs: 1300,
     basePierce: 5,
@@ -710,7 +724,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     projectileColor: 0xfca5a5,
   },
   sandbox_projectile: { id: 'sandbox_projectile', name: 'Test: Projectile', profession: 'Tester', damageType: 'Physical', attackKind: 'ranged', attackStyle: 'projectile', range: 500, damage: 20, attackRateMs: 1000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
-  sandbox_melee_cleave: { id: 'sandbox_melee_cleave', name: 'Test: Melee Cleave', profession: 'Tester', damageType: 'Physical', attackKind: 'melee', attackStyle: 'melee-cleave', range: 300, damage: 20, attackRateMs: 1000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
+  sandbox_melee_cleave: { id: 'sandbox_melee_cleave', name: 'Test: Melee Cleave', profession: 'Tester', damageType: 'Physical', attackKind: 'melee', attackStyle: 'melee-cleave', range: 700, damage: 20, attackRateMs: 1000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
   sandbox_beam: { id: 'sandbox_beam', name: 'Test: Beam', profession: 'Tester', damageType: 'Physical', attackKind: 'ranged', attackStyle: 'beam', range: 500, damage: 20, attackRateMs: 3000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
   sandbox_lobbed: { id: 'sandbox_lobbed', name: 'Test: Lobbed', profession: 'Tester', damageType: 'Physical', attackKind: 'ranged', attackStyle: 'lobbed', range: 500, damage: 20, attackRateMs: 1000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
   sandbox_pierce: { id: 'sandbox_pierce', name: 'Test: Pierce', profession: 'Tester', damageType: 'Physical', attackKind: 'ranged', attackStyle: 'pierce', range: 500, damage: 20, attackRateMs: 1000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
@@ -727,7 +741,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Wind',
     attackKind: 'ranged',
     attackStyle: 'beam',
-    range: 360,
+    range: 850,
     damage: 5,
     attackRateMs: 500, // Very fast — fastest attacker in the game
     color: 0xec4899,
@@ -742,7 +756,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Frost',
     attackKind: 'ranged',
     attackStyle: 'trap',
-    range: 240,
+    range: 550,
     damage: 12,
     attackRateMs: 3000,
     color: 0xf472b6,
@@ -757,7 +771,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Lightning',
     attackKind: 'ranged',
     attackStyle: 'chain',
-    range: 360,
+    range: 850,
     damage: 15,
     attackRateMs: 1600,
     baseChain: 3,
@@ -773,7 +787,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Fire',
     attackKind: 'ranged',
     attackStyle: 'lobbed',
-    range: 285,
+    range: 660,
     damage: 14,
     attackRateMs: 1800,
     color: 0xef4444,
@@ -788,7 +802,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'vortex',
-    range: 240,
+    range: 550,
     damage: 7,
     attackRateMs: 3800,
     color: 0x475569,
@@ -803,7 +817,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Water',
     attackKind: 'ranged',
     attackStyle: 'linear-wave',
-    range: 300,
+    range: 700,
     damage: 11,
     attackRateMs: 2400,
     color: 0x2563eb,
@@ -818,7 +832,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Wind',
     attackKind: 'ranged',
     attackStyle: 'boomerang',
-    range: 390,
+    range: 950,
     damage: 13,
     attackRateMs: 1500,
     color: 0x22c55e,

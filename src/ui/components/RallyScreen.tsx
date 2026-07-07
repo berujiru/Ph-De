@@ -136,10 +136,10 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
       <div
         style={{
           position: 'relative',
-          width: 76,
-          height: 82,
+          width: 62,
+          height: 68,
           padding: 4,
-          paddingBottom: 12,
+          paddingBottom: 10,
           backgroundColor: theme.materials.paper,
           borderRadius: 3,
           boxShadow: `0 6px 14px ${withAlpha(theme.colors.background, 0.6)}`,
@@ -201,8 +201,8 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
       <div
         style={{
           position: 'relative',
-          width: 70,
-          height: 70,
+          width: 58,
+          height: 58,
           borderRadius: '50%',
           border: `2px solid ${withAlpha(emblemTint, isBuhis ? 0.6 : 0.5)}`,
           background: `radial-gradient(circle at 50% 40%, ${withAlpha(emblemTint, 0.22)}, ${withAlpha(theme.colors.background, 0.6)})`,
@@ -213,7 +213,7 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
           color: emblemTint,
         }}
       >
-        <Icon size={32} />
+        <Icon size={28} />
         {kind === 'heroUpgrade' && (
           // Small "up" chevron badge to read as an *upgrade* to a hero, not a fresh recruit.
           <span
@@ -242,9 +242,10 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
     );
   }
 
+  // Flex item so 3 cards always share one row (capped width on wide screens).
   const frame: CSSProperties = isBuhis
-    ? { background: cautionTape(theme.colors.danger), padding: 3, borderRadius: 18 }
-    : { padding: 3, borderRadius: 18 };
+    ? { background: cautionTape(theme.colors.danger), padding: 3, borderRadius: 18, flex: '1 1 0', minWidth: 0, maxWidth: 210 }
+    : { padding: 3, borderRadius: 18, flex: '1 1 0', minWidth: 0, maxWidth: 210 };
 
   return (
     <div style={frame}>
@@ -261,8 +262,8 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
             ? `0 10px 26px ${withAlpha(theme.colors.background, 0.7)}`
             : `${meta.glow}${meta.glow === 'none' ? '' : ', '}0 10px 26px ${withAlpha(theme.colors.background, 0.7)}`,
           borderRadius: 15,
-          width: 'min(210px, 44vw)',
-          minHeight: 264,
+          width: '100%',
+          minHeight: 232,
           padding: 0,
           display: 'flex',
           flexDirection: 'column',
@@ -308,14 +309,14 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
           {meta.label}
         </span>
 
-        <div style={{ display: 'flex', justifyContent: 'center', margin: '12px 0 10px' }}>{visual}</div>
+        <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0 8px' }}>{visual}</div>
 
-        <div style={{ padding: '0 14px 16px', display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
-          <span style={{ fontSize: 17, fontWeight: 900, lineHeight: 1.15, letterSpacing: 0.2 }}>
+        <div style={{ padding: '0 clamp(6px, 2.5vw, 12px) 14px', display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
+          <span style={{ fontSize: 'clamp(13px, 3.6vw, 16px)', fontWeight: 900, lineHeight: 1.15, letterSpacing: 0.2 }}>
             {option.title}
           </span>
           {/* The PURPOSE copy — the thing the player is meant to read. */}
-          <span style={{ fontSize: 12.5, color: theme.colors.textPrimary, opacity: 0.9, lineHeight: 1.45 }}>
+          <span style={{ fontSize: 'clamp(10px, 2.8vw, 12px)', color: theme.colors.textPrimary, opacity: 0.9, lineHeight: 1.4 }}>
             {option.description}
           </span>
 
@@ -323,13 +324,13 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
             <span
               style={{
                 marginTop: 'auto',
-                paddingTop: 8,
-                fontSize: 10,
+                paddingTop: 6,
+                fontSize: 9,
                 fontWeight: 800,
-                letterSpacing: 0.4,
+                letterSpacing: 0.3,
                 textTransform: 'uppercase',
                 color: theme.colors.danger,
-                lineHeight: 1.4,
+                lineHeight: 1.35,
                 borderTop: `1px dashed ${withAlpha(theme.colors.danger, 0.4)}`,
               }}
             >
@@ -862,7 +863,8 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 12, maxWidth: 720 }}>
+          {/* Single row — cards flex to share the width so all fit on portrait. */}
+          <div style={{ display: 'flex', flexWrap: 'nowrap', justifyContent: 'center', gap: 'clamp(6px, 2vw, 12px)', width: '100%', maxWidth: 720 }}>
             {dropOptions.map((option, index) => (
               <DropCard key={option.id} option={option} index={index} onSelect={handleSelectDrop} />
             ))}
