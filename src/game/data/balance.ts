@@ -83,10 +83,10 @@ export type UnitSizeClass = 'minion' | 'miniboss' | 'hero' | 'boss';
  * their shadows/bars/labels from it.
  */
 export const UNIT_RENDER_SIZES: Record<UnitSizeClass, number> = {
-  minion: 56,
-  miniboss: 80,
-  hero: 104,
-  boss: 148,
+  minion: 128,
+  miniboss: 180,
+  hero: 200,
+  boss: 333,
 };
 
 /** Resolve an enemy's size tier: explicit sizeClass, else boss ids, else minion. */

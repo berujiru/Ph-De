@@ -145,6 +145,38 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.model.setState(outcome);
   }
 
+  /**
+   * The frontmost enemy this hero should shoot AND is within range of, or null.
+   * Taunting enemies in range take priority; otherwise the most-advanced enemy
+   * ahead is chosen and only returned if it's actually within range. Called
+   * every frame so an engaged hero holds a ready idle rather than walking.
+   */
+  private findTargetInRange(enemies: Enemy[]): Enemy | null {
+    let target: Enemy | null = null;
+    let maxEnemyY = -Infinity;
+    let foundTaunt = false;
+
+    for (const enemy of enemies) {
+      if (enemy.isDead || enemy.y >= this.y) continue;
+      // Ignore stealthed enemies unless this hero can see stealth.
+      if (enemy.isStealthed && !this.definition.canSeeStealth) continue;
+
+      if (enemy.definition.tauntAura && this.y - enemy.y <= this.range) {
+        // A taunting enemy in range is prioritized; pick the most-advanced one.
+        if (!foundTaunt || enemy.y > maxEnemyY) {
+          maxEnemyY = enemy.y;
+          target = enemy;
+          foundTaunt = true;
+        }
+      } else if (!foundTaunt && enemy.y > maxEnemyY) {
+        maxEnemyY = enemy.y;
+        target = enemy;
+      }
+    }
+
+    return target && this.y - target.y <= this.range ? target : null;
+  }
+
   update(delta: number, enemies: Enemy[], shieldY: number) {
     // Hold formation relative to the advancing morale shield.
     const targetY = formationTargetY(shieldY, { attackKind: this.definition.attackKind, rangePx: this.range }, RALLY.formation) + this.formationJitterY;
@@ -155,66 +187,48 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
       settleDistancePx: RALLY.formation.settleDistancePx,
     });
     this.y = step.y;
-    this.model.setState(step.locomotion);
 
-    // Auto-attack
     this.attackCooldown = Math.max(0, this.attackCooldown - delta);
-    if (this.attackCooldown === 0) {
-      // Find the most-advanced enemy (largest y, closest to the shield below),
-      // among those ahead of (above) the hero. Prioritize tauntAura.
-      let target: Enemy | null = null;
-      let maxEnemyY = -Infinity;
-      let foundTaunt = false;
 
-      for (const enemy of enemies) {
-        if (!enemy.isDead && enemy.y < this.y) {
-          // Ignore stealthed enemies unless hero has canSeeStealth
-          if (enemy.isStealthed && !this.definition.canSeeStealth) continue;
+    // The enemy this hero is engaging (frontmost, in range) — computed every
+    // frame so it drives both locomotion and attacking.
+    const target = this.findTargetInRange(enemies);
 
-          if (enemy.definition.tauntAura && this.y - enemy.y <= this.range) {
-            // Found a taunting enemy in range. Prioritize it immediately.
-            // If multiple taunt, attack the most-advanced one.
-            if (!foundTaunt || enemy.y > maxEnemyY) {
-              maxEnemyY = enemy.y;
-              target = enemy;
-              foundTaunt = true;
-            }
-          } else if (!foundTaunt && enemy.y > maxEnemyY) {
-            maxEnemyY = enemy.y;
-            target = enemy;
-          }
-        }
-      }
+    // While an enemy is in range, hold a ready idle between shots instead of
+    // flickering back to walk each time an attack finishes. Only march
+    // (walk / run) when there's nothing in range to shoot.
+    this.model.setState(target ? 'idle' : step.locomotion);
 
-      if (target && this.y - target.y <= this.range) {
-        // Cooldown starts now (attack cadence is unchanged), but the projectile
-        // and passives fire at the animation's release frame via onRelease —
-        // so the shot leaves in sync with the throw, not the instant the swing
-        // begins.
-        this.attackCooldown = this.attackRateMs;
-        const releaseTarget = target;
-        this.model.setState('attack', {
-          onRelease: () => {
-            if (!this.scene || releaseTarget.isDead) return;
-            this.onAttack(this, releaseTarget);
+    // Auto-attack — fire when the cadence is ready and a target is in range.
+    if (target && this.attackCooldown === 0) {
+      // Cooldown starts now (attack cadence is unchanged), but the projectile
+      // and passives fire at the animation's release frame via onRelease —
+      // so the shot leaves in sync with the throw, not the instant the swing
+      // begins.
+      this.attackCooldown = this.attackRateMs;
+      const releaseTarget = target;
+      this.model.setState('attack', {
+        attackIntervalMs: this.attackRateMs,
+        onRelease: () => {
+          if (!this.scene || releaseTarget.isDead) return;
+          this.onAttack(this, releaseTarget);
 
-            // Passives applied on attack
-            const activePassive = this.passiveOverride || this.id;
-            applyHeroPassive(activePassive, this, releaseTarget, {
-              GAME_WIDTH: Number(this.scene.game.config.width),
-              GAME_HEIGHT: Number(this.scene.game.config.height),
-              heroes: [], // Passive doesn't currently read other heroes
-              enemies: [], // or other enemies
-              onVisual: (evt) => {
-                if (evt.type === 'text') {
-                  const txt = this.scene.add.text(evt.x || 0, evt.y || 0, evt.text || '', { color: evt.color || '#fff', fontStyle: 'bold' }).setOrigin(0.5);
-                  this.scene.tweens.add({ targets: txt, y: (evt.y || 0) - 30, alpha: 0, duration: 1000, onComplete: () => txt.destroy() });
-                }
+          // Passives applied on attack
+          const activePassive = this.passiveOverride || this.id;
+          applyHeroPassive(activePassive, this, releaseTarget, {
+            GAME_WIDTH: Number(this.scene.game.config.width),
+            GAME_HEIGHT: Number(this.scene.game.config.height),
+            heroes: [], // Passive doesn't currently read other heroes
+            enemies: [], // or other enemies
+            onVisual: (evt) => {
+              if (evt.type === 'text') {
+                const txt = this.scene.add.text(evt.x || 0, evt.y || 0, evt.text || '', { color: evt.color || '#fff', fontStyle: 'bold' }).setOrigin(0.5);
+                this.scene.tweens.add({ targets: txt, y: (evt.y || 0) - 30, alpha: 0, duration: 1000, onComplete: () => txt.destroy() });
               }
-            });
-          },
-        });
-      }
+            }
+          });
+        },
+      });
     }
 
     // Skill cooldown logic

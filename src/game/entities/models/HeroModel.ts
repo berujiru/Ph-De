@@ -14,23 +14,26 @@ import { UnitModel } from './UnitModel';
 export class HeroModel extends UnitModel {
   /** Fraction into the attack animation at which the projectile is released. */
   private static readonly ATTACK_RELEASE_FRAC = 0.45;
+  /** Longest a single attack swing plays; faster attackers shrink to fit. */
+  private static readonly NATURAL_ATTACK_MS = 800;
 
   private bodySprite: Phaser.GameObjects.Sprite;
   private readonly baseW: number;
   private readonly baseH: number;
-  private readonly sizePx: number;
   /** True when the body is a real sprite sheet (drives the resting-frame reset). */
   private readonly artBacked: boolean;
 
   constructor(scene: Phaser.Scene, x: number, y: number, tint: number, spriteKey?: string, sizePx = 64) {
     super(scene, x, y);
-    this.sizePx = sizePx;
     // Only treat spriteKey as real art if its texture actually loaded; otherwise
     // fall back to the shared placeholder so a missing sheet can't green-box.
     const hasArt = !!spriteKey && scene.textures.exists(spriteKey);
     this.artBacked = hasArt;
     const key = hasArt ? spriteKey! : 'hero-base';
-    this.bodySprite = scene.add.sprite(0, 0, key);
+    // For a sprite sheet, start on frame 0 — NOT the default `__BASE` frame,
+    // which is the whole sheet (e.g. 2048x512). Reading width/height off __BASE
+    // gives a bogus aspect and shrinks the rendered hero to ~half size.
+    this.bodySprite = scene.add.sprite(0, 0, key, hasArt ? 0 : undefined);
     if (hasArt) {
       // Scale the real sheet to the size-class height (UNIT_RENDER_SIZES),
       // preserving the frame's aspect ratio so non-square frames (e.g.
@@ -58,8 +61,9 @@ export class HeroModel extends UnitModel {
   }
 
   override get muzzleOffset(): { x: number; y: number } {
-    const f = this.sizePx / 64;
-    return { x: 16 * f, y: -8 * f };
+    // In front of the hero: heroes face UP toward the enemies, so "front" is the
+    // top edge of the sprite (centered horizontally), not off to the side.
+    return { x: 0, y: -this.baseH * 0.5 };
   }
 
   protected bodyTarget(): Phaser.GameObjects.GameObject {
@@ -165,11 +169,15 @@ export class HeroModel extends UnitModel {
     ];
   }
 
-  protected playAttack(onComplete: () => void, onRelease?: () => void): void {
+  protected playAttack(onComplete: () => void, onRelease?: () => void, attackIntervalMs?: number): void {
     if (this.hasStateAnim('attack')) {
+      // Fit the swing to the attack cadence: a fast attacker's clip speeds up so
+      // it finishes within the interval; a slow one caps at the natural length
+      // (then idles). Keeps the release frame in sync at any attack speed.
+      const duration = Math.max(120, Math.min(attackIntervalMs ?? HeroModel.NATURAL_ATTACK_MS, HeroModel.NATURAL_ATTACK_MS));
       // Release the projectile at the throw frame, not the start of the swing.
       if (onRelease) this.scheduleAttackRelease(`${this.spriteBaseKey}-attack`, onRelease);
-      this.playOneShotAnim('attack', onComplete);
+      this.playOneShotAnim('attack', onComplete, duration);
       return;
     }
     // Placeholder throw lunge toward the enemy side (right); release at the apex.

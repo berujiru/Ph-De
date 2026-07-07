@@ -40,6 +40,12 @@ export interface UnitModelStateOptions {
    * swing instead of the instant the attack starts.
    */
   onRelease?: () => void;
+  /**
+   * For 'attack': the attack cadence in ms (attackRateMs). The model fits the
+   * swing within this so a fast attacker's animation speeds up and a slow one
+   * doesn't drag — keeping the release frame in sync with the actual rate.
+   */
+  attackIntervalMs?: number;
 }
 
 /**
@@ -108,14 +114,16 @@ export abstract class UnitModel extends Phaser.GameObjects.Container {
    * Play a one-shot frame animation, firing onComplete when it finishes.
    * Returns true if a real animation existed (the caller then skips its tween).
    */
-  protected playOneShotAnim(state: UnitModelState, onComplete: () => void): boolean {
+  protected playOneShotAnim(state: UnitModelState, onComplete: () => void, durationMs?: number): boolean {
     if (!this.hasStateAnim(state)) return false;
     const key = `${this.spriteBaseKey}-${STATE_ANIM_TAG[state] ?? state}`;
     const sprite = this.animatedBody!;
     sprite.anims.timeScale = 1;
     sprite.once(`${Phaser.Animations.Events.ANIMATION_COMPLETE_KEY}${key}`, onComplete);
     // repeat: 0 so a one-shot fires onComplete even if the tag was exported looping.
-    sprite.play({ key, repeat: 0 });
+    // An explicit duration overrides the sheet's frameRate so the clip fits the
+    // requested time window (e.g. the attack cadence).
+    sprite.play({ key, repeat: 0, ...(durationMs !== undefined ? { duration: durationMs } : {}) });
     return true;
   }
 
@@ -165,7 +173,7 @@ export abstract class UnitModel extends Phaser.GameObjects.Container {
       options?.onComplete?.();
       this.startLocomotion(this.locomotionState);
     };
-    if (state === 'attack') this.playAttack(revert, options?.onRelease);
+    if (state === 'attack') this.playAttack(revert, options?.onRelease, options?.attackIntervalMs);
     else this.playCast(revert);
     return this;
   }
@@ -246,8 +254,9 @@ export abstract class UnitModel extends Phaser.GameObjects.Container {
   /**
    * One-shot attack — MUST call onComplete exactly once. If `onRelease` is
    * given, fire it once at the swing's release point (not frame 0).
+   * `attackIntervalMs` (the attack cadence) lets the swing scale to the rate.
    */
-  protected abstract playAttack(onComplete: () => void, onRelease?: () => void): void;
+  protected abstract playAttack(onComplete: () => void, onRelease?: () => void, attackIntervalMs?: number): void;
   protected abstract playCast(onComplete: () => void): void;
   protected abstract playDeath(onComplete?: () => void): void;
 }

@@ -235,7 +235,14 @@ export class SkillCutIn {
     sprite.setScale(fit * (options.artScale ?? 1));
     sprite.x = options.artOffsetX ?? 0;
     sprite.y = options.artOffsetY ?? 0;
-    if (scene.anims.exists(animKey)) sprite.play({ key: animKey, duration: totalMs });
+    if (scene.anims.exists(animKey)) {
+      // Spread the whole clip across the cut-in duration so it finishes exactly
+      // as the panel leaves. The anim is created without a frameRate (defaults
+      // to 24fps), which for a 40-frame sheet ends ~1.8s early and freezes on
+      // the last frame — so set an explicit frameRate from the real frame count.
+      const frameCount = scene.anims.get(animKey)?.frames.length ?? 1;
+      sprite.play({ key: animKey, frameRate: frameCount / (totalMs / 1000) });
+    }
     container.add(sprite);
 
     // Clip the art to the diagonal cutout so the sprite sheet never spills
@@ -269,6 +276,10 @@ export class SkillCutIn {
       stroke: '#000000',
       strokeThickness: 18,
       align: 'center',
+      // Pad the text canvas so the italic overhang + thick stroke + drop shadow
+      // aren't clipped (Phaser sizes the canvas to the glyph metrics only, which
+      // cuts the last letter of an italic word like "RALLY").
+      padding: { x: 32, y: 18 },
       shadow: { offsetX: 10, offsetY: 10, color: '#000000', blur: 0, stroke: true, fill: true },
     }).setOrigin(0.5);
     label.setRotation(tiltAngle);

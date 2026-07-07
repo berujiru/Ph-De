@@ -644,30 +644,8 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
           >
             <SkullIcon size={20} />
           </button>
-        </div>
-      </div>
 
-      {/* ---------- Bottom-center: Bayanihan Act Button ---------- */}
-      <div
-        style={{
-          position: 'absolute',
-          left: '50%',
-          bottom: 22,
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          pointerEvents: 'auto',
-          zIndex: 10,
-        }}
-      >
-        {/* Caution-tape ring around the megaphone — the rally's focal CTA. */}
-        <div
-          style={{
-            padding: 3,
-            borderRadius: '50%',
-            background: cautionTape(theme.colors.accent),
-            boxShadow: `0 8px 22px ${withAlpha(theme.colors.background, 0.7)}`,
-          }}
-        >
+          {/* Bayanihan Act — the rally's focal CTA, now stacked below surrender. */}
           <button
             type="button"
             className="hud-btn"
@@ -676,27 +654,21 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
             title="Bayanihan Act — Ready!"
             style={{
               ...fab,
-              width: 72,
-              height: 72,
-              borderRadius: '50%',
+              flexDirection: 'column',
+              gap: 1,
               backgroundColor: withAlpha(theme.colors.background, 0.92),
               border: `2px solid ${theme.colors.accent}`,
               color: theme.colors.accent,
-              boxShadow: `0 0 20px ${withAlpha(theme.colors.accent, 0.7)}, inset 0 0 10px ${withAlpha(theme.colors.accent, 0.4)}`,
+              boxShadow: `0 0 16px ${withAlpha(theme.colors.accent, 0.6)}, inset 0 0 8px ${withAlpha(theme.colors.accent, 0.35)}`,
               animation: 'pulse-glow 2s infinite',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 2,
             }}
             onClick={() => {
               playBtnSound();
               // In the future: emit bayanihan act event
             }}
           >
-            <MegaphoneIcon size={26} />
-            <span style={{ ...stampLabel, fontSize: 9 }}>Act</span>
+            <MegaphoneIcon size={20} />
+            <span style={{ ...stampLabel, fontSize: 8 }}>Act</span>
           </button>
         </div>
       </div>
