@@ -74,15 +74,34 @@ export class HeroModel extends UnitModel {
     this.bodySprite.setPosition(0, 0);
     this.bodySprite.setAngle(0);
     // Art-backed heroes: halt any running frame animation and snap back to the
-    // resting base frame. Otherwise a state with no sheet (idle) keeps playing
-    // the previous march loop, or freezes on the last attack/cast frame. States
+    // resting frame. Otherwise a state with no sheet (idle) keeps playing the
+    // previous march loop, or freezes on the last attack/cast frame. States
     // that DO have a sheet immediately restart their own anim after this.
-    if (this.artBacked && this.spriteBaseKey) {
+    if (this.artBacked) {
       this.bodySprite.anims.stop();
-      this.bodySprite.setTexture(this.spriteBaseKey, 0);
+      this.applyRestingFrame();
     }
     this.bodySprite.setDisplaySize(this.baseW, this.baseH);
     this.bodySprite.setAlpha(1);
+  }
+
+  /**
+   * Snap the body to its resting frame. Prefers a real `idle` animation's first
+   * frame; if the hero ships no idle sheet, uses the first frame of the `attack`
+   * swing (a neutral ready pose) rather than a walk frame; else the base
+   * texture's frame 0.
+   */
+  private applyRestingFrame(): void {
+    const useFirstFrame = (animKey: string): boolean => {
+      if (!this.scene.anims.exists(animKey)) return false;
+      const frame = this.scene.anims.get(animKey).frames[0]?.frame;
+      if (!frame) return false;
+      this.bodySprite.setTexture(frame.texture.key, frame.name);
+      return true;
+    };
+    if (useFirstFrame(`${this.spriteBaseKey}-idle`)) return;
+    if (useFirstFrame(`${this.spriteBaseKey}-attack`)) return;
+    this.bodySprite.setTexture(this.spriteBaseKey!, 0);
   }
 
   protected playIdle(): Phaser.Tweens.Tween[] {

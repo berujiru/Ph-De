@@ -74,6 +74,10 @@ and you always label them as placeholder-quality.
   shipping it.
 - **State tags must match `UnitModel` exactly** (`idle march attack cast
   stunned celebrate defeat death`), because playback keys are `${spriteKey}-${tag}`.
+  For smooth hero gameplay draw `idle / march / attack / cast` **plus** the skill
+  cut-in; `celebrate/defeat/stunned` use engine placeholders. If `idle` is
+  missing the engine rests on `attack`'s first frame (so `idle` is recommended,
+  not mandatory when `attack` exists).
 - **A new animation state is not your call.** If a character needs a state that
   doesn't exist in the state machine, hand off to `gameplay-engineer` to add it
   to `UnitModel` first — do not invent an ad-hoc tag the engine won't play.

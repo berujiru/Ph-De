@@ -29,15 +29,24 @@ For every new hero, three assets must be created and placed in `public/assets/he
 3. **Animated Sprite Sheet (`[hero_id].png` + `[hero_id].json`)**
    - **Specs**: A transparent texture atlas (preferably exported from Aseprite using the "Aseprite JSON Array" or "Hash" format).
    - **Required Animations** — tag names must match the `UnitModel` states in
-     `src/game/entities/models/UnitModel.ts` exactly, since
-     `createFromAseprite` keys animations as `${spriteKey}-${tag}`. Heroes draw
-     only THREE, all TOP-BEHIND (back view):
-     - `idle`: Bouncing/breathing while standing still.
+     `src/game/entities/models/UnitModel.ts` exactly, since animations key as
+     `${spriteKey}-${tag}`. Heroes draw FOUR states for smooth gameplay, all
+     TOP-BEHIND (back view):
+     - `idle`: Bouncing/breathing while standing still (held while engaging an
+       enemy in range).
+     - `march`: Walk cycle advancing toward the enemy line (plays only when no
+       enemy is in range; `run` reuses it faster).
      - `attack`: Swinging weapon / throwing projectile; clear impact frame.
-     - `cast`: Signature-skill wind-up pose (plays under the anime cut-in).
-   - `march`, `celebrate`, and `defeat` are **not drawn** (owner decision) — the
-     engine plays a tween placeholder for those states, so heroes still move and
-     react without dedicated frames.
+     - `cast`: Signature-skill wind-up pose (plays after the anime cut-in clears).
+   - `celebrate`, `defeat`, and `stunned` are **not drawn** — the engine plays a
+     tween placeholder for those, so heroes still react without dedicated frames.
+   - **Idle is optional if `attack` exists:** with no `idle` sheet the engine
+     rests on the first frame of `attack` (a neutral ready pose). Ship `idle`
+     anyway for the best look.
+   - Eden is the reference hero. She ships her states as **separate per-state
+     PNG spritesheets** (`eden_walk.png` → `march`, `eden_attack.png`,
+     `eden_cast.png`) wired by hand in `GameScene`, alongside the single-atlas
+     path below — either layout works.
 
 ---
 
@@ -89,10 +98,11 @@ Implement the hero's signature Active Skill and/or Passive.
 The model layer is `Phaser.GameObjects.Sprite`-based. `HeroModel` already routes
 every state (`idle/march/attack/cast/celebrate/defeat`) through the sprite-sheet
 path: if an animation `${spriteKey}-<state>` exists it plays those frames,
-otherwise it falls back to the tween placeholder. So once your atlas is loaded
-(Step B) with tags named exactly for each state, the hero animates with **no
-`HeroModel` changes**. Only touch `HeroModel` if you need a genuinely new state
-(add it to `UnitModel`'s state machine first).
+otherwise it falls back to the tween placeholder (and `idle` specifically rests
+on the first frame of `attack` when no idle sheet exists). So once your atlas is
+loaded (Step B) with tags named exactly for each state, the hero animates with
+**no `HeroModel` changes**. Only touch `HeroModel` if you need a genuinely new
+state (add it to `UnitModel`'s state machine first).
 
 ---
 

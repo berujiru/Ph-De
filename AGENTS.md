@@ -25,7 +25,9 @@ over React Native.
   perspective** (landscape 16:9 lane; high top-down oblique camera above and
   behind the rally; heroes top-behind with their backs to the camera / enemies
   top-front facing the camera), the required per-character animation-state set
-  (idle/march/attack/cast/stunned/celebrate/defeat/death, matching `UnitModel`),
+  (heroes draw `idle/march/attack/cast` + a skill cut-in; enemies
+  `march/attack/stunned/celebrate/death` +`cast` for casters — all matching
+  `UnitModel`; a hero with no `idle` sheet rests on `attack`'s first frame),
   and the Gemini→Claude workflow for generating turnarounds and animated sprite
   sheets. Read before creating or wiring any character art. (The per-character
   prompt packs under `docs/references/` were removed and are being re-authored

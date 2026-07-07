@@ -41,11 +41,13 @@ For each of the 20 Heroes, the following visual assets are required:
 - **Frame counts & timing are canonical in
   `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` → *Animation Standards*** — the counts
   below are copied from there; if they ever disagree, that guide wins.
-- **Animations Required** (heroes draw only THREE — owner decision):
-  1. **`idle`** — **8 frames**, looping. Breathing/bouncing in place.
-  2. **`attack`** — **8 frames**, one-shot. The primary attack motion (e.g., throwing a fishball, waving a broom, shouting into a headset). **Frame 4 is the clear impact frame.**
-  3. **`cast`** — **10 frames**, one-shot. Signature-skill wind-up pose, energy building across the ramp, played under the anime cut-in.
-  - `march`, `celebrate`, `defeat` are **not drawn** — the engine plays a tween
+- **Animations Required** (heroes draw FOUR for smooth gameplay, plus the cut-in):
+  1. **`idle`** — **8 frames**, looping. Breathing/bouncing in place (held while an enemy is in range).
+  2. **`march`** — **8 frames**, looping. Walk cycle advancing toward the enemy line; plays only when no enemy is in range (`run` reuses it ~1.5× faster).
+  3. **`attack`** — **8 frames**, one-shot. The primary attack motion (e.g., throwing a fishball, waving a broom, shouting into a headset). **Frame 4 is the clear impact frame.**
+  4. **`cast`** — **10 frames**, one-shot. Signature-skill wind-up pose, energy building across the ramp, played after the anime cut-in clears.
+  - If `idle` is omitted, the engine rests on the **first frame of `attack`** — so `idle` is recommended but optional when `attack` exists.
+  - `celebrate`, `defeat`, `stunned` are **not drawn** — the engine plays a tween
     placeholder for those, so heroes still move and react without frames.
 
 ### C. Skill Cut-In Overlays (Anime-Style)

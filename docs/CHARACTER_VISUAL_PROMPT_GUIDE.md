@@ -88,16 +88,29 @@ it here first and keep the templates in sync.
 - **One row per state, one frame per cell**, evenly spaced, non-overlapping,
   transparent background, no baked grid/labels (see Phase 4).
 
-### Heroes — DRAWN sheet is 3 rows (owner decision)
+### Heroes — DRAWN sheet is 4 rows + a cut-in
 
-Heroes only need `idle / attack / cast` drawn; `march`, `celebrate`, and
-`defeat` use engine tween placeholders, so **do not** put them in a hero sheet.
+For smooth gameplay a hero needs the full **`idle / march / attack / cast`** set
+drawn, **plus** the animated skill cut-in (its own sheet — see below). Only
+`celebrate`, `defeat`, and `stunned` fall back to engine tween placeholders, so
+**do not** put those in a hero sheet.
 
 | Row (tag) | Frames | Play | Notes |
 |---|---|---|---|
 | `idle`   | **8**  | loop     | Breathing/bounce in place. Seamless (frame 8 → frame 1). |
+| `march`  | **8**  | loop     | Walk cycle advancing toward the enemy line. Seamless. `run` reuses it ~1.5× faster. Plays only while there's no enemy in range (an engaged hero holds `idle`). |
 | `attack` | **8**  | one-shot | Basic attack. **Frame 4 = the clear impact/release frame** (wind-up 1–3, impact 4, follow-through 5–8). |
-| `cast`   | **10** | one-shot | Signature-skill wind-up, energy building across the ramp (pairs with the cut-in). |
+| `cast`   | **10** | one-shot | Signature-skill wind-up, energy building across the ramp (pairs with the cut-in, and plays *after* the cut-in clears). |
+
+> **Idle fallback:** if a hero ships `attack` but no `idle` sheet, the engine
+> uses the **first frame of `attack`** as the resting pose (a neutral ready
+> stance) instead of a walk frame or the placeholder. So `idle` is strongly
+> recommended but not strictly required as long as `attack` exists.
+>
+> **Timing note:** unlike the flat-10-FPS loops, a hero's `attack` clip is
+> time-scaled to its `attackRateMs` (a fast attacker's swing speeds up), and the
+> cut-in sheet is spread across `cutInDurationMs` — so author clean, evenly
+> paced frames and let the engine set the rate.
 
 ### Enemies — DRAWN sheet is 5 rows (+1 for casters)
 
@@ -221,10 +234,10 @@ section above** — this table is just *what each tag is*.
 | `defeat` | heroes | morale broken — take a knee (heroes never die) |
 | `death` | enemies | one-shot dissolve, then the entity is destroyed |
 
-> **Heroes get a DRAWN sheet of `idle / attack / cast` only** (owner decision).
-> Their `march`, `celebrate`, and `defeat` states still exist in the engine but
-> use the built-in tween placeholder — they are **not drawn**, so don't put them
-> in a hero sprite sheet.
+> **Heroes get a DRAWN set of `idle / march / attack / cast`** plus their skill
+> cut-in. `celebrate`, `defeat`, and `stunned` still use the built-in tween
+> placeholder — they are **not drawn**, so don't put them in a hero sprite
+> sheet. If `idle` is omitted, the engine rests on the first frame of `attack`.
 > **Enemies get `march / attack / stunned / celebrate / death`** (bosses/casters
 > add `cast`). `idle` falls back to the tween/`march` placeholder, so it is not a
 > required row on an enemy sheet.
@@ -242,13 +255,14 @@ Provide the Base Concept Sheet to Claude and use the following prompt, adjusting
 > 
 > **OUTPUT RULES (critical — image models will otherwise draw these):** Fully **transparent** background (no white fill). Do NOT draw any grid lines, cell borders, boxes, guide lines, or separators. Do NOT render any text, row names, labels, numbers, or captions anywhere. Output ONLY the character art in evenly-spaced **invisible** cells.
 > 
-> **MANDATORY LAYOUT (Exactly 3 rows, one animation per row, in this top-to-bottom order — do NOT write the row names into the image):**
+> **MANDATORY LAYOUT (Exactly 4 rows, one animation per row, in this top-to-bottom order — do NOT write the row names into the image):**
 > 1. **Row 1 — `idle`:** EXACTLY 8 frames, breathing/bouncing in place, a smooth seamless loop (Back View).
-> 2. **Row 2 — `attack`:** EXACTLY 8 frames of the basic attack [Insert attack, e.g. swinging the ruler] — wind-up (frames 1–3), impact (frame 4 MUST be a clear impact frame), follow-through (frames 5–8) (Back View).
-> 3. **Row 3 — `cast`:** EXACTLY 10 frames winding up the signature skill [Insert skill, e.g. raising the megaphone], energy building steadily across the frames (Back View, dramatic).
+> 2. **Row 2 — `march`:** EXACTLY 8 frames, a seamless walk cycle advancing forward toward the enemy line (Back View).
+> 3. **Row 3 — `attack`:** EXACTLY 8 frames of the basic attack [Insert attack, e.g. swinging the ruler] — wind-up (frames 1–3), impact (frame 4 MUST be a clear impact frame), follow-through (frames 5–8) (Back View).
+> 4. **Row 4 — `cast`:** EXACTLY 10 frames winding up the signature skill [Insert skill, e.g. raising the megaphone], energy building steadily across the frames (Back View, dramatic).
 > 
 > You must verify that every single frame listed above is present in the final image grid.
-> (Heroes no longer draw `march` / `celebrate` / `defeat` — those use engine placeholders.)
+> (Heroes don't draw `celebrate` / `defeat` / `stunned` — those use engine placeholders. The skill cut-in is a separate high-res sheet, not a row here.)
 
 **Prompt for Claude (For Enemies):**
 > Attached is the base concept turnaround sheet for our character. I need you to generate a strictly formatted 2D sprite sheet for this character for a top-down auto-battler game.
@@ -292,7 +306,7 @@ If generating the 2D Ultimate Skill cut-in for a Hero, you can use Claude to gen
 Since AI image generators can sometimes hallucinate or skip frames, QA and developers MUST verify the generated sprite sheet against this checklist before slicing it in Aseprite:
 
 - [ ] **Perspective Check:** Are Hero sprites strictly TOP-BEHIND (back view, facing *away* from camera)? Are Enemy sprites TOP-FRONT (front view, facing *toward* camera)? No flat zenith, no side profiles.
-- [ ] **State Completeness:** Every required row present and correctly labelled — Heroes: `idle / attack / cast`. Enemies: `march / attack / stunned / celebrate / death` (bosses/casters add `cast`). Tag names must match `UnitModel` states exactly.
+- [ ] **State Completeness:** Every required row present and correctly labelled — Heroes: `idle / march / attack / cast` (+ a separate skill cut-in sheet; `idle` may be dropped only if `attack` exists, since the engine rests on `attack`'s first frame). Enemies: `march / attack / stunned / celebrate / death` (bosses/casters add `cast`). Tag names must match `UnitModel` states exactly.
 - [ ] **Animation Frame Count:** Count the individual frames. Does every row match its per-row count from the *Animation Standards* table (6/8/10 by motion — **never below 6**)? Under-frame rows look choppy — regenerate them.
 - [ ] **Impact Frame:** Does the Attack row have a clear, distinct frame where the weapon hits the target or the projectile is released?
 - [ ] **No baked-in grid/labels/background:** The sheet must be character art ONLY on a transparent background — **no drawn grid lines, cell borders, row-name text, numbers, or a white fill**. Image models love to draw these; if present, re-generate with the OUTPUT RULES (they can't be reliably erased). This is the single most common failure.
