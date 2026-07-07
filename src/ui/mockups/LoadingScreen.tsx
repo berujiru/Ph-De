@@ -211,17 +211,22 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
           </div>
         </div>
 
-        {/* Rotating rally tip */}
-        <div style={{
-          marginTop: '20px',
-          textAlign: 'center',
-          fontSize: '13px',
-          color: theme.colors.textMuted,
-          fontStyle: 'italic',
-          minHeight: '20px'
-        }}>
-          {tip}
-        </div>
+      </div>
+
+      {/* Rotating rally tip — pinned to the bottom edge of the screen */}
+      <div style={{
+        position: 'absolute',
+        left: 16,
+        right: 16,
+        bottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
+        textAlign: 'center',
+        fontSize: '13px',
+        color: theme.colors.textMuted,
+        fontStyle: 'italic',
+        minHeight: '20px',
+        zIndex: 2,
+      }}>
+        {tip}
       </div>
     </div>
   );

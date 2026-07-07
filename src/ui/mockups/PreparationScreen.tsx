@@ -219,11 +219,11 @@ export function PreparationScreen({ onBack, onDeploy }: PreparationScreenProps) 
           zIndex: 5,
           maxWidth: 760,
           margin: '0 auto',
-          padding: 'clamp(16px, 4vw, 36px)',
-          paddingBottom: 130,
+          padding: 'clamp(12px, 4vw, 36px)',
+          paddingBottom: 120,
           display: 'flex',
           flexDirection: 'column',
-          gap: 26,
+          gap: 18,
         }}
       >
         {/* Header */}
@@ -487,10 +487,19 @@ export function PreparationScreen({ onBack, onDeploy }: PreparationScreenProps) 
           )}
         </div>
 
-        {/* Bayanihan Act selector */}
+        {/* Bayanihan Act selector — compact chip rail so the section stays
+            short on mobile; the selected act's effect reads out on one line. */}
         <div>
           <SectionLabel>Bayanihan Act — the barrier's ultimate</SectionLabel>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 8 }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: 8,
+              overflowX: 'auto',
+              paddingBottom: 8,
+              WebkitOverflowScrolling: 'touch',
+            }}
+          >
             {BAYANIHAN_ACTS.map((act) => {
               const selected = selectedAct === act.id;
               return (
@@ -499,14 +508,16 @@ export function PreparationScreen({ onBack, onDeploy }: PreparationScreenProps) 
                   onClick={() => act.unlocked && setSelectedAct(act.id)}
                   disabled={!act.unlocked}
                   aria-pressed={selected}
+                  title={act.unlocked ? act.effect : 'Locked — earn it on the march or at the store.'}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 10,
-                    minHeight: 56,
-                    padding: '10px 12px',
-                    borderRadius: 10,
-                    textAlign: 'left',
+                    gap: 6,
+                    flexShrink: 0,
+                    minHeight: 40,
+                    padding: '8px 12px',
+                    borderRadius: 999,
+                    whiteSpace: 'nowrap',
                     border: `2px solid ${selected ? theme.colors.accent : theme.colors.borderGlass}`,
                     backgroundColor: selected ? 'rgba(56, 189, 248, 0.1)' : theme.colors.surfaceGlass,
                     color: 'inherit',
@@ -523,17 +534,23 @@ export function PreparationScreen({ onBack, onDeploy }: PreparationScreenProps) 
                       flexShrink: 0,
                     }}
                   >
-                    {act.unlocked ? (selected ? <CheckIcon size={20} /> : <MegaphoneIcon size={20} />) : <LockIcon size={20} />}
+                    {act.unlocked ? (selected ? <CheckIcon size={16} /> : <MegaphoneIcon size={16} />) : <LockIcon size={16} />}
                   </span>
-                  <span style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                    <span style={{ fontWeight: 900, fontSize: 14 }}>{act.name}</span>
-                    <span style={{ fontSize: 11.5, color: theme.colors.textMuted }}>
-                      {act.unlocked ? act.effect : 'Locked — earn it on the march or at the store.'}
-                    </span>
-                  </span>
+                  <span style={{ fontWeight: 900, fontSize: 13 }}>{act.name}</span>
                 </button>
               );
             })}
+          </div>
+          {/* Selected act effect — single line instead of per-card descriptions */}
+          <div style={{ fontSize: 12, color: theme.colors.textSecondary, minHeight: 18, marginTop: 2 }}>
+            {(() => {
+              const act = BAYANIHAN_ACTS.find((a) => a.id === selectedAct);
+              return act ? (
+                <>
+                  <strong style={{ color: theme.colors.accent }}>{act.name}:</strong> {act.effect}
+                </>
+              ) : null;
+            })()}
           </div>
         </div>
       </div>

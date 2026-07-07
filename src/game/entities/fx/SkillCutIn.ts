@@ -200,19 +200,20 @@ export class SkillCutIn {
     // Parallelogram corners (TL, TR, BR, BL), container-relative. `position`
     // flips which way the slash leans.
     const leanRight = options.position === 'right';
-    const pts = leanRight
+    const corners: [number, number][] = leanRight
       ? [
-          { x: -halfW, y: -halfH },
-          { x: halfW, y: -halfH + slant },
-          { x: halfW, y: halfH },
-          { x: -halfW, y: halfH - slant },
+          [-halfW, -halfH],
+          [halfW, -halfH + slant],
+          [halfW, halfH],
+          [-halfW, halfH - slant],
         ]
       : [
-          { x: -halfW, y: -halfH + slant },
-          { x: halfW, y: -halfH },
-          { x: halfW, y: halfH - slant },
-          { x: -halfW, y: halfH },
+          [-halfW, -halfH + slant],
+          [halfW, -halfH],
+          [halfW, halfH - slant],
+          [-halfW, halfH],
         ];
+    const pts = corners.map(([x, y]) => new Phaser.Math.Vector2(x, y));
 
     // Dark backdrop, faded in with the container.
     const overlay = scene.add.rectangle(GAME_WIDTH / 2, centerY, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.85);
@@ -242,7 +243,7 @@ export class SkillCutIn {
     // camera (scrollFactor 0) to stay aligned with the viewport-locked container.
     const maskShape = scene.make.graphics({}, false);
     maskShape.fillStyle(0xffffff);
-    maskShape.fillPoints(pts.map((p) => ({ x: p.x + GAME_WIDTH / 2, y: p.y + centerY })), true);
+    maskShape.fillPoints(pts.map((p) => new Phaser.Math.Vector2(p.x + GAME_WIDTH / 2, p.y + centerY)), true);
     maskShape.setScrollFactor(0);
     sprite.setMask(maskShape.createGeometryMask());
 
@@ -303,8 +304,8 @@ export class SkillCutIn {
    */
   private drawHazardEdge(
     g: Phaser.GameObjects.Graphics,
-    a: { x: number; y: number },
-    b: { x: number; y: number },
+    a: Phaser.Math.Vector2,
+    b: Phaser.Math.Vector2,
     inwardY: 1 | -1,
   ): void {
     const dx = b.x - a.x;
@@ -327,10 +328,10 @@ export class SkillCutIn {
       g.fillStyle(i % 2 === 0 ? SkillCutIn.HAZARD_YELLOW : 0x111111, 1);
       g.fillPoints(
         [
-          { x: a.x + ux * d, y: a.y + uy * d },
-          { x: a.x + ux * e, y: a.y + uy * e },
-          { x: a.x + ux * e + nx * t, y: a.y + uy * e + ny * t },
-          { x: a.x + ux * d + nx * t, y: a.y + uy * d + ny * t },
+          new Phaser.Math.Vector2(a.x + ux * d, a.y + uy * d),
+          new Phaser.Math.Vector2(a.x + ux * e, a.y + uy * e),
+          new Phaser.Math.Vector2(a.x + ux * e + nx * t, a.y + uy * e + ny * t),
+          new Phaser.Math.Vector2(a.x + ux * d + nx * t, a.y + uy * d + ny * t),
         ],
         true,
       );

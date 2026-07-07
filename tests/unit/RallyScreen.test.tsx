@@ -31,7 +31,7 @@ describe('RallyScreen', () => {
     render(<RallyScreen onReturnToMenu={vi.fn()} />);
     expect(screen.queryByText('A Voice Rises!')).not.toBeInTheDocument();
     expect(screen.queryByText('Spoils of War')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Pause' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Game speed' })).toBeEnabled();
   });
 
   it('shows the drop overlay on voicesFull, including rarity and Buhis-Buhay risk framing', () => {
@@ -99,9 +99,27 @@ describe('RallyScreen', () => {
     render(<RallyScreen onReturnToMenu={vi.fn()} />);
     act(() => gameToUiEvents.emit('stateChanged', snapshot({ status: 'won' })));
 
-    expect(screen.getByRole('button', { name: 'Pause' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Toggle game speed' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Game speed' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Surrender' })).toBeDisabled();
+  });
+
+  it('cycles the speed control 1x → 2x → paused → 1x', () => {
+    render(<RallyScreen onReturnToMenu={vi.fn()} />);
+    const setSpeed = vi.fn();
+    const unsub = uiToGameEvents.on('setSpeed', setSpeed);
+    const btn = screen.getByRole('button', { name: 'Game speed' });
+
+    fireEvent.click(btn); // 1x -> 2x
+    expect(setSpeed).toHaveBeenLastCalledWith({ speed: 2 });
+
+    act(() => gameToUiEvents.emit('stateChanged', snapshot({ gameSpeed: 2 })));
+    fireEvent.click(btn); // 2x -> paused
+    expect(setSpeed).toHaveBeenLastCalledWith({ speed: 0 });
+
+    act(() => gameToUiEvents.emit('stateChanged', snapshot({ gameSpeed: 0 })));
+    fireEvent.click(btn); // paused -> 1x
+    expect(setSpeed).toHaveBeenLastCalledWith({ speed: 1 });
+    unsub();
   });
 
   it('pauses on opening Battle Intel and restores the previous speed on close', () => {

@@ -15,17 +15,26 @@ export class EnemyModel extends UnitModel {
   private shadow: Phaser.GameObjects.Ellipse;
   /** Ring behind the body used for passive telegraphs (fake HP / immunity). */
   private outline: Phaser.GameObjects.Arc;
+  /** Size-tier factor relative to the original 38px blob — scales offsets. */
+  private readonly f: number;
+  /** Sprite scale that renders the body at its size-tier height. */
+  private baseScaleX = 1;
+  private baseScaleY = 1;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, tint: number, spriteKey?: string) {
+  constructor(scene: Phaser.Scene, x: number, y: number, tint: number, spriteKey?: string, sizePx = 38) {
     super(scene, x, y);
-    this.shadow = scene.add.ellipse(0, 16, 28, 9, 0x000000, 0.35);
+    const f = sizePx / 38;
+    this.f = f;
+    this.shadow = scene.add.ellipse(0, 16 * f, 28 * f, 9 * f, 0x000000, 0.35);
     this.add(this.shadow);
-    this.outline = scene.add.circle(0, 0, 18, 0x000000, 0);
+    this.outline = scene.add.circle(0, 0, 18 * f, 0x000000, 0);
     this.outline.setVisible(false);
     this.add(this.outline);
     const key = spriteKey && scene.textures.exists(spriteKey) ? spriteKey : 'enemy-base';
     this.bodySprite = scene.add.sprite(0, 0, key);
-    this.bodySprite.setDisplaySize(38, 38);
+    this.bodySprite.setDisplaySize(sizePx, sizePx);
+    this.baseScaleX = this.bodySprite.scaleX;
+    this.baseScaleY = this.bodySprite.scaleY;
     // Tint is the placeholder's per-enemy identity; a real sheet ships its own colors.
     if (key === 'enemy-base') this.bodySprite.setTint(tint);
 
@@ -40,7 +49,7 @@ export class EnemyModel extends UnitModel {
 
   override get muzzleOffset(): { x: number; y: number } {
     // Enemies face left (toward the rally).
-    return { x: -14, y: 0 };
+    return { x: -14 * this.f, y: 0 };
   }
 
   /** Passive telegraphs (fake HP shield, hit immunity) render as a ring. */
@@ -60,7 +69,7 @@ export class EnemyModel extends UnitModel {
 
   protected resetPose(): void {
     this.bodySprite.setPosition(0, 0);
-    this.bodySprite.setScale(1);
+    this.bodySprite.setScale(this.baseScaleX, this.baseScaleY);
     this.bodySprite.setAlpha(1);
     this.shadow.setScale(1);
   }
@@ -71,7 +80,8 @@ export class EnemyModel extends UnitModel {
     return [
       this.scene.tweens.add({
         targets: this.bodySprite,
-        scale: 1.06,
+        scaleX: this.baseScaleX * 1.06,
+        scaleY: this.baseScaleY * 1.06,
         yoyo: true,
         repeat: -1,
         duration: 600,
@@ -87,9 +97,9 @@ export class EnemyModel extends UnitModel {
     return [
       this.scene.tweens.add({
         targets: this.bodySprite,
-        y: -5,
-        scaleX: 1.08,
-        scaleY: 0.92,
+        y: -5 * this.f,
+        scaleX: this.baseScaleX * 1.08,
+        scaleY: this.baseScaleY * 0.92,
         yoyo: true,
         repeat: -1,
         duration,
@@ -127,8 +137,8 @@ export class EnemyModel extends UnitModel {
     return [
       this.scene.tweens.add({
         targets: this.bodySprite,
-        x: -8,
-        scaleX: 1.12,
+        x: -8 * this.f,
+        scaleX: this.baseScaleX * 1.12,
         yoyo: true,
         repeat: -1,
         duration: 220,
@@ -144,9 +154,9 @@ export class EnemyModel extends UnitModel {
     return [
       this.scene.tweens.add({
         targets: this.bodySprite,
-        scaleX: 0.85,
-        scaleY: 0.85,
-        y: 4,
+        scaleX: this.baseScaleX * 0.85,
+        scaleY: this.baseScaleY * 0.85,
+        y: 4 * this.f,
         duration: 400,
         ease: 'Quad.easeIn',
       }),
@@ -158,7 +168,7 @@ export class EnemyModel extends UnitModel {
     // Lunge toward the shield (left).
     this.scene.tweens.add({
       targets: this.bodySprite,
-      x: -10,
+      x: -10 * this.f,
       yoyo: true,
       duration: 100,
       onComplete,
@@ -168,7 +178,7 @@ export class EnemyModel extends UnitModel {
   protected playCast(onComplete: () => void): void {
     if (this.playOneShotAnim('cast', onComplete)) return;
     // Boss skill telegraph — dark expanding ring.
-    const ring = this.scene.add.circle(0, 0, 18, 0x000000, 0.25);
+    const ring = this.scene.add.circle(0, 0, 18 * this.f, 0x000000, 0.25);
     ring.setStrokeStyle(2, 0xffffff, 0.8);
     this.add(ring);
     this.scene.tweens.add({
@@ -180,7 +190,8 @@ export class EnemyModel extends UnitModel {
     });
     this.scene.tweens.add({
       targets: this.bodySprite,
-      scale: 1.3,
+      scaleX: this.baseScaleX * 1.3,
+      scaleY: this.baseScaleY * 1.3,
       yoyo: true,
       duration: 200,
       onComplete,
@@ -194,9 +205,9 @@ export class EnemyModel extends UnitModel {
     // Collapse and dissolve (placeholder).
     this.scene.tweens.add({
       targets: this.bodySprite,
-      scaleY: 0.2,
-      scaleX: 1.4,
-      y: 10,
+      scaleY: this.baseScaleY * 0.2,
+      scaleX: this.baseScaleX * 1.4,
+      y: 10 * this.f,
       alpha: 0,
       duration: 300,
       ease: 'Quad.easeIn',

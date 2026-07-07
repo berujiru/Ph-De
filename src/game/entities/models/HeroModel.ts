@@ -15,25 +15,29 @@ export class HeroModel extends UnitModel {
   private bodySprite: Phaser.GameObjects.Sprite;
   private readonly baseW: number;
   private readonly baseH: number;
+  private readonly sizePx: number;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, tint: number, spriteKey?: string) {
+  constructor(scene: Phaser.Scene, x: number, y: number, tint: number, spriteKey?: string, sizePx = 64) {
     super(scene, x, y);
+    this.sizePx = sizePx;
     // Only treat spriteKey as real art if its texture actually loaded; otherwise
     // fall back to the shared placeholder so a missing sheet can't green-box.
     const hasArt = !!spriteKey && scene.textures.exists(spriteKey);
     const key = hasArt ? spriteKey! : 'hero-base';
     this.bodySprite = scene.add.sprite(0, 0, key);
     if (hasArt) {
-      // Scale the real sheet to a target height, preserving the frame's aspect
-      // ratio so non-square frames (e.g. 256x170) aren't squished into a box.
-      const targetH = 64;
+      // Scale the real sheet to the size-class height (UNIT_RENDER_SIZES),
+      // preserving the frame's aspect ratio so non-square frames (e.g.
+      // 256x170) aren't squished into a box.
+      const targetH = sizePx;
       const frameW = this.bodySprite.width || targetH;
       const frameH = this.bodySprite.height || targetH;
       this.baseH = targetH;
       this.baseW = targetH * (frameW / frameH);
     } else {
-      this.baseW = 40;
-      this.baseH = 54;
+      // Placeholder keeps its original 40:54 proportions, scaled to the tier.
+      this.baseH = Math.round(sizePx * 0.85);
+      this.baseW = Math.round(this.baseH * (40 / 54));
       this.bodySprite.setTint(tint);
     }
     this.bodySprite.setDisplaySize(this.baseW, this.baseH);
@@ -48,7 +52,8 @@ export class HeroModel extends UnitModel {
   }
 
   override get muzzleOffset(): { x: number; y: number } {
-    return { x: 16, y: -8 };
+    const f = this.sizePx / 64;
+    return { x: 16 * f, y: -8 * f };
   }
 
   protected bodyTarget(): Phaser.GameObjects.GameObject {

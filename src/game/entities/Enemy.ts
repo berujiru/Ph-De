@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import type { EnemyDefinition } from '../data/balance';
-import { ENEMY_VISUALS } from '../data/balance';
+import { ENEMY_VISUALS, UNIT_RENDER_SIZES, enemySizeClass } from '../data/balance';
 import type { MoraleShield } from './MoraleShield';
 import type { Summon } from './Summon';
 import type { ISkillEnemy } from '../core/Skills';
@@ -51,6 +51,8 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
   private hpBarFill: Phaser.GameObjects.Rectangle;
   public isDead = false;
   private attackCooldown = 0;
+  /** Render height (px) from the unit's size tier — offsets hang off this. */
+  private readonly sizePx: number;
 
   // Passives
   public isStealthed = false;
@@ -79,11 +81,17 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     this.definition = definition;
     this.hp = definition.maxHp;
 
-    this.model = new EnemyModel(scene, 0, 0, definition.color, definition.spriteKey ?? definition.id);
+    // Size tier drives the model height and how far the HP bar sits above it:
+    // minion < miniboss < boss (bosses tower over heroes).
+    const sizePx = UNIT_RENDER_SIZES[enemySizeClass(definition)];
+    this.sizePx = sizePx;
+    this.model = new EnemyModel(scene, 0, 0, definition.color, definition.spriteKey ?? definition.id, sizePx);
     this.add(this.model);
 
-    this.hpBarBg = scene.add.rectangle(0, -25, 30, 6, 0x000000, 0.5);
-    this.hpBarFill = scene.add.rectangle(0, -25, 30, 6, 0x22c55e);
+    const barY = -(sizePx / 2 + 8);
+    const barW = Math.max(30, Math.round(sizePx * 0.75));
+    this.hpBarBg = scene.add.rectangle(0, barY, barW, 6, 0x000000, 0.5);
+    this.hpBarFill = scene.add.rectangle(0, barY, barW, 6, 0x22c55e);
     this.add([this.hpBarBg, this.hpBarFill]);
 
     scene.add.existing(this);
@@ -106,7 +114,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     }
 
     if (definition.id === 'sandbox_target') {
-      this.setSize(30, 30);
+      this.setSize(sizePx, sizePx);
       this.setInteractive({ draggable: true });
       this.on('drag', (_pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
         this.x = dragX;
@@ -209,7 +217,8 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     // Create icon if doesn't exist
     if (!this.ailmentIcons[type]) {
       const idx = Object.keys(this.ailmentIcons).length;
-      const icon = this.scene.add.text(-15 + (idx * 15), -45, AILMENT_ICONS[type], { fontSize: '12px' }).setOrigin(0.5);
+      const iconY = -(this.sizePx / 2 + 24); // above the HP bar
+      const icon = this.scene.add.text(-15 + (idx * 15), iconY, AILMENT_ICONS[type], { fontSize: '12px' }).setOrigin(0.5);
       this.add(icon);
       this.ailmentIcons[type] = icon;
     }

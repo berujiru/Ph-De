@@ -13,6 +13,16 @@ import { FX } from '../data/level';
  * reported as barrierHp/maxBarrierHp in the snapshot ("Morale" in the HUD). The
  * scene moves it via `y` as the formation advances up.
  */
+/**
+ * Morale color ramp — healthy sky-blue, worried amber, critical red. The wall,
+ * edges and score all shift together so the barrier itself reads as the HP bar.
+ */
+const MORALE_TIERS = [
+  { min: 0.6, core: 0x38bdf8, bright: 0x7dd3fc },
+  { min: 0.3, core: 0xf59e0b, bright: 0xfcd34d },
+  { min: 0, core: 0xef4444, bright: 0xfca5a5 },
+] as const;
+
 export class MoraleShield extends Phaser.GameObjects.Container {
   public hp: number;
   public maxHp: number;
@@ -23,6 +33,8 @@ export class MoraleShield extends Phaser.GameObjects.Container {
   private shimmer: Phaser.GameObjects.Rectangle;
   private edgeGlow: Phaser.GameObjects.Rectangle;
   private edge: Phaser.GameObjects.Rectangle;
+  /** The morale score, rendered on the barrier itself (no HUD pill). */
+  private scoreLabel: Phaser.GameObjects.Text;
 
   constructor(scene: Phaser.Scene, x: number, y: number, width: number, height: number, maxHp: number) {
     super(scene, x, y);
@@ -42,7 +54,16 @@ export class MoraleShield extends Phaser.GameObjects.Container {
     // drawn ahead of the wall (playtesters read a detached arc as a second shield).
     this.edgeGlow = scene.add.rectangle(0, -height / 2 + 5, width, 10, 0x38bdf8, 0.3);
     this.edge = scene.add.rectangle(0, -height / 2 + 2, width, 4, 0x7dd3fc, 0.9);
-    this.add([this.bloom, this.wall, this.shimmer, this.edgeGlow, this.edge]);
+    // Morale score lives ON the barrier (replaces the HUD pill).
+    this.scoreLabel = scene.add.text(0, 0, `${maxHp}`, {
+      fontSize: '30px',
+      fontStyle: 'bold',
+      color: '#e0f2fe',
+      stroke: '#0f172a',
+      strokeThickness: 5,
+    }).setOrigin(0.5);
+    this.add([this.bloom, this.wall, this.shimmer, this.edgeGlow, this.edge, this.scoreLabel]);
+    this.refreshMoraleVisual();
 
     // Idle morale pulse.
     scene.tweens.add({
@@ -78,6 +99,9 @@ export class MoraleShield extends Phaser.GameObjects.Container {
       try { this.scene.sound.play('sfx-barrier-hit'); } catch (e) {}
     }
 
+    // Barrier IS the HP readout — retint + update the on-wall score.
+    this.refreshMoraleVisual();
+
     // Reactive flash: the leading edge flares white and a crack skitters down it.
     this.flashEdge();
     this.spawnCrack();
@@ -92,6 +116,30 @@ export class MoraleShield extends Phaser.GameObjects.Container {
     });
   }
 
+  /** Current color tier for the hp ratio — drives every layer + the score. */
+  private moraleTier() {
+    const ratio = this.maxHp > 0 ? this.hp / this.maxHp : 0;
+    return MORALE_TIERS.find((t) => ratio >= t.min) ?? MORALE_TIERS[MORALE_TIERS.length - 1];
+  }
+
+  /**
+   * Make the barrier itself read as the morale meter: color shifts
+   * blue → amber → red as hp drops, the energy core thins out, and the
+   * on-wall score updates.
+   */
+  private refreshMoraleVisual(): void {
+    const ratio = this.maxHp > 0 ? this.hp / this.maxHp : 0;
+    const tier = this.moraleTier();
+    this.bloom.setFillStyle(tier.core, 0.08);
+    // Core thins as morale drains — a nearly-broken wall looks nearly gone.
+    this.wall.setFillStyle(tier.core, 0.08 + 0.14 * ratio);
+    this.shimmer.setFillStyle(tier.bright, 0.12);
+    this.edgeGlow.setFillStyle(tier.core, 0.3);
+    this.edge.setFillStyle(tier.bright, 0.9);
+    this.scoreLabel.setText(`${this.hp}`);
+    this.scoreLabel.setColor(ratio > 0.6 ? '#e0f2fe' : ratio > 0.3 ? '#fef3c7' : '#fee2e2');
+  }
+
   private flashEdge(): void {
     this.edge.setFillStyle(0xffffff);
     this.edgeGlow.setFillStyle(0xffffff);
@@ -101,8 +149,9 @@ export class MoraleShield extends Phaser.GameObjects.Container {
       yoyo: true,
       duration: 90,
       onComplete: () => {
-        this.edge.setFillStyle(0x7dd3fc);
-        this.edgeGlow.setFillStyle(0x38bdf8);
+        const tier = this.moraleTier();
+        this.edge.setFillStyle(tier.bright, 0.9);
+        this.edgeGlow.setFillStyle(tier.core, 0.3);
       },
     });
   }
@@ -130,6 +179,12 @@ export class MoraleShield extends Phaser.GameObjects.Container {
       duration: 220,
       onComplete: () => crackLines.forEach(l => l.destroy()),
     });
+  }
+
+  /** Restore morale (e.g. the Barrier Patch drop) and re-sync the visual. */
+  heal(amount: number): void {
+    this.hp = Math.min(this.maxHp, this.hp + amount);
+    this.refreshMoraleVisual();
   }
 
   get isDead() {

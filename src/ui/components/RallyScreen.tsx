@@ -10,7 +10,6 @@ import {
   type GameStateSnapshot,
 } from '../../game/core/GameEvents';
 import {
-  BarrierIcon,
   BarricadeIcon,
   ChestIcon,
   HeroCardIcon,
@@ -383,98 +382,6 @@ function SpoilRow({ icon, iconColor, label, value, valueColor, prefix = '+', suf
   );
 }
 
-/**
- * A "vital sign" HUD pill — Morale and Voices are the two readings the player
- * must never miss, so they share a bold framed treatment: an icon chip, a
- * stamped label, a live numeric read-out, and a thick gradient track.
- */
-function VitalPill({
-  icon,
-  color,
-  label,
-  value,
-  ratio,
-  ariaLabel,
-  alarm = false,
-  pulse = false,
-  glowTrack = false,
-  trackWidth = 64,
-}: {
-  icon: ReactNode;
-  color: string;
-  label: string;
-  value: ReactNode;
-  ratio: number;
-  ariaLabel: string;
-  alarm?: boolean;
-  pulse?: boolean;
-  glowTrack?: boolean;
-  trackWidth?: number;
-}) {
-  const pct = Math.max(0, Math.min(1, ratio)) * 100;
-  const active = alarm || pulse;
-  return (
-    <div
-      aria-label={ariaLabel}
-      style={{
-        ...hudPill,
-        border: `1px solid ${active ? withAlpha(color, 0.6) : glass.border}`,
-        animation: alarm
-          ? 'morale-alarm 0.9s ease-in-out infinite'
-          : pulse
-            ? 'voices-pulse 1s ease-in-out infinite'
-            : undefined,
-      }}
-    >
-      <span
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 30,
-          height: 30,
-          borderRadius: 8,
-          flexShrink: 0,
-          backgroundColor: withAlpha(color, 0.16),
-          border: `1px solid ${withAlpha(color, 0.4)}`,
-          color,
-        }}
-      >
-        {icon}
-      </span>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
-          <span style={{ ...stampLabel, fontSize: 9, color: theme.colors.textMuted }}>{label}</span>
-          <span style={{ fontSize: 12, fontWeight: 800, color, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
-            {value}
-          </span>
-        </div>
-        <div
-          style={{
-            width: trackWidth,
-            height: 7,
-            borderRadius: 4,
-            backgroundColor: withAlpha(theme.colors.background, 0.7),
-            border: `1px solid ${withAlpha(theme.colors.background, 0.9)}`,
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              width: `${pct}%`,
-              height: '100%',
-              borderRadius: 4,
-              background: `linear-gradient(90deg, ${withAlpha(color, 0.75)}, ${color})`,
-              boxShadow: glowTrack ? `0 0 8px ${withAlpha(color, 0.8)}` : undefined,
-              transition: 'width 0.3s ease, background 0.3s ease',
-            }}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* ------------------------------------------------------------------ */
 /* RallyScreen                                                           */
 /* ------------------------------------------------------------------ */
@@ -517,20 +424,11 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
   const won = state.status === 'won';
   const paused = state.isPaused || state.gameSpeed === 0;
 
-  const togglePause = () => {
+  /** Single compact control cycles play (1x) → fast (2x) → paused → play. */
+  const cycleSpeed = () => {
     playBtnSound();
-    if (paused) {
-      handleSetSpeed(lastSpeedRef.current || 1);
-    } else {
-      lastSpeedRef.current = state.gameSpeed || 1;
-      handleSetSpeed(0);
-    }
-  };
-
-  const toggleSpeed = () => {
-    playBtnSound();
-    const next = state.gameSpeed === 2 ? 1 : 2;
-    lastSpeedRef.current = next;
+    const next = paused ? 1 : state.gameSpeed === 1 ? 2 : 0;
+    if (next > 0) lastSpeedRef.current = next;
     handleSetSpeed(next);
   };
 
@@ -571,8 +469,6 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
     setDropOptions([]);
   };
 
-  const moraleRatio = state.maxBarrierHp > 0 ? state.barrierHp / state.maxBarrierHp : 0;
-  const moraleLow = moraleRatio <= 0.35;
   const voicesRatio = state.maxVoicesCount > 0 ? state.voicesCount / state.maxVoicesCount : 0;
   const voicesNearFull = voicesRatio >= 0.75;
 
@@ -600,18 +496,8 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
           padding: '10px 8px 0',
         }}
       >
-        {/* Left: Morale (vital sign) + wave placard chip */}
+        {/* Left: wave placard chip (Morale now reads on the barrier itself) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, pointerEvents: 'auto' }}>
-          <VitalPill
-            ariaLabel={`Morale ${state.barrierHp} of ${state.maxBarrierHp}`}
-            icon={<BarrierIcon size={18} />}
-            color={moraleLow ? theme.colors.danger : theme.colors.success}
-            label="Morale"
-            value={state.barrierHp}
-            ratio={moraleRatio}
-            alarm={moraleLow}
-          />
-
           <div
             style={{
               ...hudPill,
@@ -648,33 +534,82 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
           </div>
         </div>
 
-        {/* Center: Voices (vital sign) — pulses when a drop is close */}
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', pointerEvents: 'auto' }}>
-          <VitalPill
-            ariaLabel={`Voices ${state.voicesCount} of ${state.maxVoicesCount}`}
-            icon={<VoicesIcon size={18} />}
-            color={theme.colors.accent}
-            label="Voices"
-            value={`${state.voicesCount}/${state.maxVoicesCount}`}
-            ratio={voicesRatio}
-            pulse={voicesNearFull}
-            glowTrack
-            trackWidth={64}
-          />
+        {/* Center: Voices — a bare progress bar (no card), pulses near full */}
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', pointerEvents: 'auto', paddingTop: 6 }}>
+          <div
+            aria-label={`Voices ${state.voicesCount} of ${state.maxVoicesCount}`}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              width: 'min(44vw, 190px)',
+              animation: voicesNearFull ? 'voices-pulse 1s ease-in-out infinite' : undefined,
+            }}
+          >
+            <span style={{ color: theme.colors.accent, display: 'flex', flexShrink: 0 }}>
+              <VoicesIcon size={16} />
+            </span>
+            <div
+              style={{
+                flex: 1,
+                height: 10,
+                borderRadius: 5,
+                backgroundColor: withAlpha(theme.colors.background, 0.55),
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  width: `${Math.max(0, Math.min(1, voicesRatio)) * 100}%`,
+                  height: '100%',
+                  borderRadius: 5,
+                  background: `linear-gradient(90deg, ${withAlpha(theme.colors.accent, 0.75)}, ${theme.colors.accent})`,
+                  boxShadow: `0 0 8px ${withAlpha(theme.colors.accent, 0.8)}`,
+                  transition: 'width 0.3s ease',
+                }}
+              />
+            </div>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                color: theme.colors.accent,
+                fontVariantNumeric: 'tabular-nums',
+                flexShrink: 0,
+                textShadow: `0 1px 2px ${withAlpha(theme.colors.background, 0.9)}`,
+              }}
+            >
+              {state.voicesCount}/{state.maxVoicesCount}
+            </span>
+          </div>
         </div>
 
-        {/* Right: circular FABs (pause / speed / corner menu) */}
+        {/* Right: circular FABs (cyclable speed / intel / surrender) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end', pointerEvents: 'auto' }}>
+          {/* One compact control cycles ▶ 1x → ⏩ 2x → ⏸ paused → ▶ 1x. */}
           <button
             type="button"
             className="hud-btn"
-            style={fab}
-            onClick={togglePause}
+            style={{
+              ...fab,
+              flexDirection: 'column',
+              gap: 0,
+              color: paused
+                ? theme.colors.textMuted
+                : state.gameSpeed === 2
+                  ? theme.colors.accent
+                  : theme.colors.textPrimary,
+              border: `1px solid ${state.gameSpeed === 2 && !paused ? withAlpha(theme.colors.accent, 0.6) : glass.border}`,
+            }}
+            onClick={cycleSpeed}
             disabled={gameOver}
-            aria-label={paused ? 'Resume' : 'Pause'}
-            title={paused ? 'Resume' : 'Pause'}
+            aria-label="Game speed"
+            title={paused ? 'Paused — tap to play' : state.gameSpeed === 2 ? '2x — tap to pause' : '1x — tap for 2x'}
           >
-            {paused ? <PlayIcon size={20} /> : <PauseIcon size={20} />}
+            {paused ? <PauseIcon size={16} /> : state.gameSpeed === 2 ? <SpeedIcon size={16} /> : <PlayIcon size={16} />}
+            <span style={{ fontSize: 9, fontWeight: 800, lineHeight: 1 }}>
+              {paused ? '❚❚' : state.gameSpeed === 2 ? '2x' : '1x'}
+            </span>
           </button>
 
           <button
@@ -687,28 +622,6 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
             title="Battle Intel"
           >
             <BrainIcon size={20} />
-          </button>
-
-          <button
-            type="button"
-            className="hud-btn"
-            style={{
-              ...fab,
-              flexDirection: 'column',
-              gap: 0,
-              color: state.gameSpeed === 2 ? theme.colors.accent : theme.colors.textPrimary,
-              border: `1px solid ${state.gameSpeed === 2 ? withAlpha(theme.colors.accent, 0.6) : glass.border}`,
-            }}
-            onClick={toggleSpeed}
-            disabled={gameOver}
-            aria-pressed={state.gameSpeed === 2}
-            aria-label="Toggle game speed"
-            title="Toggle game speed"
-          >
-            <SpeedIcon size={16} />
-            <span style={{ fontSize: 9, fontWeight: 800, lineHeight: 1 }}>
-              {state.gameSpeed === 2 ? '2x' : '1x'}
-            </span>
           </button>
 
           <button

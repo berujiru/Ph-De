@@ -224,11 +224,9 @@ export class GameScene extends Phaser.Scene {
         def.activeSkill = { name: 'Sandbox Horde', effect: 'resurrectAll' };
       }
 
-      // Sandbox keeps the static camera and spawns just above the visible top;
-      // live battles spawn ahead of (above) the advancing formation.
-      const y = this.isSandbox
-        ? this.cameras.main.scrollY - ENEMY_SPAWN_Y_OFFSET
-        : this.shield.y - RALLY.enemySpawnAheadPx;
+      // Spawn just above the visible top of the screen so enemies always walk
+      // in from the top edge (the camera tracks the shield in live battles).
+      const y = this.cameras.main.scrollY - ENEMY_SPAWN_Y_OFFSET;
       const enemy = new Enemy(this, x, y, def);
       this.enemies.push(enemy);
     });
@@ -751,9 +749,11 @@ export class GameScene extends Phaser.Scene {
   }
 
   private spawnEnemy() {
-    // Scatter across the lane (X); spawn ahead of (above) the formation, off-camera at the top.
+    // Scatter across the lane (X); spawn just above the visible top of the
+    // screen so enemies enter from the top edge of what the player sees.
     const x = Phaser.Math.Between(50, GAME_WIDTH - 50);
-    const enemy = new Enemy(this, x, this.shield.y - RALLY.enemySpawnAheadPx, ENEMY_DEFINITIONS['grunt']);
+    const y = this.cameras.main.scrollY - ENEMY_SPAWN_Y_OFFSET;
+    const enemy = new Enemy(this, x, y, ENEMY_DEFINITIONS['grunt']);
     this.enemies.push(enemy);
   }
 
@@ -875,7 +875,7 @@ export class GameScene extends Phaser.Scene {
       const heroId = dropId.slice('hero:'.length) as HeroId;
       this.spawnHero(heroId);
     } else if (dropId === 'global:moraleHeal') {
-      this.shield.hp = Math.min(this.shield.maxHp, this.shield.hp + GLOBAL_DROP_DEFS.moraleHeal.magnitude);
+      this.shield.heal(GLOBAL_DROP_DEFS.moraleHeal.magnitude);
     } else if (dropId.startsWith('upgrade:')) {
       const [, heroId, kind] = dropId.split(':');
       this.applyHeroUpgrade(heroId, kind as UpgradeKind);

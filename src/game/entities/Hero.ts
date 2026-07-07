@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import type { Enemy } from './Enemy';
 import type { AttackModifiers } from './Attacks';
-import { ATTACK_STYLE_BADGES, type HeroDefinition, type UpgradeKind } from '../data/balance';
+import { ATTACK_STYLE_BADGES, UNIT_RENDER_SIZES, type HeroDefinition, type UpgradeKind } from '../data/balance';
 import { RALLY } from '../data/level';
 import { formationTargetY, stepTowardFormation } from '../core/RallyMarch';
 import { applyHeroPassive, type ISkillHero } from '../core/Skills';
@@ -61,10 +61,13 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.rangeIndicator.setVisible(false);
     this.add(this.rangeIndicator);
 
-    this.model = new HeroModel(scene, 0, 0, def.color, def.spriteKey ?? def.id);
+    // Heroes render at the 'hero' size tier; labels/bars hang off its half-height.
+    const sizePx = UNIT_RENDER_SIZES.hero;
+    const half = sizePx / 2;
+    this.model = new HeroModel(scene, 0, 0, def.color, def.spriteKey ?? def.id, sizePx);
     this.add(this.model);
 
-    const nameLabel = scene.add.text(0, 25, def.name, {
+    const nameLabel = scene.add.text(0, half + 4, def.name, {
       fontSize: '10px',
       color: '#ffffff',
       align: 'center',
@@ -73,7 +76,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
 
     // Attack-type hint chip — quick read on what this hero's basic attack does.
     const badge = ATTACK_STYLE_BADGES[def.attackStyle];
-    const badgeChip = scene.add.text(0, 38, badge.label, {
+    const badgeChip = scene.add.text(0, half + 17, badge.label, {
       fontSize: '9px',
       fontStyle: 'bold',
       color: '#0f172a',
@@ -82,25 +85,25 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     }).setOrigin(0.5, 0);
     this.add(badgeChip);
 
-    this.skillHighlight = scene.add.text(0, -45, '★ SKILL', { fontSize: '12px', color: '#facc15', fontStyle: 'bold' }).setOrigin(0.5);
+    this.skillHighlight = scene.add.text(0, -(half + 24), '★ SKILL', { fontSize: '12px', color: '#facc15', fontStyle: 'bold' }).setOrigin(0.5);
     this.skillHighlight.setVisible(false);
     this.add(this.skillHighlight);
 
     // Cooldown bars
-    this.attackBarBg = scene.add.rectangle(0, -25, 30, 4, 0x000000);
+    this.attackBarBg = scene.add.rectangle(0, -(half + 8), 30, 4, 0x000000);
     this.add(this.attackBarBg);
-    this.attackBarFill = scene.add.rectangle(-15, -25, 30, 4, 0x00ff00);
+    this.attackBarFill = scene.add.rectangle(-15, -(half + 8), 30, 4, 0x00ff00);
     this.attackBarFill.setOrigin(0, 0.5);
     this.add(this.attackBarFill);
 
-    this.skillBarBg = scene.add.rectangle(0, -32, 30, 4, 0x000000);
+    this.skillBarBg = scene.add.rectangle(0, -(half + 15), 30, 4, 0x000000);
     this.add(this.skillBarBg);
-    this.skillBarFill = scene.add.rectangle(-15, -32, 30, 4, 0xffff00);
+    this.skillBarFill = scene.add.rectangle(-15, -(half + 15), 30, 4, 0xffff00);
     this.skillBarFill.setOrigin(0, 0.5);
     this.add(this.skillBarFill);
 
-    // Make interactive
-    this.setSize(40, 60);
+    // Make interactive — hit area tracks the size tier.
+    this.setSize(Math.round(sizePx * 0.7), sizePx + 30);
     this.setInteractive({ useHandCursor: true });
     this.on('pointerdown', () => {
       this.useSkill();
