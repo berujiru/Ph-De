@@ -60,7 +60,13 @@ export class GameScene extends Phaser.Scene {
     // Heroes → public/assets/heroes/, enemies → public/assets/enemies/.
     // Re-enable once a corrected top-down, transparent eden sheet is generated:
     // this.load.aseprite('eden', '/assets/heroes/eden.png', '/assets/heroes/eden.json');
+    // Eden's in-battle sheets. The walk sheet is keyed 'eden' (her spriteKey) so
+    // it doubles as the model's base texture — that makes HeroModel resolve its
+    // animation base to `eden`, so `eden-march`/`eden-attack`/`eden-cast` play
+    // instead of the tween placeholders.
+    this.load.spritesheet('eden', '/assets/heroes/eden_walk.png', { frameWidth: 256, frameHeight: 256 });
     this.load.spritesheet('eden_attack_sheet', '/assets/heroes/eden_attack.png', { frameWidth: 256, frameHeight: 256 });
+    this.load.spritesheet('eden_cast_sheet', '/assets/heroes/eden_cast.png', { frameWidth: 256, frameHeight: 256 });
     
     // Dynamically load all hero portraits (static or animated)
     Object.values(HERO_DEFINITIONS).forEach((hero) => {
@@ -448,6 +454,9 @@ export class GameScene extends Phaser.Scene {
           onComplete: () => {
             if (!this.sys) return;
             this.isPaused = false;
+            // Show the cast animation now the cut-in has cleared (it would
+            // otherwise finish hidden behind the full-screen cut-in).
+            hero.playCast();
           },
         });
       }
@@ -694,12 +703,34 @@ export class GameScene extends Phaser.Scene {
   private createHeroAnimations(): void {
     this.createAtlasAnimations(Object.values(HERO_DEFINITIONS).map(d => d.spriteKey ?? d.id));
 
-    // Manually wire Eden's attack since it's a standalone spritesheet for now
+    // Eden's states are standalone spritesheets (no Aseprite JSON), so wire them
+    // by hand as `eden-<tag>` — the keys UnitModel derives from her spriteKey.
+
+    // Walk/march (also the base texture). run reuses this, played faster.
+    if (this.textures.exists('eden') && !this.anims.exists('eden-march')) {
+      this.anims.create({
+        key: 'eden-march',
+        frames: this.anims.generateFrameNumbers('eden', { start: 0, end: 15 }), // 16 frames
+        frameRate: 10, // Steady walking loop
+        repeat: -1,
+      });
+    }
+
+    // Attack — snappy one-shot.
     if (this.textures.exists('eden_attack_sheet') && !this.anims.exists('eden-attack')) {
       this.anims.create({
         key: 'eden-attack',
-        frames: this.anims.generateFrameNumbers('eden_attack_sheet', { start: 0, end: 21 }),
-        frameRate: 30, // Fast 30 FPS playback for snappy attack (~0.7s)
+        frames: this.anims.generateFrameNumbers('eden_attack_sheet', { start: 0, end: 23 }), // 24 frames
+        frameRate: 30, // ~0.8s
+      });
+    }
+
+    // Cast — the skill wind-up (plays with the cut-in).
+    if (this.textures.exists('eden_cast_sheet') && !this.anims.exists('eden-cast')) {
+      this.anims.create({
+        key: 'eden-cast',
+        frames: this.anims.generateFrameNumbers('eden_cast_sheet', { start: 0, end: 23 }), // 24 frames
+        frameRate: 20, // ~1.2s wind-up
       });
     }
   }

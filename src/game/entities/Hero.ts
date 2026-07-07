@@ -128,6 +128,15 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   }
 
   /**
+   * Replay the cast animation. GameScene calls this when a skill cut-in
+   * finishes so the cast reads *after* the full-screen cut-in clears, rather
+   * than playing hidden behind it.
+   */
+  playCast(): void {
+    this.model.setState('cast');
+  }
+
+  /**
    * Lock this hero into a terminal battle-outcome pose. Called by GameScene
    * when the rally is decided: 'celebrate' on victory (raised fist), 'defeat'
    * on loss (morale broken — heroes take a knee, they don't die).
@@ -178,25 +187,33 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
       }
 
       if (target && this.y - target.y <= this.range) {
-        this.onAttack(this, target);
-
-        // Passives applied on attack
-        const activePassive = this.passiveOverride || this.id;
-        applyHeroPassive(activePassive, this, target, {
-          GAME_WIDTH: Number(this.scene.game.config.width),
-          GAME_HEIGHT: Number(this.scene.game.config.height),
-          heroes: [], // Passive doesn't currently read other heroes
-          enemies: [], // or other enemies
-          onVisual: (evt) => {
-            if (evt.type === 'text') {
-              const txt = this.scene.add.text(evt.x || 0, evt.y || 0, evt.text || '', { color: evt.color || '#fff', fontStyle: 'bold' }).setOrigin(0.5);
-              this.scene.tweens.add({ targets: txt, y: (evt.y || 0) - 30, alpha: 0, duration: 1000, onComplete: () => txt.destroy() });
-            }
-          }
-        });
-
+        // Cooldown starts now (attack cadence is unchanged), but the projectile
+        // and passives fire at the animation's release frame via onRelease —
+        // so the shot leaves in sync with the throw, not the instant the swing
+        // begins.
         this.attackCooldown = this.attackRateMs;
-        this.model.setState('attack');
+        const releaseTarget = target;
+        this.model.setState('attack', {
+          onRelease: () => {
+            if (!this.scene || releaseTarget.isDead) return;
+            this.onAttack(this, releaseTarget);
+
+            // Passives applied on attack
+            const activePassive = this.passiveOverride || this.id;
+            applyHeroPassive(activePassive, this, releaseTarget, {
+              GAME_WIDTH: Number(this.scene.game.config.width),
+              GAME_HEIGHT: Number(this.scene.game.config.height),
+              heroes: [], // Passive doesn't currently read other heroes
+              enemies: [], // or other enemies
+              onVisual: (evt) => {
+                if (evt.type === 'text') {
+                  const txt = this.scene.add.text(evt.x || 0, evt.y || 0, evt.text || '', { color: evt.color || '#fff', fontStyle: 'bold' }).setOrigin(0.5);
+                  this.scene.tweens.add({ targets: txt, y: (evt.y || 0) - 30, alpha: 0, duration: 1000, onComplete: () => txt.destroy() });
+                }
+              }
+            });
+          },
+        });
       }
     }
 

@@ -12,10 +12,15 @@ import { UnitModel } from './UnitModel';
  * docs/ADDING_HEROES.md for the asset/integration pipeline.
  */
 export class HeroModel extends UnitModel {
+  /** Fraction into the attack animation at which the projectile is released. */
+  private static readonly ATTACK_RELEASE_FRAC = 0.45;
+
   private bodySprite: Phaser.GameObjects.Sprite;
   private readonly baseW: number;
   private readonly baseH: number;
   private readonly sizePx: number;
+  /** True when the body is a real sprite sheet (drives the resting-frame reset). */
+  private readonly artBacked: boolean;
 
   constructor(scene: Phaser.Scene, x: number, y: number, tint: number, spriteKey?: string, sizePx = 64) {
     super(scene, x, y);
@@ -23,6 +28,7 @@ export class HeroModel extends UnitModel {
     // Only treat spriteKey as real art if its texture actually loaded; otherwise
     // fall back to the shared placeholder so a missing sheet can't green-box.
     const hasArt = !!spriteKey && scene.textures.exists(spriteKey);
+    this.artBacked = hasArt;
     const key = hasArt ? spriteKey! : 'hero-base';
     this.bodySprite = scene.add.sprite(0, 0, key);
     if (hasArt) {
@@ -63,6 +69,14 @@ export class HeroModel extends UnitModel {
   protected resetPose(): void {
     this.bodySprite.setPosition(0, 0);
     this.bodySprite.setAngle(0);
+    // Art-backed heroes: halt any running frame animation and snap back to the
+    // resting base frame. Otherwise a state with no sheet (idle) keeps playing
+    // the previous march loop, or freezes on the last attack/cast frame. States
+    // that DO have a sheet immediately restart their own anim after this.
+    if (this.artBacked && this.spriteBaseKey) {
+      this.bodySprite.anims.stop();
+      this.bodySprite.setTexture(this.spriteBaseKey, 0);
+    }
     this.bodySprite.setDisplaySize(this.baseW, this.baseH);
     this.bodySprite.setAlpha(1);
   }
@@ -151,9 +165,15 @@ export class HeroModel extends UnitModel {
     ];
   }
 
-  protected playAttack(onComplete: () => void): void {
-    if (this.playOneShotAnim('attack', onComplete)) return;
-    // Throw lunge toward the enemy side (right).
+  protected playAttack(onComplete: () => void, onRelease?: () => void): void {
+    if (this.hasStateAnim('attack')) {
+      // Release the projectile at the throw frame, not the start of the swing.
+      if (onRelease) this.scheduleAttackRelease(`${this.spriteBaseKey}-attack`, onRelease);
+      this.playOneShotAnim('attack', onComplete);
+      return;
+    }
+    // Placeholder throw lunge toward the enemy side (right); release at the apex.
+    if (onRelease) this.scene.time.delayedCall(60, () => { if (this.scene) onRelease(); });
     this.scene.tweens.add({
       targets: this.bodySprite,
       x: 10,
@@ -162,6 +182,29 @@ export class HeroModel extends UnitModel {
       duration: 90,
       onComplete,
     });
+  }
+
+  /**
+   * Fire `onRelease` once when the attack animation reaches its release frame
+   * (~mid-swing). Falls back to firing on animation-complete if the swing is
+   * interrupted before that frame, so a projectile is never silently dropped.
+   */
+  private scheduleAttackRelease(key: string, onRelease: () => void): void {
+    const anim = this.scene.anims.get(key);
+    const frameCount = anim?.frames.length ?? 1;
+    const releaseFrame = Math.max(1, Math.round(frameCount * HeroModel.ATTACK_RELEASE_FRAC));
+    let released = false;
+    const fire = () => {
+      if (released) return;
+      released = true;
+      this.bodySprite.off(Phaser.Animations.Events.ANIMATION_UPDATE, onUpdate);
+      onRelease();
+    };
+    const onUpdate = (a: Phaser.Animations.Animation, frame: Phaser.Animations.AnimationFrame) => {
+      if (a.key === key && frame.index >= releaseFrame) fire();
+    };
+    this.bodySprite.on(Phaser.Animations.Events.ANIMATION_UPDATE, onUpdate);
+    this.bodySprite.once(`${Phaser.Animations.Events.ANIMATION_COMPLETE_KEY}${key}`, fire);
   }
 
   protected playCast(onComplete: () => void): void {

@@ -519,20 +519,20 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     signatureSkill: { name: 'Rally', description: 'Massive attack speed buff to all deployed heroes.' },
     passive: { name: 'Voice of the People', description: 'Generates 1 Voice every 10 seconds.' },
     projectileColor: 0x60a5fa,
-    // portraitKey: 'eden_cutin', // Temporarily removed while awaiting new asset
+    portraitKey: 'eden_cutin', // 8x5 sheet, 40 frames. Master: docs/references/eden_cutin.png
+    // (1024px/frame); shipped sheet is downscaled to 512px/frame (4096x2560) to
+    // stay within mobile WebGL texture/VRAM limits under Capacitor.
     spriteKey: 'eden', // Aseprite atlas key — loaded in GameScene.preload once eden.png/.json exist.
-    /*
-    cutInDurationMs: 3500, // Custom duration for the 79-frame cut-in
+    cutInDurationMs: 3500, // Full 40-frame cut-in playthrough
     cutInMarginY: 0, // Fullscreen cut-in
     cutInMarginX: 0,
     cutInArtScale: 1,
     cutInPosition: 'left',
     cutInAnim: {
-      frameWidth: 1024,
-      frameHeight: 1024,
-      frames: 13,
+      frameWidth: 512,
+      frameHeight: 512,
+      frames: 40,
     },
-    */
   },
   teacher: {
     id: 'teacher',

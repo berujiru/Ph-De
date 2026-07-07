@@ -34,6 +34,12 @@ const OUTCOME_STATES: ReadonlySet<UnitModelState> = new Set(['celebrate', 'defea
 export interface UnitModelStateOptions {
   /** Fired when a one-shot state (attack / cast / death) finishes playing. */
   onComplete?: () => void;
+  /**
+   * For 'attack': fired at the animation's *release* frame (the throw/strike
+   * moment), not frame 0. Lets the owner spawn its projectile in sync with the
+   * swing instead of the instant the attack starts.
+   */
+  onRelease?: () => void;
 }
 
 /**
@@ -159,7 +165,7 @@ export abstract class UnitModel extends Phaser.GameObjects.Container {
       options?.onComplete?.();
       this.startLocomotion(this.locomotionState);
     };
-    if (state === 'attack') this.playAttack(revert);
+    if (state === 'attack') this.playAttack(revert, options?.onRelease);
     else this.playCast(revert);
     return this;
   }
@@ -237,8 +243,11 @@ export abstract class UnitModel extends Phaser.GameObjects.Container {
   /** Terminal battle-outcome loops — held until the scene tears down. */
   protected abstract playCelebrate(): Phaser.Tweens.Tween[];
   protected abstract playDefeat(): Phaser.Tweens.Tween[];
-  /** One-shot placeholder animations — MUST call onComplete exactly once. */
-  protected abstract playAttack(onComplete: () => void): void;
+  /**
+   * One-shot attack — MUST call onComplete exactly once. If `onRelease` is
+   * given, fire it once at the swing's release point (not frame 0).
+   */
+  protected abstract playAttack(onComplete: () => void, onRelease?: () => void): void;
   protected abstract playCast(onComplete: () => void): void;
   protected abstract playDeath(onComplete?: () => void): void;
 }

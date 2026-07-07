@@ -34,10 +34,10 @@ describe('RallyScreen', () => {
     expect(screen.getByRole('button', { name: 'Game speed' })).toBeEnabled();
   });
 
-  it('shows the drop overlay on voicesFull, including rarity and Buhis-Buhay risk framing', () => {
+  it('shows the drop overlay on voicesFull, hiding hero descriptions and showing Buhis-Buhay risk', () => {
     render(<RallyScreen onReturnToMenu={vi.fn()} />);
     const options: DropOption[] = [
-      { id: 'a', title: 'New Hero: Eden', description: 'Joins the rally.', type: 'spawn', rarity: 'epic', kind: 'hero', damageType: 'Physical' },
+      { id: 'hero:eden', title: 'New Hero: Eden', description: 'Joins the rally.', type: 'spawn', rarity: 'epic', kind: 'hero', damageType: 'Physical' },
       { id: 'b', title: 'Sharper Chants', description: '+10% damage.', type: 'damage' },
       { id: 'c', title: 'Overtime', description: '+200% attack speed.', type: 'speed', rarity: 'rare', kind: 'buhisBuhay', risk: 'barrier healing pauses' },
     ];
@@ -45,9 +45,13 @@ describe('RallyScreen', () => {
 
     expect(screen.getByText('A Voice Rises!')).toBeInTheDocument();
     expect(screen.getByText('New Hero: Eden')).toBeInTheDocument();
-    expect(screen.getByText('Epic')).toBeInTheDocument();
-    // Un-tagged option falls back to common rarity
-    expect(screen.getByText('Common')).toBeInTheDocument();
+    // Hero recruit drops hide the description copy (portrait + name carry it).
+    expect(screen.queryByText('Joins the rally.')).not.toBeInTheDocument();
+    // Non-hero drops still show their purpose copy.
+    expect(screen.getByText('+10% damage.')).toBeInTheDocument();
+    // Rarity is shown as stars only — no rarity label text.
+    expect(screen.queryByText('Epic')).not.toBeInTheDocument();
+    expect(screen.queryByText('Common')).not.toBeInTheDocument();
     // Buhis-Buhay drops carry an explicit risk line
     expect(screen.getByText(/high risk: barrier healing pauses/i)).toBeInTheDocument();
   });

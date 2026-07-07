@@ -39,6 +39,7 @@ import {
   stampLabel,
   withAlpha,
 } from '../mockups/battleStyles';
+import { HERO_CARD_PORTRAITS } from './ArchiveCards';
 import { IntelModal } from './IntelModal';
 
 interface RallyScreenProps {
@@ -125,6 +126,9 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
   const kindMeta = KIND_META[kind];
   const isBuhis = kind === 'buhisBuhay';
   const DamageIcon = option.damageType ? damageTypeIcons[option.damageType] : undefined;
+  // Hero drops carry the hero id as `hero:<id>` — look up a real portrait.
+  const heroId = kind === 'hero' && option.id.startsWith('hero:') ? option.id.slice('hero:'.length) : undefined;
+  const heroPortrait = heroId ? HERO_CARD_PORTRAITS[heroId] : undefined;
 
   /* The emblem art differs per kind so the three drop types are unmistakable
      at a glance: a portrait for a recruit, a damage chip for a hero upgrade,
@@ -159,9 +163,11 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
           }}
         >
           <img
-            src="/assets/heroes/hero-placeholder.svg"
+            src={heroPortrait ?? '/assets/heroes/hero-placeholder.svg'}
             alt=""
-            style={{ width: '90%', height: '90%', objectFit: 'contain' }}
+            style={heroPortrait
+              ? { width: '100%', height: '100%', objectFit: 'cover' }
+              : { width: '90%', height: '90%', objectFit: 'contain' }}
           />
         </div>
         <span
@@ -263,7 +269,7 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
             : `${meta.glow}${meta.glow === 'none' ? '' : ', '}0 10px 26px ${withAlpha(theme.colors.background, 0.7)}`,
           borderRadius: 15,
           width: '100%',
-          minHeight: 232,
+          minHeight: 170,
           padding: 0,
           display: 'flex',
           flexDirection: 'column',
@@ -280,45 +286,44 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 6,
-            padding: '7px 8px',
+            gap: 5,
+            padding: '5px 6px',
             backgroundColor: withAlpha(kindMeta.tint, 0.16),
             borderBottom: `1px solid ${withAlpha(kindMeta.tint, 0.4)}`,
             color: kindMeta.tint,
             ...stampLabel,
-            fontSize: 10,
+            fontSize: 9,
           }}
         >
-          {kind === 'hero' ? <RaisedFistIcon size={13} /> : isBuhis ? <SkullIcon size={13} /> : <PlusIcon size={13} />}
+          {kind === 'hero' ? <RaisedFistIcon size={12} /> : isBuhis ? <SkullIcon size={12} /> : <PlusIcon size={12} />}
           {kindMeta.ribbon}
         </span>
 
+        {/* Rarity — stars only (no label text). */}
         <span
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 6,
-            marginTop: 12,
-            ...stampLabel,
-            fontSize: 10,
+            marginTop: 8,
             color: rarity === 'common' ? theme.colors.textMuted : theme.colors.accent,
           }}
         >
           <RarityStars rarity={rarity} />
-          {meta.label}
         </span>
 
-        <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0 8px' }}>{visual}</div>
+        <div style={{ display: 'flex', justifyContent: 'center', margin: '8px 0 6px' }}>{visual}</div>
 
-        <div style={{ padding: '0 clamp(6px, 2.5vw, 12px) 14px', display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
+        <div style={{ padding: '0 clamp(6px, 2.5vw, 12px) 12px', display: 'flex', flexDirection: 'column', gap: 5, flex: 1 }}>
           <span style={{ fontSize: 'clamp(13px, 3.6vw, 16px)', fontWeight: 900, lineHeight: 1.15, letterSpacing: 0.2 }}>
             {option.title}
           </span>
-          {/* The PURPOSE copy — the thing the player is meant to read. */}
-          <span style={{ fontSize: 'clamp(10px, 2.8vw, 12px)', color: theme.colors.textPrimary, opacity: 0.9, lineHeight: 1.4 }}>
-            {option.description}
-          </span>
+          {/* Purpose copy — hidden for hero recruits (the portrait + name say it). */}
+          {kind !== 'hero' && (
+            <span style={{ fontSize: 'clamp(10px, 2.8vw, 12px)', color: theme.colors.textPrimary, opacity: 0.9, lineHeight: 1.4 }}>
+              {option.description}
+            </span>
+          )}
 
           {isBuhis && (
             <span

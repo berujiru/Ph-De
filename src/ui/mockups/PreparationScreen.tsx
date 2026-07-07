@@ -10,7 +10,7 @@ import {
   damageTypeIcons,
 } from '../icons';
 import { BackButton } from '../components/BackButton';
-import { EnemyCaseCard, HeroPolaroidCard } from '../components/ArchiveCards';
+import { EnemyCaseCard, HeroPolaroidCard, HERO_CARD_PORTRAITS } from '../components/ArchiveCards';
 import { HERO_DEFINITIONS, type HeroDefinition, type HeroId } from '../../game/data/balance';
 
 interface PreparationScreenProps {
@@ -384,7 +384,25 @@ export function PreparationScreen({ onBack, onDeploy }: PreparationScreenProps) 
               boxShadow: '0 0 16px rgba(56, 189, 248, 0.2)',
             }}
           >
-            <img src="/assets/heroes/hero-placeholder.svg" alt="" style={{ width: 56, height: 56, flexShrink: 0 }} />
+            {(() => {
+              const portrait = HERO_CARD_PORTRAITS[EDEN.id];
+              return portrait ? (
+                <img
+                  src={portrait}
+                  alt={EDEN.name}
+                  style={{
+                    width: 56,
+                    height: 56,
+                    flexShrink: 0,
+                    objectFit: 'cover',
+                    borderRadius: 8,
+                    border: `2px solid ${theme.colors.accent}`,
+                  }}
+                />
+              ) : (
+                <img src="/assets/heroes/hero-placeholder.svg" alt="" style={{ width: 56, height: 56, flexShrink: 0 }} />
+              );
+            })()}
             <div style={{ minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                 <span style={{ fontSize: 15, fontWeight: 900 }}>{EDEN.name}</span>
@@ -430,6 +448,7 @@ export function PreparationScreen({ onBack, onDeploy }: PreparationScreenProps) 
                 name={hero.name}
                 subtitle={hero.profession}
                 rotation={(i % 2 === 0 ? 1 : -1) * (2 + (i % 3))}
+                imageSrc={HERO_CARD_PORTRAITS[hero.id]}
               >
                 <span style={{ fontSize: '7px', padding: '1px 4px', backgroundColor: '#dbeafe', color: '#1e3a8a', border: '1px solid #93c5fd', fontWeight: 'bold' }}>
                   {hero.damageType.toUpperCase()}

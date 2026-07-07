@@ -14,6 +14,7 @@ import { BackButton } from '../components/BackButton';
 import {
   EnemyCaseCard,
   HeroPolaroidCard,
+  HERO_CARD_PORTRAITS,
   HERO_PLACEHOLDER_SRC,
   PORTRAIT_BG,
   TIER_COLOR,
@@ -212,6 +213,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 unlocked={isUnlocked}
                 level={mockLevel}
                 rotation={rotation}
+                imageSrc={HERO_CARD_PORTRAITS[hero.id]}
                 onClick={() => setSelectedHero(hero)}
               >
                 <span style={{ fontSize: '7px', padding: '1px 4px', backgroundColor: '#e2e8f0', color: '#334155', border: '1px solid #cbd5e1', fontWeight: 'bold' }}>
@@ -381,11 +383,18 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                   borderBottom: 'none',
                   zIndex: 2
                 }} />
-                <img
-                  src={HERO_PLACEHOLDER_SRC}
-                  alt={selectedHero.name}
-                  style={{ width: '92%', height: '92%', objectFit: 'contain' }}
-                />
+                {(() => {
+                  const portrait = HERO_CARD_PORTRAITS[selectedHero.id];
+                  return (
+                    <img
+                      src={portrait ?? HERO_PLACEHOLDER_SRC}
+                      alt={selectedHero.name}
+                      style={portrait
+                        ? { width: '100%', height: '100%', objectFit: 'cover' }
+                        : { width: '92%', height: '92%', objectFit: 'contain' }}
+                    />
+                  );
+                })()}
               </div>
 
               <div style={{ flex: 1, minWidth: 140, color: '#000' }}>

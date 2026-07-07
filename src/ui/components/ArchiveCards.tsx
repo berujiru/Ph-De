@@ -18,6 +18,16 @@ export const PORTRAIT_BG_LOCKED = 'radial-gradient(circle at 50% 34%, #64748b 0%
 
 export const hexColor = (color: number) => `#${color.toString(16).padStart(6, '0')}`;
 
+/**
+ * Real card portraits per hero id (a photo that replaces the silhouette
+ * placeholder). Add an entry as each hero's portrait art lands. Note: the file
+ * may be a JPEG behind a .png name — browsers sniff content, so an <img src>
+ * still renders it.
+ */
+export const HERO_CARD_PORTRAITS: Record<string, string> = {
+  eden: '/assets/heroes/eden_portrait.png',
+};
+
 // ---- Enemy tiering + data-driven "lie debunked" blurbs ---------------------
 
 const MINI_BOSS_IDS = new Set<EnemyId>([
@@ -68,6 +78,11 @@ export interface HeroPolaroidCardProps {
   level?: number;
   /** Stable tilt in degrees. */
   rotation?: number;
+  /**
+   * Real portrait photo. Shown (cover-fit) when the hero is unlocked; locked
+   * heroes always keep the silhouette placeholder so art isn't spoiled.
+   */
+  imageSrc?: string;
   onClick?: () => void;
   /** Extra content under the divider (damage chip, cards pill, counters…). */
   children?: ReactNode;
@@ -80,10 +95,13 @@ export function HeroPolaroidCard({
   unlocked = true,
   level,
   rotation = 0,
+  imageSrc,
   onClick,
   children,
 }: HeroPolaroidCardProps) {
   const interactive = unlocked && !!onClick;
+  // Real portrait only when unlocked; otherwise the silhouette placeholder.
+  const showPortrait = unlocked && !!imageSrc;
   return (
     <div
       onClick={() => interactive && onClick!()}
@@ -145,14 +163,13 @@ export function HeroPolaroidCard({
         }}
       >
         <img
-          src={HERO_PLACEHOLDER_SRC}
+          src={showPortrait ? imageSrc : HERO_PLACEHOLDER_SRC}
           alt={unlocked ? name : 'Locked hero silhouette'}
-          style={{
-            width: '92%',
-            height: '92%',
-            objectFit: 'contain',
-            filter: unlocked ? 'none' : 'brightness(0)',
-          }}
+          style={
+            showPortrait
+              ? { width: '100%', height: '100%', objectFit: 'cover' }
+              : { width: '92%', height: '92%', objectFit: 'contain', filter: unlocked ? 'none' : 'brightness(0)' }
+          }
         />
         {!unlocked && (
           <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#94a3b8', display: 'flex' }}>
