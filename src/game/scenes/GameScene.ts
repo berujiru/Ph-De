@@ -60,6 +60,20 @@ export class GameScene extends Phaser.Scene {
     // Heroes → public/assets/heroes/, enemies → public/assets/enemies/.
     // Re-enable once a corrected top-down, transparent eden sheet is generated:
     // this.load.aseprite('eden', '/assets/heroes/eden.png', '/assets/heroes/eden.json');
+    
+    // Dynamically load all hero portraits (static or animated)
+    Object.values(HERO_DEFINITIONS).forEach((hero) => {
+      if (hero.portraitKey) {
+        if (hero.cutInAnim) {
+          this.load.spritesheet(hero.portraitKey, `/assets/heroes/${hero.portraitKey}.png`, {
+            frameWidth: hero.cutInAnim.frameWidth,
+            frameHeight: hero.cutInAnim.frameHeight,
+          });
+        } else {
+          this.load.image(hero.portraitKey, `/assets/heroes/${hero.portraitKey}.png`);
+        }
+      }
+    });
     // this.load.aseprite('grunt', '/assets/enemies/grunt.png', '/assets/enemies/grunt.json');
     // this.load.audio('sfx-btn-press', 'assets/sounds/btn-press.mp3');
     // this.load.audio('sfx-victory', 'assets/sounds/victory.mp3');
@@ -75,6 +89,7 @@ export class GameScene extends Phaser.Scene {
     this.skillCutIn = new SkillCutIn(this);
     this.createHeroAnimations();
     this.createEnemyAnimations();
+    this.createCutInAnimations();
     this.buildGame();
 
     // Shared cleanup — called on both shutdown (scene.restart) and destroy (game.destroy)
@@ -422,8 +437,15 @@ export class GameScene extends Phaser.Scene {
         this.isPaused = true;
         this.skillCutIn.play({
           skillName: hero.definition.signatureSkill.name,
-          tint: hero.definition.color,
+          faction: 'hero',
           portraitKey: hero.definition.portraitKey,
+          durationMs: hero.definition.cutInDurationMs,
+          marginY: hero.definition.cutInMarginY,
+          marginX: hero.definition.cutInMarginX,
+          artScale: hero.definition.cutInArtScale,
+          artOffsetX: hero.definition.cutInArtOffsetX,
+          artOffsetY: hero.definition.cutInArtOffsetY,
+          position: hero.definition.cutInPosition,
           onComplete: () => {
             if (!this.sys) return;
             this.isPaused = false;
@@ -677,6 +699,21 @@ export class GameScene extends Phaser.Scene {
   /** Same as createHeroAnimations(), for enemies (top-front sprite sheets). */
   private createEnemyAnimations(): void {
     this.createAtlasAnimations(Object.values(ENEMY_DEFINITIONS).map(d => d.spriteKey ?? d.id));
+  }
+
+  /** Manually generate animations for sprite sheets without a JSON atlas. */
+  private createCutInAnimations(): void {
+    Object.values(HERO_DEFINITIONS).forEach((hero) => {
+      if (hero.portraitKey && hero.cutInAnim) {
+        const animKey = `${hero.portraitKey}-anim`;
+        if (this.textures.exists(hero.portraitKey) && !this.anims.exists(animKey)) {
+          this.anims.create({
+            key: animKey,
+            frames: this.anims.generateFrameNumbers(hero.portraitKey, { start: 0, end: hero.cutInAnim.frames - 1 }),
+          });
+        }
+      }
+    });
   }
 
   /**

@@ -419,6 +419,23 @@ export interface HeroDefinition {
   };
   projectileColor?: number;
   canSeeStealth?: boolean;
+  cutInDurationMs?: number;
+  /** Top/bottom inset for the framed cut-in. 0 = fullscreen height. */
+  cutInMarginY?: number;
+  /** Left/right inset for the framed cut-in. 0 = fullscreen width. */
+  cutInMarginX?: number;
+  /** Zoom the art inside the frame (1 = cover-fit). Use when art has padding. */
+  cutInArtScale?: number;
+  /** Nudge the art inside the frame, in px. */
+  cutInArtOffsetX?: number;
+  cutInArtOffsetY?: number;
+  cutInPosition?: 'left' | 'right';
+  /** If the portrait is an animated spritesheet, define its geometry here. */
+  cutInAnim?: {
+    frameWidth: number;
+    frameHeight: number;
+    frames: number;
+  };
 }
 
 /**
@@ -456,8 +473,20 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     signatureSkill: { name: 'Rally', description: 'Massive attack speed buff to all deployed heroes.' },
     passive: { name: 'Voice of the People', description: 'Generates 1 Voice every 10 seconds.' },
     projectileColor: 0x60a5fa,
-    portraitKey: 'eden_portrait',
+    // portraitKey: 'eden_cutin', // Temporarily removed while awaiting new asset
     spriteKey: 'eden', // Aseprite atlas key — loaded in GameScene.preload once eden.png/.json exist.
+    /*
+    cutInDurationMs: 3500, // Custom duration for the 79-frame cut-in
+    cutInMarginY: 0, // Fullscreen cut-in
+    cutInMarginX: 0,
+    cutInArtScale: 1,
+    cutInPosition: 'left',
+    cutInAnim: {
+      frameWidth: 1024,
+      frameHeight: 1024,
+      frames: 13,
+    },
+    */
   },
   teacher: {
     id: 'teacher',
