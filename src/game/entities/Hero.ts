@@ -7,6 +7,7 @@ import { formationTargetY, stepTowardFormation } from '../core/RallyMarch';
 import { applyHeroPassive, type ISkillHero } from '../core/Skills';
 import { HeroModel } from './models/HeroModel';
 import { SkillAura } from './fx/SkillAura';
+import { SpriteAura } from './fx/SpriteAura';
 
 export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   public id: string;
@@ -18,6 +19,9 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   public damage: number;
   public range: number;
   private onAttack: (hero: Hero, target: Enemy) => void;
+
+  public activeBuffs: Record<string, number> = {};
+  public hasRallyBuff?: boolean;
 
   /**
    * Persistent behavior mods from Voice-drop upgrades (bonusPierce/bonusChain/
@@ -40,6 +44,8 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
 
   private model: HeroModel;
   private skillAura: SkillAura;
+  private spriteAura: SpriteAura;
+  private buffIcons: Record<string, Phaser.GameObjects.Text> = {};
   private rangeIndicator: Phaser.GameObjects.Arc;
 
   constructor(
@@ -87,6 +93,11 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     // Put aura below the model (index 1, as range indicator is 0)
     this.addAt(this.skillAura, 1);
 
+    // Buff Sprite Aura (reverse tear drops)
+    this.spriteAura = new SpriteAura(scene, 0xfacc15); // Default yellow
+    // Add above the model
+    this.add(this.spriteAura);
+
     this.updateSkillButtonVisuals();
 
     scene.add.existing(this);
@@ -113,6 +124,58 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
    */
   playCast(): void {
     this.model.setState('cast');
+  }
+
+  applyBuff(type: string, durationMs: number = 4000, color: number = 0xfacc15, iconText: string = '⚡') {
+    if (this.activeBuffs[type] > 0 || this.activeBuffs[type] === -1) {
+      if (this.activeBuffs[type] !== -1) {
+          this.activeBuffs[type] = durationMs; // refresh duration
+      }
+      return;
+    }
+
+    this.activeBuffs[type] = durationMs;
+    
+    // Support specific logic flags
+    if (type === 'rally') this.hasRallyBuff = true;
+
+    // Create icon if doesn't exist
+    if (!this.buffIcons[type]) {
+      const idx = Object.keys(this.buffIcons).length;
+      const iconY = -60; // above the head
+      const icon = this.scene.add.text(-15 + (idx * 24), iconY, iconText, { fontSize: '24px' }).setOrigin(0.5);
+      this.add(icon);
+      this.buffIcons[type] = icon;
+      
+      // Bob animation for the icon
+      this.scene.tweens.add({
+        targets: icon,
+        y: iconY - 5,
+        yoyo: true,
+        repeat: -1,
+        duration: 1000,
+        ease: 'Sine.easeInOut'
+      });
+    }
+
+    this.buffIcons[type].setVisible(true);
+    this.spriteAura.play(color);
+  }
+
+  removeBuff(type: string) {
+    if (!this.activeBuffs[type]) return;
+    delete this.activeBuffs[type];
+    
+    if (type === 'rally') this.hasRallyBuff = false;
+    
+    if (this.buffIcons[type]) {
+      this.buffIcons[type].setVisible(false);
+    }
+    
+    // If no active buffs remain, stop the aura
+    if (Object.keys(this.activeBuffs).length === 0) {
+      this.spriteAura.stop();
+    }
   }
 
   /**
@@ -157,6 +220,15 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   }
 
   update(delta: number, enemies: Enemy[], shieldY: number) {
+    // Process Buff Durations
+    for (const [type, duration] of Object.entries(this.activeBuffs)) {
+      if (duration === -1) continue; // Permanent buff
+      this.activeBuffs[type] = duration - delta;
+      if (this.activeBuffs[type] <= 0) {
+        this.removeBuff(type);
+      }
+    }
+
     // Hold formation relative to the advancing morale shield.
     const targetY = formationTargetY(shieldY, { attackKind: this.definition.attackKind, rangePx: this.range }, RALLY.formation) + this.formationJitterY;
     const step = stepTowardFormation(this.y, targetY, delta, {

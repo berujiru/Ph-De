@@ -29,6 +29,9 @@ export class GameScene extends Phaser.Scene {
   private heroes: Hero[] = [];
   private attacks: Attack[] = [];
   public summons: Summon[] = [];
+  public barriers: Phaser.GameObjects.GameObject[] = [];
+  public traps: Phaser.GameObjects.GameObject[] = [];
+  public persistentAoe: Phaser.GameObjects.GameObject[] = [];
   
   private voicesCount = 0;
   private maxVoicesCount = 5; // Drops a hero when full
@@ -580,10 +583,20 @@ export class GameScene extends Phaser.Scene {
     for (const h of this.heroes) h.destroy();
     for (const a of this.attacks) a.destroy();
     for (const s of this.summons) s.destroy();
+    for (const b of this.barriers) b.destroy();
+    for (const t of this.traps) t.destroy();
+    for (const aoe of this.persistentAoe) aoe.destroy();
     if (this.parallax) this.parallax.destroy();
     if (this.shield) this.shield.destroy();
 
     this.buildGame();
+  }
+
+  /** Heals the morale shield. Used by Nurse's Vaccine Drive. */
+  public healShield(amount: number): void {
+    if (this.shield) {
+      this.shield.heal(amount);
+    }
   }
 
   /** Create the morale shield + initial hero and reset all state counters. */
@@ -592,6 +605,9 @@ export class GameScene extends Phaser.Scene {
     this.enemies = [];
     this.attacks = [];
     this.summons = [];
+    this.barriers = [];
+    this.traps = [];
+    this.persistentAoe = [];
     this.voicesCount = 0;
     this.waveActive = false;
     this.currentWave = 1;

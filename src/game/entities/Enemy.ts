@@ -8,9 +8,10 @@ import { EnemyModel } from './models/EnemyModel';
 import { spawnDamageNumber } from './fx/FloatingText';
 import { spawnHitSpark, spawnDeathBurst } from './fx/ImpactFx';
 import { cameraPunch } from './fx/CameraPunch';
+import { SpriteAura } from './fx/SpriteAura';
 import { FX } from '../data/level';
 
-export type AilmentType = 'burn' | 'slow' | 'wet' | 'freeze' | 'stun' | 'poison' | 'bleed' | 'rot' | 'sleep' | 'curse' | 'knockback' | 'armorShred';
+export type AilmentType = 'burn' | 'slow' | 'wet' | 'freeze' | 'stun' | 'poison' | 'bleed' | 'rot' | 'sleep' | 'curse' | 'knockback' | 'armorShred' | 'muted' | 'root';
 
 const AILMENT_ICONS: Record<AilmentType, string> = {
   burn: '🔥',
@@ -24,7 +25,9 @@ const AILMENT_ICONS: Record<AilmentType, string> = {
   sleep: '💤',
   curse: '👁️',
   knockback: '💨',
-  armorShred: '🛡️'
+  armorShred: '🛡️',
+  muted: '😶',
+  root: '🌱'
 };
 
 const AILMENT_OVERLAYS: Record<AilmentType, string> = {
@@ -39,7 +42,9 @@ const AILMENT_OVERLAYS: Record<AilmentType, string> = {
   sleep: '💭',
   curse: '💀',
   knockback: '🌬️',
-  armorShred: '🔨'
+  armorShred: '🔨',
+  muted: '🔇',
+  root: '🌿'
 };
 
 export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
@@ -75,6 +80,11 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
   // DoT Tracking
   private tickTimer = 0;
 
+  // Buff Tracking
+  public hasSpeedBuff = false;
+  private spriteAura: SpriteAura;
+  private buffIcon: Phaser.GameObjects.Text | null = null;
+
   constructor(scene: Phaser.Scene, x: number, y: number, definition: EnemyDefinition) {
     super(scene, x, y);
     this.id = definition.id;
@@ -93,6 +103,10 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     this.hpBarBg = scene.add.rectangle(0, barY, barW, 6, 0x000000, 0.5);
     this.hpBarFill = scene.add.rectangle(0, barY, barW, 6, 0x22c55e);
     this.add([this.hpBarBg, this.hpBarFill]);
+
+    // Buff Sprite Aura (reverse tear drops)
+    this.spriteAura = new SpriteAura(scene, 0xffffff); // Default white
+    this.add(this.spriteAura);
 
     scene.add.existing(this);
 
@@ -132,6 +146,42 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
 
   resumeVisuals(): void {
     this.model.resume();
+  }
+
+  applySpeedBuff(durationMs: number = 4000) {
+    if (this.isDead) return;
+    
+    this.hasSpeedBuff = true;
+
+    // We can use a custom property for duration if we want, 
+    // or just rely on the GameScene logic to clear it when duration ends.
+    // For now, setting the visual state:
+
+    if (!this.buffIcon) {
+      const iconY = -(this.sizePx / 2 + 40); // above ailment icons
+      this.buffIcon = this.scene.add.text(0, iconY, '💨', { fontSize: '24px' }).setOrigin(0.5);
+      this.add(this.buffIcon);
+      
+      this.scene.tweens.add({
+        targets: this.buffIcon,
+        y: iconY - 5,
+        yoyo: true,
+        repeat: -1,
+        duration: 1000,
+        ease: 'Sine.easeInOut'
+      });
+    }
+
+    this.buffIcon.setVisible(true);
+    this.spriteAura.play(0x60a5fa); // Light blue aura
+  }
+
+  removeSpeedBuff() {
+    this.hasSpeedBuff = false;
+    if (this.buffIcon) {
+      this.buffIcon.setVisible(false);
+    }
+    this.spriteAura.stop();
   }
 
   takeDamage(amount: number) {
