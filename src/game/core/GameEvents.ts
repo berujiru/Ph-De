@@ -23,6 +23,7 @@ export class TypedEmitter<Events extends Record<string, unknown>> {
 export interface ActiveHeroInfo {
   id: string;
   passiveOverride?: string;
+  isSkillReady: boolean;
 }
 
 export interface ActiveEnemyInfo {
@@ -79,6 +80,7 @@ export interface UiToGameEvents extends Record<string, unknown> {
   selectDrop: { dropId: string };
   debugSpawn: { heroId?: string; passive?: string; skill?: string };
   triggerHeroSkill: { skill?: string };
+  queueHeroSkill: { heroId: string };
   spawnSandboxTarget: undefined;
   spawnSpecificEnemy: { enemyId: string, passive?: string, skill?: string };
   triggerEnemySkill: undefined;

@@ -48,6 +48,9 @@ export class GameScene extends Phaser.Scene {
   private isSandbox = false;
   private sandboxRespawnTimer = 0;
   private skillCutIn!: SkillCutIn;
+  private comboQueue: Hero[] = [];
+  private isProcessingCombo = false;
+  private comboCount = 0;
 
   constructor() {
     super('GameScene');
@@ -152,9 +155,15 @@ export class GameScene extends Phaser.Scene {
       unsubSpawnSandboxTarget();
       unsubSpawnSpecificEnemy();
       unsubTriggerHeroSkill();
+      unsubQueueHeroSkill();
       unsubTriggerEnemySkill();
       unsubPlaySound();
       unsubApplyAilment();
+
+      // Clean up internal scene events to prevent duplication on restart
+      this.events.off('enemyFlood');
+      this.events.off('heroSkillTriggered');
+      this.events.off('enemySkillTriggered');
     };
 
     // UI event binding — every handler guards against a destroyed scene
@@ -222,6 +231,19 @@ export class GameScene extends Phaser.Scene {
       for (const h of this.heroes) {
         h.isSkillReady = true; // Force ready for sandbox
         h.useSkill(skill);
+      }
+    });
+
+    const unsubQueueHeroSkill = uiToGameEvents.on('queueHeroSkill', ({ heroId }) => {
+      if (!this.sys) return;
+      const hero = this.heroes.find(h => h.id === heroId);
+      if (hero && hero.isSkillReady && !this.comboQueue.includes(hero)) {
+        this.comboQueue.push(hero);
+        this.emitState(true);
+        if (!this.isProcessingCombo) {
+          this.comboCount = 0;
+          this.processComboQueue();
+        }
       }
     });
 
@@ -478,23 +500,14 @@ export class GameScene extends Phaser.Scene {
 
     // --- HERO SKILLS ---
     this.events.on('heroSkillTriggered', ({ hero, skillId }: { hero: Hero, skillId: HeroId }) => {
-      // Camera punch on the cast — layered on the follow camera via the shake
-      // effect (render-only, no scroll drift). It decays during the cut-in
-      // freeze that follows, reading as an impact.
+      // Camera punch on the cast
       cameraPunch(this, FX.cameraShake.skillCast, true);
 
-      // Anime-style cut-in for every hero (Eden is the reference). Pauses
-      // gameplay while it plays, reusing the system-pause pattern (no UI
-      // events — the GameEvents contract stays unchanged). Skipped in sandbox
-      // so rapid skill-testing isn't interrupted.
-      if (!this.isSandbox && !this.isPaused) {
-        this.isPaused = true;
-        this.syncVisualPauseState();
-        this.emitState(true);
-      }
+      this.comboCount++;
+      const isCombo = this.comboCount > 1;
 
       this.skillCutIn.play({
-          skillName: hero.definition.signatureSkill.name,
+          skillName: isCombo ? `${hero.definition.signatureSkill.name}\nCOMBO x${this.comboCount}!` : hero.definition.signatureSkill.name,
           faction: 'hero',
           portraitKey: hero.definition.portraitKey,
           durationMs: hero.definition.cutInDurationMs,
@@ -506,12 +519,8 @@ export class GameScene extends Phaser.Scene {
           position: hero.definition.cutInPosition,
           onComplete: () => {
             if (!this.sys) return;
-            this.isPaused = false;
-            this.syncVisualPauseState();
-            
-            // Show the cast animation now the cut-in has cleared (it would
-            // otherwise finish hidden behind the full-screen cut-in).
             hero.playCast();
+            this.processComboQueue();
           },
         });
 
@@ -597,6 +606,9 @@ export class GameScene extends Phaser.Scene {
     this.gameSpeed = 1;
     this.status = 'playing';
     this.lastSnapshot = '';
+    this.comboQueue = [];
+    this.isProcessingCombo = false;
+    this.comboCount = 0;
 
     // Layered parallax backdrop — sells forward motion as the rally marches.
     // When an activeMapSkin is set (campaign stages), pass its texture keys;
@@ -759,11 +771,25 @@ export class GameScene extends Phaser.Scene {
   }
 
   private pauseVisuals(): void {
+    if (!this.sys) return;
+    
+    const audioCtx = (this.sys.game.sound as any).context;
+    if (!audioCtx || audioCtx.state !== 'closed') {
+      this.sys.game.sound.pauseAll();
+    }
+    
     for (const hero of this.heroes) hero.pauseVisuals();
     for (const enemy of this.enemies) enemy.pauseVisuals();
   }
 
   private resumeVisuals(): void {
+    if (!this.sys) return;
+
+    const audioCtx = (this.sys.game.sound as any).context;
+    if (!audioCtx || audioCtx.state !== 'closed') {
+      this.sys.game.sound.resumeAll();
+    }
+    
     for (const hero of this.heroes) hero.resumeVisuals();
     for (const enemy of this.enemies) enemy.resumeVisuals();
   }
@@ -774,6 +800,30 @@ export class GameScene extends Phaser.Scene {
     } else {
       this.resumeVisuals();
     }
+  }
+
+  private processComboQueue() {
+    if (this.comboQueue.length === 0) {
+      this.isProcessingCombo = false;
+      this.comboCount = 0;
+      if (this.isPaused) {
+        this.isPaused = false;
+        this.syncVisualPauseState();
+        this.emitState(true);
+      }
+      return;
+    }
+
+    this.isProcessingCombo = true;
+    if (!this.isPaused) {
+      this.isPaused = true;
+      this.syncVisualPauseState();
+      this.emitState(true);
+    }
+
+    const hero = this.comboQueue.shift()!;
+    // call useSkill to trigger 'heroSkillTriggered' event and start animation
+    hero.useSkill();
   }
 
   /**
@@ -1065,7 +1115,11 @@ export class GameScene extends Phaser.Scene {
       isPaused: this.isPaused,
       gameSpeed: this.gameSpeed,
       status: this.status,
-      activeHeroes: this.heroes.map(h => ({ id: h.id, passiveOverride: h.passiveOverride })),
+      activeHeroes: this.heroes.map(h => ({ 
+        id: h.id, 
+        passiveOverride: h.passiveOverride,
+        isSkillReady: h.isSkillReady && !this.comboQueue.includes(h)
+      })),
       activeEnemies: activeEnemies
     };
     const serialized = JSON.stringify(snapshot);

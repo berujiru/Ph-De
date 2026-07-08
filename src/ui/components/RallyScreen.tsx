@@ -41,7 +41,7 @@ import {
 } from '../mockups/battleStyles';
 import { SkinPortrait } from './ArchiveCards';
 import { getSelectedSkin } from '../../game/data/skinSelection';
-import type { HeroId } from '../../game/data/balance';
+import { HERO_DEFINITIONS, type HeroId } from '../../game/data/balance';
 import { IntelModal } from './IntelModal';
 
 interface RallyScreenProps {
@@ -668,6 +668,59 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
             <span style={{ ...stampLabel, fontSize: 8 }}>Act</span>
           </button>
         </div>
+      </div>
+
+      {/* ---------- Right Side: Skill Queue ---------- */}
+      <div
+        style={{
+          position: 'absolute',
+          right: 12,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 16,
+          pointerEvents: 'auto',
+          zIndex: 50,
+        }}
+      >
+        {state.activeHeroes.filter(h => h.isSkillReady).map(hero => {
+           const def = HERO_DEFINITIONS[hero.id as HeroId];
+           if (!def) return null;
+           const shortName = def.signatureSkill.shortName || def.signatureSkill.name.split(' ')[0];
+           return (
+             <button
+               key={hero.id}
+               type="button"
+               className="hud-btn"
+               onClick={() => {
+                 playBtnSound();
+                 uiToGameEvents.emit('queueHeroSkill', { heroId: hero.id });
+               }}
+               style={{
+                 width: 64,
+                 height: 64,
+                 borderRadius: '50%',
+                 backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                 border: `3px solid #ef4444`, // Fiery red
+                 boxShadow: `0 0 18px #ef4444, inset 0 0 10px #ef4444`,
+                 color: '#facc15', // Gold
+                 display: 'flex',
+                 flexDirection: 'column',
+                 alignItems: 'center',
+                 justifyContent: 'center',
+                 animation: 'pulse-glow 1.5s infinite',
+                 cursor: 'pointer',
+                 overflow: 'hidden',
+                 padding: 4
+               }}
+             >
+                <span style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase', textAlign: 'center', lineHeight: 1.1, textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
+                  {shortName}
+                </span>
+             </button>
+           );
+        })}
       </div>
 
       {/* ---------- Abandon Rally Confirmation ---------- */}

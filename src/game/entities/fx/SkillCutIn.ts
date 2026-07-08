@@ -98,7 +98,7 @@ export class SkillCutIn {
       // yellow hazard stripes on the slanted edges. The art is cover-fit and
       // clipped to the cutout, so per-character tuning is limited to
       // artScale / artOffset{X,Y}.
-      this.playDiagonal(container, centerY, accent, options);
+      this.playDiagonal(container, accent, options);
     } else {
       // LEGACY DIAGONAL SLIDING PANEL (For silhouettes)
       const panelWidth = GAME_WIDTH * 1.4;
@@ -181,7 +181,6 @@ export class SkillCutIn {
    */
   private playDiagonal(
     container: Phaser.GameObjects.Container,
-    centerY: number,
     accent: number,
     options: SkillCutInOptions,
   ): void {
@@ -215,10 +214,6 @@ export class SkillCutIn {
         ];
     const pts = corners.map(([x, y]) => new Phaser.Math.Vector2(x, y));
 
-    // Dark backdrop, faded in with the container.
-    const overlay = scene.add.rectangle(GAME_WIDTH / 2, centerY, GAME_WIDTH, GAME_HEIGHT, 0x000000, 0.85);
-    overlay.setScrollFactor(0).setDepth(9_999).setAlpha(0);
-
     container.x = GAME_WIDTH / 2;
     container.setAlpha(0);
 
@@ -245,14 +240,33 @@ export class SkillCutIn {
     }
     container.add(sprite);
 
-    // Clip the art to the diagonal cutout so the sprite sheet never spills
-    // past the slanted edges. Mask lives in screen space and pins to the
-    // camera (scrollFactor 0) to stay aligned with the viewport-locked container.
-    const maskShape = scene.make.graphics({}, false);
-    maskShape.fillStyle(0xffffff);
-    maskShape.fillPoints(pts.map((p) => new Phaser.Math.Vector2(p.x + GAME_WIDTH / 2, p.y + centerY)), true);
-    maskShape.setScrollFactor(0);
-    sprite.setMask(maskShape.createGeometryMask());
+    // Instead of a mask, we draw the 85% black overlay as two polygons (top and bottom) 
+    // ON TOP of the sprite. This darkens the screen exactly like the overlay did, 
+    // but also plunges any overflowing sprite parts into the shadows!
+    const shadowOverlay = scene.add.graphics();
+    shadowOverlay.fillStyle(0x000000, 0.85);
+    
+    // Top shadow
+    shadowOverlay.fillPoints([
+      new Phaser.Math.Vector2(-GAME_WIDTH * 2, -GAME_HEIGHT * 2),
+      new Phaser.Math.Vector2(GAME_WIDTH * 2, -GAME_HEIGHT * 2),
+      new Phaser.Math.Vector2(GAME_WIDTH * 2, pts[1].y),
+      pts[1],
+      pts[0],
+      new Phaser.Math.Vector2(-GAME_WIDTH * 2, pts[0].y),
+    ], true);
+    
+    // Bottom shadow
+    shadowOverlay.fillPoints([
+      pts[3],
+      pts[2],
+      new Phaser.Math.Vector2(GAME_WIDTH * 2, pts[2].y),
+      new Phaser.Math.Vector2(GAME_WIDTH * 2, GAME_HEIGHT * 2),
+      new Phaser.Math.Vector2(-GAME_WIDTH * 2, GAME_HEIGHT * 2),
+      new Phaser.Math.Vector2(-GAME_WIDTH * 2, pts[3].y),
+    ], true);
+    
+    container.add(shadowOverlay);
 
     // Yellow/black hazard stripes riding both diagonal edges, drawn inward so
     // they stay inside the cutout, then an accent stroke around the whole rim.
@@ -288,19 +302,17 @@ export class SkillCutIn {
 
     const fadeDuration = 200;
     scene.tweens.add({
-      targets: [container, overlay],
+      targets: [container],
       alpha: 1,
       duration: fadeDuration,
       onComplete: () => {
         scene.tweens.add({
-          targets: [container, overlay],
+          targets: [container],
           alpha: 0,
           delay: Math.max(0, totalMs - fadeDuration * 2),
           duration: fadeDuration,
           onComplete: () => {
-            maskShape.destroy();
             container.destroy();
-            overlay.destroy();
             options.onComplete?.();
           },
         });

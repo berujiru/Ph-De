@@ -6,6 +6,7 @@ import { RALLY } from '../data/level';
 import { formationTargetY, stepTowardFormation } from '../core/RallyMarch';
 import { applyHeroPassive, type ISkillHero } from '../core/Skills';
 import { HeroModel } from './models/HeroModel';
+import { SkillAura } from './fx/SkillAura';
 
 export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   public id: string;
@@ -38,9 +39,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   private formationJitterY: number;
 
   private model: HeroModel;
-  private skillButton: Phaser.GameObjects.Container;
-  private skillButtonBg: Phaser.GameObjects.Rectangle;
-  private skillButtonText: Phaser.GameObjects.Text;
+  private skillAura: SkillAura;
   private rangeIndicator: Phaser.GameObjects.Arc;
 
   constructor(
@@ -82,31 +81,12 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
       this.showRange();
     });
 
-    // Skill Button (below the hero)
-    this.skillButton = scene.add.container(0, sizePx / 2 + 30);
-    this.skillButtonBg = scene.add.rectangle(0, 0, 80, 28, 0x000000, 0.7);
-    this.skillButtonBg.setStrokeStyle(2, 0xef4444);
-    
-    const shortName = def.signatureSkill.shortName || def.signatureSkill.name.split(' ')[0];
-    this.skillButtonText = scene.add.text(0, 0, shortName.toUpperCase(), {
-      fontSize: '14px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    // Skill Aura (below the hero)
+    this.skillAura = new SkillAura(scene, def.color);
+    this.skillAura.setPosition(0, 35); // Approx foot position for 64px tier
+    // Put aura below the model (index 1, as range indicator is 0)
+    this.addAt(this.skillAura, 1);
 
-    this.skillButton.add([this.skillButtonBg, this.skillButtonText]);
-    this.skillButton.setSize(80, 28);
-    this.skillButton.setInteractive({ useHandCursor: true });
-    
-    this.skillButton.on('pointerdown', (_pointer: Phaser.Input.Pointer, _localX: number, _localY: number, event: Phaser.Types.Input.EventData) => {
-      event.stopPropagation(); // prevent hero click
-      const gs = this.scene as any;
-      if (gs.isPaused || gs.gameSpeed === 0) return;
-      this.useSkill();
-      this.showRange();
-    });
-
-    this.add(this.skillButton);
     this.updateSkillButtonVisuals();
 
     scene.add.existing(this);
@@ -277,10 +257,16 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
 
   pauseVisuals(): void {
     this.model.pause();
+    if (this.isSkillReady && this.skillAura) {
+      this.skillAura.pause();
+    }
   }
 
   resumeVisuals(): void {
     this.model.resume();
+    if (this.isSkillReady && this.skillAura) {
+      this.skillAura.resume();
+    }
   }
 
   useSkill(skillOverride?: string) {
@@ -318,18 +304,10 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   }
 
   private updateSkillButtonVisuals() {
-    this.scene.tweens.killTweensOf(this.skillButton);
-    this.skillButton.setScale(1);
-
     if (this.isSkillReady) {
-      this.skillButton.setAlpha(1);
-      this.skillButtonBg.setStrokeStyle(3, 0xef4444); // Fiery red border
-      this.skillButtonText.setColor('#facc15'); // Gold text
-      this.scene.tweens.add({ targets: this.skillButton, scale: 1.15, yoyo: true, repeat: -1, duration: 500 });
+      this.skillAura.play();
     } else {
-      this.skillButton.setAlpha(0.4);
-      this.skillButtonBg.setStrokeStyle(2, 0x333333); // Gray border
-      this.skillButtonText.setColor('#888888'); // Gray text
+      this.skillAura.stop();
     }
   }
 }

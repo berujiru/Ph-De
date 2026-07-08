@@ -3,7 +3,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { theme } from '../theme';
 import { uiToGameEvents, gameToUiEvents } from '../../game/core/GameEvents';
 import type { GameStateSnapshot } from '../../game/core/GameEvents';
-import { HERO_DEFINITIONS } from '../../game/data/balance';
+import { HERO_DEFINITIONS, type HeroId } from '../../game/data/balance';
 import {
   BackIcon,
   LightningIcon,
@@ -432,6 +432,59 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
           </RigSection>
         </div>
       )}
+
+      {/* ---------- Right Side: Skill Queue ---------- */}
+      <div
+        style={{
+          position: 'absolute',
+          right: 12,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 16,
+          pointerEvents: 'auto',
+          zIndex: 50,
+        }}
+      >
+        {gameState?.activeHeroes.filter(h => h.isSkillReady).map(hero => {
+           const def = HERO_DEFINITIONS[hero.id as HeroId];
+           if (!def) return null;
+           const shortName = def.signatureSkill.shortName || def.signatureSkill.name.split(' ')[0];
+           return (
+             <button
+               key={hero.id}
+               type="button"
+               className="hud-btn"
+               onClick={() => {
+                 playBtnSound();
+                 uiToGameEvents.emit('queueHeroSkill', { heroId: hero.id });
+               }}
+               style={{
+                 width: 64,
+                 height: 64,
+                 borderRadius: '50%',
+                 backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                 border: `3px solid #ef4444`, // Fiery red
+                 boxShadow: `0 0 18px #ef4444, inset 0 0 10px #ef4444`,
+                 color: '#facc15', // Gold
+                 display: 'flex',
+                 flexDirection: 'column',
+                 alignItems: 'center',
+                 justifyContent: 'center',
+                 animation: 'pulse-glow 1.5s infinite',
+                 cursor: 'pointer',
+                 overflow: 'hidden',
+                 padding: 4
+               }}
+             >
+                <span style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase', textAlign: 'center', lineHeight: 1.1, textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
+                  {shortName}
+                </span>
+             </button>
+           );
+        })}
+      </div>
 
       {/* Bottom-right: speed controls + intel + leave — always visible */}
       <div style={{
