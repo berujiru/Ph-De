@@ -18,7 +18,7 @@ const AILMENT_ICONS: Record<AilmentType, string> = {
   slow: '🐌',
   wet: '💧',
   freeze: '❄️',
-  stun: '💫',
+  stun: '⛔',
   poison: '🧪',
   bleed: '🩸',
   rot: '🦠',
@@ -35,7 +35,7 @@ const AILMENT_OVERLAYS: Record<AilmentType, string> = {
   slow: '⏳',
   wet: '💦',
   freeze: '🧊',
-  stun: '⚡',
+  stun: '⛔',
   poison: '🫧',
   bleed: '🩸',
   rot: '🪰',
@@ -308,6 +308,30 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       this.scene.tweens.add({ targets: this, alpha: 0, duration: 300 });
       this.model.setState('death', { onComplete: () => this.destroy() });
     }
+  }
+
+  public applyAilment(type: any, _amount: number, duration: number) {
+    if (this.isDead) return;
+    this.activeAilments[type] = duration;
+    
+    // Create icon if doesn't exist
+    if (!this.ailmentIcons[type]) {
+      const idx = Object.keys(this.ailmentIcons).length;
+      const iconY = -(this.sizePx / 2 + 24); // above the HP bar
+      const icon = this.scene.add.text(-15 + (idx * 24), iconY, AILMENT_ICONS[type as AilmentType], { fontSize: '24px' }).setOrigin(0.5);
+      this.add(icon);
+      this.ailmentIcons[type] = icon;
+    }
+    
+    this.ailmentIcons[type].setAlpha(1);
+    
+    // Play visual pop
+    this.scene.tweens.add({
+      targets: this.ailmentIcons[type],
+      scale: 1.5,
+      yoyo: true,
+      duration: 150
+    });
   }
 
   applyAilmentBuildup(type: AilmentType, amount: number) {

@@ -810,7 +810,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackStyle: 'vortex',
     range: 650,
     damage: 8,
-    attackRateMs: 3800,
+    attackRateMs: 6500,
     color: 0x475569,
     purpose: 'Whistle-and-STOP crowd control — magnetically pulls enemies into a tight clump for the squad to blast. Low damage, high setup.',
     signatureSkill: { name: 'STOP!', description: 'Hard stuns a wide radius and cancels channeling Boss Skills.' },

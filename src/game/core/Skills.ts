@@ -28,6 +28,7 @@ export interface ISkillEnemy {
   };
   silenceTimer: number;
   takeDamage: (amount: number) => void;
+  applyAilment: (type: string, amount: number, duration: number) => void;
 }
 
 export interface SkillVisualEvent {
@@ -71,6 +72,18 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
         h.applyBuff?.('rally', 10000, 0xef4444, '⚔️');
       }
       onVisual({ type: 'text', x: h.x, y: h.y - 20, text: 'RALLY!', color: '#ef4444' });
+    }
+  } else if (skillId === 'traffic_enforcer') {
+    // STOP!: Global hard stun and traffic lights visual
+    const stunDuration = 2000;
+    
+    // Traffic light visual
+    onVisual({ type: 'trafficLights', duration: stunDuration });
+    
+    for (const e of enemies) {
+      if (!e.isDead) {
+        e.applyAilment('stun', 1, stunDuration);
+      }
     }
   } else if (skillId === 'teacher') {
     // Silence: Silence all enemy auras globally (visualized as an expanding circle)

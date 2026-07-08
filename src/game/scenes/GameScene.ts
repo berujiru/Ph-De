@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { MoraleShield } from '../entities/MoraleShield';
+import { TrafficLight } from '../entities/fx/TrafficLight';
 import { Hero } from '../entities/Hero';
 import { Enemy } from '../entities/Enemy';
 import { Summon } from '../entities/Summon';
@@ -599,6 +600,19 @@ export class GameScene extends Phaser.Scene {
                 ease: 'Sine.easeOut',
                 onComplete: () => circle.destroy()
               });
+            }
+          } else if (evt.type === 'trafficLights') {
+            const startY = RALLY.shieldStartY - 20;
+            const endY = this.cameras.main.scrollY + 100;
+            const numRows = 8;
+            const stepY = (startY - endY) / (numRows - 1);
+            
+            for (let i = 0; i < numRows; i++) {
+              const y = startY - (i * stepY);
+              // Left side
+              new TrafficLight(this, 30, y, evt.duration);
+              // Right side
+              new TrafficLight(this, GAME_WIDTH - 30, y, evt.duration);
             }
           }
         }
