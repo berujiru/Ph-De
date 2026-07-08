@@ -456,22 +456,25 @@ export class ChainAttack extends Attack {
     let jumps = 0;
     const hitEnemies = new Set<Enemy>();
     const enemies = (scene as any).enemies as Enemy[];
+    let currentDamage = this.totalDamage;
     
     while (currentTarget && jumps < maxJumps) {
-      currentTarget.takeDamage(this.totalDamage);
+      currentTarget.takeDamage(currentDamage);
       hitEnemies.add(currentTarget);
 
       // Crackling multi-segment arc between the two points, with a wider soft
       // glow underneath and a bright white core over it.
-      this.drawCrackle(scene, currentX, currentY, currentTarget.x, currentTarget.y, color, 7, 0.35);
-      this.drawCrackle(scene, currentX, currentY, currentTarget.x, currentTarget.y, 0xffffff, 2.5, 1);
+      this.drawCrackle(scene, currentX, currentY, currentTarget.x, currentTarget.y, color, 14, 0.4);
+      this.drawCrackle(scene, currentX, currentY, currentTarget.x, currentTarget.y, 0xffffff, 5, 1);
 
       currentX = currentTarget.x;
       currentY = currentTarget.y;
       jumps++;
       
+      currentDamage = Math.max(1, currentDamage * 0.8); // 20% damage drop per bounce
+      
       let nextTarget: Enemy | null = null;
-      let minDist = 150 * 150;
+      let minDist = 350 * 350; // Increased chain bounce range to 350 (smaller than hero's 1400 range)
       if (enemies) {
         for (const e of enemies) {
           if (!e.isDead && !hitEnemies.has(e)) {
@@ -830,5 +833,92 @@ export class TrapAttack extends Attack {
     this.telegraph.destroy();
     this.visual.destroy();
     this.destroy();
+  }
+}
+
+export class AoeRootFieldAttack extends Attack {
+  private durationMs: number;
+  private ageMs = 0;
+  private radius: number;
+  private xPos: number;
+  private yPos: number;
+  private groundVisual: Phaser.GameObjects.Graphics;
+  private lightningIcon: Phaser.GameObjects.Text;
+  private pulsingCircles: Phaser.GameObjects.Graphics;
+
+  constructor(scene: Phaser.Scene, x: number, y: number, radius: number, duration: number, damage: number) {
+    super(scene, 'AoeRootFieldAttack', damage);
+    this.xPos = x;
+    this.yPos = y;
+    this.radius = radius;
+    this.durationMs = duration;
+    
+    // Outer glowing ring (STATIC)
+    this.groundVisual = scene.add.graphics();
+    this.groundVisual.setPosition(x, y);
+    this.groundVisual.lineStyle(6, 0xeab308, 0.8);
+    this.groundVisual.strokeCircle(0, 0, radius);
+
+    // Pulsing circle lines within the AoE
+    this.pulsingCircles = scene.add.graphics();
+    this.pulsingCircles.setPosition(x, y);
+    this.pulsingCircles.lineStyle(2, 0xfef08a, 0.6);
+    this.pulsingCircles.strokeCircle(0, 0, radius * 0.4);
+    this.pulsingCircles.strokeCircle(0, 0, radius * 0.8);
+    
+    scene.tweens.add({
+      targets: this.pulsingCircles,
+      scaleX: 1.15,
+      scaleY: 1.15,
+      alpha: 0.3,
+      duration: 800,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+
+    // 1 big lightning icon in the middle
+    this.lightningIcon = scene.add.text(x, y, '⚡', { fontSize: '42px' }).setOrigin(0.5);
+    scene.tweens.add({
+      targets: this.lightningIcon,
+      scaleX: 1.15,
+      scaleY: 1.15,
+      duration: 500,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+  }
+
+  update(_time: number, delta: number) {
+    if (this.isDead) return;
+    this.ageMs += delta;
+    if (this.ageMs >= this.durationMs) {
+      this.isDead = true;
+      this.groundVisual.destroy();
+      this.pulsingCircles.destroy();
+      this.lightningIcon.destroy();
+      this.destroy();
+      return;
+    }
+
+    const enemies = (this.scene as any).enemies as Enemy[];
+    if (enemies) {
+      for (const enemy of enemies) {
+        if (!enemy.isDead) {
+          const dx = enemy.x - this.xPos;
+          const dy = enemy.y - this.yPos;
+          if (dx * dx + dy * dy <= this.radius * this.radius) {
+            enemy.applyAilment('root', 1, 500); // rooted icon
+            enemy.applyAilment('stun', 1, 500); // completely stunned
+            if (this.damage > 0) {
+                enemy.takeDamage(this.damage);
+            }
+          }
+        }
+      }
+    }
+    // Set damage to 0 after first frame so it only bursts once upon cast
+    this.damage = 0;
   }
 }

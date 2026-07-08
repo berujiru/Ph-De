@@ -156,7 +156,9 @@ export function IntelModal({ heroes, enemies, onClose }: IntelModalProps) {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
                         <div style={{ fontSize: 16, fontWeight: 800, color: theme.colors.textPrimary }}>{def.name}</div>
-                        <div style={{ fontSize: 11, color: theme.colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 }}>{def.profession}</div>
+                        <div style={{ fontSize: 11, color: theme.colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                          {def.profession} • {def.attackKind} / {def.attackStyle.replace('-', ' ')}
+                        </div>
                       </div>
                       <span style={{ fontSize: 10, fontWeight: 800, color: theme.colors.accent, padding: '2px 6px', borderRadius: 6, border: `1px solid ${glass.border}` }}>
                         {def.damageType}

@@ -123,6 +123,26 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
         }
       }
     }
+  } else if (skillId === 'call_center_agent') {
+    // Put-on-hold: AoE Root that deals minor damage and continuously roots enemies inside.
+    const rootRadius = 250; // Larger AoE
+    const rootDuration = 5000; // 5s persistent field
+    const burstDamage = 2; // tiny damage just to tag them, focused on CC not burst
+    
+    // Find target in range
+    const range = 1400; // call center agent range
+    let target = enemies.find(e => !e.isDead && (hero.y - e.y <= range));
+    let targetX = hero.x;
+    let targetY = hero.y - range;
+    
+    if (target) {
+      targetX = target.x;
+      targetY = target.y;
+    }
+    
+    // Dispatch visual event at target coordinates. The GameScene will spawn an AoeRootFieldAttack 
+    // which handles both the persistent field logic and visuals.
+    onVisual({ type: 'aoeRoot', x: targetX, y: targetY, radius: rootRadius, duration: rootDuration, damage: burstDamage });
   } else if (skillId === 'teacher') {
     // Silence: Silence all enemy auras globally (visualized as an expanding circle)
     onVisual({ type: 'expandingCircle', x: hero.x, y: hero.y, color: '#8b5cf6', maxRadius: GAME_HEIGHT, duration: 1000 });
@@ -193,12 +213,7 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     // Yero Barricade: Fake Obstacle — a horizontal wall across the lane, just
     // above the visible bottom front line.
     onVisual({ type: 'spawnObstacle', x: GAME_WIDTH / 2, y: GAME_HEIGHT - 150, width: 200, height: 20, color: '#d97706', duration: 5000 });
-  } else if (skillId === 'call_center_agent') {
-    // Escalate: 15% Max HP to lowest HP enemy
-    const lowestHp = enemies.filter(e => !e.isDead).sort((a, b) => a.hp - b.hp)[0];
-    if (lowestHp) {
-      lowestHp.takeDamage(lowestHp.definition.maxHp * 0.15);
-    }
+
   } else if (skillId === 'security_guard') {
     // Flashlight: Wide cone slow — enemies ahead of (above) the hero.
     for (const e of enemies) {

@@ -4,7 +4,7 @@ import { TrafficLight } from '../entities/fx/TrafficLight';
 import { Hero } from '../entities/Hero';
 import { Enemy } from '../entities/Enemy';
 import { Summon } from '../entities/Summon';
-import { Attack, ProjectileAttack, PierceAttack, MeleeCleaveAttack, VortexAttack, BoomerangAttack, ChainAttack, SummonAttack, BeamAttack, LobbedAttack, LinearWaveAttack, TrapAttack } from '../entities/Attacks';
+import { Attack, ProjectileAttack, PierceAttack, MeleeCleaveAttack, VortexAttack, BoomerangAttack, ChainAttack, SummonAttack, BeamAttack, LobbedAttack, LinearWaveAttack, TrapAttack, AoeRootFieldAttack } from '../entities/Attacks';
 import { gameToUiEvents, uiToGameEvents, type GameStateSnapshot, type DropOption } from '../core/GameEvents';
 import { BARRICADE_DEFAULTS, ENEMY_DEFINITIONS, HERO_DEFINITIONS, MAX_ACTIVE_HEROES, UPGRADE_DEFS, GLOBAL_DROP_DEFS, computeKillPool, voiceDropCost, enemySizeClass, type EnemyId, type HeroId, type UpgradeKind } from '../data/balance';
 import { DAMAGE_TYPE_COLORS, type DamageType } from '../core/Damage';
@@ -648,6 +648,9 @@ export class GameScene extends Phaser.Scene {
               ease: 'Quad.easeIn',
               onComplete: () => graphics.destroy()
             });
+          } else if (evt.type === 'aoeRoot') {
+            const attack = new AoeRootFieldAttack(this, evt.x, evt.y, evt.radius, evt.duration, evt.damage);
+            this.attacks.push(attack);
           }
         }
       });

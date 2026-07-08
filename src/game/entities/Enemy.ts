@@ -534,6 +534,8 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
           // Ailment active effects
           if (type === 'freeze' || type === 'stun') {
             isStunnedOrFrozen = true;
+          } else if (type === 'root') {
+            speedMult = 0; // completely halted, but can still attack
           } else if (type === 'slow') {
             speedMult = 0.6; // −40% speed per docs/DAMAGE_AND_AILMENTS.md (no stack)
           }

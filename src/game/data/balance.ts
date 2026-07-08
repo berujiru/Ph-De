@@ -676,10 +676,10 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     range: 1400, // longest non-global reach — sniper tier taxes the DPS
     damage: 13,
     attackRateMs: 1600,
-    baseChain: 3,
+    baseChain: 5,
     color: 0xfef08a,
-    purpose: 'Headset feedback arcs to 3 enemies at once and can target Stealth; excellent against Wet clumps.',
-    signatureSkill: { name: 'Escalate to Manager', description: 'Deals massive single-target damage (15% Max HP).' },
+    purpose: 'Headset feedback arcs to 5 enemies at once and can target Stealth; excellent against Wet clumps.',
+    signatureSkill: { name: 'Put-on-hold', description: 'Deals damage and applies a 5s Root in a small AoE.' },
     passive: { name: 'Graveyard Shift', description: 'Can see and directly target Stealthed enemies.' },
   },
   security_guard: {

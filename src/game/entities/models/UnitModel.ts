@@ -134,7 +134,9 @@ export abstract class UnitModel extends Phaser.GameObjects.Container {
   /** Pause the current animation/tweens visually */
   pause(): void {
     if (this.animatedBody) {
-      this.animatedBody.anims.pause();
+      if (this.animatedBody.anims) {
+        this.animatedBody.anims.pause();
+      }
       this.scene.tweens.getTweensOf(this.animatedBody).forEach(t => t.pause());
     }
   }
@@ -155,7 +157,9 @@ export abstract class UnitModel extends Phaser.GameObjects.Container {
   /** Resume the current animation/tweens visually */
   resume(): void {
     if (this.animatedBody) {
-      this.animatedBody.anims.resume();
+      if (this.animatedBody.anims) {
+        this.animatedBody.anims.resume();
+      }
       this.scene.tweens.getTweensOf(this.animatedBody).forEach(t => t.resume());
     }
   }
