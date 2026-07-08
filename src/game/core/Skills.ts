@@ -90,8 +90,8 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     }
   } else if (skillId === 'security_guard') {
     // Flash: Cone of light that heavily slows all enemies
-    const coneLength = 800; // configurable for voice drops
-    const slowDuration = 5000; // default 5s
+    const coneLength = 1200; // configurable for voice drops
+    const slowDuration = 7000; // 7s
     
     // Find target to aim at (closest or most advanced enemy)
     const validEnemies = enemies.filter(e => !e.isDead);
