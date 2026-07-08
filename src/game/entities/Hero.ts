@@ -142,15 +142,22 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     // Create icon if doesn't exist
     if (!this.buffIcons[type]) {
       const idx = Object.keys(this.buffIcons).length;
-      const iconY = -60; // above the head
-      const icon = this.scene.add.text(-15 + (idx * 24), iconY, iconText, { fontSize: '24px' }).setOrigin(0.5);
+      const iconY = -120; // moved even higher
+      // Stack horizontally (idx * 34) and start slightly left of center
+      const icon = this.scene.add.text(-20 + (idx * 34), iconY, iconText, { 
+        fontSize: '32px', // scaled up
+        color: '#ffffff',
+        stroke: '#000000',
+        strokeThickness: 6 // stronger outline
+      }).setOrigin(0.5);
+      
       this.add(icon);
       this.buffIcons[type] = icon;
       
       // Bob animation for the icon
       this.scene.tweens.add({
         targets: icon,
-        y: iconY - 5,
+        y: iconY - 12,
         yoyo: true,
         repeat: -1,
         duration: 1000,
@@ -219,6 +226,14 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     return target && this.y - target.y <= this.range ? target : null;
   }
 
+  getEffectiveAttackRateMs(): number {
+    let rate = this.attackRateMs;
+    if (this.hasRallyBuff || this.activeBuffs['attackSpeed']) {
+      rate /= 2; // 100% attack speed boost
+    }
+    return Math.max(100, rate); // Floor at 100ms
+  }
+
   update(delta: number, enemies: Enemy[], shieldY: number) {
     // Process Buff Durations
     for (const [type, duration] of Object.entries(this.activeBuffs)) {
@@ -274,16 +289,18 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
 
     // Auto-attack — fire when the cadence is ready and a target is in range.
     if (target && this.attackCooldown === 0) {
+      const effectiveRate = this.getEffectiveAttackRateMs();
+      
       // Cooldown starts now (attack cadence is unchanged). We decouple the 
       // actual projectile launch from the animation frames using a delayed timer 
       // so the mechanical attack fires reliably even at extremely fast speeds.
-      this.attackCooldown = this.attackRateMs;
+      this.attackCooldown = effectiveRate;
       
-      this.model.setState('attack', { attackIntervalMs: this.attackRateMs });
+      this.model.setState('attack', { attackIntervalMs: effectiveRate });
 
       // Fire projectile roughly halfway through the attack interval to sync with the visual swing.
       this.pendingAttacks.push({
-        delayMs: this.attackRateMs * 0.45,
+        delayMs: effectiveRate * 0.45,
         originalTarget: target,
       });
     }

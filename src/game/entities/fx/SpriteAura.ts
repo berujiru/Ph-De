@@ -19,28 +19,31 @@ export class SpriteAura extends Phaser.GameObjects.Container {
     // Using an empty string for texture in particles sometimes defaults to a white square, but it's safer to use graphics.
     
     // Instead of relying on an image, we can use a graphics generated texture.
-    const textureKey = 'aura-drop';
+    const textureKey = 'aura-drop-32';
     if (!scene.textures.exists(textureKey)) {
-        const g = scene.make.graphics({ x: 0, y: 0, add: false });
+        const g = scene.add.graphics();
         g.fillStyle(0xffffff, 1);
-        g.fillCircle(4, 4, 4); // 8x8 circle
-        g.generateTexture(textureKey, 8, 8);
+        g.fillCircle(16, 16, 16); // 32x32 circle
+        g.generateTexture(textureKey, 32, 32);
+        g.destroy();
     }
 
     this.particles = scene.add.particles(0, 0, textureKey, {
       tint: this.color,
       alpha: { start: 0.8, end: 0 },
-      scale: { start: 0.8, end: 0.2 },
-      speedY: { min: -30, max: -60 },
+      scale: { start: 0.6, end: 0.1 },
+      speedY: { min: -40, max: -80 },
       speedX: { min: -10, max: 10 },
       lifespan: 1000,
-      frequency: 150,
-      blendMode: 'ADD',
+      frequency: 100,
+      blendMode: 'SCREEN',
       emitZone: {
         type: 'random',
-        source: new Phaser.Geom.Rectangle(-20, -10, 40, 20),
+        source: new Phaser.Geom.Rectangle(-30, -50, 60, 50),
       }
     });
+    
+    this.setDepth(10);
 
     this.add(this.particles);
     this.particles.stop();

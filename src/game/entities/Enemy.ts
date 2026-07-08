@@ -82,8 +82,10 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
 
   // Buff Tracking
   public hasSpeedBuff = false;
+  public hasAttackSpeedBuff = false;
   private spriteAura: SpriteAura;
   private buffIcon: Phaser.GameObjects.Text | null = null;
+  private attackSpeedBuffIcon: Phaser.GameObjects.Text | null = null;
 
   constructor(scene: Phaser.Scene, x: number, y: number, definition: EnemyDefinition) {
     super(scene, x, y);
@@ -181,7 +183,49 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     if (this.buffIcon) {
       this.buffIcon.setVisible(false);
     }
-    this.spriteAura.stop();
+    if (!this.hasAttackSpeedBuff) this.spriteAura.stop();
+  }
+
+  applyAttackSpeedBuff(durationMs: number = 4000) {
+    if (this.isDead) return;
+    
+    this.hasAttackSpeedBuff = true;
+
+    if (!this.attackSpeedBuffIcon) {
+      const iconY = -(this.sizePx / 2 + 40); // above ailment icons
+      // Offset slightly to the side if they already have a speed buff
+      const iconX = this.buffIcon ? 20 : 0;
+      this.attackSpeedBuffIcon = this.scene.add.text(iconX, iconY, '⚔️', { fontSize: '24px' }).setOrigin(0.5);
+      this.add(this.attackSpeedBuffIcon);
+      
+      this.scene.tweens.add({
+        targets: this.attackSpeedBuffIcon,
+        y: iconY - 5,
+        yoyo: true,
+        repeat: -1,
+        duration: 1000,
+        ease: 'Sine.easeInOut'
+      });
+    }
+
+    this.attackSpeedBuffIcon.setVisible(true);
+    this.spriteAura.play(0xef4444); // Red aura
+  }
+
+  removeAttackSpeedBuff() {
+    this.hasAttackSpeedBuff = false;
+    if (this.attackSpeedBuffIcon) {
+      this.attackSpeedBuffIcon.setVisible(false);
+    }
+    if (!this.hasSpeedBuff) this.spriteAura.stop();
+  }
+
+  getEffectiveAttackRateMs(): number {
+    let rate = this.definition.attackRateMs;
+    if (this.hasAttackSpeedBuff) {
+      rate /= 2; // 100% attack speed boost
+    }
+    return Math.max(100, rate); // Floor at 100ms
   }
 
   takeDamage(amount: number) {
@@ -503,7 +547,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       this.attackCooldown -= delta;
       if (this.attackCooldown <= 0) {
         targetSummon.takeDamage(this.definition.damage);
-        this.attackCooldown = this.definition.attackRateMs;
+        this.attackCooldown = this.getEffectiveAttackRateMs();
         this.model.setState('attack');
       }
     } else if (this.y >= shield.y - shield.height / 2 - (this.definition.attackRangePx ?? 0)) {
@@ -517,7 +561,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       if (this.attackCooldown <= 0) {
         const dmg = this.definition.damage * (this.definition.barrierDamageMultiplier || 1);
         shield.takeDamage(dmg);
-        this.attackCooldown = this.definition.attackRateMs;
+        this.attackCooldown = this.getEffectiveAttackRateMs();
         this.model.setState('attack');
       }
     } else if (moveSpeed > 0) {

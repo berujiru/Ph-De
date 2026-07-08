@@ -7,6 +7,7 @@ export interface ISkillHero {
   currentSkillCooldown: number;
   isSkillReady: boolean;
   hasRallyBuff?: boolean;
+  applyBuff?: (type: string, durationMs?: number, color?: number, iconText?: string) => void;
 }
 
 export interface ISkillEnemy {
@@ -61,11 +62,10 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
   const { heroes, enemies, onVisual, GAME_WIDTH, GAME_HEIGHT } = ctx;
 
   if (skillId === 'eden') {
-    // Rally: Attack speed buff to all heroes
+    // Rally: Attack speed buff to all heroes (10s duration)
     for (const h of heroes) {
       if (!h.hasRallyBuff) {
-        h.attackRateMs /= 2;
-        h.hasRallyBuff = true;
+        h.applyBuff?.('rally', 10000, 0xef4444, '⚔️');
       }
       onVisual({ type: 'text', x: h.x, y: h.y - 20, text: 'RALLY!', color: '#ef4444' });
     }
@@ -79,14 +79,9 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       }
     }
   } else if (skillId === 'student') {
-    // Cramming: Reset 1 random adjacent hero's skill
-    const adjacent = heroes.filter(h => h !== hero && dist(h.x, h.y, hero.x, hero.y) < 150);
-    if (adjacent.length > 0) {
-      const target = adjacent[Math.floor(Math.random() * adjacent.length)];
-      target.currentSkillCooldown = 0;
-      target.isSkillReady = true;
-      onVisual({ type: 'text', x: target.x, y: target.y - 20, text: 'CRAM!', color: '#f59e0b' });
-    }
+    // Cramming: Self-buff attack speed and throws multiple damage types (implemented later)
+    hero.applyBuff?.('attackSpeed', 5000, 0xfacc15, '⚔️');
+    onVisual({ type: 'text', x: hero.x, y: hero.y - 20, text: 'CRAMMING!', color: '#f59e0b' });
   } else if (skillId === 'jeepney_driver') {
     // Barya Lang Po: AoE Shotgun
     for (const e of enemies) {
