@@ -133,14 +133,27 @@ export abstract class UnitModel extends Phaser.GameObjects.Container {
 
   /** Pause the current animation/tweens visually */
   pause(): void {
-    if (this.animatedBody) this.animatedBody.anims.pause();
-    this.scene.tweens.pauseTweensOf(this.bodySprite);
+    if (this.animatedBody) {
+      this.animatedBody.anims.pause();
+      this.scene.tweens.getTweensOf(this.animatedBody).forEach(t => t.pause());
+    }
   }
 
   /** Resume the current animation/tweens visually */
   resume(): void {
-    if (this.animatedBody) this.animatedBody.anims.resume();
-    this.scene.tweens.resumeTweensOf(this.bodySprite);
+    if (this.animatedBody) {
+      this.animatedBody.anims.resume();
+      this.scene.tweens.getTweensOf(this.animatedBody).forEach(t => t.resume());
+    }
+  }
+
+  setFlipX(flip: boolean): this {
+    if (this.animatedBody) this.animatedBody.setFlipX(flip);
+    return this;
+  }
+  
+  getFlipX(): boolean {
+    return this.animatedBody ? this.animatedBody.flipX : false;
   }
 
   /** Local-space point projectiles visually launch from. */

@@ -126,6 +126,14 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     }
   }
 
+  pauseVisuals(): void {
+    this.model.pause();
+  }
+
+  resumeVisuals(): void {
+    this.model.resume();
+  }
+
   takeDamage(amount: number) {
     if (this.isDead) return;
 

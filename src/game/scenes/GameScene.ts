@@ -705,13 +705,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   private pauseVisuals(): void {
-    for (const hero of this.heroes) hero.model.pause();
-    for (const enemy of this.enemies) enemy.model.pause();
+    for (const hero of this.heroes) hero.pauseVisuals();
+    for (const enemy of this.enemies) enemy.pauseVisuals();
   }
 
   private resumeVisuals(): void {
-    for (const hero of this.heroes) hero.model.resume();
-    for (const enemy of this.enemies) enemy.model.resume();
+    for (const hero of this.heroes) hero.resumeVisuals();
+    for (const enemy of this.enemies) enemy.resumeVisuals();
   }
 
   /**

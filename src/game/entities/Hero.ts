@@ -9,6 +9,7 @@ import { HeroModel } from './models/HeroModel';
 
 export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   public id: string;
+  public definition: HeroDefinition;
   public isSkillReady = false;
   private attackCooldown = 0;
   private pendingAttacks: { delayMs: number, originalTarget: Enemy }[] = [];
@@ -30,7 +31,6 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
 
   public skillCooldownMs = 5000;
   public currentSkillCooldown = 5000; // start on cooldown
-  public isSkillReady = false;
 
   public passiveOverride?: string;
 
@@ -255,6 +255,14 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
         this.pendingAttacks.splice(i, 1);
       }
     }
+  }
+
+  pauseVisuals(): void {
+    this.model.pause();
+  }
+
+  resumeVisuals(): void {
+    this.model.resume();
   }
 
   useSkill(skillOverride?: string) {
