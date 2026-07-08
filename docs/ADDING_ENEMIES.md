@@ -12,7 +12,7 @@ purpose:
 
 ### 1. Common stats — shared by every enemy, defined once
 
-`ENEMY_VISUALS` in `src/game/data/balance.ts`. These are rendering constants
+`ENEMY_VISUALS` in `src/game/data/enemies.ts`. These are rendering constants
 that apply uniformly so every enemy reads visually consistent (per
 `docs/DESIGN_GUIDELINES.md`) — you don't set these per enemy type.
 
@@ -32,7 +32,7 @@ actually warranted before adding per-type rendering branches.
 
 ### 2. Per-enemy stats — one set of values per enemy type
 
-`EnemyDefinition` in `src/game/data/balance.ts`:
+`EnemyDefinition` in `src/game/data/enemies.ts`:
 
 | Field | Type | Meaning |
 |---|---|---|
@@ -57,11 +57,11 @@ For reference, the three existing enemies:
 For a **stats-only** enemy (new combination of speed/HP/reward/color — no
 new behavior), you only touch data + content:
 
-1. **`src/game/data/balance.ts`**
+1. **`src/game/data/enemies.ts`**
    - Add the new id to the `EnemyId` union type
    - Add an entry to `ENEMY_DEFINITIONS` (key must equal `id`, see invariant
      tests below)
-2. **`src/game/data/balance.ts`** — reference the new `enemyId` in at least
+2. **`src/game/data/waves.ts`** — reference the new `enemyId` in at least
    one entry in `WAVES`. An enemy definition that's never spawned is dead
    content (per `docs/BEST_PRACTICES.md`) and the invariant test below will
    fail on purpose to catch this.
@@ -83,7 +83,7 @@ architecture.
 ### Worked example: adding a "Swarm" enemy (fast, very low HP, spawns in numbers)
 
 ```ts
-// balance.ts
+// enemies.ts
 export type EnemyId = 'grunt' | 'runner' | 'brute' | 'swarm';
 
 export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {

@@ -1,12 +1,6 @@
 import type { DropOption } from './GameEvents';
-import {
-  rarityWeightsForWave,
-  GLOBAL_DROP_DEFS,
-  UPGRADE_DEFS,
-  UPGRADE_MATRIX,
-  type HeroDefinition,
-  type UpgradeKind,
-} from '../data/balance';
+import { rarityWeightsForWave, GLOBAL_DROP_DEFS, UPGRADE_DEFS, UPGRADE_MATRIX, type UpgradeKind } from '../data/drops';
+import { type HeroDefinition } from '../data/heroes';
 
 /**
  * Pure, seedable Voice-drop RNG (docs/VOICE_DROPS.md section 4).

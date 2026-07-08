@@ -1,14 +1,8 @@
 import { useEffect, useReducer, useState } from 'react';
 import { theme } from '../theme';
-import {
-  HERO_DEFINITIONS,
-  ENEMY_DEFINITIONS,
-  metersLabel,
-  metersPerSecondLabel,
-  type HeroDefinition,
-  type EnemyDefinition,
-  type EnemyId,
-} from '../../game/data/balance';
+import { HERO_DEFINITIONS, type HeroDefinition } from '../../game/data/heroes';
+import { ENEMY_DEFINITIONS, type EnemyDefinition, type EnemyId } from '../../game/data/enemies';
+import { metersLabel, metersPerSecondLabel } from '../../game/data/constants';
 import { HopeCoinIcon, RallyPermitIcon, LockIcon, SkullIcon, InfoIcon } from '../icons';
 import { BackButton } from '../components/BackButton';
 import {

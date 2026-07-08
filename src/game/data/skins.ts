@@ -1,4 +1,4 @@
-import type { HeroId } from './balance';
+import type { HeroId } from './heroes';
 
 /**
  * Hero skins — data-driven battle sprites.

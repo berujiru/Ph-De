@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
-import { HERO_DEFINITIONS, ENEMY_DEFINITIONS, type HeroId } from '../data/balance';
+import { HERO_DEFINITIONS, type HeroId } from '../data/heroes';
+import { ENEMY_DEFINITIONS } from '../data/enemies';
 import { getSelectedSkin } from '../data/skinSelection';
 
 /**

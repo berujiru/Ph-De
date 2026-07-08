@@ -455,7 +455,7 @@ export function BrainIcon(props: IconProps) {
 
 /**
  * Damage-type icon lookup, keyed by the ids used in
- * `src/game/data/balance.ts` (`HeroDefinition['damageType']`).
+ * `src/game/data/heroes.ts` (`HeroDefinition['damageType']`).
  * `Magic` is included ahead of its balance.ts carrier because
  * docs/DAMAGE_AND_AILMENTS.md ships 10 types.
  */

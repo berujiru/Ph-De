@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ENEMY_DEFINITIONS, type EnemyId } from '../../src/game/data/balance';
+import { ENEMY_DEFINITIONS, type EnemyId } from '../../src/game/data/enemies';
 import {
   INTER_WAVE_DELAY_MS,
   TOTAL_WAVES,

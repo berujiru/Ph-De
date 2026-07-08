@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { PreparationScreen } from '../../src/ui/mockups/PreparationScreen';
-import { HERO_DEFINITIONS } from '../../src/game/data/balance';
+import { HERO_DEFINITIONS } from '../../src/game/data/heroes';
 
 /**
  * The Briefing Room does NOT pre-select a squad — workers arrive mid-battle

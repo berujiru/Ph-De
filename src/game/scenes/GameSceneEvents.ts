@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import type { GameScene } from './GameScene';
 import { uiToGameEvents } from '../core/GameEvents';
-import { type HeroId, type EnemyId, ENEMY_DEFINITIONS, HERO_DEFINITIONS } from '../data/balance';
+import { type HeroId, HERO_DEFINITIONS } from '../data/heroes';
+import { type EnemyId, ENEMY_DEFINITIONS } from '../data/enemies';
 import { applyDrop } from './GameSceneDrops';
 import { spawnHero, spawnSandboxTarget } from './GameSceneSpawners';
 import { Enemy } from '../entities/Enemy';

@@ -6,7 +6,7 @@ import {
   type ActiveHeroState,
   type DropContext,
 } from '../../src/game/core/Drops';
-import { UPGRADE_DEFS, UPGRADE_MATRIX } from '../../src/game/data/balance';
+import { UPGRADE_DEFS, UPGRADE_MATRIX } from '../../src/game/data/drops';
 
 /** A projectile hero (eligible for damage/attackSpeed/range/pierce). */
 function projectileHero(overrides: Partial<ActiveHeroState> = {}): ActiveHeroState {

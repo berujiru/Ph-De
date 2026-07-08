@@ -1,4 +1,4 @@
-import type { EnemyId } from '../data/balance';
+import { type EnemyId } from '../data/enemies';
 import type { WaveDefinition } from '../data/waves';
 
 /**

@@ -41,7 +41,7 @@ import {
 } from '../mockups/battleStyles';
 import { SkinPortrait } from './ArchiveCards';
 import { getSelectedSkin } from '../../game/data/skinSelection';
-import { HERO_DEFINITIONS, type HeroId } from '../../game/data/balance';
+import { HERO_DEFINITIONS, type HeroId } from '../../game/data/heroes';
 import { IntelModal } from './IntelModal';
 
 interface RallyScreenProps {

@@ -1,4 +1,4 @@
-import { BARRICADE_DEFAULTS } from './balance';
+import { BARRICADE_DEFAULTS } from './constants';
 
 // Portrait (9:16) internal resolution. The battle now runs on a VERTICAL axis:
 // enemies march DOWN from the top, the rally pushes UP from the bottom.

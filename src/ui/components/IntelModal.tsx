@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { theme } from '../theme';
 import { BrainIcon, CloseIcon } from '../icons';
 import { cautionTape, glassPanel, glass, withAlpha } from '../mockups/battleStyles';
-import { HERO_DEFINITIONS, ENEMY_DEFINITIONS } from '../../game/data/balance';
+import { HERO_DEFINITIONS } from '../../game/data/heroes';
+import { ENEMY_DEFINITIONS } from '../../game/data/enemies';
 import type { ActiveHeroInfo, ActiveEnemyInfo } from '../../game/core/GameEvents';
 
 export interface IntelModalProps {

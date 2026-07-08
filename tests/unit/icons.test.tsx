@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/react';
 import { damageTypeIcons, MegaphoneIcon, StarIcon, StarOutlineIcon } from '../../src/ui/icons';
-import { HERO_DEFINITIONS } from '../../src/game/data/balance';
+import { HERO_DEFINITIONS } from '../../src/game/data/heroes';
 
 describe('icon library', () => {
   it('has an icon for every damage type used by hero definitions', () => {

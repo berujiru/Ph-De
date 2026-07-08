@@ -1,11 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import {
-  ENEMY_DEFINITIONS,
-  HERO_DEFINITIONS,
-  VOICE_DROP_TUNING,
-  computeKillPool,
-  voiceDropCost,
-} from '../../src/game/data/balance';
+import { ENEMY_DEFINITIONS } from '../../src/game/data/enemies';
+import { HERO_DEFINITIONS } from '../../src/game/data/heroes';
+import { VOICE_DROP_TUNING, computeKillPool, voiceDropCost } from '../../src/game/data/drops';
 
 /** How many drops actually land as kills accumulate across a pool of `pool`. */
 function dropsInPool(pool: number): number {

@@ -1,5 +1,6 @@
 import type { GameScene } from './GameScene';
-import { MAX_ACTIVE_HEROES, GLOBAL_DROP_DEFS, UPGRADE_DEFS, computeKillPool, voiceDropCost, HERO_DEFINITIONS, type HeroId, type UpgradeKind } from '../data/balance';
+import { MAX_ACTIVE_HEROES, GLOBAL_DROP_DEFS, UPGRADE_DEFS, computeKillPool, voiceDropCost, type UpgradeKind } from '../data/drops';
+import { HERO_DEFINITIONS, type HeroId } from '../data/heroes';
 import { rollDrops, makeRng, type DropContext } from '../core/Drops';
 import { gameToUiEvents, type DropOption } from '../core/GameEvents';
 import { spawnHero } from './GameSceneSpawners';

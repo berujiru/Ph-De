@@ -12,7 +12,7 @@ import {
 import { BackButton } from '../components/BackButton';
 import { EnemyCaseCard, HeroPolaroidCard, SkinPortrait } from '../components/ArchiveCards';
 import { getSelectedSkin } from '../../game/data/skinSelection';
-import { HERO_DEFINITIONS, type HeroDefinition, type HeroId } from '../../game/data/balance';
+import { HERO_DEFINITIONS, type HeroDefinition, type HeroId } from '../../game/data/heroes';
 
 interface PreparationScreenProps {
   onBack: () => void;

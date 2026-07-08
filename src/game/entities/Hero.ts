@@ -1,7 +1,9 @@
 import Phaser from 'phaser';
 import type { Enemy } from './Enemy';
 import type { AttackModifiers } from './Attacks';
-import { UNIT_RENDER_SIZES, type HeroDefinition, type UpgradeKind } from '../data/balance';
+import { UNIT_RENDER_SIZES } from '../data/enemies';
+import { type HeroDefinition } from '../data/heroes';
+import { type UpgradeKind } from '../data/drops';
 import { RALLY } from '../data/level';
 import { formationTargetY, stepTowardFormation } from '../core/RallyMarch';
 import { applyHeroPassive, type ISkillHero } from '../core/Skills';

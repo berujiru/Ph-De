@@ -55,7 +55,7 @@ For every new hero, two assets must be created and placed in `public/assets/hero
 
 Once the assets exist, follow these steps to wire the hero into the game engine.
 
-### Step A: The Data Definition (`src/game/data/balance.ts`)
+### Step A: The Data Definition (`src/game/data/heroes.ts`)
 Add the new hero to the `HeroId` type and the `HERO_DEFINITIONS` record.
 ```typescript
   [hero_id]: {
@@ -126,11 +126,11 @@ registered (Step B) and its sheet is in place, the hero animates with **no
 ## Checklist for Agents
 
 Before considering a hero "done", verify:
-- [ ] Added to `HeroId` union and `HERO_DEFINITIONS` in `balance.ts`.
+- [ ] Added to `HeroId` union and `HERO_DEFINITIONS` in `heroes.ts`.
 - [ ] Base stats, `attackStyle`, and `damageType` match the design guidelines.
 - [ ] Default skin registered in `HERO_SKINS` (`src/game/data/skins.ts`) with
       correct frame ranges + `portraitFrame`, and the combined sheet is in
       `public/assets/heroes/`.
-- [ ] Cut-in sheet wired via `portraitKey`/`cutInAnim` in `balance.ts`.
+- [ ] Cut-in sheet wired via `portraitKey`/`cutInAnim` in `heroes.ts`.
 - [ ] Active skill is implemented in `Skills.ts` and unit tested in `Skills.test.ts`.
 - [ ] Passive skill (if any) is implemented in `Skills.ts`.

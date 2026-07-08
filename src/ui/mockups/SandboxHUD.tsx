@@ -3,7 +3,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { theme } from '../theme';
 import { uiToGameEvents, gameToUiEvents } from '../../game/core/GameEvents';
 import type { GameStateSnapshot } from '../../game/core/GameEvents';
-import { HERO_DEFINITIONS, type HeroId } from '../../game/data/balance';
+import { HERO_DEFINITIONS, type HeroId } from '../../game/data/heroes';
 import {
   BackIcon,
   LightningIcon,

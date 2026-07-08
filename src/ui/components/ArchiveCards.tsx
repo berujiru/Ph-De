@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { theme } from '../theme';
 import { LockIcon, SkullIcon } from '../icons';
-import type { EnemyDefinition, EnemyId } from '../../game/data/balance';
+import { type EnemyDefinition, type EnemyId } from '../../game/data/enemies';
 import type { HeroSkin } from '../../game/data/skins';
 
 /**

@@ -8,7 +8,7 @@ import {
   type RallyMarchConfig,
 } from '../../src/game/core/RallyMarch';
 import { RALLY } from '../../src/game/data/level';
-import { HERO_DEFINITIONS } from '../../src/game/data/balance';
+import { HERO_DEFINITIONS } from '../../src/game/data/heroes';
 
 const config: RallyMarchConfig = {
   marchSpeedPxPerSec: 50,

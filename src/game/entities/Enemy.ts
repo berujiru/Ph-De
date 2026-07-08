@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import type { EnemyDefinition } from '../data/balance';
-import { ENEMY_VISUALS, UNIT_RENDER_SIZES, enemySizeClass } from '../data/balance';
+import { type EnemyDefinition } from '../data/enemies';
+import { ENEMY_VISUALS, UNIT_RENDER_SIZES, enemySizeClass } from '../data/enemies';
 import type { MoraleShield } from './MoraleShield';
 import type { Summon } from './Summon';
 import type { ISkillEnemy } from '../core/Skills';

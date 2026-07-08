@@ -1,4 +1,4 @@
-import type { EnemyId } from './balance';
+import type { EnemyId } from './enemies';
 
 // ============================================================================
 // WAVE TABLE  (spec: docs/WAVE_ENGINE_SPEC.md)
