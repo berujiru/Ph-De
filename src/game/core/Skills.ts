@@ -133,10 +133,9 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       }
     }
   } else if (skillId === 'nurse') {
-    // Vaccine Drive: Immune to debuffs
-    for (const h of heroes) {
-      onVisual({ type: 'text', x: h.x, y: h.y - 20, text: 'IMMUNE!', color: '#10b981' });
-    }
+    // Heal: Restores barrier HP and shows a green aura
+    onVisual({ type: 'healShield', amount: 150 });
+    onVisual({ type: 'text', x: hero.x, y: hero.y - 20, text: 'HEAL!', color: '#10b981' });
   } else if (skillId === 'construction_worker') {
     // Yero Barricade: Fake Obstacle — a horizontal wall across the lane, just
     // above the visible bottom front line.

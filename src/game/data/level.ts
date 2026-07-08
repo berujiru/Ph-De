@@ -63,7 +63,7 @@ export const RALLY = {
      * Enemies halt and attack this far ahead of (above) the shield's center y
      * (the wall's front edge — must match the stop rule in Enemy.update).
      */
-    enemyContactAheadPx: BARRICADE_DEFAULTS.width / 2,
+    enemyContactAheadPx: BARRICADE_DEFAULTS.height / 2,
     /** Safety margin kept between a hero's slot and the edge of its range. */
     rangeSlackPx: 20,
     /** Ranged heroes scatter up to ±half this (along the march axis) so they don't stack on one pixel. */

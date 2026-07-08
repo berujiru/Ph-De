@@ -422,7 +422,7 @@ export const BARRICADE_DEFAULTS = {
   // Sized for the 20-wave battle: wave-scaled minions chew through anything
   // smaller before the finale (see WAVE_SCALING in data/waves.ts).
   maxHp: 750,
-  width: 30,
+  height: 80,
 };
 
 
@@ -647,7 +647,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 1500,
     color: 0xfca5a5,
     purpose: 'Support striker — alcohol sprays heal any ally summon they pass through, and hit undead anomalies for +50%.',
-    signatureSkill: { name: 'Vaccine Drive', shortName: 'Vaccine', description: 'Grants all heroes immunity to debuffs for 5 seconds.' },
+    signatureSkill: { name: 'Heal', shortName: 'Heal', description: 'Restores 150 HP to the barricade.' },
     passive: { name: 'Triage', description: 'Projectiles passing through ally summons heal them.' },
     projectileColor: 0xfecaca,
   },

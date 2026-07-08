@@ -75,7 +75,8 @@ export interface GameToUiEvents extends Record<string, unknown> {
 export type SkillVisualEvent = 
   | { type: 'text', x: number, y: number, text: string, color: string }
   | { type: 'dragTo', target: { x: number, y: number }, x: number, duration: number }
-  | { type: 'projectileVolley', hero: any, target: any, damageType: string };
+  | { type: 'projectileVolley', hero: any, target: any, damageType: string }
+  | { type: 'healShield', amount: number };
 
 export interface UiToGameEvents extends Record<string, unknown> {
   startWave: undefined;

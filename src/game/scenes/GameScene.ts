@@ -578,6 +578,9 @@ export class GameScene extends Phaser.Scene {
             }
             
             this.attacks.push(attack);
+          } else if (evt.type === 'healShield') {
+            this.healShield(evt.amount);
+            this.shield?.playHealVisual();
           }
         }
       });
@@ -659,7 +662,7 @@ export class GameScene extends Phaser.Scene {
 
     // The morale shield — the crowd's front line, a horizontal bar spanning the
     // lane near the bottom. Advances UP (decreasing y) as the rally marches.
-    this.shield = new MoraleShield(this, GAME_WIDTH / 2, RALLY.shieldStartY, GAME_WIDTH, BARRICADE_DEFAULTS.width, BARRICADE_DEFAULTS.maxHp);
+    this.shield = new MoraleShield(this, GAME_WIDTH / 2, RALLY.shieldStartY, GAME_WIDTH, BARRICADE_DEFAULTS.height, BARRICADE_DEFAULTS.maxHp);
 
     // Start the camera trailing the shield near the bottom of the view (clamps
     // to the world bottom at battle start, so both modes show the formation).

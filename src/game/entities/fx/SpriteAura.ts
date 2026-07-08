@@ -9,7 +9,7 @@ export class SpriteAura extends Phaser.GameObjects.Container {
   private isPlaying = false;
   private color: number;
 
-  constructor(scene: Phaser.Scene, color: number = 0xfacc15) {
+  constructor(scene: Phaser.Scene, color: number = 0xfacc15, emitWidth: number = 60) {
     super(scene, 0, 0);
     this.color = color;
 
@@ -40,7 +40,7 @@ export class SpriteAura extends Phaser.GameObjects.Container {
       // @ts-ignore: Phaser types are strict here
       emitZone: {
         type: 'random' as const,
-        source: new Phaser.Geom.Rectangle(-30, -50, 60, 50),
+        source: new Phaser.Geom.Rectangle(-emitWidth / 2, -50, emitWidth, 50),
       }
     });
     

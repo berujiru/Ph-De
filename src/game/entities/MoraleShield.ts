@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { cameraPunch } from './fx/CameraPunch';
 import { FX } from '../data/level';
+import { SpriteAura } from './fx/SpriteAura';
 
 /**
  * The crowd's morale, made visible: a glowing shield-WALL of light that travels
@@ -87,6 +88,27 @@ export class MoraleShield extends Phaser.GameObjects.Container {
     });
 
     scene.add.existing(this);
+  }
+
+  playHealVisual() {
+    const aura = new SpriteAura(this.scene, 0x10b981, this.width);
+    this.add(aura);
+    aura.play();
+    
+    // Green flash over the whole barrier
+    const flash = this.scene.add.rectangle(0, 0, this.width, this.height, 0x10b981, 0.6);
+    this.add(flash);
+    this.scene.tweens.add({
+      targets: flash,
+      alpha: 0,
+      duration: 800,
+      onComplete: () => flash.destroy()
+    });
+    
+    // Auto-remove after 3 seconds
+    this.scene.time.delayedCall(3000, () => {
+      aura.destroy();
+    });
   }
 
   takeDamage(amount: number) {
