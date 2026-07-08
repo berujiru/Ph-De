@@ -19,34 +19,35 @@ Model* for the canonical rules and the AI generation workflow.
 
 ### Required Art Assets
 
-For every new hero, three assets must be created and placed in `public/assets/heroes/`:
+For every new hero, two assets must be created and placed in `public/assets/heroes/`:
 
-1. **HUD Portrait (`[hero_id]_portrait.png`)**
-   - **Specs**: 256x256px flat PNG. Front-facing, showing the face clearly (determined or stressed).
-2. **Animated Skill Cut-In (`[hero_id]_cutin.png` + `[hero_id]_cutin.json`)**
-   - **Specs**: A large, animated sequence (Texture Atlas) for their Ultimate Skill, played during the time-stop. High-contrast, dynamic angle, anime-style action.
+1. **Animated Skill Cut-In (`[hero_id]_cutin.png`)**
+   - **Specs**: A large, animated sheet for their Ultimate Skill, played during the time-stop. High-contrast, dynamic angle, anime-style action. Isolated from skins — every skin shares the hero's one cut-in.
    - **Required Animation Flow**: Must show the momentum of the action (e.g., Anticipation/inhaling -> Action/shouting into megaphone -> Resolution) to feel like a short, punchy video.
-3. **Animated Sprite Sheet (`[hero_id].png` + `[hero_id].json`)**
-   - **Specs**: A transparent texture atlas (preferably exported from Aseprite using the "Aseprite JSON Array" or "Hash" format).
-   - **Required Animations** — tag names must match the `UnitModel` states in
-     `src/game/entities/models/UnitModel.ts` exactly, since animations key as
-     `${spriteKey}-${tag}`. Heroes draw FOUR states for smooth gameplay, all
-     TOP-BEHIND (back view):
+2. **Combined Skin Sheet (`[hero_id].png` — one per skin; variants e.g. `[hero_id]_streetwear.png`)**
+   - **Specs**: ONE transparent spritesheet (uniform square cells, row-major,
+     ≤ 4096 px per side) holding every gameplay state **plus a front-facing
+     portrait cell**. Frame ranges are declared per state in
+     `src/game/data/skins.ts` (`HeroSkin.states`, linear `{ from, frames }`),
+     so states may span rows freely. Reference layout: see
+     `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` → *Animation Standards → Heroes*.
+   - **Required States** — all TOP-BEHIND (back view) except the portrait cell:
      - `idle`: Bouncing/breathing while standing still (held while engaging an
        enemy in range).
      - `march`: Walk cycle advancing toward the enemy line (plays only when no
        enemy is in range; `run` reuses it faster).
      - `attack`: Swinging weapon / throwing projectile; clear impact frame.
      - `cast`: Signature-skill wind-up pose (plays after the anime cut-in clears).
+     - **portrait**: one FRONT-FACING head/bust cell (`portraitFrame` in the
+       config) — the UI crops it for Archive cards, drop cards, and previews.
+       No separate `_portrait.png` file is needed.
    - `celebrate`, `defeat`, and `stunned` are **not drawn** — the engine plays a
      tween placeholder for those, so heroes still react without dedicated frames.
-   - **Idle is optional if `attack` exists:** with no `idle` sheet the engine
+   - **Idle is optional if `attack` exists:** with no `idle` range the engine
      rests on the first frame of `attack` (a neutral ready pose). Ship `idle`
      anyway for the best look.
-   - Eden is the reference hero. She ships her states as **separate per-state
-     PNG spritesheets** (`eden_walk.png` → `march`, `eden_attack.png`,
-     `eden_cast.png`) wired by hand in `GameScene`, alongside the single-atlas
-     path below — either layout works.
+   - Eden's `default` skin (`/assets/heroes/eden.png` + its `HERO_SKINS.eden[0]`
+     entry) is the reference config.
 
 ---
 
@@ -76,17 +77,33 @@ Add the new hero to the `HeroId` type and the `HERO_DEFINITIONS` record.
   },
 ```
 
-### Step B: Preload & Parse Assets (`src/game/scenes/GameScene.ts`)
-In the `preload()` method, load the portrait and the Aseprite atlas. The atlas
-key **must equal the hero's `spriteKey`** in `balance.ts`:
+### Step B: Register the Skin (`src/game/data/skins.ts`)
+No `GameScene` code is needed — hero sheets load data-driven. Add one
+`HeroSkin` entry (index 0 = the default skin) declaring the sheet URL, grid,
+portrait cell, and per-state frame ranges:
 ```typescript
-this.load.image('[hero_id]_portrait', '/assets/heroes/[hero_id]_portrait.png');
-this.load.aseprite('[hero_id]', '/assets/heroes/[hero_id].png', '/assets/heroes/[hero_id].json');
+[hero_id]: [
+  {
+    id: '[hero_id]', heroId: '[hero_id]', name: 'Default',
+    sheet: '/assets/heroes/[hero_id].png',
+    frameWidth: 256, frameHeight: 256,
+    columns: 8, totalFrames: 73, portraitFrame: 72,
+    states: {
+      idle:   { from: 0,  frames: 8 },
+      march:  { from: 8,  frames: 16 },
+      attack: { from: 24, frames: 24, frameRate: 30 },
+      cast:   { from: 48, frames: 24, frameRate: 20 },
+    },
+  },
+],
 ```
-That's it for parsing — `create()` already calls `createHeroAnimations()`, which
-loops `HERO_DEFINITIONS` and runs `createFromAseprite` for every hero whose atlas
-actually loaded. Until the atlas exists the hero renders the tinted `hero-base`
-placeholder (no broken texture), so you can wire data before art arrives.
+`GameScene.preload()` loads each hero's *selected* skin under `skin.id`, and
+`createHeroAnimations()` builds `${skin.id}-<state>` from those ranges. Until
+the sheet exists the hero renders the tinted `hero-base` placeholder (no broken
+texture), so you can wire data before art arrives. Extra skins are more entries
+in the same array — players equip them in the Archive (persisted, applies next
+battle), and the UI portrait comes from each skin's `portraitFrame`
+automatically.
 
 ### Step C: The Unique Logic (`src/game/core/Skills.ts`)
 Implement the hero's signature Active Skill and/or Passive.
@@ -97,12 +114,12 @@ Implement the hero's signature Active Skill and/or Passive.
 ### Step D: Animation states (already wired — no code needed)
 The model layer is `Phaser.GameObjects.Sprite`-based. `HeroModel` already routes
 every state (`idle/march/attack/cast/celebrate/defeat`) through the sprite-sheet
-path: if an animation `${spriteKey}-<state>` exists it plays those frames,
+path: if an animation `${skin.id}-<state>` exists it plays those frames,
 otherwise it falls back to the tween placeholder (and `idle` specifically rests
-on the first frame of `attack` when no idle sheet exists). So once your atlas is
-loaded (Step B) with tags named exactly for each state, the hero animates with
-**no `HeroModel` changes**. Only touch `HeroModel` if you need a genuinely new
-state (add it to `UnitModel`'s state machine first).
+on the first frame of `attack` when no idle range exists). So once your skin is
+registered (Step B) and its sheet is in place, the hero animates with **no
+`HeroModel` changes**. Only touch `HeroModel` if you need a genuinely new state
+(add it to `UnitModel`'s state machine first).
 
 ---
 
@@ -111,6 +128,9 @@ state (add it to `UnitModel`'s state machine first).
 Before considering a hero "done", verify:
 - [ ] Added to `HeroId` union and `HERO_DEFINITIONS` in `balance.ts`.
 - [ ] Base stats, `attackStyle`, and `damageType` match the design guidelines.
-- [ ] Portrait and Sprite Atlas are preloaded in `GameScene.ts`.
+- [ ] Default skin registered in `HERO_SKINS` (`src/game/data/skins.ts`) with
+      correct frame ranges + `portraitFrame`, and the combined sheet is in
+      `public/assets/heroes/`.
+- [ ] Cut-in sheet wired via `portraitKey`/`cutInAnim` in `balance.ts`.
 - [ ] Active skill is implemented in `Skills.ts` and unit tested in `Skills.test.ts`.
 - [ ] Passive skill (if any) is implemented in `Skills.ts`.

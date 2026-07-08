@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { theme } from '../theme';
 import {
   HERO_DEFINITIONS,
@@ -14,15 +14,16 @@ import { BackButton } from '../components/BackButton';
 import {
   EnemyCaseCard,
   HeroPolaroidCard,
-  HERO_CARD_PORTRAITS,
-  HERO_PLACEHOLDER_SRC,
   PORTRAIT_BG,
+  SkinPortrait,
   TIER_COLOR,
   TYPEWRITER_FONT,
   enemyMechanic,
   enemyTier,
   hexColor,
 } from '../components/ArchiveCards';
+import { getSelectedSkin, setSelectedSkin, subscribeSkins } from '../../game/data/skinSelection';
+import { heroSkins } from '../../game/data/skins';
 
 interface InventoryScreenProps {
   onBack: () => void;
@@ -42,6 +43,9 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
   const [tab, setTab] = useState<ArchiveTab>('heroes');
   const [selectedHero, setSelectedHero] = useState<HeroDefinition | null>(null);
   const [selectedEnemy, setSelectedEnemy] = useState<EnemyDefinition | null>(null);
+  // Re-render when a skin is equipped so every portrait reflects the choice.
+  const [, forceSkinRefresh] = useReducer((n: number) => n + 1, 0);
+  useEffect(() => subscribeSkins(forceSkinRefresh), []);
 
   // Real workers only — the sandbox test dummies never belong in the roster.
   const roster = Object.values(HERO_DEFINITIONS).filter((hero) => !hero.id.startsWith('sandbox_'));
@@ -213,7 +217,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 unlocked={isUnlocked}
                 level={mockLevel}
                 rotation={rotation}
-                imageSrc={HERO_CARD_PORTRAITS[hero.id]}
+                skin={getSelectedSkin(hero.id)}
                 onClick={() => setSelectedHero(hero)}
               >
                 <span style={{ fontSize: '7px', padding: '1px 4px', backgroundColor: '#e2e8f0', color: '#334155', border: '1px solid #cbd5e1', fontWeight: 'bold' }}>
@@ -383,18 +387,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                   borderBottom: 'none',
                   zIndex: 2
                 }} />
-                {(() => {
-                  const portrait = HERO_CARD_PORTRAITS[selectedHero.id];
-                  return (
-                    <img
-                      src={portrait ?? HERO_PLACEHOLDER_SRC}
-                      alt={selectedHero.name}
-                      style={portrait
-                        ? { width: '100%', height: '100%', objectFit: 'cover' }
-                        : { width: '92%', height: '92%', objectFit: 'contain' }}
-                    />
-                  );
-                })()}
+                <SkinPortrait skin={getSelectedSkin(selectedHero.id)} alt={selectedHero.name} />
               </div>
 
               <div style={{ flex: 1, minWidth: 140, color: '#000' }}>
@@ -450,6 +443,45 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
               <div style={{ marginBottom: '18px', color: '#000' }}>
                 <h3 style={{ margin: '0 0 4px 0', fontSize: '13px', borderBottom: '1px solid #000', display: 'inline-block' }}>PASSIVE: {selectedHero.passive.name}</h3>
                 <p style={{ margin: '4px 0 0 0', fontSize: '11px', fontFamily: TYPEWRITER_FONT }}>{selectedHero.passive.description}</p>
+              </div>
+            )}
+
+            {/* Skins — pick which sheet this worker wears into battle */}
+            {heroSkins(selectedHero.id).length > 0 && (
+              <div style={{ marginBottom: '18px', color: '#000' }}>
+                <h3 style={{ margin: '0 0 8px 0', fontSize: '13px', borderBottom: '1px solid #000', display: 'inline-block' }}>SKINS</h3>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                  {heroSkins(selectedHero.id).map((skin) => {
+                    const active = getSelectedSkin(selectedHero.id)?.id === skin.id;
+                    return (
+                      <button
+                        key={skin.id}
+                        onClick={() => setSelectedSkin(selectedHero.id, skin.id)}
+                        aria-pressed={active}
+                        aria-label={`Equip skin: ${skin.name}`}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: 4,
+                          padding: 5,
+                          backgroundColor: active ? '#fef08a' : '#f8fafc',
+                          border: active ? '2px solid #000' : '1px solid #c2b291',
+                          boxShadow: active ? '2px 2px 0 #000' : '1px 2px 6px rgba(0,0,0,0.25)',
+                          cursor: 'pointer',
+                          fontFamily: TYPEWRITER_FONT,
+                        }}
+                      >
+                        <div style={{ width: 56, height: 56, background: PORTRAIT_BG, overflow: 'hidden', border: '1px solid #94a3b8' }}>
+                          <SkinPortrait skin={skin} alt={skin.name} />
+                        </div>
+                        <span style={{ fontSize: 9, fontWeight: 900, textTransform: 'uppercase', color: '#000' }}>
+                          {active ? `✓ ${skin.name}` : skin.name}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             )}
 

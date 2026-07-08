@@ -88,29 +88,46 @@ it here first and keep the templates in sync.
 - **One row per state, one frame per cell**, evenly spaced, non-overlapping,
   transparent background, no baked grid/labels (see Phase 4).
 
-### Heroes — DRAWN sheet is 4 rows + a cut-in
+### Heroes — ONE combined SKIN sheet (+ a separate cut-in)
 
-For smooth gameplay a hero needs the full **`idle / march / attack / cast`** set
-drawn, **plus** the animated skill cut-in (its own sheet — see below). Only
-`celebrate`, `defeat`, and `stunned` fall back to engine tween placeholders, so
-**do not** put those in a hero sheet.
+Hero battle art is a **skin**: one combined spritesheet per skin holding every
+gameplay state **`idle / march / attack / cast`** *plus one dedicated
+front-facing portrait cell*, wired through a config in `src/game/data/skins.ts`
+(`HeroSkin`: per-state `{ from, frames, frameRate? }` linear ranges, plus
+`columns` / `totalFrames` / `portraitFrame` for the UI's CSS portrait crop).
+The animated skill cut-in stays **its own isolated sheet** — never part of a
+skin. Only `celebrate`, `defeat`, and `stunned` fall back to engine tween
+placeholders, so **do not** put those in a skin sheet.
 
-| Row (tag) | Frames | Play | Notes |
+| Section (state) | Frames | Play | Notes |
 |---|---|---|---|
 | `idle`   | **8**  | loop     | Breathing/bounce in place. Seamless (frame 8 → frame 1). |
-| `march`  | **8**  | loop     | Walk cycle advancing toward the enemy line. Seamless. `run` reuses it ~1.5× faster. Plays only while there's no enemy in range (an engaged hero holds `idle`). |
-| `attack` | **8**  | one-shot | Basic attack. **Frame 4 = the clear impact/release frame** (wind-up 1–3, impact 4, follow-through 5–8). |
-| `cast`   | **10** | one-shot | Signature-skill wind-up, energy building across the ramp (pairs with the cut-in, and plays *after* the cut-in clears). |
+| `march`  | **8–16** | loop   | Walk cycle advancing toward the enemy line. Seamless. `run` reuses it ~1.5× faster. Plays only while there's no enemy in range (an engaged hero holds `idle`). |
+| `attack` | **8–24** | one-shot | Basic attack. A clear impact/release frame ~45% in (wind-up → impact → follow-through). |
+| `cast`   | **10–24** | one-shot | Signature-skill wind-up, energy building across the ramp (pairs with the cut-in, and plays *after* the cut-in clears). |
+| portrait | **1**  | static   | Front-facing head/bust cell — the UI crops this for Archive cards, drop cards, and previews. The one front-view exception inside an otherwise top-behind sheet. |
 
-> **Idle fallback:** if a hero ships `attack` but no `idle` sheet, the engine
+Because ranges are declared in the skin config (`from` + `frames`), states can
+span multiple rows and don't need to fill rows exactly — but keep the grid
+row-major, uniform cells, and the sheet **≤ 4096 px per side** (mobile GL
+texture limit). Reference layout (Eden default, 256px cells, 8 columns):
+idle row 0, march rows 1–2, attack rows 3–5, cast rows 6–8, portrait = first
+cell of row 9.
+
+> **Idle fallback:** if a skin ships `attack` but no `idle` range, the engine
 > uses the **first frame of `attack`** as the resting pose (a neutral ready
 > stance) instead of a walk frame or the placeholder. So `idle` is strongly
 > recommended but not strictly required as long as `attack` exists.
 >
-> **Timing note:** unlike the flat-10-FPS loops, a hero's `attack` clip is
-> time-scaled to its `attackRateMs` (a fast attacker's swing speeds up), and the
-> cut-in sheet is spread across `cutInDurationMs` — so author clean, evenly
-> paced frames and let the engine set the rate.
+> **Timing note:** loops default to 10 FPS unless the skin config sets a
+> `frameRate`; a hero's `attack` clip is additionally time-scaled to its
+> `attackRateMs` (a fast attacker's swing speeds up), and the cut-in sheet is
+> spread across `cutInDurationMs` — so author clean, evenly paced frames and
+> let the engine set the rate.
+>
+> **Skins:** every skin is one such sheet + one config entry in
+> `HERO_SKINS`; players equip them in the Archive and the choice (persisted in
+> localStorage) applies on the next battle. The cut-in is shared across skins.
 
 ### Enemies — DRAWN sheet is 5 rows (+1 for casters)
 
@@ -234,10 +251,12 @@ section above** — this table is just *what each tag is*.
 | `defeat` | heroes | morale broken — take a knee (heroes never die) |
 | `death` | enemies | one-shot dissolve, then the entity is destroyed |
 
-> **Heroes get a DRAWN set of `idle / march / attack / cast`** plus their skill
-> cut-in. `celebrate`, `defeat`, and `stunned` still use the built-in tween
-> placeholder — they are **not drawn**, so don't put them in a hero sprite
-> sheet. If `idle` is omitted, the engine rests on the first frame of `attack`.
+> **Heroes get ONE combined skin sheet of `idle / march / attack / cast` + a
+> front-face portrait cell** (config in `src/game/data/skins.ts`), plus their
+> skill cut-in as a separate sheet. `celebrate`, `defeat`, and `stunned` still
+> use the built-in tween placeholder — they are **not drawn**, so don't put
+> them in a skin sheet. If `idle` is omitted, the engine rests on the first
+> frame of `attack`.
 > **Enemies get `march / attack / stunned / celebrate / death`** (bosses/casters
 > add `cast`). `idle` falls back to the tween/`march` placeholder, so it is not a
 > required row on an enemy sheet.

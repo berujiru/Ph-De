@@ -39,7 +39,9 @@ import {
   stampLabel,
   withAlpha,
 } from '../mockups/battleStyles';
-import { HERO_CARD_PORTRAITS } from './ArchiveCards';
+import { SkinPortrait } from './ArchiveCards';
+import { getSelectedSkin } from '../../game/data/skinSelection';
+import type { HeroId } from '../../game/data/balance';
 import { IntelModal } from './IntelModal';
 
 interface RallyScreenProps {
@@ -126,9 +128,10 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
   const kindMeta = KIND_META[kind];
   const isBuhis = kind === 'buhisBuhay';
   const DamageIcon = option.damageType ? damageTypeIcons[option.damageType] : undefined;
-  // Hero drops carry the hero id as `hero:<id>` — look up a real portrait.
+  // Hero drops carry the hero id as `hero:<id>` — the equipped skin's portrait
+  // cell renders as the recruit photo.
   const heroId = kind === 'hero' && option.id.startsWith('hero:') ? option.id.slice('hero:'.length) : undefined;
-  const heroPortrait = heroId ? HERO_CARD_PORTRAITS[heroId] : undefined;
+  const heroSkin = heroId ? getSelectedSkin(heroId as HeroId) : undefined;
 
   /* The emblem art differs per kind so the three drop types are unmistakable
      at a glance: a portrait for a recruit, a damage chip for a hero upgrade,
@@ -162,13 +165,7 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
             justifyContent: 'center',
           }}
         >
-          <img
-            src={heroPortrait ?? '/assets/heroes/hero-placeholder.svg'}
-            alt=""
-            style={heroPortrait
-              ? { width: '100%', height: '100%', objectFit: 'cover' }
-              : { width: '90%', height: '90%', objectFit: 'contain' }}
-          />
+          <SkinPortrait skin={heroSkin} />
         </div>
         <span
           style={{

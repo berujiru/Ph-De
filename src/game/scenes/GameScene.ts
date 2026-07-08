@@ -10,6 +10,7 @@ import { rollDrops, makeRng, type DropContext } from '../core/Drops';
 import { GAME_HEIGHT, GAME_WIDTH, WORLD_HEIGHT, RALLY, ENEMY_SPAWN_Y_OFFSET, FX, PARALLAX } from '../data/level';
 import { formationTargetY, nextShieldY } from '../core/RallyMarch';
 import { applyHeroSkill, type SkillVisualEvent } from '../core/Skills';
+import { getSelectedSkin } from '../data/skinSelection';
 import { SkillCutIn } from '../entities/fx/SkillCutIn';
 import { ParallaxBackground } from '../entities/fx/ParallaxBackground';
 import { cameraPunch } from '../entities/fx/CameraPunch';
@@ -51,23 +52,28 @@ export class GameScene extends Phaser.Scene {
       this.load.image(layer.key, `/assets/backgrounds/${layer.key}.svg`);
     }
     this.load.image('hero-base', '/assets/heroes/hero-base.svg');
-    this.load.image('eden_portrait', '/assets/heroes/eden_portrait.png');
     this.load.image('enemy-base', '/assets/enemies/enemy-base.svg');
-    // Character sprite sheets (Aseprite atlas). Uncomment each as its art lands;
+    // Enemy sprite sheets (Aseprite atlas). Uncomment each as its art lands;
     // the model falls back to the tinted base cut-out until then, and
-    // create{Hero,Enemy}Animations() below wire whatever loaded. The atlas key
+    // createEnemyAnimations() below wires whatever loaded. The atlas key
     // defaults to the unit's id (override via `spriteKey` in balance.ts).
-    // Heroes → public/assets/heroes/, enemies → public/assets/enemies/.
-    // Re-enable once a corrected top-down, transparent eden sheet is generated:
-    // this.load.aseprite('eden', '/assets/heroes/eden.png', '/assets/heroes/eden.json');
-    // Eden's in-battle sheets. The walk sheet is keyed 'eden' (her spriteKey) so
-    // it doubles as the model's base texture — that makes HeroModel resolve its
-    // animation base to `eden`, so `eden-march`/`eden-attack`/`eden-cast` play
-    // instead of the tween placeholders.
-    this.load.spritesheet('eden', '/assets/heroes/eden_walk.png', { frameWidth: 256, frameHeight: 256 });
-    this.load.spritesheet('eden_attack_sheet', '/assets/heroes/eden_attack.png', { frameWidth: 256, frameHeight: 256 });
-    this.load.spritesheet('eden_cast_sheet', '/assets/heroes/eden_cast.png', { frameWidth: 256, frameHeight: 256 });
-    
+
+    // Hero battle sprites are data-driven SKINS: each hero's selected skin is
+    // ONE combined sheet (idle/march/attack/cast + a portrait cell) loaded
+    // under the skin's id. Heroes with no skin keep the tinted placeholder.
+    // Selection is read here at load time, so an Archive skin change applies
+    // on the next battle. See src/game/data/skins.ts.
+    for (const heroId of Object.keys(HERO_DEFINITIONS) as HeroId[]) {
+      const skin = getSelectedSkin(heroId);
+      if (skin && !this.textures.exists(skin.id)) {
+        this.load.spritesheet(skin.id, skin.sheet, {
+          frameWidth: skin.frameWidth,
+          frameHeight: skin.frameHeight,
+        });
+      }
+    }
+
+
     // Dynamically load all hero portraits (static or animated)
     Object.values(HERO_DEFINITIONS).forEach((hero) => {
       if (hero.portraitKey) {
@@ -695,43 +701,31 @@ export class GameScene extends Phaser.Scene {
   }
 
   /**
-   * Register Aseprite tag animations (`${spriteKey}-<state>`) for every hero
-   * whose atlas actually loaded. Heroes without art simply have no animations,
-   * so HeroModel keeps using its tween placeholders. Safe to call once in
-   * create(); the atlas key defaults to the hero id.
+   * Build `${skin.id}-<state>` animations for every hero whose selected skin
+   * sheet actually loaded, from the skin's declared frame ranges
+   * (src/game/data/skins.ts). Heroes without a skin (or whose sheet failed to
+   * load) simply have no animations, so HeroModel keeps its tween placeholders.
+   * Loops (idle/march) repeat; one-shots (attack/cast) play once — attack is
+   * additionally time-scaled to attackRateMs at play time by HeroModel.
    */
   private createHeroAnimations(): void {
-    this.createAtlasAnimations(Object.values(HERO_DEFINITIONS).map(d => d.spriteKey ?? d.id));
-
-    // Eden's states are standalone spritesheets (no Aseprite JSON), so wire them
-    // by hand as `eden-<tag>` — the keys UnitModel derives from her spriteKey.
-
-    // Walk/march (also the base texture). run reuses this, played faster.
-    if (this.textures.exists('eden') && !this.anims.exists('eden-march')) {
-      this.anims.create({
-        key: 'eden-march',
-        frames: this.anims.generateFrameNumbers('eden', { start: 0, end: 15 }), // 16 frames
-        frameRate: 10, // Steady walking loop
-        repeat: -1,
-      });
-    }
-
-    // Attack — snappy one-shot.
-    if (this.textures.exists('eden_attack_sheet') && !this.anims.exists('eden-attack')) {
-      this.anims.create({
-        key: 'eden-attack',
-        frames: this.anims.generateFrameNumbers('eden_attack_sheet', { start: 0, end: 23 }), // 24 frames
-        frameRate: 30, // ~0.8s
-      });
-    }
-
-    // Cast — the skill wind-up (plays with the cut-in).
-    if (this.textures.exists('eden_cast_sheet') && !this.anims.exists('eden-cast')) {
-      this.anims.create({
-        key: 'eden-cast',
-        frames: this.anims.generateFrameNumbers('eden_cast_sheet', { start: 0, end: 23 }), // 24 frames
-        frameRate: 20, // ~1.2s wind-up
-      });
+    for (const heroId of Object.keys(HERO_DEFINITIONS) as HeroId[]) {
+      const skin = getSelectedSkin(heroId);
+      if (!skin || !this.textures.exists(skin.id)) continue;
+      for (const [state, cfg] of Object.entries(skin.states)) {
+        if (!cfg) continue;
+        const animKey = `${skin.id}-${state}`;
+        if (this.anims.exists(animKey)) continue;
+        this.anims.create({
+          key: animKey,
+          frames: this.anims.generateFrameNumbers(skin.id, {
+            start: cfg.from,
+            end: cfg.from + cfg.frames - 1,
+          }),
+          frameRate: cfg.frameRate ?? 10,
+          repeat: state === 'idle' || state === 'march' ? -1 : 0,
+        });
+      }
     }
   }
 
@@ -852,8 +846,8 @@ export class GameScene extends Phaser.Scene {
       }
 
       this.attacks.push(attack);
-    });
-    
+    }, getSelectedSkin(id)?.id); // equipped skin drives which sheet the model renders
+
     if (passiveOverride) {
       hero.passiveOverride = passiveOverride;
     }

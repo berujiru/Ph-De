@@ -44,7 +44,15 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   private skillBarFill: Phaser.GameObjects.Rectangle;
   private rangeIndicator: Phaser.GameObjects.Arc;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, def: HeroDefinition, onAttack: (hero: Hero, target: Enemy) => void) {
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    def: HeroDefinition,
+    onAttack: (hero: Hero, target: Enemy) => void,
+    /** Selected-skin texture key; falls back to def.spriteKey / def.id. */
+    spriteKey?: string,
+  ) {
     super(scene, x, y);
     this.id = def.id;
     this.definition = def;
@@ -64,7 +72,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     // Heroes render at the 'hero' size tier; labels/bars hang off its half-height.
     const sizePx = UNIT_RENDER_SIZES.hero;
     const half = sizePx / 2;
-    this.model = new HeroModel(scene, 0, 0, def.color, def.spriteKey ?? def.id, sizePx);
+    this.model = new HeroModel(scene, 0, 0, def.color, spriteKey ?? def.spriteKey ?? def.id, sizePx);
     this.add(this.model);
 
     const nameLabel = scene.add.text(0, half + 4, def.name, {
