@@ -38,7 +38,7 @@ export class SpriteAura extends Phaser.GameObjects.Container {
       frequency: 100,
       blendMode: 'SCREEN',
       emitZone: {
-        type: 'random',
+        type: 'random' as const,
         source: new Phaser.Geom.Rectangle(-30, -50, 60, 50),
       }
     });

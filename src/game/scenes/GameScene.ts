@@ -565,6 +565,19 @@ export class GameScene extends Phaser.Scene {
                 }
               }
             });
+          } else if (evt.type === 'projectileVolley') {
+            const h = evt.hero as Hero;
+            const elementColors: Record<string, number> = {
+              'Fire': 0xef4444,
+              'Water': 0x3b82f6,
+              'Wind': 0x10b981,
+              'Earth': 0x84cc16,
+              'Lightning': 0xeab308,
+              'Physical': 0x9ca3af
+            };
+            const volleyColor = elementColors[evt.damageType] || 0xffffff;
+            const attack = new ProjectileAttack(this, h.muzzleX, h.muzzleY, evt.target, h.damage, volleyColor, h.modifiers, evt.damageType as any);
+            this.attacks.push(attack);
           }
         }
       });
@@ -962,9 +975,10 @@ export class GameScene extends Phaser.Scene {
     // Heroes join directly at their formation slot behind (below) the shield.
     const y = formationTargetY(this.shield.y, { attackKind: def.attackKind, rangePx: def.range }, RALLY.formation);
 
-    const hero = new Hero(this, x, y, def, (h, target) => {
+    const hero = new Hero(this, x, y, def, (h, target, overrideDamageType, overrideColor) => {
       let attack: Attack;
-      const color = h.definition.projectileColor || h.definition.color;
+      const color = overrideColor ?? h.definition.projectileColor ?? h.definition.color;
+      const damageType = overrideDamageType ?? h.definition.damageType;
       // Persisted per-hero upgrade mods land on every Attack this hero spawns.
       const mods = h.modifiers;
 
@@ -990,11 +1004,11 @@ export class GameScene extends Phaser.Scene {
         attack = new TrapAttack(this, h.x, h.y, target, h.damage, color, mods);
       } else if (h.definition.attackStyle === 'pierce') {
         // Non-homing straight-line shot; pass-throughs = basePierce + bonusPierce.
-        attack = new PierceAttack(this, h.muzzleX, h.muzzleY, target, h.damage, color, h.definition.basePierce ?? 1, mods);
+        attack = new PierceAttack(this, h.muzzleX, h.muzzleY, target, h.damage, color, h.definition.basePierce ?? 1, mods, damageType);
         h.playProjectileLaunch();
       } else {
         // Plain projectile — homes, expires on first hit (+bonusPierce).
-        attack = new ProjectileAttack(this, h.muzzleX, h.muzzleY, target, h.damage, color, mods);
+        attack = new ProjectileAttack(this, h.muzzleX, h.muzzleY, target, h.damage, color, mods, damageType);
         h.playProjectileLaunch();
       }
 

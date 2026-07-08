@@ -79,8 +79,22 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       }
     }
   } else if (skillId === 'student') {
-    // Cramming: Self-buff attack speed and throws multiple damage types (implemented later)
-    hero.applyBuff?.('attackSpeed', 5000, 0xfacc15, '⚔️');
+    // Cramming: Self-buff attack speed (10s) and instantly hurl a multi-element blast
+    hero.applyBuff?.('attackSpeed', 10000, 0xfacc15, '⚔️');
+    
+    // Find up to 5 random targets and fire a mixed-element volley
+    const validTargets = enemies.filter(e => !e.isDead);
+    if (validTargets.length > 0) {
+      const volleySize = 5;
+      const elements: ('Physical' | 'Fire' | 'Wind' | 'Earth' | 'Lightning')[] = ['Physical', 'Fire', 'Wind', 'Earth', 'Lightning'];
+      
+      for (let i = 0; i < volleySize; i++) {
+        const target = validTargets[Math.floor(Math.random() * validTargets.length)];
+        const damageType = elements[i % elements.length];
+        onVisual({ type: 'projectileVolley', hero, target, damageType });
+      }
+    }
+    
     onVisual({ type: 'text', x: hero.x, y: hero.y - 20, text: 'CRAMMING!', color: '#f59e0b' });
   } else if (skillId === 'jeepney_driver') {
     // Barya Lang Po: AoE Shotgun

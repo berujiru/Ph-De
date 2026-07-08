@@ -150,7 +150,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     this.model.resume();
   }
 
-  applySpeedBuff(durationMs: number = 4000) {
+  applySpeedBuff(_durationMs: number = 4000) {
     if (this.isDead) return;
     
     this.hasSpeedBuff = true;
@@ -186,7 +186,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     if (!this.hasAttackSpeedBuff) this.spriteAura.stop();
   }
 
-  applyAttackSpeedBuff(durationMs: number = 4000) {
+  applyAttackSpeedBuff(_durationMs: number = 4000) {
     if (this.isDead) return;
     
     this.hasAttackSpeedBuff = true;
@@ -228,7 +228,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     return Math.max(100, rate); // Floor at 100ms
   }
 
-  takeDamage(amount: number) {
+  takeDamage(amount: number, _damageType: string = 'Physical') {
     if (this.isDead) return;
 
     // Hit immunity completely blocks the hit

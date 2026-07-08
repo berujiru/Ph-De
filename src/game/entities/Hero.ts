@@ -53,7 +53,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     x: number,
     y: number,
     def: HeroDefinition,
-    onAttack: (hero: Hero, target: Enemy) => void,
+    onAttack: (hero: Hero, target: Enemy, overrideDamageType?: string, overrideColor?: number) => void,
     /** Selected-skin texture key; falls back to def.spriteKey / def.id. */
     spriteKey?: string,
   ) {
@@ -157,11 +157,11 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
       // Bob animation for the icon
       this.scene.tweens.add({
         targets: icon,
-        y: iconY - 12,
-        yoyo: true,
-        repeat: -1,
-        duration: 1000,
-        ease: 'Sine.easeInOut'
+        emitZone: {
+        type: 'edge' as const,
+        source: new Phaser.Geom.Rectangle(-20, -120, 40, 40),
+        quantity: 32,
+      },  ease: 'Sine.easeInOut'
       });
     }
 

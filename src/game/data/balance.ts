@@ -566,7 +566,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     basePierce: 2,
     color: 0xf59e0b,
     purpose: 'Slingshot pebbles punch through a line of 2 enemies — and every enhancement you feed the squad lands at 1.5x on his picks.',
-    signatureSkill: { name: 'Cramming', shortName: 'Cramming', description: 'Instantly resets the active skill cooldown of 1 random adjacent hero.' },
+    signatureSkill: { name: 'Cramming', shortName: 'Cramming', description: 'Self-buffs Attack Speed for 10s and instantly hurls a rapid burst of randomized elemental projectiles.' },
     passive: { name: 'Overachiever', description: 'Enhancement drops apply at 1.5x potency.' },
     projectileColor: 0xfcd34d,
   },

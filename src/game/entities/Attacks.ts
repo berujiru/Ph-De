@@ -19,10 +19,12 @@ export abstract class Attack extends Phaser.GameObjects.GameObject {
   public isDead = false;
   protected damage: number;
   protected modifiers: AttackModifiers;
+  public damageType: string;
 
-  constructor(scene: Phaser.Scene, type: string, damage: number, modifiers?: Partial<AttackModifiers>) {
+  constructor(scene: Phaser.Scene, type: string, damage: number, modifiers?: Partial<AttackModifiers>, damageType: string = 'Physical') {
     super(scene, type);
     this.damage = damage;
+    this.damageType = damageType;
     this.modifiers = {
       bonusDamage: modifiers?.bonusDamage || 0,
       bonusPierce: modifiers?.bonusPierce || 0,
@@ -58,8 +60,8 @@ export class ProjectileAttack extends Attack {
   private maxHits: number;
   private hitEnemies = new Set<Enemy>();
 
-  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
-    super(scene, 'ProjectileAttack', damage, modifiers);
+  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>, damageType: string = 'Physical') {
+    super(scene, 'ProjectileAttack', damage, modifiers, damageType);
     this.target = target;
     this.maxHits = 1 + this.modifiers.bonusPierce;
     this.trail = new MotionTrail(scene, color);
@@ -107,7 +109,7 @@ export class ProjectileAttack extends Attack {
           const dy = enemy.y - this.visual.y;
           const collisionRadius = 50 + this.modifiers.bonusRadius;
           if (dx * dx + dy * dy < collisionRadius * collisionRadius) {
-            enemy.takeDamage(this.totalDamage);
+            enemy.takeDamage(this.totalDamage, this.damageType);
             this.hitEnemies.add(enemy);
             this.hitCount++;
             if (this.hitCount >= this.maxHits) {
@@ -148,8 +150,8 @@ export class PierceAttack extends Attack {
   private maxHits: number;
   private hitEnemies = new Set<Enemy>();
 
-  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy, damage: number, color: number, basePierce: number, modifiers?: Partial<AttackModifiers>) {
-    super(scene, 'PierceAttack', damage, modifiers);
+  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy | { x: number, y: number }, damage: number, color: number, basePierce: number, modifiers?: Partial<AttackModifiers>, damageType: string = 'Physical') {
+    super(scene, 'PierceAttack', damage, modifiers, damageType);
     // Total pass-throughs = basePierce + bonusPierce (guard against bad data).
     this.maxHits = Math.max(1, basePierce + this.modifiers.bonusPierce);
     // A long lance/streak behind a bright tip so pierce reads as a spear, not a dot.
@@ -179,16 +181,19 @@ export class PierceAttack extends Attack {
     // Trail the lance body a little behind the tip.
     this.lance.setPosition(this.visual.x - this.vx / this.speed * 18, this.visual.y - this.vy / this.speed * 18);
 
+    const nx = -this.vy;
+    const ny = this.vx;
+    const len = Math.sqrt(nx * nx + ny * ny) || 1;
+
     const enemies = (this.scene as any).enemies as Enemy[];
     if (enemies) {
       for (const enemy of enemies) {
         if (!enemy.isDead && !this.hitEnemies.has(enemy)) {
           const dx = enemy.x - this.visual.x;
           const dy = enemy.y - this.visual.y;
-          const distSq = dx * dx + dy * dy;
-          const collisionRadius = 50;
-          if (distSq < collisionRadius * collisionRadius) {
-            enemy.takeDamage(this.totalDamage);
+          const cross = Math.abs(dx * (ny / len) - dy * (nx / len));
+          if (cross < 40 + this.modifiers.bonusRadius) {
+            enemy.takeDamage(this.totalDamage, this.damageType);
             this.hitEnemies.add(enemy);
             this.hitCount++;
             if (this.hitCount >= this.maxHits) {

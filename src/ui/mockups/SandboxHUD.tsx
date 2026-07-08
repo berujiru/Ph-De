@@ -209,6 +209,12 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
           <div style={{ fontSize: 11, color: theme.colors.textMuted, marginTop: 2 }}>
             Wave mechanics disabled.
           </div>
+          
+          <div style={{ display: 'flex', gap: 6, marginTop: 8, pointerEvents: 'auto' }}>
+            {speedFab(0, 'Pause', <PauseIcon size={16} />)}
+            {speedFab(1, 'Normal speed', <PlayIcon size={16} />)}
+            {speedFab(2, 'Fast forward', <SpeedIcon size={16} />)}
+          </div>
         </div>
       </div>
 
@@ -258,7 +264,12 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
           <RigSection label="Hero Rig">
             <select
               value={selectedHero}
-              onChange={(e) => setSelectedHero(e.target.value)}
+              onChange={(e) => {
+                const id = e.target.value;
+                setSelectedHero(id);
+                if (HERO_DEFINITIONS[id as HeroId]?.passive) setSelectedHeroPassive(id);
+                if (HERO_DEFINITIONS[id as HeroId]?.signatureSkill) setSelectedHeroSkill(id);
+              }}
               aria-label="Hero to spawn"
               style={glassSelect}
             >
@@ -497,9 +508,7 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
         justifyContent: 'flex-end',
         pointerEvents: 'auto',
       }}>
-        {speedFab(0, 'Pause', <PauseIcon size={18} />)}
-        {speedFab(1, 'Normal speed', <PlayIcon size={18} />)}
-        {speedFab(2, 'Fast forward', <SpeedIcon size={18} />)}
+        {/* Speed controls moved to top-left */}
 
         <button
           type="button"
