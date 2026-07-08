@@ -87,7 +87,7 @@ src/
     core/       pure TS, no Phaser/DOM imports — game rules (unit tested)
     data/       balance.ts (towers/enemies/waves), level.ts (path/slots)
     entities/   Phaser GameObjects — Enemy, Tower, Projectile
-    scenes/     GameScene — orchestration, wires core/ + entities together
+    scenes/     GameScene — orchestration, wires core/ + entities together. Helper modules (GameSceneAnimations, GameSceneSpawners, GameSceneEvents, GameSceneDrops) handle specific domains.
     PhaserGame.ts  Phaser.Game factory
   ui/           React components (HUD, GameCanvas)
 tests/
