@@ -106,18 +106,27 @@ describe('Hero Skills', () => {
     vi.restoreAllMocks();
   });
 
-  it('jeepney_driver (Barya) damages nearby enemies', () => {
-    const h1 = createDummyHero('jeepney_driver', 0, 0);
-    const e1 = createDummyEnemy('e1', 100, 0, 50); // Close
-    const e2 = createDummyEnemy('e2', 400, 0, 50); // Far
+  it('jeepney_driver (Barya) damages enemies in a cone', () => {
+    const h1 = createDummyHero('jeepney_driver', 0, 0); // At origin
+    // Most advanced enemy determines cone angle. Make eTarget have the highest Y (closest to 0).
+    const eTarget = createDummyEnemy('eTarget', 0, -50, 50);
+    // eInside is inside the 60 degree cone (straight UP, within 400 range)
+    const eInside = createDummyEnemy('eInside', 50, -200, 50); 
+    // eOutside is within 400 range but outside the 60 degree cone (e.g. to the right)
+    const eOutside = createDummyEnemy('eOutside', 200, -100, 50); 
+    // eFar is inside the cone angle but too far (>400 range)
+    const eFar = createDummyEnemy('eFar', 0, -500, 50);
 
-    const ctx = createDummyContext([h1], [e1, e2]);
+    const ctx = createDummyContext([h1], [eTarget, eInside, eOutside, eFar]);
 
     applyHeroSkill('jeepney_driver', h1, ctx);
 
     // Damage is hero.damage * 3 (10 * 3 = 30)
-    expect(e1.hp).toBe(20); // 50 - 30 = 20
-    expect(e2.hp).toBe(50); // Untouched
+    expect(eTarget.hp).toBe(20); // Hits target
+    expect(eInside.hp).toBe(20); // Hits inside cone
+    expect(eOutside.hp).toBe(50); // Misses outside cone angle
+    expect(eFar.hp).toBe(50); // Misses too far
+    expect(ctx.onVisual).toHaveBeenCalledWith(expect.objectContaining({ type: 'coinShrapnelCone' }));
   });
   
   it('fisherfolk (Lambat) drags enemies to GAME_WIDTH / 2', () => {

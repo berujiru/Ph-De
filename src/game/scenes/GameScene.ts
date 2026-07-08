@@ -525,138 +525,204 @@ export class GameScene extends Phaser.Scene {
           onComplete: () => {
             if (!this.sys) return;
             hero.playCast();
-            this.processComboQueue();
-          },
-        });
-
-      applyHeroSkill(skillId, hero, {
-        // Lane width is static (no horizontal scroll). Skills treat GAME_HEIGHT
-        // as "the bottom edge of what the player sees" — the front line — which
-        // with a scrolling camera is scrollY + viewport height in world coords.
-        GAME_WIDTH,
-        GAME_HEIGHT: this.cameras.main.scrollY + GAME_HEIGHT,
-        heroes: this.heroes,
-        enemies: this.enemies,
-        onVisual: (evt: SkillVisualEvent) => {
-          if (evt.type === 'text') {
-            const fx = this.add.text(evt.x || 0, evt.y || 0, evt.text || '', { color: evt.color || '#fff', fontStyle: 'bold' }).setOrigin(0.5);
-            this.tweens.add({ targets: fx, y: (evt.y || 0) - 30, alpha: 0, duration: 1000, onComplete: () => fx.destroy() });
-          } else if (evt.type === 'dragTo') {
-            this.tweens.add({ targets: evt.target, x: evt.x, duration: evt.duration || 500 });
-          } else if (evt.type === 'spawnObstacle') {
-            const block = this.add.rectangle(evt.x, evt.y, evt.width, evt.height, parseInt((evt.color || '#000').replace('#', '0x')));
-            this.time.delayedCall(evt.duration || 5000, () => block.destroy());
-          } else if (evt.type === 'spawnTrap') {
-            const trap = this.add.circle(evt.x, evt.y, evt.radius, parseInt((evt.color || '#000').replace('#', '0x')));
-            this.time.delayedCall(evt.duration || 3000, () => trap.destroy());
-          } else if (evt.type === 'screenFlash') {
-            const blackout = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, parseInt((evt.color || '#000').replace('#', '0x')), evt.alpha || 0.5).setScrollFactor(0);
-            this.time.delayedCall(evt.duration || 3000, () => blackout.destroy());
-          } else if (evt.type === 'spawnRider') {
-            const rider = this.add.circle(evt.x, evt.y, 8, 0x22c55e);
-            this.tweens.add({
-              targets: rider,
-              y: evt.targetY,
-              duration: evt.duration || 1000,
-              onComplete: () => {
-                rider.destroy();
-                for (const e of this.enemies) {
-                  if (!e.isDead && Phaser.Math.Distance.Between(rider.x, rider.y, e.x, e.y) < 100) {
-                    e.takeDamage(evt.damage || 10);
+            
+            applyHeroSkill(skillId, hero, {
+              // Lane width is static (no horizontal scroll). Skills treat GAME_HEIGHT
+              // as "the bottom edge of what the player sees" — the front line — which
+              // with a scrolling camera is scrollY + viewport height in world coords.
+              GAME_WIDTH,
+              GAME_HEIGHT: this.cameras.main.scrollY + GAME_HEIGHT,
+              heroes: this.heroes,
+              enemies: this.enemies,
+              onVisual: (evt: SkillVisualEvent) => {
+                if (evt.type === 'text') {
+                  const fx = this.add.text(evt.x || 0, evt.y || 0, evt.text || '', { color: evt.color || '#fff', fontStyle: 'bold' }).setOrigin(0.5);
+                  this.tweens.add({ targets: fx, y: (evt.y || 0) - 30, alpha: 0, duration: 1000, onComplete: () => fx.destroy() });
+                } else if (evt.type === 'dragTo') {
+                  this.tweens.add({ targets: evt.target, x: evt.x, duration: evt.duration || 500 });
+                } else if (evt.type === 'spawnObstacle') {
+                  const block = this.add.rectangle(evt.x, evt.y, evt.width, evt.height, parseInt((evt.color || '#000').replace('#', '0x')));
+                  this.time.delayedCall(evt.duration || 5000, () => block.destroy());
+                } else if (evt.type === 'spawnTrap') {
+                  const trap = this.add.circle(evt.x, evt.y, evt.radius, parseInt((evt.color || '#000').replace('#', '0x')));
+                  this.time.delayedCall(evt.duration || 3000, () => trap.destroy());
+                } else if (evt.type === 'screenFlash') {
+                  const blackout = this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, parseInt((evt.color || '#000').replace('#', '0x')), evt.alpha || 0.5).setScrollFactor(0);
+                  this.time.delayedCall(evt.duration || 3000, () => blackout.destroy());
+                } else if (evt.type === 'spawnRider') {
+                  const rider = this.add.circle(evt.x, evt.y, 8, 0x22c55e);
+                  this.tweens.add({
+                    targets: rider,
+                    y: evt.targetY,
+                    duration: evt.duration || 1000,
+                    onComplete: () => {
+                      rider.destroy();
+                      for (const e of this.enemies) {
+                        if (!e.isDead && Phaser.Math.Distance.Between(rider.x, rider.y, e.x, e.y) < 100) {
+                          e.takeDamage(evt.damage || 10);
+                        }
+                      }
+                    }
+                  });
+                } else if (evt.type === 'projectileVolley') {
+                  const h = evt.hero as Hero;
+                  const volleyColor = DAMAGE_TYPE_COLORS[evt.damageType as DamageType] || 0xffffff;
+                  
+                  let attack: Attack;
+                  if (h.definition.attackStyle === 'pierce') {
+                    attack = new PierceAttack(this, h.muzzleX, h.muzzleY, evt.target, h.damage, volleyColor, h.definition.basePierce ?? 1, h.modifiers, evt.damageType as any);
+                  } else {
+                    attack = new ProjectileAttack(this, h.muzzleX, h.muzzleY, evt.target, h.damage, volleyColor, h.modifiers, evt.damageType as any);
                   }
+                  
+                  this.attacks.push(attack);
+                } else if (evt.type === 'healShield') {
+                  this.healShield(evt.amount);
+                  this.shield?.playHealVisual();
+                } else if (evt.type === 'rollingBlackoutWave') {
+                  const attack = new RollingBlackoutWaveAttack(this, this.shield.y, evt.damage, 0x38bdf8);
+                  this.attacks.push(attack);
+                } else if (evt.type === 'expandingCircle') {
+                  const baseColor = Phaser.Display.Color.HexStringToColor(evt.color).color;
+                  
+                  // Create a multi-ring ripple effect for texture
+                  for (let i = 0; i < 4; i++) {
+                    const circle = this.add.circle(evt.x, evt.y, 10, baseColor, 0.15);
+                    circle.setStrokeStyle(8 - (i * 1.5), baseColor, 0.8);
+                    circle.setBlendMode(Phaser.BlendModes.ADD);
+                    
+                    this.tweens.add({
+                      targets: circle,
+                      radius: evt.maxRadius,
+                      alpha: 0,
+                      duration: evt.duration * 1.2,
+                      delay: i * 150, // stagger the rings to create outward texture
+                      ease: 'Sine.easeOut',
+                      onComplete: () => circle.destroy()
+                    });
+                  }
+                } else if (evt.type === 'trafficLights') {
+                  const startY = RALLY.shieldStartY - 20;
+                  const endY = this.cameras.main.scrollY + 100;
+                  const numRows = 8;
+                  const stepY = (startY - endY) / (numRows - 1);
+                  
+                  for (let i = 0; i < numRows; i++) {
+                    const y = startY - (i * stepY);
+                    // Left side
+                    new TrafficLight(this, 30, y, evt.duration);
+                    // Right side
+                    new TrafficLight(this, GAME_WIDTH - 30, y, evt.duration);
+                  }
+                } else if (evt.type === 'coinShrapnelCone') {
+                  const hero = evt.hero;
+                  const length = evt.length;
+                  const angle = evt.angle;
+                  const spreadAngle = Math.PI / 6; // 30 degrees each side = 60 degrees total
+                  
+                  // Draw a quick-fading green cone indicator (very low opacity so focus is on coins)
+                  const graphics = this.add.graphics();
+                  graphics.fillStyle(0x10b981, 0.1); 
+                  graphics.beginPath();
+                  
+                  // Cone starts slightly in front of hero
+                  const startX = hero.x + Math.cos(angle) * 20;
+                  const startY = hero.y + Math.sin(angle) * 20;
+                  graphics.moveTo(startX, startY); 
+                  
+                  // Calculate base points using trig
+                  const p1X = startX + Math.cos(angle - spreadAngle) * length;
+                  const p1Y = startY + Math.sin(angle - spreadAngle) * length;
+                  const p2X = startX + Math.cos(angle + spreadAngle) * length;
+                  const p2Y = startY + Math.sin(angle + spreadAngle) * length;
+                  
+                  graphics.lineTo(p1X, p1Y);
+                  graphics.lineTo(p2X, p2Y);
+                  graphics.closePath();
+                  graphics.fillPath();
+                  graphics.setBlendMode(Phaser.BlendModes.ADD);
+
+                  this.tweens.add({
+                    targets: graphics,
+                    alpha: 0,
+                    duration: 300,
+                    ease: 'Power2',
+                    onComplete: () => graphics.destroy()
+                  });
+
+                  // Spawn larger coin chunks flying outward that scatter on the ground
+                  for (let i = 0; i < 12; i++) {
+                    const pAngle = angle + (Math.random() * spreadAngle * 2) - spreadAngle;
+                    const travelDuration = 250 + Math.random() * 150; 
+                    const lingerDuration = 2000 + Math.random() * 1000;
+                    const distanceMultiplier = 0.4 + Math.random() * 0.6; // Coins stop at varied distances
+                    const isGold = Math.random() > 0.5;
+                    
+                    // Larger chunks (radius 6)
+                    const coin = this.add.circle(startX, startY, 6, isGold ? 0xfacc15 : 0x94a3b8);
+                    
+                    this.tweens.add({
+                      targets: coin,
+                      x: startX + Math.cos(pAngle) * (length * distanceMultiplier),
+                      y: startY + Math.sin(pAngle) * (length * distanceMultiplier),
+                      duration: travelDuration,
+                      ease: 'Cubic.easeOut',
+                      onComplete: () => {
+                        // Linger on the ground then fade out
+                        this.tweens.add({
+                          targets: coin,
+                          alpha: 0,
+                          duration: 500,
+                          delay: lingerDuration,
+                          onComplete: () => coin.destroy()
+                        });
+                      }
+                    });
+                  }
+                } else if (evt.type === 'flashlightCone') {
+                  const hero = evt.hero;
+                  const length = evt.length;
+                  const angle = evt.angle; // Added angle to payload
+                  const spreadAngle = Math.PI / 6; // 30 degrees each side = 60 degrees total
+                  
+                  const graphics = this.add.graphics();
+                  graphics.fillStyle(0xfffbeb, 0.4); // Bright light yellow
+                  graphics.beginPath();
+                  
+                  // Cone starts slightly in front of hero
+                  const startX = hero.x + Math.cos(angle) * 20;
+                  const startY = hero.y + Math.sin(angle) * 20;
+                  graphics.moveTo(startX, startY); 
+                  
+                  // Calculate base points using trig
+                  const p1X = startX + Math.cos(angle - spreadAngle) * length;
+                  const p1Y = startY + Math.sin(angle - spreadAngle) * length;
+                  const p2X = startX + Math.cos(angle + spreadAngle) * length;
+                  const p2Y = startY + Math.sin(angle + spreadAngle) * length;
+                  
+                  graphics.lineTo(p1X, p1Y);
+                  graphics.lineTo(p2X, p2Y);
+                  graphics.closePath();
+                  graphics.fillPath();
+                  graphics.setBlendMode(Phaser.BlendModes.ADD);
+
+                  this.tweens.add({
+                    targets: graphics,
+                    alpha: 0,
+                    duration: evt.duration,
+                    ease: 'Quad.easeIn',
+                    onComplete: () => graphics.destroy()
+                  });
+                } else if (evt.type === 'aoeRoot') {
+                  const attack = new AoeRootFieldAttack(this, evt.x, evt.y, evt.radius, evt.duration, evt.damage);
+                  this.attacks.push(attack);
                 }
               }
             });
-          } else if (evt.type === 'projectileVolley') {
-            const h = evt.hero as Hero;
-            const volleyColor = DAMAGE_TYPE_COLORS[evt.damageType as DamageType] || 0xffffff;
             
-            let attack: Attack;
-            if (h.definition.attackStyle === 'pierce') {
-              attack = new PierceAttack(this, h.muzzleX, h.muzzleY, evt.target, h.damage, volleyColor, h.definition.basePierce ?? 1, h.modifiers, evt.damageType as any);
-            } else {
-              attack = new ProjectileAttack(this, h.muzzleX, h.muzzleY, evt.target, h.damage, volleyColor, h.modifiers, evt.damageType as any);
-            }
-            
-            this.attacks.push(attack);
-          } else if (evt.type === 'healShield') {
-            this.healShield(evt.amount);
-            this.shield?.playHealVisual();
-          } else if (evt.type === 'rollingBlackoutWave') {
-            const attack = new RollingBlackoutWaveAttack(this, this.shield.y, evt.damage, 0x38bdf8);
-            this.attacks.push(attack);
-          } else if (evt.type === 'expandingCircle') {
-            const baseColor = Phaser.Display.Color.HexStringToColor(evt.color).color;
-            
-            // Create a multi-ring ripple effect for texture
-            for (let i = 0; i < 4; i++) {
-              const circle = this.add.circle(evt.x, evt.y, 10, baseColor, 0.15);
-              circle.setStrokeStyle(8 - (i * 1.5), baseColor, 0.8);
-              circle.setBlendMode(Phaser.BlendModes.ADD);
-              
-              this.tweens.add({
-                targets: circle,
-                radius: evt.maxRadius,
-                alpha: 0,
-                duration: evt.duration * 1.2,
-                delay: i * 150, // stagger the rings to create outward texture
-                ease: 'Sine.easeOut',
-                onComplete: () => circle.destroy()
-              });
-            }
-          } else if (evt.type === 'trafficLights') {
-            const startY = RALLY.shieldStartY - 20;
-            const endY = this.cameras.main.scrollY + 100;
-            const numRows = 8;
-            const stepY = (startY - endY) / (numRows - 1);
-            
-            for (let i = 0; i < numRows; i++) {
-              const y = startY - (i * stepY);
-              // Left side
-              new TrafficLight(this, 30, y, evt.duration);
-              // Right side
-              new TrafficLight(this, GAME_WIDTH - 30, y, evt.duration);
-            }
-          } else if (evt.type === 'flashlightCone') {
-            const hero = evt.hero;
-            const length = evt.length;
-            const angle = evt.angle; // Added angle to payload
-            const spreadAngle = Math.PI / 6; // 30 degrees each side = 60 degrees total
-            
-            const graphics = this.add.graphics();
-            graphics.fillStyle(0xfffbeb, 0.4); // Bright light yellow
-            graphics.beginPath();
-            
-            // Cone starts slightly in front of hero
-            const startX = hero.x + Math.cos(angle) * 20;
-            const startY = hero.y + Math.sin(angle) * 20;
-            graphics.moveTo(startX, startY); 
-            
-            // Calculate base points using trig
-            const p1X = startX + Math.cos(angle - spreadAngle) * length;
-            const p1Y = startY + Math.sin(angle - spreadAngle) * length;
-            const p2X = startX + Math.cos(angle + spreadAngle) * length;
-            const p2Y = startY + Math.sin(angle + spreadAngle) * length;
-            
-            graphics.lineTo(p1X, p1Y);
-            graphics.lineTo(p2X, p2Y);
-            graphics.closePath();
-            graphics.fillPath();
-            graphics.setBlendMode(Phaser.BlendModes.ADD);
-
-            this.tweens.add({
-              targets: graphics,
-              alpha: 0,
-              duration: evt.duration,
-              ease: 'Quad.easeIn',
-              onComplete: () => graphics.destroy()
-            });
-          } else if (evt.type === 'aoeRoot') {
-            const attack = new AoeRootFieldAttack(this, evt.x, evt.y, evt.radius, evt.duration, evt.damage);
-            this.attacks.push(attack);
-          }
-        }
-      });
+            this.processComboQueue();
+          },
+        });
     });
 
     // Clean up on both shutdown (restart) AND destroy (game.destroy / React unmount)

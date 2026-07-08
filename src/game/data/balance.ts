@@ -580,7 +580,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Wind',
     attackKind: 'melee',
     attackStyle: 'melee-cleave',
-    range: 275,
+    range: 500,
     damage: 22, // top melee DPS — frontline risk pays
     attackRateMs: 1250,
     color: 0x10b981,
@@ -784,7 +784,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     baseChain: 5,
     color: 0x38bdf8,
     purpose: 'Jumper cables that always bounce to 5 nearby targets — reliable, steady horde clear.',
-    signatureSkill: { name: 'Rolling Blackout', description: 'Unleashes a massive electric wave from the barrier to the top of the screen, dealing immense damage.' },
+    signatureSkill: { name: 'Rolling Blackout', shortName: 'Zap', description: 'Unleashes a massive electric wave from the barrier to the top of the screen, dealing immense damage.' },
     passive: { name: 'Live Wire', description: 'Attacks automatically bounce to 5 nearby targets.' },
   },
   baker: {

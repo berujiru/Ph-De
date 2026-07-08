@@ -174,10 +174,36 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     
     onVisual({ type: 'text', x: hero.x, y: hero.y - 20, text: 'CRAMMING!', color: '#f59e0b' });
   } else if (skillId === 'jeepney_driver') {
-    // Barya Lang Po: AoE Shotgun
-    for (const e of enemies) {
-      if (!e.isDead && dist(hero.x, hero.y, e.x, e.y) < 300) {
-        e.takeDamage(hero.damage * 3);
+    // Barya Lang Po: Cone Shotgun of coins
+    const coneLength = 550;
+    
+    // Find target to aim at (closest or most advanced enemy)
+    const validEnemies = enemies.filter(e => !e.isDead);
+    validEnemies.sort((a, b) => b.y - a.y);
+    const target = validEnemies[0];
+    
+    // Calculate angle towards target, default to straight UP (-Math.PI / 2)
+    const targetAngle = target ? Math.atan2(target.y - hero.y, target.x - hero.x) : -Math.PI / 2;
+    
+    // Dispatch visual event
+    onVisual({ type: 'coinShrapnelCone', hero, length: coneLength, angle: targetAngle });
+    
+    // Apply damage to enemies in the cone
+    for (const e of validEnemies) {
+      const dx = e.x - hero.x;
+      const dy = e.y - hero.y;
+      const distSq = dx * dx + dy * dy;
+      
+      if (distSq <= coneLength * coneLength) {
+        let eAngle = Math.atan2(dy, dx);
+        let diff = eAngle - targetAngle;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        
+        // 60-degree cone (30 degrees or ~0.52 radians on either side)
+        if (Math.abs(diff) <= Math.PI / 6) {
+          e.takeDamage(hero.damage * 3);
+        }
       }
     }
   } else if (skillId === 'fisherfolk') {
