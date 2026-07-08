@@ -251,11 +251,9 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       onVisual({ type: 'spawnTrap', x: GAME_WIDTH / 2 + (i-1)*120 + (Math.random()-0.5)*40, y: GAME_HEIGHT - 200, radius: 10, color: '#f472b6', duration: 3000 });
     }
   } else if (skillId === 'electrician') {
-    // Rolling Blackout: Stun all
-    onVisual({ type: 'screenFlash', color: '#000000', alpha: 0.5, duration: 3000 });
-    for (const e of enemies) {
-      if (!e.isDead) e.activeAilments['freeze'] = 100;
-    }
+    // Rolling Blackout: AoE electric surge wave moving from bottom to top
+    // High damage, no debuff. Starting from barrier all the way to top.
+    onVisual({ type: 'rollingBlackoutWave', damage: hero.damage * 2 });
   } else if (skillId === 'baker') {
     // Dough Knead: Flatten damage
     for (const e of enemies) {

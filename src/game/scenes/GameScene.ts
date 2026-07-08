@@ -4,7 +4,7 @@ import { TrafficLight } from '../entities/fx/TrafficLight';
 import { Hero } from '../entities/Hero';
 import { Enemy } from '../entities/Enemy';
 import { Summon } from '../entities/Summon';
-import { Attack, ProjectileAttack, PierceAttack, MeleeCleaveAttack, VortexAttack, BoomerangAttack, ChainAttack, SummonAttack, BeamAttack, LobbedAttack, LinearWaveAttack, TrapAttack, AoeRootFieldAttack } from '../entities/Attacks';
+import { Attack, ProjectileAttack, PierceAttack, MeleeCleaveAttack, VortexAttack, BoomerangAttack, ChainAttack, SummonAttack, BeamAttack, LobbedAttack, LinearWaveAttack, TrapAttack, AoeRootFieldAttack, RollingBlackoutWaveAttack } from '../entities/Attacks';
 import { gameToUiEvents, uiToGameEvents, type GameStateSnapshot, type DropOption } from '../core/GameEvents';
 import { BARRICADE_DEFAULTS, ENEMY_DEFINITIONS, HERO_DEFINITIONS, MAX_ACTIVE_HEROES, UPGRADE_DEFS, GLOBAL_DROP_DEFS, computeKillPool, voiceDropCost, enemySizeClass, type EnemyId, type HeroId, type UpgradeKind } from '../data/balance';
 import { DAMAGE_TYPE_COLORS, type DamageType } from '../core/Damage';
@@ -582,6 +582,9 @@ export class GameScene extends Phaser.Scene {
           } else if (evt.type === 'healShield') {
             this.healShield(evt.amount);
             this.shield?.playHealVisual();
+          } else if (evt.type === 'rollingBlackoutWave') {
+            const attack = new RollingBlackoutWaveAttack(this, this.shield.y, evt.damage, 0x38bdf8);
+            this.attacks.push(attack);
           } else if (evt.type === 'expandingCircle') {
             const baseColor = Phaser.Display.Color.HexStringToColor(evt.color).color;
             

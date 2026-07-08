@@ -922,3 +922,84 @@ export class AoeRootFieldAttack extends Attack {
     this.damage = 0;
   }
 }
+
+export class RollingBlackoutWaveAttack extends Attack {
+  private speed = 1200;
+  private hitEnemies = new Set<Enemy>();
+  private waveGraphic: Phaser.GameObjects.Graphics;
+  private waveWidth = 1200; // Larger than GAME_WIDTH to cover screen during shake
+  private lastFlicker = 0;
+
+  constructor(scene: Phaser.Scene, y: number, damage: number, _color: number) {
+    super(scene, 'RollingBlackoutWaveAttack', damage);
+    
+    this.waveGraphic = scene.add.graphics();
+    this.waveGraphic.setPosition(scene.scale.width / 2, y);
+    this.waveGraphic.setDepth(30);
+    
+    this.drawLightning();
+  }
+
+  private drawLightning() {
+    this.waveGraphic.clear();
+
+    // Outer glow (Yellow)
+    this.waveGraphic.lineStyle(16, 0xfacc15, 0.6);
+    this.waveGraphic.beginPath();
+    let currX = -this.waveWidth / 2;
+    this.waveGraphic.moveTo(currX, 0);
+    while (currX < this.waveWidth / 2) {
+      currX += Phaser.Math.Between(40, 90);
+      if (currX > this.waveWidth / 2) currX = this.waveWidth / 2;
+      const jY = Phaser.Math.Between(-40, 40);
+      this.waveGraphic.lineTo(currX, jY);
+    }
+    this.waveGraphic.strokePath();
+
+    // Inner core (White)
+    this.waveGraphic.lineStyle(6, 0xffffff, 1);
+    this.waveGraphic.beginPath();
+    currX = -this.waveWidth / 2;
+    this.waveGraphic.moveTo(currX, 0);
+    while (currX < this.waveWidth / 2) {
+      currX += Phaser.Math.Between(40, 90);
+      if (currX > this.waveWidth / 2) currX = this.waveWidth / 2;
+      const jY = Phaser.Math.Between(-20, 20);
+      this.waveGraphic.lineTo(currX, jY);
+    }
+    this.waveGraphic.strokePath();
+  }
+  
+  update(time: number, delta: number) {
+    if (this.isDead) return;
+    
+    // Redraw every 50ms to create a flowing current effect
+    if (time - this.lastFlicker > 50) {
+      this.lastFlicker = time;
+      this.drawLightning();
+    }
+    
+    this.waveGraphic.y -= this.speed * (delta / 1000);
+    
+    // Destroy when it has scrolled completely off the top of the visible screen
+    if (this.waveGraphic.y < this.scene.cameras.main.scrollY - 100) {
+      this.isDead = true;
+      this.waveGraphic.destroy();
+      this.destroy();
+      return;
+    }
+
+    const enemies = (this.scene as any).enemies as Enemy[];
+    if (enemies) {
+      for (const enemy of enemies) {
+        if (!enemy.isDead && !this.hitEnemies.has(enemy)) {
+          // If enemy's y is close to the wave's y
+          if (Math.abs(enemy.y - this.waveGraphic.y) < 60) {
+            enemy.takeDamage(this.totalDamage);
+            this.hitEnemies.add(enemy);
+          }
+        }
+      }
+    }
+  }
+}
