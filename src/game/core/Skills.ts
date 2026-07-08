@@ -82,7 +82,7 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     }
   } else if (skillId === 'student') {
     // Cramming: Self-buff attack speed (10s) and instantly hurl a multi-element blast
-    hero.applyBuff?.('attackSpeed', 10000, 0xfacc15, '⚔️');
+    hero.applyBuff?.('cramming', 10000, 0xfacc15, '⚔️');
     
     // Find up to 5 random targets and fire a mixed-element volley
     const validTargets = enemies.filter(e => !e.isDead);

@@ -228,7 +228,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
 
   getEffectiveAttackRateMs(): number {
     let rate = this.attackRateMs;
-    if (this.hasRallyBuff || this.activeBuffs['attackSpeed']) {
+    if (this.hasRallyBuff || this.activeBuffs['attackSpeed'] || this.activeBuffs['cramming']) {
       rate /= 2; // 100% attack speed boost
     }
     return Math.max(100, rate); // Floor at 100ms

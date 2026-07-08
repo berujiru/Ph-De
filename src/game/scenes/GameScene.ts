@@ -979,8 +979,8 @@ export class GameScene extends Phaser.Scene {
       let attack: Attack;
       let damageType = overrideDamageType ?? h.definition.damageType;
 
-      // During Cramming (indicated by student having attackSpeed buff), attacks become randomized elemental!
-      if (h.id === 'student' && h.activeBuffs['attackSpeed']) {
+      // During Cramming (indicated by student having cramming buff), attacks become randomized elemental!
+      if (h.id === 'student' && h.activeBuffs['cramming']) {
         const elements: DamageType[] = ['Physical', 'Magic', 'Fire', 'Frost', 'Lightning', 'Water', 'Wind', 'Earth', 'Holy', 'Dark'];
         damageType = elements[Math.floor(Math.random() * elements.length)];
       }
