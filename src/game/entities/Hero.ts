@@ -84,6 +84,8 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.setSize(Math.round(sizePx * 0.7), sizePx + 30);
     this.setInteractive({ useHandCursor: true });
     this.on('pointerdown', () => {
+      const gs = this.scene as any;
+      if (gs.isPaused || gs.gameSpeed === 0) return;
       this.useSkill();
       this.showRange();
     });

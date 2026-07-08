@@ -131,12 +131,14 @@ export class GameScene extends Phaser.Scene {
       if (!this.sys) return;
       this.applyDrop(dropId);
       this.isPaused = false;
+      this.syncVisualPauseState();
       this.emitState(true);
     });
 
     const unsubSetSpeed = uiToGameEvents.on('setSpeed', ({ speed }) => {
       if (!this.sys) return;
       this.gameSpeed = speed;
+      this.syncVisualPauseState();
       this.emitState(true);
     });
 
@@ -446,9 +448,11 @@ export class GameScene extends Phaser.Scene {
       // so rapid skill-testing isn't interrupted.
       if (!this.isSandbox && !this.isPaused) {
         this.isPaused = true;
-        this.pauseVisuals();
+        this.syncVisualPauseState();
+        this.emitState(true);
+      }
 
-        this.skillCutIn.play({
+      this.skillCutIn.play({
           skillName: hero.definition.signatureSkill.name,
           faction: 'hero',
           portraitKey: hero.definition.portraitKey,
@@ -462,14 +466,13 @@ export class GameScene extends Phaser.Scene {
           onComplete: () => {
             if (!this.sys) return;
             this.isPaused = false;
-            this.resumeVisuals();
+            this.syncVisualPauseState();
             
             // Show the cast animation now the cut-in has cleared (it would
             // otherwise finish hidden behind the full-screen cut-in).
             hero.playCast();
           },
         });
-      }
 
       applyHeroSkill(skillId, hero, {
         // Lane width is static (no horizontal scroll). Skills treat GAME_HEIGHT
@@ -553,6 +556,7 @@ export class GameScene extends Phaser.Scene {
     this.dropRollSeed = 0;
     this.maxVoicesCount = voiceDropCost(0, computeKillPool(this.totalWaves));
     this.isPaused = false;
+    this.syncVisualPauseState();
     this.gameSpeed = 1;
     this.status = 'playing';
     this.spawnTimer = 2000;
@@ -712,6 +716,14 @@ export class GameScene extends Phaser.Scene {
   private resumeVisuals(): void {
     for (const hero of this.heroes) hero.resumeVisuals();
     for (const enemy of this.enemies) enemy.resumeVisuals();
+  }
+
+  private syncVisualPauseState(): void {
+    if (this.isPaused || this.gameSpeed === 0) {
+      this.pauseVisuals();
+    } else {
+      this.resumeVisuals();
+    }
   }
 
   /**
@@ -882,6 +894,7 @@ export class GameScene extends Phaser.Scene {
       
       // Pause game
       this.isPaused = true;
+      this.syncVisualPauseState();
       this.emitState(true);
 
       const options = this.rollDropOptions();
