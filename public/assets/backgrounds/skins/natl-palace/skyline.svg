@@ -1,30 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="540" viewBox="0 0 512 540">
-  
-      <g fill="#0c1424">
-        <!-- Skyscrapers -->
-        <rect x="20" y="180" width="60" height="240" />
-        <rect x="90" y="220" width="50" height="200" />
-        <rect x="350" y="150" width="70" height="270" />
-        <rect x="430" y="200" width="60" height="220" />
-      </g>
-      <!-- Elevated Rail -->
-      <g fill="#0c1424">
-        <rect x="-10" y="300" width="180" height="15" />
-        <rect x="40" y="315" width="20" height="105" />
-        <rect x="120" y="315" width="20" height="105" />
-      </g>
-      <!-- Windows -->
-      <g fill="#facc15" opacity="0.2">
-        <!-- Tower 1 -->
-        <rect x="30" y="200" width="10" height="15" /><rect x="50" y="200" width="10" height="15" />
-        <rect x="30" y="230" width="10" height="15" /><rect x="50" y="230" width="10" height="15" />
-        <rect x="30" y="260" width="10" height="15" /><rect x="50" y="260" width="10" height="15" />
-        <rect x="30" y="290" width="10" height="15" /><rect x="50" y="290" width="10" height="15" />
-        <!-- Tower 3 -->
-        <rect x="360" y="170" width="15" height="15" /><rect x="390" y="170" width="15" height="15" />
-        <rect x="360" y="200" width="15" height="15" /><rect x="390" y="200" width="15" height="15" />
-        <rect x="360" y="230" width="15" height="15" /><rect x="390" y="230" width="15" height="15" />
-        <rect x="360" y="260" width="15" height="15" /><rect x="390" y="260" width="15" height="15" />
-      </g>
-    
+<svg xmlns="http://www.w3.org/2000/svg" width="540" height="960" viewBox="0 0 540 960">
+  <g fill="#111a2e"><rect x="-35.5" y="177.6" width="120" height="80"/><ellipse cx="24.5" cy="177.6" rx="34" ry="30"/><rect x="22.5" y="133.6" width="4" height="16"/></g><g fill="#22d3ee" opacity="0.2"><rect x="-19.5" y="207.6" width="10" height="24"/><rect x="58.5" y="207.6" width="10" height="24"/></g>
+  <rect x="3.5" y="206.7" width="28" height="273.7" fill="#111a2e"/><rect x="16" y="182.7" width="3" height="24" fill="#111a2e"/><circle cx="17.5" cy="182.7" r="3" fill="#f43f5e" opacity="0.8"/>
+  <rect x="23" y="671.1" width="6" height="26" fill="#202c46"/><circle cx="26" cy="656.6" r="20.7" fill="#202c46" opacity="0.9"/>
+  <g fill="#111a2e"><rect x="458.6" y="149.6" width="120" height="80"/><ellipse cx="518.6" cy="149.6" rx="34" ry="30"/><rect x="516.6" y="105.6" width="4" height="16"/></g><g fill="#22d3ee" opacity="0.2"><rect x="474.6" y="179.6" width="10" height="24"/><rect x="552.6" y="179.6" width="10" height="24"/></g>
+  <rect x="511.9" y="215.5" width="28" height="227.7" fill="#111a2e"/><rect x="524.4" y="191.5" width="3" height="24" fill="#111a2e"/><circle cx="525.9" cy="191.5" r="3" fill="#f43f5e" opacity="0.8"/>
+  <rect x="514.7" y="721" width="6" height="26" fill="#202c46"/><circle cx="517.7" cy="704.3" r="23.8" fill="#202c46" opacity="0.9"/>
 </svg>

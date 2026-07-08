@@ -1,19 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="540" viewBox="0 0 512 540" preserveAspectRatio="none">
+<svg xmlns="http://www.w3.org/2000/svg" width="540" height="960" viewBox="0 0 540 960" preserveAspectRatio="none">
   <defs>
-    
-      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#060a14"/>
-        <stop offset="0.6" stop-color="#0a0f1e"/>
-        <stop offset="1" stop-color="#0f172a"/>
-      </linearGradient>
-      <linearGradient id="horizon" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#38bdf8" stop-opacity="0"/>
-        <stop offset="0.7" stop-color="#38bdf8" stop-opacity="0.06"/>
-        <stop offset="1" stop-color="#38bdf8" stop-opacity="0.15"/>
-      </linearGradient>
-    
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#010409"/>
+      <stop offset="0.55" stop-color="#020617"/>
+      <stop offset="1" stop-color="#101736"/>
+    </linearGradient>
+    <linearGradient id="horizon" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#22d3ee" stop-opacity="0"/>
+      <stop offset="1" stop-color="#22d3ee" stop-opacity="0.14"/>
+    </linearGradient>
   </defs>
-  <rect width="512" height="540" fill="url(#sky)"/>
-  <rect y="300" width="512" height="240" fill="url(#horizon)"/>
-  
+  <rect width="540" height="960" fill="url(#sky)"/>
+  <rect y="480" width="540" height="480" fill="url(#horizon)"/>
+  <g fill="#f8fafc" opacity="0.25"><circle cx="509.5" cy="208.8" r="1.8"/><circle cx="238.1" cy="218.1" r="2.1"/><circle cx="138.9" cy="105.2" r="0.9"/><circle cx="213.6" cy="257.3" r="2.2"/><circle cx="275.3" cy="342.1" r="1.9"/><circle cx="522.4" cy="566.3" r="2"/><circle cx="113.3" cy="438" r="1.4"/><circle cx="281.5" cy="564.5" r="1.6"/><circle cx="349.4" cy="301.6" r="2.1"/><circle cx="457" cy="41.2" r="1.2"/><circle cx="382.7" cy="551.5" r="1.2"/><circle cx="422.4" cy="138.8" r="1"/><circle cx="70.6" cy="161.8" r="1.6"/><circle cx="10.8" cy="634" r="2.1"/><circle cx="438.6" cy="323.9" r="0.8"/><circle cx="239.4" cy="302.6" r="1.2"/><circle cx="526.3" cy="610.4" r="2.1"/><circle cx="505.9" cy="290.5" r="0.8"/></g><ellipse cx="270" cy="960" rx="540" ry="160" fill="#22d3ee" opacity="0.10"/><ellipse cx="108" cy="883.2" rx="140" ry="60" fill="#a78bfa" opacity="0.06"/><ellipse cx="432" cy="902.4" rx="140" ry="60" fill="#f43f5e" opacity="0.05"/>
 </svg>

@@ -1,44 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="256" height="540" viewBox="0 0 256 540">
-  
-    <!-- barricade base -->
-    <rect x="0" y="502" width="256" height="38" fill="#0b1322"/>
-    <rect x="0" y="500" width="256" height="4" fill="#1e293b"/>
-
-    <!-- caution tape band (slate backing) -->
-    <rect x="0" y="470" width="256" height="30" fill="#111c30"/>
-    <!-- gold hazard stripes, period 32, drawn beyond edges then cropped -->
-    <g fill="#facc15" opacity="0.85">
-      <path d="M-32 500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M0   500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M32  500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M64  500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M96  500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M128 500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M160 500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M192 500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M224 500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M256 500 l16 0 l14 -30 l-16 0 z"/>
-    </g>
-    <rect x="0" y="470" width="256" height="2" fill="#0f172a"/>
-    <rect x="0" y="498" width="256" height="2" fill="#0f172a"/>
-
-    <!-- barricade posts (one per tile -> seamless) -->
-    <g fill="#0f172a">
-      <rect x="118" y="486" width="20" height="54" rx="2"/>
-    </g>
-    <rect x="118" y="490" width="20" height="4" fill="#facc15" opacity="0.35"/>
-  
-      <!-- Bollards / Hydrant on sides -->
-      <g fill="#0b1322">
-        <!-- Fire hydrant -->
-        <rect x="25" y="445" width="15" height="30" rx="3"/>
-        <circle cx="32.5" cy="445" r="8"/>
-        <rect x="20" y="455" width="25" height="6"/>
-        
-        <!-- Concrete Bollard -->
-        <rect x="215" y="440" width="20" height="35" rx="2"/>
-        <circle cx="225" cy="440" r="10"/>
-      </g>
-      <rect x="215" y="450" width="20" height="5" fill="#facc15" opacity="0.8"/>
-    
+<svg xmlns="http://www.w3.org/2000/svg" width="540" height="960" viewBox="0 0 540 960">
+  <g transform="translate(103.9 187.9) scale(1.5) translate(-103.9 -187.9)" opacity="0.95"><g><rect x="71.9" y="163.9" width="64" height="24" rx="3" fill="#202c46"/><polygon points="77.9,163.9 91.9,163.9 81.9,187.9 67.9,187.9" fill="#22d3ee" opacity="0.45"/><polygon points="107.9,163.9 121.9,163.9 111.9,187.9 97.9,187.9" fill="#22d3ee" opacity="0.45"/></g></g>
+  <g transform="translate(86.5 519.3) scale(1.5) translate(-86.5 -519.3)" opacity="0.95"><rect x="81.5" y="497.3" width="10" height="22" rx="4" fill="#202c46"/><rect x="81.5" y="501.3" width="10" height="3" fill="#22d3ee" opacity="0.5"/></g>
+  <g transform="translate(97.3 708.4) scale(1.5) translate(-97.3 -708.4)" opacity="0.95"><rect x="94.8" y="630.4" width="5" height="78" fill="#202c46"/><circle cx="97.3" cy="628.4" r="6" fill="#22d3ee" opacity="0.9"/><circle cx="97.3" cy="628.4" r="16" fill="#22d3ee" opacity="0.12"/></g>
+  <g transform="translate(437.5 239.8) scale(1.5) translate(-437.5 -239.8)" opacity="0.95"><g><rect x="405.5" y="215.8" width="64" height="24" rx="3" fill="#202c46"/><polygon points="411.5,215.8 425.5,215.8 415.5,239.8 401.5,239.8" fill="#22d3ee" opacity="0.45"/><polygon points="441.5,215.8 455.5,215.8 445.5,239.8 431.5,239.8" fill="#22d3ee" opacity="0.45"/></g></g>
+  <g transform="translate(433.1 485.8) scale(1.5) translate(-433.1 -485.8)" opacity="0.95"><rect x="428.1" y="463.8" width="10" height="22" rx="4" fill="#202c46"/><rect x="428.1" y="467.8" width="10" height="3" fill="#22d3ee" opacity="0.5"/></g>
+  <g transform="translate(463.2 766.1) scale(1.5) translate(-463.2 -766.1)" opacity="0.95"><rect x="460.7" y="688.1" width="5" height="78" fill="#202c46"/><circle cx="463.2" cy="686.1" r="6" fill="#22d3ee" opacity="0.9"/><circle cx="463.2" cy="686.1" r="16" fill="#22d3ee" opacity="0.12"/></g>
 </svg>

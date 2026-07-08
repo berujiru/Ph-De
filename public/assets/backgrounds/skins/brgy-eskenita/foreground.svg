@@ -1,42 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="256" height="540" viewBox="0 0 256 540">
-  
-    <!-- barricade base -->
-    <rect x="0" y="502" width="256" height="38" fill="#0b1322"/>
-    <rect x="0" y="500" width="256" height="4" fill="#1e293b"/>
-
-    <!-- caution tape band (slate backing) -->
-    <rect x="0" y="470" width="256" height="30" fill="#111c30"/>
-    <!-- gold hazard stripes, period 32, drawn beyond edges then cropped -->
-    <g fill="#facc15" opacity="0.85">
-      <path d="M-32 500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M0   500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M32  500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M64  500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M96  500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M128 500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M160 500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M192 500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M224 500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M256 500 l16 0 l14 -30 l-16 0 z"/>
-    </g>
-    <rect x="0" y="470" width="256" height="2" fill="#0f172a"/>
-    <rect x="0" y="498" width="256" height="2" fill="#0f172a"/>
-
-    <!-- barricade posts (one per tile -> seamless) -->
-    <g fill="#0f172a">
-      <rect x="118" y="486" width="20" height="54" rx="2"/>
-    </g>
-    <rect x="118" y="490" width="20" height="4" fill="#facc15" opacity="0.35"/>
-  
-      <!-- Potted plant / drum on sides -->
-      <g fill="#0b1322">
-        <rect x="20" y="440" width="30" height="35" rx="5"/> <!-- Plant pot -->
-        <circle cx="35" cy="430" r="15" opacity="0.8"/> <!-- Plant -->
-        <circle cx="25" cy="435" r="10" opacity="0.8"/>
-        
-        <rect x="210" y="435" width="25" height="40" rx="3"/> <!-- Drum/barrel -->
-        <rect x="208" y="445" width="29" height="4"/>
-        <rect x="208" y="465" width="29" height="4"/>
-      </g>
-    
+<svg xmlns="http://www.w3.org/2000/svg" width="540" height="960" viewBox="0 0 540 960">
+  <g transform="translate(89.8 288) scale(1.5) translate(-89.8 -288)" opacity="0.95"><g><rect x="76.8" y="252" width="26" height="36" rx="3" fill="#22304f"/><rect x="74.8" y="260" width="30" height="4" fill="#1e293b"/><rect x="74.8" y="274" width="30" height="4" fill="#1e293b"/></g></g>
+  <g transform="translate(95.1 443.2) scale(1.5) translate(-95.1 -443.2)" opacity="0.95"><rect x="79.1" y="423.2" width="32" height="20" rx="4" fill="#22304f"/><circle cx="88.1" cy="417.2" r="10" fill="#22304f" opacity="0.85"/><circle cx="103.1" cy="415.2" r="12" fill="#22304f" opacity="0.85"/></g>
+  <g transform="translate(94.9 760.1) scale(1.5) translate(-94.9 -760.1)" opacity="0.95"><g fill="#22304f"><rect x="70.9" y="726.1" width="48" height="26" rx="6"/><rect x="64.9" y="716.1" width="30" height="14" rx="4"/><circle cx="80.9" cy="754.1" r="7"/><circle cx="108.9" cy="754.1" r="7"/></g></g>
+  <g transform="translate(447.4 209.5) scale(1.5) translate(-447.4 -209.5)" opacity="0.95"><g><rect x="434.4" y="173.5" width="26" height="36" rx="3" fill="#22304f"/><rect x="432.4" y="181.5" width="30" height="4" fill="#1e293b"/><rect x="432.4" y="195.5" width="30" height="4" fill="#1e293b"/></g></g>
+  <g transform="translate(444 464.2) scale(1.5) translate(-444 -464.2)" opacity="0.95"><rect x="428" y="444.2" width="32" height="20" rx="4" fill="#22304f"/><circle cx="437" cy="438.2" r="10" fill="#22304f" opacity="0.85"/><circle cx="452" cy="436.2" r="12" fill="#22304f" opacity="0.85"/></g>
+  <g transform="translate(436.9 753) scale(1.5) translate(-436.9 -753)" opacity="0.95"><g fill="#22304f"><rect x="412.9" y="719" width="48" height="26" rx="6"/><rect x="406.9" y="709" width="30" height="14" rx="4"/><circle cx="422.9" cy="747" r="7"/><circle cx="450.9" cy="747" r="7"/></g></g>
 </svg>

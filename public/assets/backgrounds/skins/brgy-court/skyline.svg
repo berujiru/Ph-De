@@ -1,27 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="540" viewBox="0 0 512 540">
-  
-      <!-- Left side houses/roofs -->
-      <g fill="#0c1424">
-        <rect x="20" y="320" width="80" height="100"/>
-        <polygon points="10,320 60,280 110,320" />
-        <rect x="120" y="350" width="40" height="70"/>
-        <polygon points="115,350 140,320 165,350" />
-      </g>
-      <!-- Right side houses/roofs -->
-      <g fill="#0c1424">
-        <rect x="360" y="310" width="70" height="110"/>
-        <polygon points="350,310 395,270 440,310" />
-        <rect x="450" y="340" width="50" height="80"/>
-        <polygon points="440,340 475,300 510,340" />
-      </g>
-      <!-- Wires -->
-      <path d="M100 280 Q 256 340 395 270" stroke="#0c1424" stroke-width="2" fill="none" opacity="0.6"/>
-      <!-- Windows -->
-      <g fill="#facc15" opacity="0.2">
-        <rect x="40" y="350" width="15" height="20" />
-        <rect x="70" y="350" width="15" height="20" />
-        <rect x="380" y="340" width="15" height="20" />
-        <rect x="400" y="340" width="15" height="20" />
-      </g>
-    
+<svg xmlns="http://www.w3.org/2000/svg" width="540" height="960" viewBox="0 0 540 960">
+  <g fill="#22304f"><rect x="-22.1" y="222.1" width="79.9" height="63.1"/><polygon points="-30.1,222.1 17.9,196.1 65.8,222.1"/></g><rect x="9.9" y="234.1" width="14" height="16" fill="#facc15" opacity="0.25"/>
+  <rect x="11" y="202.9" width="28" height="258.3" fill="#141e36"/><rect x="23.5" y="178.9" width="3" height="24" fill="#141e36"/><circle cx="25" cy="178.9" r="3" fill="#ef4444" opacity="0.8"/>
+  <g fill="#22304f"><rect x="-32.8" y="675.2" width="94.8" height="72.6"/><polygon points="-40.8,675.2 14.6,649.2 70,675.2"/></g><rect x="6.6" y="687.2" width="14" height="16" fill="#facc15" opacity="0.25"/>
+  <g fill="#22304f"><rect x="468.3" y="181.4" width="92.9" height="75.2"/><polygon points="460.3,181.4 514.8,155.4 569.2,181.4"/></g><rect x="506.7" y="193.4" width="14" height="16" fill="#facc15" opacity="0.25"/>
+  <rect x="510.2" y="163.1" width="28" height="308.6" fill="#141e36"/><rect x="522.7" y="139.1" width="3" height="24" fill="#141e36"/><circle cx="524.2" cy="139.1" r="3" fill="#ef4444" opacity="0.8"/>
+  <g fill="#22304f"><rect x="479.3" y="671.9" width="71.5" height="70.2"/><polygon points="471.3,671.9 515.1,645.9 558.8,671.9"/></g><rect x="507" y="683.9" width="14" height="16" fill="#facc15" opacity="0.25"/>
 </svg>

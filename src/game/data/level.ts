@@ -85,12 +85,14 @@ export const RALLY = {
  * viewport-pinned TileSprite whose texture scrolls at `factor` of the camera's
  * scrollY — smaller = farther away. All layers stay BEHIND the units (negative
  * depth) so gameplay reads cleanly on the dark background. Textures live under
- * public/assets/backgrounds/ and tile seam-free vertically. Factor 0 (sandbox,
- * static camera) still looks right because tilePositionY is just 0.
+ * public/assets/backgrounds/ as portrait 9:16 art (one copy covers the whole
+ * viewport — see ParallaxBackground) and wrap seam-free vertically as the
+ * camera scrolls. The sky is factor 0: it is infinitely far, so it stays
+ * pinned — which also means its vertical gradient never wraps into a seam.
  */
 export const PARALLAX = {
   layers: [
-    { key: 'bg-sky',        factor: 0.05, depth: -40 },
+    { key: 'bg-sky',        factor: 0,    depth: -40 },
     { key: 'bg-skyline',    factor: 0.25, depth: -30 },
     { key: 'bg-street',     factor: 0.55, depth: -20 },
     { key: 'bg-foreground', factor: 0.85, depth: -10 },

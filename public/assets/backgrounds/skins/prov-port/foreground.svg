@@ -1,39 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="256" height="540" viewBox="0 0 256 540">
-  
-    <!-- barricade base -->
-    <rect x="0" y="502" width="256" height="38" fill="#0b1322"/>
-    <rect x="0" y="500" width="256" height="4" fill="#1e293b"/>
-
-    <!-- caution tape band (slate backing) -->
-    <rect x="0" y="470" width="256" height="30" fill="#111c30"/>
-    <!-- gold hazard stripes, period 32, drawn beyond edges then cropped -->
-    <g fill="#facc15" opacity="0.85">
-      <path d="M-32 500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M0   500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M32  500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M64  500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M96  500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M128 500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M160 500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M192 500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M224 500 l16 0 l14 -30 l-16 0 z"/>
-      <path d="M256 500 l16 0 l14 -30 l-16 0 z"/>
-    </g>
-    <rect x="0" y="470" width="256" height="2" fill="#0f172a"/>
-    <rect x="0" y="498" width="256" height="2" fill="#0f172a"/>
-
-    <!-- barricade posts (one per tile -> seamless) -->
-    <g fill="#0f172a">
-      <rect x="118" y="486" width="20" height="54" rx="2"/>
-    </g>
-    <rect x="118" y="490" width="20" height="4" fill="#facc15" opacity="0.35"/>
-  
-      <!-- Reflector / rocks on sides -->
-      <g fill="#0b1322">
-        <polygon points="20,475 40,475 35,450 25,450" />
-        <polygon points="215,475 245,475 235,445 225,445" />
-      </g>
-      <rect x="28" y="455" width="4" height="10" fill="#facc15" opacity="0.6"/>
-      <rect x="228" y="455" width="4" height="10" fill="#facc15" opacity="0.6"/>
-    
+<svg xmlns="http://www.w3.org/2000/svg" width="540" height="960" viewBox="0 0 540 960">
+  <g transform="translate(88.4 295.6) scale(1.5) translate(-88.4 -295.6)" opacity="0.95"><rect x="58.4" y="269.6" width="60" height="26" fill="#443040"/><rect x="58.4" y="269.6" width="60" height="5" fill="#fb7185" opacity="0.5"/><rect x="66.4" y="247.6" width="44" height="22" fill="#443040" opacity="0.9"/></g>
+  <g transform="translate(101.5 430.9) scale(1.5) translate(-101.5 -430.9)" opacity="0.95"><rect x="96.5" y="408.9" width="10" height="22" rx="4" fill="#443040"/><rect x="96.5" y="412.9" width="10" height="3" fill="#fbbf24" opacity="0.5"/></g>
+  <g transform="translate(101 690.3) scale(1.5) translate(-101 -690.3)" opacity="0.95"><g fill="#443040"><rect x="87" y="666.3" width="28" height="24"/><rect x="93" y="646.3" width="24" height="20" opacity="0.9"/></g></g>
+  <g transform="translate(459.2 267.7) scale(1.5) translate(-459.2 -267.7)" opacity="0.95"><rect x="429.2" y="241.7" width="60" height="26" fill="#443040"/><rect x="429.2" y="241.7" width="60" height="5" fill="#f97316" opacity="0.5"/><rect x="437.2" y="219.7" width="44" height="22" fill="#443040" opacity="0.9"/></g>
+  <g transform="translate(440.4 428.5) scale(1.5) translate(-440.4 -428.5)" opacity="0.95"><rect x="435.4" y="406.5" width="10" height="22" rx="4" fill="#443040"/><rect x="435.4" y="410.5" width="10" height="3" fill="#fbbf24" opacity="0.5"/></g>
+  <g transform="translate(438.4 733.9) scale(1.5) translate(-438.4 -733.9)" opacity="0.95"><g fill="#443040"><rect x="424.4" y="709.9" width="28" height="24"/><rect x="430.4" y="689.9" width="24" height="20" opacity="0.9"/></g></g>
 </svg>
