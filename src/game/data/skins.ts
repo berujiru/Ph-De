@@ -75,20 +75,22 @@ export const HERO_SKINS: Partial<Record<HeroId, HeroSkin[]>> = {
       heroId: 'eden',
       name: 'Default',
       // Combined sheet (replaces the old separate eden_walk/attack/cast.png).
-      // Layout (256px cells, 8 per row): idle row 0, march rows 1–2,
-      // attack rows 3–5, cast rows 6–8, portrait = first cell of row 9.
-      // Adjust these ranges if the authored sheet lands with a different grid.
-      sheet: '/assets/heroes/eden.png',
+      // Layout (256px cells, 8 per row, 19 rows total = 152 frames):
+      // attack: rows 1-5 (frames 0-37, 38 frames)
+      // idle: rows 6-14 (frames 40-107, 68 frames)
+      // march: rows 15-16 (frames 112-127, 16 frames)
+      // cast: rows 17-19 (frames 128-149, 22 frames)
+      sheet: '/assets/heroes/eden_spritesheet.png',
       frameWidth: 256,
       frameHeight: 256,
       columns: 8,
-      totalFrames: 73,
-      portraitFrame: 72,
+      totalFrames: 152,
+      portraitFrame: 40,
       states: {
-        idle: { from: 0, frames: 8 },
-        march: { from: 8, frames: 16 },
-        attack: { from: 24, frames: 24, frameRate: 30 },
-        cast: { from: 48, frames: 24, frameRate: 20 },
+        idle: { from: 40, frames: 68 },
+        march: { from: 112, frames: 16 },
+        attack: { from: 0, frames: 38, frameRate: 30 },
+        cast: { from: 128, frames: 22, frameRate: 20 },
       },
     },
   ],

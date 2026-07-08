@@ -121,7 +121,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
         this.y = dragY;
       });
 
-      const dragLabel = scene.add.text(0, 15, 'DRAG ME', { fontSize: '10px', color: '#ffffff' }).setOrigin(0.5);
+      const dragLabel = scene.add.text(0, 15, 'DRAG ME', { fontSize: '24px', color: '#ffffff', stroke: '#000000', strokeThickness: 3 }).setOrigin(0.5);
       this.add(dragLabel);
     }
   }
@@ -133,7 +133,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     if (this.hitImmunityCount > 0) {
       this.hitImmunityCount--;
 
-      const blockText = this.scene.add.text(this.x, this.y - 30, 'BLOCKED', { fontSize: '12px', color: '#fff', fontStyle: 'bold' }).setOrigin(0.5);
+      const blockText = this.scene.add.text(this.x, this.y - 30, 'BLOCKED', { fontSize: '24px', color: '#fff', fontStyle: 'bold', stroke: '#000000', strokeThickness: 4 }).setOrigin(0.5);
       this.scene.tweens.add({ targets: blockText, y: this.y - 50, alpha: 0, duration: 800, onComplete: () => blockText.destroy() });
       this.model.playHitFlash();
 
@@ -218,7 +218,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     if (!this.ailmentIcons[type]) {
       const idx = Object.keys(this.ailmentIcons).length;
       const iconY = -(this.sizePx / 2 + 24); // above the HP bar
-      const icon = this.scene.add.text(-15 + (idx * 15), iconY, AILMENT_ICONS[type], { fontSize: '12px' }).setOrigin(0.5);
+      const icon = this.scene.add.text(-15 + (idx * 24), iconY, AILMENT_ICONS[type], { fontSize: '24px' }).setOrigin(0.5);
       this.add(icon);
       this.ailmentIcons[type] = icon;
     }
@@ -253,10 +253,10 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     this.model.setState('cast');
 
     const castText = this.scene.add.text(this.x, this.y - 40, skill.name, {
-      fontSize: '14px',
+      fontSize: '28px',
       color: '#fff',
       backgroundColor: '#000',
-      padding: { x: 4, y: 2 }
+      padding: { x: 8, y: 4 }
     }).setOrigin(0.5);
 
     this.scene.tweens.add({
@@ -330,7 +330,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
         this.scene.events.emit('stealVoices', { amount: this.definition.stealVoicesPerSecond });
 
         // Visual cue
-        const txt = this.scene.add.text(this.x, this.y - 30, '-VOICE', { fontSize: '10px', color: '#10b981', fontStyle: 'bold' }).setOrigin(0.5);
+        const txt = this.scene.add.text(this.x, this.y - 30, '-VOICE', { fontSize: '24px', color: '#10b981', fontStyle: 'bold', stroke: '#000000', strokeThickness: 4 }).setOrigin(0.5);
         this.scene.tweens.add({ targets: txt, y: this.y - 60, alpha: 0, duration: 1000, onComplete: () => txt.destroy() });
       }
     }
@@ -398,7 +398,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
               Phaser.Math.Between(-10, 10),
               Phaser.Math.Between(-10, 10),
               overlayChar,
-              { fontSize: '12px' }
+              { fontSize: '24px' }
             ).setOrigin(0.5);
             this.add(particle);
 

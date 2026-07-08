@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import type { Enemy } from './Enemy';
 import type { AttackModifiers } from './Attacks';
-import { ATTACK_STYLE_BADGES, UNIT_RENDER_SIZES, type HeroDefinition, type UpgradeKind } from '../data/balance';
+import { UNIT_RENDER_SIZES, type HeroDefinition, type UpgradeKind } from '../data/balance';
 import { RALLY } from '../data/level';
 import { formationTargetY, stepTowardFormation } from '../core/RallyMarch';
 import { applyHeroPassive, type ISkillHero } from '../core/Skills';
@@ -37,7 +37,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   private formationJitterY: number;
 
   private model: HeroModel;
-  private skillHighlight: Phaser.GameObjects.Text;
+  private nameLabel: Phaser.GameObjects.Text;
   private attackBarBg: Phaser.GameObjects.Rectangle;
   private attackBarFill: Phaser.GameObjects.Rectangle;
   private skillBarBg: Phaser.GameObjects.Rectangle;
@@ -75,27 +75,16 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.model = new HeroModel(scene, 0, 0, def.color, spriteKey ?? def.spriteKey ?? def.id, sizePx);
     this.add(this.model);
 
-    const nameLabel = scene.add.text(0, half + 4, def.name, {
-      fontSize: '10px',
+    this.nameLabel = scene.add.text(0, half + 10, def.name, {
+      fontSize: '40px',
       color: '#ffffff',
       align: 'center',
-    }).setOrigin(0.5, 0);
-    this.add(nameLabel);
-
-    // Attack-type hint chip — quick read on what this hero's basic attack does.
-    const badge = ATTACK_STYLE_BADGES[def.attackStyle];
-    const badgeChip = scene.add.text(0, half + 17, badge.label, {
-      fontSize: '9px',
       fontStyle: 'bold',
-      color: '#0f172a',
-      backgroundColor: badge.background,
-      padding: { x: 4, y: 1 },
+      stroke: '#000000',
+      strokeThickness: 6,
     }).setOrigin(0.5, 0);
-    this.add(badgeChip);
+    this.add(this.nameLabel);
 
-    this.skillHighlight = scene.add.text(0, -(half + 24), '★ SKILL', { fontSize: '12px', color: '#facc15', fontStyle: 'bold' }).setOrigin(0.5);
-    this.skillHighlight.setVisible(false);
-    this.add(this.skillHighlight);
 
     // Cooldown bars
     this.attackBarBg = scene.add.rectangle(0, -(half + 8), 30, 4, 0x000000);
@@ -245,9 +234,11 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
       if (this.currentSkillCooldown <= 0) {
         this.currentSkillCooldown = 0;
         this.isSkillReady = true;
-        this.skillHighlight.setVisible(true);
-        // Simple pulsing animation
-        this.scene.tweens.add({ targets: this.skillHighlight, scale: 1.2, yoyo: true, repeat: -1, duration: 500 });
+
+        // Fiery glow when skill is ready
+        this.nameLabel.setColor('#facc15'); // Gold
+        this.nameLabel.setStroke('#ef4444', 8); // Red fiery stroke
+        this.scene.tweens.add({ targets: this.nameLabel, scale: 1.2, yoyo: true, repeat: -1, duration: 500 });
       }
     }
 
@@ -263,9 +254,12 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     if (!this.isSkillReady) return;
     this.isSkillReady = false;
     this.currentSkillCooldown = this.skillCooldownMs;
-    this.skillHighlight.setVisible(false);
-    this.scene.tweens.killTweensOf(this.skillHighlight);
-    this.skillHighlight.setScale(1);
+
+    // Reset name label glow
+    this.scene.tweens.killTweensOf(this.nameLabel);
+    this.nameLabel.setScale(1);
+    this.nameLabel.setColor('#ffffff');
+    this.nameLabel.setStroke('#000000', 6);
 
     // Cast animation plays through the model.
     this.model.setState('cast');
@@ -275,7 +269,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
 
     // Bark
     const skillName = this.definition.signatureSkill.name;
-    const txt = this.scene.add.text(this.x, this.y - 60, `${skillName}!`, { color: '#facc15', fontStyle: 'bold' }).setOrigin(0.5);
+    const txt = this.scene.add.text(this.x, this.y - 120, `${skillName}!`, { fontSize: '48px', color: '#facc15', fontStyle: 'bold', stroke: '#000000', strokeThickness: 8 }).setOrigin(0.5);
     this.scene.tweens.add({ targets: txt, y: this.y - 100, alpha: 0, duration: 1500, onComplete: () => txt.destroy() });
   }
 

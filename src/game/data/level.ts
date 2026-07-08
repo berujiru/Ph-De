@@ -70,7 +70,7 @@ export const RALLY = {
     /** Ranged heroes scatter up to ±half this (along the march axis) so they don't stack on one pixel. */
     rangedJitterPx: 24,
     /** Horizontal spacing between heroes across the lane. */
-    rowSpacingPx: 55,
+    rowSpacingPx: 180,
     /** Heroes out of position catch up faster than the march itself. */
     catchUpSpeedMultiplier: 2.2,
     /** Distance from formation slot beyond which a hero runs instead of walks. */
@@ -105,11 +105,11 @@ export const PARALLAX = {
  */
 export const FX = {
   damageNumber: {
-    risePx: 34,
-    driftPx: 22,
+    risePx: 60,
+    driftPx: 40,
     durationMs: 650,
-    fontSizePx: 15,
-    critFontSizePx: 20,
+    fontSizePx: 30,
+    critFontSizePx: 44,
     normalColor: '#f8fafc',
     critColor: '#facc15',
   },
