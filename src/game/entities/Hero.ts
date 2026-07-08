@@ -38,7 +38,9 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   private formationJitterY: number;
 
   private model: HeroModel;
-  private nameLabel: Phaser.GameObjects.Text;
+  private skillButton: Phaser.GameObjects.Container;
+  private skillButtonBg: Phaser.GameObjects.Rectangle;
+  private skillButtonText: Phaser.GameObjects.Text;
   private rangeIndicator: Phaser.GameObjects.Arc;
 
   constructor(
@@ -71,24 +73,41 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.model = new HeroModel(scene, 0, 0, def.color, spriteKey ?? def.spriteKey ?? def.id, sizePx);
     this.add(this.model);
 
-    this.nameLabel = scene.add.text(0, -sizePx / 2 - 20, def.name.toUpperCase(), {
-      fontSize: '20px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-      stroke: '#000000',
-      strokeThickness: 6
-    }).setOrigin(0.5);
-    this.add(this.nameLabel);
-
     // Make interactive — hit area tracks the size tier.
     this.setSize(Math.round(sizePx * 0.7), sizePx + 30);
     this.setInteractive({ useHandCursor: true });
     this.on('pointerdown', () => {
       const gs = this.scene as any;
       if (gs.isPaused || gs.gameSpeed === 0) return;
+      this.showRange();
+    });
+
+    // Skill Button (below the hero)
+    this.skillButton = scene.add.container(0, sizePx / 2 + 30);
+    this.skillButtonBg = scene.add.rectangle(0, 0, 80, 28, 0x000000, 0.7);
+    this.skillButtonBg.setStrokeStyle(2, 0xef4444);
+    
+    const shortName = def.signatureSkill.shortName || def.signatureSkill.name.split(' ')[0];
+    this.skillButtonText = scene.add.text(0, 0, shortName.toUpperCase(), {
+      fontSize: '14px',
+      color: '#ffffff',
+      fontStyle: 'bold',
+    }).setOrigin(0.5);
+
+    this.skillButton.add([this.skillButtonBg, this.skillButtonText]);
+    this.skillButton.setSize(80, 28);
+    this.skillButton.setInteractive({ useHandCursor: true });
+    
+    this.skillButton.on('pointerdown', (_pointer: Phaser.Input.Pointer, _localX: number, _localY: number, event: Phaser.Types.Input.EventData) => {
+      event.stopPropagation(); // prevent hero click
+      const gs = this.scene as any;
+      if (gs.isPaused || gs.gameSpeed === 0) return;
       this.useSkill();
       this.showRange();
     });
+
+    this.add(this.skillButton);
+    this.updateSkillButtonVisuals();
 
     scene.add.existing(this);
   }
@@ -179,7 +198,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
       // Instead of raw 2D rotation (which breaks the oblique perspective and makes them 
       // look like they are lying flat on the ground), we simply flip them horizontally 
       // to "face" left or right depending on where the enemy is.
-      this.model.setFlipX(target.x < this.x);
+      this.model.setFlipX(target.x > this.x);
     } else {
       // Default to facing right (or neutral) when marching
       this.model.setFlipX(false);
@@ -197,10 +216,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
         this.currentSkillCooldown = 0;
         this.isSkillReady = true;
 
-        // Fiery glow when skill is ready
-        this.nameLabel.setColor('#facc15'); // Gold
-        this.nameLabel.setStroke('#ef4444', 8); // Red fiery stroke
-        this.scene.tweens.add({ targets: this.nameLabel, scale: 1.2, yoyo: true, repeat: -1, duration: 500 });
+        this.updateSkillButtonVisuals();
       }
     }
 
@@ -272,11 +288,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.isSkillReady = false;
     this.currentSkillCooldown = this.skillCooldownMs;
 
-    // Reset name label glow
-    this.scene.tweens.killTweensOf(this.nameLabel);
-    this.nameLabel.setScale(1);
-    this.nameLabel.setColor('#ffffff');
-    this.nameLabel.setStroke('#000000', 6);
+    this.updateSkillButtonVisuals();
 
     // Cast animation plays through the model.
     this.model.setState('cast');
@@ -303,5 +315,21 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
         this.rangeIndicator.setVisible(false);
       }
     });
+  }
+
+  private updateSkillButtonVisuals() {
+    this.scene.tweens.killTweensOf(this.skillButton);
+    this.skillButton.setScale(1);
+
+    if (this.isSkillReady) {
+      this.skillButton.setAlpha(1);
+      this.skillButtonBg.setStrokeStyle(3, 0xef4444); // Fiery red border
+      this.skillButtonText.setColor('#facc15'); // Gold text
+      this.scene.tweens.add({ targets: this.skillButton, scale: 1.15, yoyo: true, repeat: -1, duration: 500 });
+    } else {
+      this.skillButton.setAlpha(0.4);
+      this.skillButtonBg.setStrokeStyle(2, 0x333333); // Gray border
+      this.skillButtonText.setColor('#888888'); // Gray text
+    }
   }
 }

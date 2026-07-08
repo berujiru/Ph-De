@@ -6,6 +6,7 @@ export interface ISkillHero {
   attackRateMs: number;
   currentSkillCooldown: number;
   isSkillReady: boolean;
+  hasRallyBuff?: boolean;
 }
 
 export interface ISkillEnemy {
@@ -62,9 +63,11 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
   if (skillId === 'eden') {
     // Rally: Attack speed buff to all heroes
     for (const h of heroes) {
-      h.attackRateMs /= 2;
+      if (!h.hasRallyBuff) {
+        h.attackRateMs /= 2;
+        h.hasRallyBuff = true;
+      }
       onVisual({ type: 'text', x: h.x, y: h.y - 20, text: 'RALLY!', color: '#ef4444' });
-      onVisual({ type: 'delayedRevertAttackRate', target: h, amount: h.attackRateMs * 2, delay: 5000 });
     }
   } else if (skillId === 'teacher') {
     // Recess: Silence enemy auras

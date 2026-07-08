@@ -60,10 +60,10 @@ export class WaveManager {
   }
 
   /**
-   * Advance by `dtMs` (already speed-scaled). `livingEnemyCount` gates wave
-   * advancement — clear-to-advance, matching the prototype's behavior.
+   * Advance by `dtMs` (already speed-scaled). Waves now advance immediately
+   * upon finishing their spawns, without waiting for livingEnemyCount to hit 0.
    */
-  update(dtMs: number, livingEnemyCount: number): WaveManagerOutput[] {
+  update(dtMs: number, _livingEnemyCount: number): WaveManagerOutput[] {
     const out: WaveManagerOutput[] = [];
     if (this.phase === 'done') return out;
 
@@ -73,9 +73,6 @@ export class WaveManager {
       this.enterEvent(out);
     }
 
-    // Spawns emitted this call aren't in livingEnemyCount yet — never let the
-    // clear-check race past them into the next wave on the same frame.
-    let spawnedThisUpdate = false;
     let budget = dtMs;
 
     // Bounded: every iteration either consumes budget, emits an event from the
@@ -92,7 +89,6 @@ export class WaveManager {
         const evt = this.waves[this.waveIdx].events[this.eventIdx];
         if (evt.type === 'spawn') {
           out.push({ kind: 'spawn', enemyId: evt.enemyId, wave: this.waveIdx + 1 });
-          spawnedThisUpdate = true;
           this.spawnedInEvent++;
           if (this.spawnedInEvent >= evt.count) {
             this.advanceEvent(out);
@@ -104,7 +100,7 @@ export class WaveManager {
           this.advanceEvent(out);
         }
       } else if (this.phase === 'clearWait') {
-        if (livingEnemyCount > 0 || spawnedThisUpdate) break;
+        // Obsolete phase: fall through to interDelay instantly.
         this.phase = 'interDelay';
         this.waitMs = this.interWaveDelayMs;
       } else if (this.phase === 'interDelay') {

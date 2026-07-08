@@ -459,6 +459,7 @@ export interface HeroDefinition {
   baseChain?: number;
   signatureSkill: {
     name: string;
+    shortName?: string;
     description: string;
   };
   passive?: {
@@ -518,7 +519,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 1300,
     color: 0x3b82f6,
     purpose: 'Reliable all-rounder — hurls megaphones at the frontmost anomaly. Always deployed, she is your steady damage floor.',
-    signatureSkill: { name: 'Rally', description: 'Massive attack speed buff to all deployed heroes.' },
+    signatureSkill: { name: 'Rally', shortName: 'Rally', description: 'Massive attack speed buff to all deployed heroes.' },
     passive: { name: 'Voice of the People', description: 'Generates 1 Voice every 10 seconds.' },
     projectileColor: 0x60a5fa,
     portraitKey: 'eden_cutin', // 8x5 sheet, 40 frames. Master: docs/references/eden_cutin.png
@@ -548,7 +549,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 1500,
     color: 0x8b5cf6,
     purpose: 'Two-hit boomerang ruler (out and back) that marks anomalies for bonus damage — strong against single tough targets.',
-    signatureSkill: { name: 'Recess', description: 'Silences enemy auras in a radius.' },
+    signatureSkill: { name: 'Recess', shortName: 'Recess', description: 'Silences enemy auras in a radius.' },
     passive: { name: 'Fact Check', description: 'Instantly pops and destroys Fake HP padding.' },
     projectileColor: 0xddd6fe,
   },
@@ -565,7 +566,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     basePierce: 2,
     color: 0xf59e0b,
     purpose: 'Slingshot pebbles punch through a line of 2 enemies — and every enhancement you feed the squad lands at 1.5x on his picks.',
-    signatureSkill: { name: 'Cramming', description: 'Instantly resets the active skill cooldown of 1 random adjacent hero.' },
+    signatureSkill: { name: 'Cramming', shortName: 'Cramming', description: 'Instantly resets the active skill cooldown of 1 random adjacent hero.' },
     passive: { name: 'Overachiever', description: 'Enhancement drops apply at 1.5x potency.' },
     projectileColor: 0xfcd34d,
   },
@@ -581,7 +582,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 1250,
     color: 0x10b981,
     purpose: 'Frontline cleaver — revs into clustered enemies and hits Bosses extra hard. A durable bruiser, not a sniper.',
-    signatureSkill: { name: 'Barya Lang Po', description: 'Tosses coin shrapnel for massive shotgun AoE damage.' },
+    signatureSkill: { name: 'Barya Lang Po', shortName: 'Barya', description: 'Tosses coin shrapnel for massive shotgun AoE damage.' },
     passive: { name: 'Hari ng Kalsada', description: 'Deals bonus damage to Bosses.' },
   },
   fisherfolk: {
@@ -596,7 +597,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 3500,
     color: 0x0ea5e9,
     purpose: 'Support net — clumps enemies and soaks them Wet, setting up Lightning and Freeze combos. Low direct damage by design.',
-    signatureSkill: { name: 'Lambat', description: 'Casts a net dragging enemies from off-lanes into the center.' },
+    signatureSkill: { name: 'Lambat', shortName: 'Lambat', description: 'Casts a net dragging enemies from off-lanes into the center.' },
     passive: { name: 'Deep Water', description: 'Attacks apply Wet (amplifies lightning damage).' },
     projectileColor: 0x7dd3fc,
   },
@@ -612,7 +613,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 2200,
     color: 0xa8a29e,
     purpose: 'Sweeps a debris wave across the whole frontline, hitting everything in the lane; shreds Obstacles and Traps.',
-    signatureSkill: { name: 'Dust Storm', description: 'Blinds enemies, reducing speed and damage by 50%.' },
+    signatureSkill: { name: 'Dust Storm', shortName: 'Dust', description: 'Blinds enemies, reducing speed and damage by 50%.' },
     passive: { name: 'Clean Sweep', description: 'Deals 10x damage to Obstacles and Traps.' },
   },
   taho_vendor: {
@@ -627,7 +628,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 1700,
     color: 0xe2e8f0,
     purpose: 'Lobs scalding syrup that slows and splashes a small area; strips enemy speed buffs off whatever it hits.',
-    signatureSkill: { name: 'Hot Syrup', description: 'Sticky puddle that permanently strips enemy speed buffs.' },
+    signatureSkill: { name: 'Hot Syrup', shortName: 'Syrup', description: 'Sticky puddle that permanently strips enemy speed buffs.' },
     passive: { name: 'Sweet Tooth', description: 'Drops 1 extra Voice when killing an Elite/Boss.' },
     projectileColor: 0xffffff,
   },
@@ -643,7 +644,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 1500,
     color: 0xfca5a5,
     purpose: 'Support striker — alcohol sprays heal any ally summon they pass through, and hit undead anomalies for +50%.',
-    signatureSkill: { name: 'Vaccine Drive', description: 'Grants all heroes immunity to debuffs for 5 seconds.' },
+    signatureSkill: { name: 'Vaccine Drive', shortName: 'Vaccine', description: 'Grants all heroes immunity to debuffs for 5 seconds.' },
     passive: { name: 'Triage', description: 'Projectiles passing through ally summons heal them.' },
     projectileColor: 0xfecaca,
   },

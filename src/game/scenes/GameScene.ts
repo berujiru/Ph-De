@@ -5,7 +5,7 @@ import { Enemy } from '../entities/Enemy';
 import { Summon } from '../entities/Summon';
 import { Attack, ProjectileAttack, PierceAttack, MeleeCleaveAttack, VortexAttack, BoomerangAttack, ChainAttack, SummonAttack, BeamAttack, LobbedAttack, LinearWaveAttack, TrapAttack } from '../entities/Attacks';
 import { gameToUiEvents, uiToGameEvents, type GameStateSnapshot, type DropOption } from '../core/GameEvents';
-import { BARRICADE_DEFAULTS, ENEMY_DEFINITIONS, HERO_DEFINITIONS, MAX_ACTIVE_HEROES, UPGRADE_DEFS, GLOBAL_DROP_DEFS, computeKillPool, voiceDropCost, type EnemyId, type HeroId, type UpgradeKind } from '../data/balance';
+import { BARRICADE_DEFAULTS, ENEMY_DEFINITIONS, HERO_DEFINITIONS, MAX_ACTIVE_HEROES, UPGRADE_DEFS, GLOBAL_DROP_DEFS, computeKillPool, voiceDropCost, enemySizeClass, type EnemyId, type HeroId, type UpgradeKind } from '../data/balance';
 import { rollDrops, makeRng, type DropContext } from '../core/Drops';
 import { GAME_HEIGHT, GAME_WIDTH, WORLD_HEIGHT, RALLY, ENEMY_SPAWN_Y_OFFSET, FX, PARALLAX } from '../data/level';
 import { getMapSkinForStage, type MapSkin } from '../data/mapSkins';
@@ -527,10 +527,6 @@ export class GameScene extends Phaser.Scene {
           if (evt.type === 'text') {
             const fx = this.add.text(evt.x || 0, evt.y || 0, evt.text || '', { color: evt.color || '#fff', fontStyle: 'bold' }).setOrigin(0.5);
             this.tweens.add({ targets: fx, y: (evt.y || 0) - 30, alpha: 0, duration: 1000, onComplete: () => fx.destroy() });
-          } else if (evt.type === 'delayedRevertAttackRate') {
-            this.time.delayedCall(evt.delay || 5000, () => {
-              if (evt.target) evt.target.attackRateMs = evt.amount;
-            });
           } else if (evt.type === 'dragTo') {
             this.tweens.add({ targets: evt.target, x: evt.x, duration: evt.duration || 500 });
           } else if (evt.type === 'spawnObstacle') {
@@ -709,7 +705,9 @@ export class GameScene extends Phaser.Scene {
       enemy.update(delta, this.shield, this.summons);
       if (enemy.isDead && enemy.hp <= 0) {
         // Was killed by hero, not by hitting the shield
-        this.addVoices(1);
+        const sizeClass = enemySizeClass(enemy.definition);
+        const dropAmount = sizeClass === 'boss' ? 10 : (sizeClass === 'miniboss' ? 3 : 1);
+        this.addVoices(dropAmount);
       }
     }
 

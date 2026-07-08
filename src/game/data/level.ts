@@ -25,28 +25,27 @@ export const ENEMY_SPAWN_Y_OFFSET = 50;
  */
 export const RALLY = {
   /**
-   * Where the shield front starts the battle — near the BOTTOM of the world.
-   * The rally advances up (decreasing y) from here.
+   * Where the shield front starts the battle. Decrease the number (e.g., 300) 
+   * to move heroes LOWER on screen, or increase it (e.g., 600) to move them HIGHER.
    */
   shieldStartY: WORLD_HEIGHT - 200,
   /**
-   * The shield never advances past this point (smallest y it can reach — leaves
-   * room for spawns ahead, above the top edge).
+   * The shield never advances past this point. Keep this matching shieldStartY
+   * to freeze the march.
    */
-  shieldMaxY: 700,
+  shieldMaxY: WORLD_HEIGHT - 350,
   /** Formation advance speed while the field ahead is clear. */
   marchSpeedPxPerSec: 55,
   /** A living enemy within this distance ahead of (above) the shield halts the march. */
   engageRangePx: 240,
-  /** Enemies spawn this far ahead of (above) the shield (off-camera at the top). */
-  enemySpawnAheadPx: 750,
+  /** Enemies spawn this far ahead of (above) the shield. Now closer for immediate action! */
+  enemySpawnAheadPx: 400,
   /**
    * Vertical screen position the camera keeps the shield at (0..1 of viewport,
-   * measured from the top). ~0.78 holds the shield near the BOTTOM of the view.
-   * Kept high enough that the start-of-battle target scroll clamps to the world
-   * bottom, so the camera picks up the formation without a pop.
+   * measured from the top). 0.70 holds the shield in the lower half of the view
+   * without being right at the bottom edge.
    */
-  cameraAnchorRatio: 0.78,
+  cameraAnchorRatio: 0.70,
   /** Camera scroll smoothing — higher catches up faster (per-second lerp rate). */
   cameraLerpPerSec: 4,
   formation: {
