@@ -8,6 +8,7 @@ import { gameToUiEvents, uiToGameEvents, type GameStateSnapshot, type DropOption
 import { BARRICADE_DEFAULTS, ENEMY_DEFINITIONS, HERO_DEFINITIONS, MAX_ACTIVE_HEROES, UPGRADE_DEFS, GLOBAL_DROP_DEFS, computeKillPool, voiceDropCost, type EnemyId, type HeroId, type UpgradeKind } from '../data/balance';
 import { rollDrops, makeRng, type DropContext } from '../core/Drops';
 import { GAME_HEIGHT, GAME_WIDTH, WORLD_HEIGHT, RALLY, ENEMY_SPAWN_Y_OFFSET, FX, PARALLAX } from '../data/level';
+import { getMapSkinForStage, type MapSkin } from '../data/mapSkins';
 import { formationTargetY, nextShieldY } from '../core/RallyMarch';
 import { applyHeroSkill, type SkillVisualEvent } from '../core/Skills';
 import { getSelectedSkin } from '../data/skinSelection';
@@ -18,6 +19,8 @@ import { cameraPunch } from '../entities/fx/CameraPunch';
 export class GameScene extends Phaser.Scene {
   private shield!: MoraleShield;
   private parallax!: ParallaxBackground;
+  /** The active map skin for this battle, resolved from the stage being played. */
+  private activeMapSkin: MapSkin | null = null;
   private enemies: Enemy[] = [];
   private heroes: Hero[] = [];
   private attacks: Attack[] = [];
@@ -47,9 +50,35 @@ export class GameScene extends Phaser.Scene {
     super('GameScene');
   }
 
+  init(data: any) {
+    if (data?.act != null && data?.stageIdx != null) {
+      this.activeMapSkin = getMapSkinForStage(data.act, data.stageIdx);
+    } else {
+      this.activeMapSkin = null;
+    }
+  }
+
   preload() {
+    // Always load default backgrounds (sandbox fallback).
     for (const layer of PARALLAX.layers) {
       this.load.image(layer.key, `/assets/backgrounds/${layer.key}.svg`);
+    }
+
+    // If a stage skin was resolved in init(), load its 4 SVGs under
+    // unique texture keys (`${skinId}-sky`, etc.) so they don't collide.
+    if (this.activeMapSkin) {
+      const s = this.activeMapSkin;
+      const entries: [string, string][] = [
+        [`${s.id}-sky`, s.layers.sky],
+        [`${s.id}-skyline`, s.layers.skyline],
+        [`${s.id}-street`, s.layers.street],
+        [`${s.id}-foreground`, s.layers.foreground],
+      ];
+      for (const [key, path] of entries) {
+        if (!this.textures.exists(key)) {
+          this.load.image(key, path);
+        }
+      }
     }
     this.load.image('hero-base', '/assets/heroes/hero-base.svg');
     this.load.image('enemy-base', '/assets/enemies/enemy-base.svg');
@@ -151,6 +180,11 @@ export class GameScene extends Phaser.Scene {
     const unsubRestart = uiToGameEvents.on('restart', (data) => {
       if (!this.sys) return;
       this.isSandbox = data?.mode === 'sandbox';
+      if (data?.act != null && data?.stageIdx != null) {
+        // Hard restart to re-run preload() for dynamic map skins
+        this.scene.restart(data);
+        return;
+      }
       this.resetGame();
     });
 
@@ -563,7 +597,17 @@ export class GameScene extends Phaser.Scene {
     this.lastSnapshot = '';
 
     // Layered parallax backdrop — sells forward motion as the rally marches.
-    this.parallax = new ParallaxBackground(this, GAME_WIDTH, GAME_HEIGHT);
+    // When an activeMapSkin is set (campaign stages), pass its texture keys;
+    // otherwise fall back to the default bg-* textures (sandbox).
+    const skinKeys = this.activeMapSkin
+      ? [
+          `${this.activeMapSkin.id}-sky`,
+          `${this.activeMapSkin.id}-skyline`,
+          `${this.activeMapSkin.id}-street`,
+          `${this.activeMapSkin.id}-foreground`,
+        ]
+      : undefined;
+    this.parallax = new ParallaxBackground(this, GAME_WIDTH, GAME_HEIGHT, skinKeys);
 
     // Scrolling camera over the tall world (scrolls vertically along the march
     // axis; X is pinned since bounds width == viewport width).

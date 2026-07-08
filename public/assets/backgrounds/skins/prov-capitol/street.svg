@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="540" viewBox="0 0 512 540">
+  
+    <rect x="0" y="430" width="512" height="110" fill="#0e1930"/>
+    <rect x="0" y="430" width="512" height="6" fill="#1e293b"/>
+    <!-- Center Road/Pathway (x=170 to 342) -->
+    <rect x="170" y="200" width="172" height="760" fill="#131c31"/>
+    <rect x="170" y="200" width="6" height="760" fill="#1e293b"/>
+    <rect x="336" y="200" width="6" height="760" fill="#1e293b"/>
+  
+      <!-- Left side nature/fields -->
+      <g fill="#0b1322">
+        <path d="M0 430 L 160 430 L 120 380 L 0 380 Z" opacity="0.8"/>
+        <path d="M0 380 L 100 380 L 60 350 L 0 350 Z" opacity="0.6"/>
+      </g>
+      <!-- Right side nature/fields -->
+      <g fill="#0b1322">
+        <path d="M350 430 L 512 430 L 512 380 L 390 380 Z" opacity="0.8"/>
+        <path d="M390 380 L 512 380 L 512 340 L 410 340 Z" opacity="0.6"/>
+      </g>
+      <!-- Trees/Grass -->
+      <circle cx="100" cy="350" r="30" fill="#0b1322" opacity="0.9"/>
+      <circle cx="420" cy="360" r="40" fill="#0b1322" opacity="0.9"/>
+      <circle cx="460" cy="340" r="35" fill="#0b1322" opacity="0.8"/>
+      <!-- Street markings (white dashed) -->
+      <g fill="#ffffff" opacity="0.2">
+        <rect x="254" y="200" width="4" height="30"/>
+        <rect x="254" y="260" width="4" height="30"/>
+        <rect x="254" y="320" width="4" height="30"/>
+        <rect x="254" y="380" width="4" height="30"/>
+        <rect x="254" y="440" width="4" height="30"/>
+        <rect x="254" y="500" width="4" height="30"/>
+      </g>
+    
+</svg>

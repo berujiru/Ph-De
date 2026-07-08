@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="540" viewBox="0 0 512 540">
+  
+    <rect x="0" y="430" width="512" height="110" fill="#0e1930"/>
+    <rect x="0" y="430" width="512" height="6" fill="#1e293b"/>
+    <!-- Center Road/Pathway (x=170 to 342) -->
+    <rect x="170" y="200" width="172" height="760" fill="#131c31"/>
+    <rect x="170" y="200" width="6" height="760" fill="#1e293b"/>
+    <rect x="336" y="200" width="6" height="760" fill="#1e293b"/>
+  
+      <!-- Wide road for national -->
+      <rect x="130" y="200" width="252" height="760" fill="#131c31"/>
+      <rect x="130" y="200" width="6" height="760" fill="#1e293b"/>
+      <rect x="376" y="200" width="6" height="760" fill="#1e293b"/>
+      
+      <!-- Left side modern structures -->
+      <g fill="#0b1322">
+        <rect x="0" y="250" width="100" height="190"/>
+        <rect x="40" y="220" width="60" height="30"/>
+      </g>
+      <rect x="90" y="380" width="10" height="50" fill="#ef4444" opacity="0.7"/> <!-- Traffic light pole -->
+      <circle cx="95" cy="385" r="3" fill="#ef4444"/>
+      
+      <!-- Right side modern structures -->
+      <g fill="#0b1322">
+        <rect x="410" y="230" width="102" height="210"/>
+        <rect x="410" y="200" width="80" height="30"/>
+      </g>
+      <rect x="410" y="360" width="50" height="20" fill="#38bdf8" opacity="0.2"/> <!-- Bus stop glow -->
+      
+      <!-- Street markings -->
+      <g fill="#ffffff" opacity="0.2">
+        <rect x="210" y="200" width="4" height="30"/>
+        <rect x="210" y="260" width="4" height="30"/>
+        <rect x="210" y="320" width="4" height="30"/>
+        <rect x="210" y="380" width="4" height="30"/>
+        <rect x="210" y="440" width="4" height="30"/>
+        <rect x="210" y="500" width="4" height="30"/>
+        
+        <rect x="298" y="200" width="4" height="30"/>
+        <rect x="298" y="260" width="4" height="30"/>
+        <rect x="298" y="320" width="4" height="30"/>
+        <rect x="298" y="380" width="4" height="30"/>
+        <rect x="298" y="440" width="4" height="30"/>
+        <rect x="298" y="500" width="4" height="30"/>
+      </g>
+    
+</svg>

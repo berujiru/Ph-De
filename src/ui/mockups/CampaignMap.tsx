@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { theme } from '../theme';
+import { type MapSkinId, skinsForAct } from '../../game/data/mapSkins';
 import {
   CheckIcon,
   LockIcon,
@@ -13,7 +14,7 @@ import { BackButton } from '../components/BackButton';
 
 interface CampaignMapProps {
   onBack: () => void;
-  onPrepareBattle: () => void;
+  onPrepareBattle: (act: number, stageIdx: number) => void;
   onStartSandbox: () => void;
 }
 
@@ -30,8 +31,10 @@ interface ActEntry {
   id: number;
   title: string;
   description: string;
-  /** Portrait map thumbnail for the act's tier. */
+  /** Portrait map thumbnail for the act's tier — uses the first battle-map skin's street layer. */
   map: string;
+  /** Map skin IDs available in this act (stages cycle through them). */
+  mapSkins: MapSkinId[];
   stages: StageEntry[];
 }
 
@@ -43,7 +46,8 @@ const CAMPAIGN_DATA: ActEntry[] = [
     id: 1,
     title: 'Act 1: The Grassroots',
     description: 'Protecting local communities from immediate threats like Troll Bots and Fixers.',
-    map: '/assets/maps/map-barangay.svg',
+    map: skinsForAct(1)[0]?.layers.street ?? '/assets/maps/map-barangay.svg',
+    mapSkins: skinsForAct(1).map((s) => s.id),
     stages: [
       stage(1, 'The Street Corner'),
       stage(2, 'Alleyway Ambush'),
@@ -61,7 +65,8 @@ const CAMPAIGN_DATA: ActEntry[] = [
     id: 2,
     title: 'Act 2: The Town Core',
     description: 'Taking back public utilities and spaces from entrenched local corruption.',
-    map: '/assets/maps/map-bayan.svg',
+    map: skinsForAct(2)[0]?.layers.street ?? '/assets/maps/map-bayan.svg',
+    mapSkins: skinsForAct(2).map((s) => s.id),
     stages: [
       stage(11, 'Public Market Gates'),
       stage(12, 'Jeepney Terminal'),
@@ -79,7 +84,8 @@ const CAMPAIGN_DATA: ActEntry[] = [
     id: 3,
     title: 'Act 3: The Regional Hub',
     description: 'Dismantling provincial syndicates and ghost projects across the region.',
-    map: '/assets/maps/map-province.svg',
+    map: skinsForAct(3)[0]?.layers.street ?? '/assets/maps/map-province.svg',
+    mapSkins: skinsForAct(3).map((s) => s.id),
     stages: [
       stage(21, 'Provincial Highway'),
       stage(22, 'Ghost Bridge'),
@@ -97,7 +103,8 @@ const CAMPAIGN_DATA: ActEntry[] = [
     id: 4,
     title: 'Act 4: The National Gauntlet',
     description: 'Facing the systemic root of the anomalies across national government agencies.',
-    map: '/assets/maps/map-national.svg',
+    map: skinsForAct(4)[0]?.layers.street ?? '/assets/maps/map-national.svg',
+    mapSkins: skinsForAct(4).map((s) => s.id),
     stages: [
       stage(31, 'National Highway'),
       stage(32, 'Transport Agency'),
@@ -115,7 +122,8 @@ const CAMPAIGN_DATA: ActEntry[] = [
     id: 5,
     title: 'Finale: Ang Sistema',
     description: 'Every defeated anomaly returns at once. The full alliance holds the line.',
-    map: '/assets/maps/map-finale.svg',
+    map: skinsForAct(4)[2]?.layers.street ?? '/assets/maps/map-finale.svg',
+    mapSkins: ['natl-palace'],
     stages: [stage(41, 'Ang Sistema (Finale)', 3)],
   },
 ];
@@ -506,7 +514,7 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
 
                             {!isLocked ? (
                               <button
-                                onClick={onPrepareBattle}
+                                onClick={() => onPrepareBattle(act.id, stageIdx)}
                                 disabled={!canAffordRun}
                                 aria-label={`${isCleared ? 'Replay' : 'Prepare'} ${stageEntry.name} — costs ${stageEntry.permitCost} rally permit${stageEntry.permitCost > 1 ? 's' : ''}`}
                                 style={{

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="540" viewBox="0 0 512 540">
+  
+      <g fill="#0c1424">
+        <!-- Distant Mountains -->
+        <polygon points="-20,420 80,240 180,420" />
+        <polygon points="320,420 420,260 520,420" />
+      </g>
+      <g stroke="#0c1424" stroke-width="2" fill="none">
+        <!-- Power lines -->
+        <path d="M380 420 L 390 280 L 400 420" />
+        <path d="M370 300 L 410 300" />
+        <path d="M385 280 L 370 300 L 390 320" />
+        <path d="M395 280 L 410 300 L 390 320" />
+      </g>
+      <!-- Coconut tree -->
+      <g stroke="#0c1424" stroke-width="4" fill="none">
+        <path d="M120 420 Q 130 350 140 320" />
+        <path d="M140 320 Q 110 300 100 340" />
+        <path d="M140 320 Q 150 280 180 300" />
+        <path d="M140 320 Q 170 320 160 350" />
+      </g>
+    
+</svg>

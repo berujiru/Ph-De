@@ -13,6 +13,7 @@ import './App.css';
 
 function App() {
   const [currentView, setCurrentView] = useState<'loading' | 'main' | 'campaign' | 'prep' | 'battle' | 'sandbox' | 'store' | 'inventory'>('loading');
+  const [selectedStage, setSelectedStage] = useState<{ act: number; stageIdx: number } | null>(null);
 
   const handlePlay = () => {
     setCurrentView('campaign');
@@ -21,7 +22,7 @@ function App() {
   const handleStartBattle = () => {
     setCurrentView('battle');
     // Start game systems
-    uiToGameEvents.emit('restart', undefined);
+    uiToGameEvents.emit('restart', selectedStage ? { act: selectedStage.act, stageIdx: selectedStage.stageIdx } : undefined);
   };
 
   const handleStartSandbox = () => {
@@ -57,7 +58,10 @@ function App() {
       {currentView === 'campaign' && (
         <CampaignMap 
           onBack={() => setCurrentView('main')} 
-          onPrepareBattle={() => setCurrentView('prep')}
+          onPrepareBattle={(act, stageIdx) => {
+            setSelectedStage({ act, stageIdx });
+            setCurrentView('prep');
+          }}
           onStartSandbox={handleStartSandbox}
         />
       )}

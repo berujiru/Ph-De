@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="540" viewBox="0 0 512 540" preserveAspectRatio="none">
+  <defs>
+    
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#1a0f0a"/>
+        <stop offset="0.6" stop-color="#2d1608"/>
+        <stop offset="1" stop-color="#4a2a10"/>
+      </linearGradient>
+      <linearGradient id="horizon" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#facc15" stop-opacity="0"/>
+        <stop offset="0.7" stop-color="#facc15" stop-opacity="0.1"/>
+        <stop offset="1" stop-color="#facc15" stop-opacity="0.2"/>
+      </linearGradient>
+    
+  </defs>
+  <rect width="512" height="540" fill="url(#sky)"/>
+  <rect y="300" width="512" height="240" fill="url(#horizon)"/>
+  
+</svg>

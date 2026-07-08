@@ -20,11 +20,10 @@ export const PORTRAIT_BG_LOCKED = 'radial-gradient(circle at 50% 34%, #64748b 0%
 export const hexColor = (color: number) => `#${color.toString(16).padStart(6, '0')}`;
 
 /**
- * A hero portrait cropped straight out of the skin's combined spritesheet:
- * the sheet ships a dedicated front-face cell (`skin.portraitFrame`), and this
- * component CSS-crops it, so every skin brings its own portrait with zero
- * extra image files. Renders the silhouette placeholder when `skin` is
- * undefined (hero has no art yet).
+ * A hero portrait referencing the standalone high-res portrait file 
+ * (e.g. eden_portrait.png) for UI showcases. Renders the silhouette 
+ * placeholder when `skin` is undefined (hero has no art yet) or if 
+ * the portrait asset fails to load.
  */
 export function SkinPortrait({
   skin,
@@ -45,25 +44,19 @@ export function SkinPortrait({
       />
     );
   }
-  const rows = Math.max(1, Math.ceil(skin.totalFrames / skin.columns));
-  const col = skin.portraitFrame % skin.columns;
-  const row = Math.floor(skin.portraitFrame / skin.columns);
-  // background-position % maps cell (col,row) onto a sheet scaled to
-  // columns×rows times the box; guard 1-col/1-row sheets (divide by zero).
-  const posX = skin.columns > 1 ? (col / (skin.columns - 1)) * 100 : 0;
-  const posY = rows > 1 ? (row / (rows - 1)) * 100 : 0;
   return (
-    <div
-      role="img"
-      aria-label={alt}
+    <img
+      src={`/assets/heroes/${skin.heroId}_portrait.png`}
+      alt={alt}
       style={{
         width: '100%',
         height: '100%',
-        backgroundImage: `url(${skin.sheet})`,
-        backgroundSize: `${skin.columns * 100}% ${rows * 100}%`,
-        backgroundPosition: `${posX}% ${posY}%`,
-        backgroundRepeat: 'no-repeat',
+        objectFit: 'cover',
         ...style,
+      }}
+      onError={(e) => {
+        // Fallback if portrait asset is missing
+        (e.target as HTMLImageElement).src = HERO_PLACEHOLDER_SRC;
       }}
     />
   );
