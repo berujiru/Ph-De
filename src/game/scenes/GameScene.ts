@@ -446,6 +446,8 @@ export class GameScene extends Phaser.Scene {
       // so rapid skill-testing isn't interrupted.
       if (!this.isSandbox && !this.isPaused) {
         this.isPaused = true;
+        this.pauseVisuals();
+
         this.skillCutIn.play({
           skillName: hero.definition.signatureSkill.name,
           faction: 'hero',
@@ -460,6 +462,8 @@ export class GameScene extends Phaser.Scene {
           onComplete: () => {
             if (!this.sys) return;
             this.isPaused = false;
+            this.resumeVisuals();
+            
             // Show the cast animation now the cut-in has cleared (it would
             // otherwise finish hidden behind the full-screen cut-in).
             hero.playCast();
@@ -698,6 +702,16 @@ export class GameScene extends Phaser.Scene {
     if (status === 'lost') {
       for (const enemy of this.enemies) enemy.playOutcome('celebrate');
     }
+  }
+
+  private pauseVisuals(): void {
+    for (const hero of this.heroes) hero.model.pause();
+    for (const enemy of this.enemies) enemy.model.pause();
+  }
+
+  private resumeVisuals(): void {
+    for (const hero of this.heroes) hero.model.resume();
+    for (const enemy of this.enemies) enemy.model.resume();
   }
 
   /**

@@ -9,8 +9,9 @@ import { HeroModel } from './models/HeroModel';
 
 export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   public id: string;
-  public definition: HeroDefinition;
+  public isSkillReady = false;
   private attackCooldown = 0;
+  private pendingAttacks: { delayMs: number, originalTarget: Enemy }[] = [];
   public attackRateMs: number;
   public damage: number;
   public range: number;
@@ -38,10 +39,6 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
 
   private model: HeroModel;
   private nameLabel: Phaser.GameObjects.Text;
-  private attackBarBg: Phaser.GameObjects.Rectangle;
-  private attackBarFill: Phaser.GameObjects.Rectangle;
-  private skillBarBg: Phaser.GameObjects.Rectangle;
-  private skillBarFill: Phaser.GameObjects.Rectangle;
   private rangeIndicator: Phaser.GameObjects.Arc;
 
   constructor(
@@ -71,33 +68,17 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
 
     // Heroes render at the 'hero' size tier; labels/bars hang off its half-height.
     const sizePx = UNIT_RENDER_SIZES.hero;
-    const half = sizePx / 2;
     this.model = new HeroModel(scene, 0, 0, def.color, spriteKey ?? def.spriteKey ?? def.id, sizePx);
     this.add(this.model);
 
-    this.nameLabel = scene.add.text(0, half + 10, def.name, {
-      fontSize: '40px',
+    this.nameLabel = scene.add.text(0, -sizePx / 2 - 20, def.name.toUpperCase(), {
+      fontSize: '20px',
       color: '#ffffff',
-      align: 'center',
       fontStyle: 'bold',
       stroke: '#000000',
-      strokeThickness: 6,
-    }).setOrigin(0.5, 0);
+      strokeThickness: 6
+    }).setOrigin(0.5);
     this.add(this.nameLabel);
-
-
-    // Cooldown bars
-    this.attackBarBg = scene.add.rectangle(0, -(half + 8), 30, 4, 0x000000);
-    this.add(this.attackBarBg);
-    this.attackBarFill = scene.add.rectangle(-15, -(half + 8), 30, 4, 0x00ff00);
-    this.attackBarFill.setOrigin(0, 0.5);
-    this.add(this.attackBarFill);
-
-    this.skillBarBg = scene.add.rectangle(0, -(half + 15), 30, 4, 0x000000);
-    this.add(this.skillBarBg);
-    this.skillBarFill = scene.add.rectangle(-15, -(half + 15), 30, 4, 0xffff00);
-    this.skillBarFill.setOrigin(0, 0.5);
-    this.add(this.skillBarFill);
 
     // Make interactive — hit area tracks the size tier.
     this.setSize(Math.round(sizePx * 0.7), sizePx + 30);
@@ -207,38 +188,6 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     // (walk / run) when there's nothing in range to shoot.
     this.model.setState(target ? 'idle' : step.locomotion);
 
-    // Auto-attack — fire when the cadence is ready and a target is in range.
-    if (target && this.attackCooldown === 0) {
-      // Cooldown starts now (attack cadence is unchanged), but the projectile
-      // and passives fire at the animation's release frame via onRelease —
-      // so the shot leaves in sync with the throw, not the instant the swing
-      // begins.
-      this.attackCooldown = this.attackRateMs;
-      const releaseTarget = target;
-      this.model.setState('attack', {
-        attackIntervalMs: this.attackRateMs,
-        onRelease: () => {
-          if (!this.scene || releaseTarget.isDead) return;
-          this.onAttack(this, releaseTarget);
-
-          // Passives applied on attack
-          const activePassive = this.passiveOverride || this.id;
-          applyHeroPassive(activePassive, this, releaseTarget, {
-            GAME_WIDTH: Number(this.scene.game.config.width),
-            GAME_HEIGHT: Number(this.scene.game.config.height),
-            heroes: [], // Passive doesn't currently read other heroes
-            enemies: [], // or other enemies
-            onVisual: (evt) => {
-              if (evt.type === 'text') {
-                const txt = this.scene.add.text(evt.x || 0, evt.y || 0, evt.text || '', { color: evt.color || '#fff', fontStyle: 'bold' }).setOrigin(0.5);
-                this.scene.tweens.add({ targets: txt, y: (evt.y || 0) - 30, alpha: 0, duration: 1000, onComplete: () => txt.destroy() });
-              }
-            }
-          });
-        },
-      });
-    }
-
     // Skill cooldown logic
     if (!this.isSkillReady) {
       this.currentSkillCooldown -= delta;
@@ -253,12 +202,59 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
       }
     }
 
-    // Update visuals
-    const attackProgress = Math.max(0, 1 - (this.attackCooldown / this.attackRateMs));
-    this.attackBarFill.scaleX = attackProgress;
+    // Auto-attack — fire when the cadence is ready and a target is in range.
+    if (target && this.attackCooldown === 0) {
+      // Cooldown starts now (attack cadence is unchanged). We decouple the 
+      // actual projectile launch from the animation frames using a delayed timer 
+      // so the mechanical attack fires reliably even at extremely fast speeds.
+      this.attackCooldown = this.attackRateMs;
+      
+      this.model.setState('attack', { attackIntervalMs: this.attackRateMs });
 
-    const skillProgress = Math.max(0, 1 - (this.currentSkillCooldown / this.skillCooldownMs));
-    this.skillBarFill.scaleX = skillProgress;
+      // Fire projectile roughly halfway through the attack interval to sync with the visual swing.
+      this.pendingAttacks.push({
+        delayMs: this.attackRateMs * 0.45,
+        originalTarget: target,
+      });
+    }
+
+    // Process pending attacks (mechanical projectile launch)
+    for (let i = this.pendingAttacks.length - 1; i >= 0; i--) {
+      const pending = this.pendingAttacks[i];
+      pending.delayMs -= delta;
+      
+      if (pending.delayMs <= 0) {
+        let finalTarget = pending.originalTarget;
+        
+        // If the original target died while the hero was swinging, try to seamlessly 
+        // redirect the attack to a new valid target so the attack isn't wasted.
+        if (finalTarget.isDead || !finalTarget.active) {
+            const allEnemies = (this.scene as any).enemies as Enemy[];
+            finalTarget = this.findTargetInRange(allEnemies) || finalTarget;
+        }
+
+        if (finalTarget && finalTarget.active && !finalTarget.isDead) {
+          this.onAttack(this, finalTarget);
+
+          // Passives applied on attack
+          const activePassive = this.passiveOverride || this.id;
+          applyHeroPassive(activePassive, this, finalTarget, {
+            GAME_WIDTH: Number(this.scene.game.config.width),
+            GAME_HEIGHT: Number(this.scene.game.config.height),
+            heroes: [],
+            enemies: [],
+            onVisual: (evt) => {
+              if (evt.type === 'text') {
+                const txt = this.scene.add.text(evt.x || 0, evt.y || 0, evt.text || '', { color: evt.color || '#fff', fontStyle: 'bold' }).setOrigin(0.5);
+                this.scene.tweens.add({ targets: txt, y: (evt.y || 0) - 30, alpha: 0, duration: 1000, onComplete: () => txt.destroy() });
+              }
+            }
+          });
+        }
+        
+        this.pendingAttacks.splice(i, 1);
+      }
+    }
   }
 
   useSkill(skillOverride?: string) {

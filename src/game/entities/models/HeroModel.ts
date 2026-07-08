@@ -191,9 +191,12 @@ export class HeroModel extends UnitModel {
   protected playAttack(onComplete: () => void, onRelease?: () => void, attackIntervalMs?: number): void {
     if (this.hasStateAnim('attack')) {
       // Fit the swing to the attack cadence: a fast attacker's clip speeds up so
-      // it finishes within the interval; a slow one caps at the natural length
-      // (then idles). Keeps the release frame in sync at any attack speed.
-      const duration = Math.max(120, Math.min(attackIntervalMs ?? HeroModel.NATURAL_ATTACK_MS, HeroModel.NATURAL_ATTACK_MS));
+      // it finishes within the interval; a slow one caps at the natural length.
+      // We scale the duration by 95% so the animation cleanly finishes and reverts
+      // to idle *just* before the next attack fires, preventing it from snapping back
+      // to frame 0 (resetting) if the next attack triggers a millisecond early.
+      const rawDuration = Math.min(attackIntervalMs ?? HeroModel.NATURAL_ATTACK_MS, HeroModel.NATURAL_ATTACK_MS);
+      const duration = rawDuration * 0.95;
       // Release the projectile at the throw frame, not the start of the swing.
       if (onRelease) this.scheduleAttackRelease(`${this.spriteBaseKey}-attack`, onRelease);
       this.playOneShotAnim('attack', onComplete, duration);

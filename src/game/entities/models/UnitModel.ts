@@ -131,6 +131,18 @@ export abstract class UnitModel extends Phaser.GameObjects.Container {
     return this.currentState;
   }
 
+  /** Pause the current animation/tweens visually */
+  pause(): void {
+    if (this.animatedBody) this.animatedBody.anims.pause();
+    this.scene.tweens.pauseTweensOf(this.bodySprite);
+  }
+
+  /** Resume the current animation/tweens visually */
+  resume(): void {
+    if (this.animatedBody) this.animatedBody.anims.resume();
+    this.scene.tweens.resumeTweensOf(this.bodySprite);
+  }
+
   /** Local-space point projectiles visually launch from. */
   get muzzleOffset(): { x: number; y: number } {
     return { x: 12, y: -4 };

@@ -11,7 +11,7 @@ import Phaser from 'phaser';
 export class MotionTrail {
   private readonly streak: Phaser.GameObjects.Ellipse;
 
-  constructor(scene: Phaser.Scene, color: number, length = 22, thickness = 8) {
+  constructor(scene: Phaser.Scene, color: number, length = 110, thickness = 40) {
     this.streak = scene.add.ellipse(0, 0, length, thickness, color, 0.45);
     this.streak.setDepth(9);
   }
@@ -20,7 +20,7 @@ export class MotionTrail {
   update(x: number, y: number, vx: number, vy: number): void {
     const angle = Math.atan2(vy, vx);
     // Sit the streak's midpoint a little behind the projectile.
-    this.streak.setPosition(x - Math.cos(angle) * 8, y - Math.sin(angle) * 8);
+    this.streak.setPosition(x - Math.cos(angle) * 40, y - Math.sin(angle) * 40);
     this.streak.setRotation(angle);
   }
 
