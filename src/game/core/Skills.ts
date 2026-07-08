@@ -1,3 +1,5 @@
+import type { DamageType } from './Damage';
+
 export interface ISkillHero {
   id: string;
   x: number;
@@ -86,7 +88,9 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     const validTargets = enemies.filter(e => !e.isDead);
     if (validTargets.length > 0) {
       const volleySize = 5;
-      const elements: ('Physical' | 'Fire' | 'Wind' | 'Earth' | 'Lightning')[] = ['Physical', 'Fire', 'Wind', 'Earth', 'Lightning'];
+      const elements: DamageType[] = [
+        'Physical', 'Magic', 'Fire', 'Frost', 'Lightning', 'Water', 'Wind', 'Earth', 'Holy', 'Dark'
+      ];
       
       for (let i = 0; i < volleySize; i++) {
         const target = validTargets[Math.floor(Math.random() * validTargets.length)];

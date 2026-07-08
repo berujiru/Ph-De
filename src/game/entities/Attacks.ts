@@ -157,7 +157,7 @@ export class PierceAttack extends Attack {
     // A long lance/streak behind a bright tip so pierce reads as a spear, not a dot.
     this.lance = scene.add.rectangle(x, y, 160, 20, color, 0.85);
     this.lance.setStrokeStyle(4, OUTLINE_COLOR, 1);
-    this.visual = scene.add.circle(x, y, 20, 0xffffff);
+    this.visual = scene.add.circle(x, y, 20, color);
     this.visual.setStrokeStyle(4, OUTLINE_COLOR, 1);
 
     // Snapshot the firing vector ONCE; the shot never curves after this.

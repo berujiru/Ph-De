@@ -1,4 +1,6 @@
 export type EnemyId = 'grunt' | 'runner' | 'brute' | 'sandbox_target' | 'ghost_employee' | 'illegal_logger' | 'epal' | 'the_overpriced' | 'kickback_courier' | 'shell_company' | 'crony_bodyguard' | 'hoarder' | 'land_grabber' | 'tender_rigger' | 'boss_flood_control' | 'boss_pork_barrel' | 'boss_troll_farm' | 'boss_vote_buying' | 'boss_nepotism' | 'boss_wang_wang' | 'boss_budget_insertion' | 'boss_smuggling' | 'boss_dynasty_1' | 'boss_dynasty_2' | 'boss_dynasty_3' | 'boss_ang_sistema';
+import type { DamageType } from '../core/Damage';
+
 export type HeroId = 'eden' | 'teacher' | 'student' | 'jeepney_driver' | 'fisherfolk' | 'street_sweeper' | 'taho_vendor' | 'nurse' | 'construction_worker' | 'call_center_agent' | 'security_guard' | 'farmer' | 'fishball_vendor' | 'sales_lady' | 'sorbetes_vendor' | 'electrician' | 'baker' | 'traffic_enforcer' | 'plumber' | 'delivery_rider' | 'sandbox_projectile' | 'sandbox_melee_cleave' | 'sandbox_beam' | 'sandbox_lobbed' | 'sandbox_pierce' | 'sandbox_chain' | 'sandbox_trap' | 'sandbox_vortex' | 'sandbox_linear_wave' | 'sandbox_summoner' | 'sandbox_boomerang';
 
 /**
@@ -423,11 +425,12 @@ export const BARRICADE_DEFAULTS = {
   width: 30,
 };
 
+
 export interface HeroDefinition {
   id: HeroId;
   name: string;
   profession: string;
-  damageType: 'Physical' | 'Wind' | 'Water' | 'Earth' | 'Frost' | 'Fire' | 'Holy' | 'Lightning' | 'Dark';
+  damageType: DamageType;
   attackKind: 'melee' | 'ranged';
   attackStyle: 'projectile' | 'melee-cleave' | 'beam' | 'lobbed' | 'pierce' | 'chain' | 'trap' | 'vortex' | 'linear-wave' | 'summoner' | 'boomerang';
   range: number;

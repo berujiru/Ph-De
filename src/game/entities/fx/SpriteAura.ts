@@ -37,6 +37,7 @@ export class SpriteAura extends Phaser.GameObjects.Container {
       lifespan: 1000,
       frequency: 100,
       blendMode: 'SCREEN',
+      // @ts-ignore: Phaser types are strict here
       emitZone: {
         type: 'random' as const,
         source: new Phaser.Geom.Rectangle(-30, -50, 60, 50),

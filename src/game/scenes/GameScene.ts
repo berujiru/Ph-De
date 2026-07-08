@@ -6,6 +6,7 @@ import { Summon } from '../entities/Summon';
 import { Attack, ProjectileAttack, PierceAttack, MeleeCleaveAttack, VortexAttack, BoomerangAttack, ChainAttack, SummonAttack, BeamAttack, LobbedAttack, LinearWaveAttack, TrapAttack } from '../entities/Attacks';
 import { gameToUiEvents, uiToGameEvents, type GameStateSnapshot, type DropOption } from '../core/GameEvents';
 import { BARRICADE_DEFAULTS, ENEMY_DEFINITIONS, HERO_DEFINITIONS, MAX_ACTIVE_HEROES, UPGRADE_DEFS, GLOBAL_DROP_DEFS, computeKillPool, voiceDropCost, enemySizeClass, type EnemyId, type HeroId, type UpgradeKind } from '../data/balance';
+import { DAMAGE_TYPE_COLORS, type DamageType } from '../core/Damage';
 import { rollDrops, makeRng, type DropContext } from '../core/Drops';
 import { GAME_HEIGHT, GAME_WIDTH, WORLD_HEIGHT, RALLY, ENEMY_SPAWN_Y_OFFSET, FX, PARALLAX } from '../data/level';
 import { getMapSkinForStage, type MapSkin } from '../data/mapSkins';
@@ -567,16 +568,15 @@ export class GameScene extends Phaser.Scene {
             });
           } else if (evt.type === 'projectileVolley') {
             const h = evt.hero as Hero;
-            const elementColors: Record<string, number> = {
-              'Fire': 0xef4444,
-              'Water': 0x3b82f6,
-              'Wind': 0x10b981,
-              'Earth': 0x84cc16,
-              'Lightning': 0xeab308,
-              'Physical': 0x9ca3af
-            };
-            const volleyColor = elementColors[evt.damageType] || 0xffffff;
-            const attack = new ProjectileAttack(this, h.muzzleX, h.muzzleY, evt.target, h.damage, volleyColor, h.modifiers, evt.damageType as any);
+            const volleyColor = DAMAGE_TYPE_COLORS[evt.damageType as DamageType] || 0xffffff;
+            
+            let attack: Attack;
+            if (h.definition.attackStyle === 'pierce') {
+              attack = new PierceAttack(this, h.muzzleX, h.muzzleY, evt.target, h.damage, volleyColor, h.definition.basePierce ?? 1, h.modifiers, evt.damageType as any);
+            } else {
+              attack = new ProjectileAttack(this, h.muzzleX, h.muzzleY, evt.target, h.damage, volleyColor, h.modifiers, evt.damageType as any);
+            }
+            
             this.attacks.push(attack);
           }
         }
@@ -977,8 +977,15 @@ export class GameScene extends Phaser.Scene {
 
     const hero = new Hero(this, x, y, def, (h, target, overrideDamageType, overrideColor) => {
       let attack: Attack;
-      const color = overrideColor ?? h.definition.projectileColor ?? h.definition.color;
-      const damageType = overrideDamageType ?? h.definition.damageType;
+      let damageType = overrideDamageType ?? h.definition.damageType;
+
+      // During Cramming (indicated by student having attackSpeed buff), attacks become randomized elemental!
+      if (h.id === 'student' && h.activeBuffs['attackSpeed']) {
+        const elements: DamageType[] = ['Physical', 'Magic', 'Fire', 'Frost', 'Lightning', 'Water', 'Wind', 'Earth', 'Holy', 'Dark'];
+        damageType = elements[Math.floor(Math.random() * elements.length)];
+      }
+
+      const color = overrideColor ?? DAMAGE_TYPE_COLORS[damageType as DamageType] ?? h.definition.projectileColor ?? h.definition.color;
       // Persisted per-hero upgrade mods land on every Attack this hero spawns.
       const mods = h.modifiers;
 
