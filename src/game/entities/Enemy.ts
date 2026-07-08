@@ -68,6 +68,8 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
   private stealVoicesTimer = 0;
   private knockbackPulseTimer = 0;
   private auraTimer = 0;
+  public silenceTimer = 0;
+  private mutedIcon: Phaser.GameObjects.Text | null = null;
 
   // Ailment Tracking
   private ailmentBuildups: Record<string, number> = {};
@@ -300,6 +302,9 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       }
 
       // Death plays through the model; fade the rest (ailment icons, etc.) with it.
+      if (this.mutedIcon) {
+        this.scene.tweens.add({ targets: this.mutedIcon, alpha: 0, duration: 400 });
+      }
       this.scene.tweens.add({ targets: this, alpha: 0, duration: 300 });
       this.model.setState('death', { onComplete: () => this.destroy() });
     }
@@ -455,7 +460,24 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       }
     }
 
-    if (this.definition.moraleAura) {
+    if (this.silenceTimer > 0) {
+      this.silenceTimer -= delta;
+      
+      if (!this.mutedIcon) {
+        const iconY = -(this.sizePx / 2 + 24); 
+        this.mutedIcon = this.scene.add.text(0, iconY, '🔇', { fontSize: '24px' }).setOrigin(0.5);
+        this.add(this.mutedIcon);
+      }
+      
+      if (this.silenceTimer <= 0) {
+        if (this.mutedIcon) {
+          this.mutedIcon.destroy();
+          this.mutedIcon = null;
+        }
+      }
+    }
+
+    if (this.definition.moraleAura && this.silenceTimer <= 0) {
       this.auraTimer += delta;
       if (this.auraTimer >= 500) { // check twice a second
         this.auraTimer = 0;

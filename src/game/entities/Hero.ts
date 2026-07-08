@@ -210,7 +210,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
       // Ignore stealthed enemies unless this hero can see stealth.
       if (enemy.isStealthed && !this.definition.canSeeStealth) continue;
 
-      if (enemy.definition.tauntAura && this.y - enemy.y <= this.range) {
+      if (enemy.definition.tauntAura && enemy.silenceTimer <= 0 && this.y - enemy.y <= this.range) {
         // A taunting enemy in range is prioritized; pick the most-advanced one.
         if (!foundTaunt || enemy.y > maxEnemyY) {
           maxEnemyY = enemy.y;

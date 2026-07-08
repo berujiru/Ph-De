@@ -26,6 +26,7 @@ export interface ISkillEnemy {
     moraleAura?: boolean;
     tauntAura?: boolean;
   };
+  silenceTimer: number;
   takeDamage: (amount: number) => void;
 }
 
@@ -72,11 +73,12 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       onVisual({ type: 'text', x: h.x, y: h.y - 20, text: 'RALLY!', color: '#ef4444' });
     }
   } else if (skillId === 'teacher') {
-    // Recess: Silence enemy auras
+    // Silence: Silence all enemy auras globally (visualized as an expanding circle)
+    onVisual({ type: 'expandingCircle', x: hero.x, y: hero.y, color: '#8b5cf6', maxRadius: GAME_HEIGHT, duration: 1000 });
+
     for (const e of enemies) {
-      if (!e.isDead && (e.definition.moraleAura || e.definition.tauntAura)) {
-        e.definition.moraleAura = false;
-        e.definition.tauntAura = false;
+      if (!e.isDead) {
+        e.silenceTimer = 10000; // 10 seconds of silence
         onVisual({ type: 'text', x: e.x, y: e.y, text: 'SILENCED', color: '#a855f7' });
       }
     }

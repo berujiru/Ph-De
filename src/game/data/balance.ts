@@ -552,7 +552,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 1500,
     color: 0x8b5cf6,
     purpose: 'Two-hit boomerang ruler (out and back) that marks anomalies for bonus damage — strong against single tough targets.',
-    signatureSkill: { name: 'Recess', shortName: 'Recess', description: 'Silences enemy auras in a radius.' },
+    signatureSkill: { name: 'Silence', shortName: 'Silence', description: 'Silences all enemy auras globally for 10 seconds.' },
     passive: { name: 'Fact Check', description: 'Instantly pops and destroys Fake HP padding.' },
     projectileColor: 0xddd6fe,
   },

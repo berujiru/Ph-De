@@ -581,6 +581,25 @@ export class GameScene extends Phaser.Scene {
           } else if (evt.type === 'healShield') {
             this.healShield(evt.amount);
             this.shield?.playHealVisual();
+          } else if (evt.type === 'expandingCircle') {
+            const baseColor = Phaser.Display.Color.HexStringToColor(evt.color).color;
+            
+            // Create a multi-ring ripple effect for texture
+            for (let i = 0; i < 4; i++) {
+              const circle = this.add.circle(evt.x, evt.y, 10, baseColor, 0.15);
+              circle.setStrokeStyle(8 - (i * 1.5), baseColor, 0.8);
+              circle.setBlendMode(Phaser.BlendModes.ADD);
+              
+              this.tweens.add({
+                targets: circle,
+                radius: evt.maxRadius,
+                alpha: 0,
+                duration: evt.duration * 1.2,
+                delay: i * 150, // stagger the rings to create outward texture
+                ease: 'Sine.easeOut',
+                onComplete: () => circle.destroy()
+              });
+            }
           }
         }
       });
