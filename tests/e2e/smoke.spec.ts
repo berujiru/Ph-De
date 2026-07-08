@@ -31,7 +31,7 @@ test('deploys into a battle and the HUD reflects the live Phaser scene', async (
   await page.getByRole('button', { name: /^Prepare / }).click();
 
   // Briefing room -> deploy to the streets.
-  await page.getByRole('button', { name: /^Deploy to the streets/ }).click();
+  await page.locator('button', { hasText: /Deploy to the streets/i }).click();
 
   // Battle HUD renders and is wired to the scene: the morale pill shows the
   // shield's hp, and the scene auto-starts wave 1 shortly after deploy —

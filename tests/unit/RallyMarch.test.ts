@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
-  formationTargetX,
+  formationTargetY,
   isFieldClear,
-  nextShieldX,
+  nextShieldY,
   stepTowardFormation,
   type FormationSlotConfig,
   type RallyMarchConfig,
@@ -13,7 +13,7 @@ import { HERO_DEFINITIONS } from '../../src/game/data/balance';
 const config: RallyMarchConfig = {
   marchSpeedPxPerSec: 50,
   engageRangePx: 200,
-  shieldMaxX: 3000,
+  shieldMaxY: 200,
 };
 
 describe('isFieldClear', () => {
@@ -22,20 +22,20 @@ describe('isFieldClear', () => {
   });
 
   it('is clear when all enemies are beyond engage range', () => {
-    expect(isFieldClear(500, [701, 1200], 200)).toBe(true);
+    expect(isFieldClear(500, [299, -100], 200)).toBe(true);
   });
 
   it('is contested when an enemy is within engage range ahead', () => {
-    expect(isFieldClear(500, [700], 200)).toBe(false);
-  });
-
-  it('is contested when an enemy has leaked behind the shield', () => {
     expect(isFieldClear(500, [400], 200)).toBe(false);
   });
 
+  it('is contested when an enemy has leaked behind the shield', () => {
+    expect(isFieldClear(500, [600], 200)).toBe(false);
+  });
+
   it('treats an enemy exactly at the engage boundary as engaged', () => {
-    expect(isFieldClear(500, [700], 200)).toBe(false);
-    expect(isFieldClear(500, [700.001], 200)).toBe(true);
+    expect(isFieldClear(500, [300], 200)).toBe(false);
+    expect(isFieldClear(500, [299.999], 200)).toBe(true);
   });
 
   it('is contested by an enemy exactly on the shield line', () => {
@@ -43,90 +43,92 @@ describe('isFieldClear', () => {
   });
 });
 
-describe('nextShieldX', () => {
+describe('nextShieldY', () => {
   it('advances at march speed while the field is clear', () => {
-    expect(nextShieldX(500, 1000, [], config)).toBe(550);
+    expect(nextShieldY(500, 1000, [], config)).toBe(450);
   });
 
   it('is frame-rate independent (two half-steps equal one full step)', () => {
-    const oneStep = nextShieldX(500, 1000, [], config);
-    const twoSteps = nextShieldX(nextShieldX(500, 500, [], config), 500, [], config);
+    const oneStep = nextShieldY(500, 1000, [], config);
+    const twoSteps = nextShieldY(nextShieldY(500, 500, [], config), 500, [], config);
     expect(twoSteps).toBeCloseTo(oneStep);
   });
 
   it('halts while an enemy is engaged', () => {
-    expect(nextShieldX(500, 1000, [650], config)).toBe(500);
+    expect(nextShieldY(500, 1000, [350], config)).toBe(500);
   });
 
   it('resumes once the engaged enemy is gone', () => {
-    const halted = nextShieldX(500, 1000, [650], config);
-    expect(nextShieldX(halted, 1000, [], config)).toBe(550);
+    const halted = nextShieldY(500, 1000, [350], config);
+    expect(nextShieldY(halted, 1000, [], config)).toBe(450);
   });
 
-  it('clamps at shieldMaxX', () => {
-    expect(nextShieldX(2999, 60_000, [], config)).toBe(3000);
+  it('clamps at shieldMaxY', () => {
+    expect(nextShieldY(210, 60_000, [], config)).toBe(200);
   });
 
-  it('stays put when already at shieldMaxX', () => {
-    expect(nextShieldX(3000, 1000, [], config)).toBe(3000);
+  it('stays put when already at shieldMaxY', () => {
+    expect(nextShieldY(200, 1000, [], config)).toBe(200);
   });
 
   it('does not move when dtMs is 0 (paused / speed-0 frame)', () => {
-    expect(nextShieldX(500, 0, [], config)).toBe(500);
+    expect(nextShieldY(500, 0, [], config)).toBe(500);
   });
 });
 
-describe('formationTargetX', () => {
+describe('formationTargetY', () => {
   // enemyContactAheadPx is small (shield half-width) so short-range heroes
   // get pulled forward; slack keeps a comfortable margin inside range.
   const formation: FormationSlotConfig = {
-    meleeOffsetX: -45,
-    rangedOffsetX: -150,
+    meleeOffsetY: 45,
+    rangedOffsetY: 150,
     enemyContactAheadPx: 15,
     rangeSlackPx: 20,
   };
 
   it('holds a long-range hero at its preferred crowd depth', () => {
     // range 1000 easily reaches the front, so the preferred offset wins.
-    expect(formationTargetX(500, { attackKind: 'ranged', rangePx: 1000 }, formation)).toBe(350);
-    expect(formationTargetX(500, { attackKind: 'melee', rangePx: 1000 }, formation)).toBe(455);
+    expect(formationTargetY(500, { attackKind: 'ranged', rangePx: 1000 }, formation)).toBe(650);
+    expect(formationTargetY(500, { attackKind: 'melee', rangePx: 1000 }, formation)).toBe(545);
   });
 
   it('pulls a short-range melee hero forward so it can reach the shield front', () => {
-    // Preferred -45 would leave a range-50 melee hero 60px from the contact
-    // point (out of range); range-awareness clamps the slot forward to -15.
-    expect(formationTargetX(500, { attackKind: 'melee', rangePx: 50 }, formation)).toBe(485);
+    // Preferred 45 would leave a range-50 melee hero 60px from the contact
+    // point (out of range); range-awareness clamps the slot forward to 15.
+    // 50 (range) - 15 (ahead) - 20 (slack) = 15 offset from shield.
+    expect(formationTargetY(500, { attackKind: 'melee', rangePx: 50 }, formation)).toBe(515);
   });
 
   it('pulls a mid-range ranged hero forward past its preferred depth', () => {
-    // range 150 can't reach from -150; clamps to -115.
-    expect(formationTargetX(500, { attackKind: 'ranged', rangePx: 150 }, formation)).toBe(385);
+    // range 150 can't reach from 150 offset. Max offset is 150 - 15 - 20 = 115.
+    // 500 + 115 = 615.
+    expect(formationTargetY(500, { attackKind: 'ranged', rangePx: 150 }, formation)).toBe(615);
   });
 
   // The load-bearing invariant: whatever slot a hero holds, an enemy stopped
   // at the shield's front edge must be inside its basic-attack range.
-  const shieldX = 500;
-  const enemyAtFrontX = shieldX + formation.enemyContactAheadPx;
+  const shieldY = 500;
+  const enemyAtFrontY = shieldY - formation.enemyContactAheadPx; // 485
 
   it('lands a range-50 melee hero on an enemy at the shield front', () => {
-    const heroX = formationTargetX(shieldX, { attackKind: 'melee', rangePx: 50 }, formation);
-    expect(enemyAtFrontX - heroX).toBeLessThanOrEqual(50);
+    const heroY = formationTargetY(shieldY, { attackKind: 'melee', rangePx: 50 }, formation); // 515
+    expect(heroY - enemyAtFrontY).toBeLessThanOrEqual(50);
   });
 
   it('lands a range-150 ranged hero on an enemy at the shield front', () => {
-    const heroX = formationTargetX(shieldX, { attackKind: 'ranged', rangePx: 150 }, formation);
-    expect(enemyAtFrontX - heroX).toBeLessThanOrEqual(150);
+    const heroY = formationTargetY(shieldY, { attackKind: 'ranged', rangePx: 150 }, formation); // 615
+    expect(heroY - enemyAtFrontY).toBeLessThanOrEqual(150);
   });
 
   it('keeps every shipped hero definition in range of an enemy at the shield front', () => {
-    const contactX = RALLY.shieldStartX + RALLY.formation.enemyContactAheadPx;
+    const contactY = RALLY.shieldStartY - RALLY.formation.enemyContactAheadPx;
     for (const hero of Object.values(HERO_DEFINITIONS)) {
-      const heroX = formationTargetX(
-        RALLY.shieldStartX,
+      const heroY = formationTargetY(
+        RALLY.shieldStartY,
         { attackKind: hero.attackKind, rangePx: hero.range },
         RALLY.formation,
       );
-      const distance = contactX - heroX;
+      const distance = heroY - contactY;
       expect(distance, `${hero.id} slot is out of range`).toBeLessThanOrEqual(hero.range);
     }
   });
@@ -141,51 +143,52 @@ describe('stepTowardFormation', () => {
   };
 
   it('snaps to the slot and idles when already close enough', () => {
-    expect(stepTowardFormation(499, 500, 16, options)).toEqual({ x: 500, locomotion: 'idle' });
+    expect(stepTowardFormation(501, 500, 16, options)).toEqual({ y: 500, locomotion: 'idle' });
   });
 
   it('walks at march speed when slightly out of position', () => {
-    const result = stepTowardFormation(480, 500, 1000, options);
+    const result = stepTowardFormation(520, 500, 1000, options);
     expect(result.locomotion).toBe('walk');
-    expect(result.x).toBe(500); // step clamped to the remaining distance
+    expect(result.y).toBe(500); // step clamped to the remaining distance
   });
 
   it('runs at catch-up speed when far from the slot', () => {
-    const result = stepTowardFormation(300, 500, 1000, options);
+    const result = stepTowardFormation(700, 500, 1000, options);
     expect(result.locomotion).toBe('run');
-    expect(result.x).toBe(400); // 50 * 2 px/sec for 1s
+    expect(result.y).toBe(600); // 50 * 2 px/sec for 1s = 100px. 700 - 100 = 600.
   });
 
   it('moves backward toward a slot behind it', () => {
-    const result = stepTowardFormation(700, 500, 1000, options);
+    const result = stepTowardFormation(300, 500, 1000, options);
     expect(result.locomotion).toBe('run');
-    expect(result.x).toBe(600);
+    expect(result.y).toBe(400); // 300 + 100 = 400
   });
 
   it('never overshoots the slot', () => {
-    const result = stepTowardFormation(495, 500, 1000, options);
-    expect(result.x).toBe(500);
+    const result = stepTowardFormation(505, 500, 1000, options);
+    expect(result.y).toBe(500);
   });
 
   it('does not move when dtMs is 0, but still reports its locomotion', () => {
-    expect(stepTowardFormation(300, 500, 0, options)).toEqual({ x: 300, locomotion: 'run' });
-    expect(stepTowardFormation(480, 500, 0, options)).toEqual({ x: 480, locomotion: 'walk' });
+    expect(stepTowardFormation(300, 500, 0, options)).toEqual({ y: 300, locomotion: 'run' });
+    expect(stepTowardFormation(520, 500, 0, options)).toEqual({ y: 520, locomotion: 'walk' });
   });
 
   it('walks (not runs) at exactly the run threshold distance', () => {
-    const result = stepTowardFormation(440, 500, 16, options);
+    const result = stepTowardFormation(560, 500, 16, options);
     expect(result.locomotion).toBe('walk');
-    expect(result.x).toBeCloseTo(440.8);
+    expect(result.y).toBeCloseTo(559.2); // 560 - (50 * 0.016)
   });
 
   it('snaps and idles at exactly the settle distance', () => {
-    expect(stepTowardFormation(498, 500, 16, options)).toEqual({ x: 500, locomotion: 'idle' });
+    expect(stepTowardFormation(502, 500, 16, options)).toEqual({ y: 500, locomotion: 'idle' });
   });
 
   it('is frame-rate independent while catching up (two half-steps equal one full step)', () => {
-    const oneStep = stepTowardFormation(200, 500, 1000, options).x;
-    const halfStep = stepTowardFormation(200, 500, 500, options).x;
-    const twoSteps = stepTowardFormation(halfStep, 500, 500, options).x;
+    const oneStep = stepTowardFormation(800, 500, 1000, options).y;
+    const halfStep = stepTowardFormation(800, 500, 500, options).y;
+    const twoSteps = stepTowardFormation(halfStep, 500, 500, options).y;
     expect(twoSteps).toBeCloseTo(oneStep);
   });
 });
+

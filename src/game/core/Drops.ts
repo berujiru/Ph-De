@@ -1,10 +1,9 @@
 import type { DropOption } from './GameEvents';
 import {
-  DROP_RARITY_WEIGHTS,
+  rarityWeightsForWave,
   GLOBAL_DROP_DEFS,
   UPGRADE_DEFS,
   UPGRADE_MATRIX,
-  type DropRarity,
   type HeroDefinition,
   type UpgradeKind,
 } from '../data/balance';
@@ -46,6 +45,7 @@ export interface DropContext {
   hasOpenSlot: boolean;
   barrierHp: number;
   barrierMaxHp: number;
+  currentWave: number;
 }
 
 interface Candidate {
@@ -64,13 +64,9 @@ export function makeRng(seed: number): () => number {
   };
 }
 
-function weightFor(rarity: DropRarity): number {
-  return DROP_RARITY_WEIGHTS[rarity];
-}
-
-/** Build the full legal candidate pool (before weighting/sampling). */
 export function buildCandidatePool(ctx: DropContext, rng: () => number): Candidate[] {
   const candidates: Candidate[] = [];
+  const weights = rarityWeightsForWave(ctx.currentWave);
 
   // --- Global drops ---------------------------------------------------------
   // newHero: only while a slot is open AND the roster has someone to recruit.
@@ -80,7 +76,7 @@ export function buildCandidatePool(ctx: DropContext, rng: () => number): Candida
     const pick = ctx.availableRecruits[Math.floor(rng() * ctx.availableRecruits.length)];
     const spec = GLOBAL_DROP_DEFS.newHero;
     candidates.push({
-      weight: weightFor(spec.rarity),
+      weight: weights[spec.rarity],
       option: {
         id: `hero:${pick.id}`,
         title: pick.name,
@@ -96,7 +92,7 @@ export function buildCandidatePool(ctx: DropContext, rng: () => number): Candida
   if (ctx.barrierHp < ctx.barrierMaxHp) {
     const spec = GLOBAL_DROP_DEFS.moraleHeal;
     candidates.push({
-      weight: weightFor(spec.rarity),
+      weight: weights[spec.rarity],
       option: {
         id: 'global:moraleHeal',
         title: spec.title,
@@ -117,7 +113,7 @@ export function buildCandidatePool(ctx: DropContext, rng: () => number): Candida
       // "No dead drops": never offer a maxed upgrade.
       if (applied >= spec.maxStacks) continue;
       candidates.push({
-        weight: weightFor(spec.rarity),
+        weight: weights[spec.rarity],
         option: {
           id: `upgrade:${hero.id}:${kind}`,
           title: `${hero.name} — ${spec.title}`,

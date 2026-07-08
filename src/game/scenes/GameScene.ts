@@ -9,6 +9,8 @@ import { BARRICADE_DEFAULTS, ENEMY_DEFINITIONS, HERO_DEFINITIONS, MAX_ACTIVE_HER
 import { rollDrops, makeRng, type DropContext } from '../core/Drops';
 import { GAME_HEIGHT, GAME_WIDTH, WORLD_HEIGHT, RALLY, ENEMY_SPAWN_Y_OFFSET, FX, PARALLAX } from '../data/level';
 import { getMapSkinForStage, type MapSkin } from '../data/mapSkins';
+import { WaveManager } from '../core/WaveManager';
+import { buildWaveTable, bossForStage, waveStatMultipliers, TOTAL_WAVES, INTER_WAVE_DELAY_MS } from '../data/waves';
 import { formationTargetY, nextShieldY } from '../core/RallyMarch';
 import { applyHeroSkill, type SkillVisualEvent } from '../core/Skills';
 import { getSelectedSkin } from '../data/skinSelection';
@@ -21,6 +23,8 @@ export class GameScene extends Phaser.Scene {
   private parallax!: ParallaxBackground;
   /** The active map skin for this battle, resolved from the stage being played. */
   private activeMapSkin: MapSkin | null = null;
+  private currentAct: number | null = null;
+  private currentStageIdx: number | null = null;
   private enemies: Enemy[] = [];
   private heroes: Hero[] = [];
   private attacks: Attack[] = [];
@@ -33,11 +37,10 @@ export class GameScene extends Phaser.Scene {
   /** Monotonic counter so each drop roll gets a fresh deterministic seed. */
   private dropRollSeed = 0;
 
-  private spawnTimer = 0;
   private waveActive = false;
   private currentWave = 1;
-  private totalWaves = 3;
-  private enemiesToSpawn = 5;
+  private totalWaves = TOTAL_WAVES;
+  private waveManager!: WaveManager;
   private isPaused = false; // System pause (drops, etc)
   private gameSpeed = 1; // User speed control (0 = stop, 1 = normal, 2 = fast)
   private status: 'playing' | 'won' | 'lost' = 'playing';
@@ -52,8 +55,12 @@ export class GameScene extends Phaser.Scene {
 
   init(data: any) {
     if (data?.act != null && data?.stageIdx != null) {
+      this.currentAct = data.act;
+      this.currentStageIdx = data.stageIdx;
       this.activeMapSkin = getMapSkinForStage(data.act, data.stageIdx);
     } else {
+      this.currentAct = null;
+      this.currentStageIdx = null;
       this.activeMapSkin = null;
     }
   }
@@ -583,8 +590,8 @@ export class GameScene extends Phaser.Scene {
     this.voicesCount = 0;
     this.waveActive = false;
     this.currentWave = 1;
-    this.totalWaves = 3;
-    this.enemiesToSpawn = 5;
+    this.totalWaves = TOTAL_WAVES;
+    this.waveManager = new WaveManager(buildWaveTable(bossForStage(this.currentAct, this.currentStageIdx)), INTER_WAVE_DELAY_MS);
     // First drop threshold is derived from the run's kill pool, not hard-coded.
     this.dropIndex = 0;
     this.dropRollSeed = 0;
@@ -593,7 +600,6 @@ export class GameScene extends Phaser.Scene {
     this.syncVisualPauseState();
     this.gameSpeed = 1;
     this.status = 'playing';
-    this.spawnTimer = 2000;
     this.lastSnapshot = '';
 
     // Layered parallax backdrop — sells forward motion as the rally marches.
@@ -652,21 +658,23 @@ export class GameScene extends Phaser.Scene {
         }
       }
     } else if (this.waveActive) {
-      if (this.enemiesToSpawn > 0) {
-        this.spawnTimer -= delta;
-        if (this.spawnTimer <= 0) {
-          this.spawnEnemy();
-          this.enemiesToSpawn--;
-          this.spawnTimer = 2000; // spawn every 2s for prototype
+      const livingEnemiesCount = this.enemies.filter(e => !e.isDead).length;
+      const outputs = this.waveManager.update(delta, livingEnemiesCount);
+      
+      for (const out of outputs) {
+        if (out.kind === 'spawn') {
+          this.spawnEnemy(out.enemyId, out.wave);
+        } else if (out.kind === 'warning') {
+          const txt = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2, out.text, { color: '#ef4444', fontStyle: 'bold', fontSize: '32px' }).setOrigin(0.5).setScrollFactor(0);
+          this.tweens.add({ targets: txt, scale: 1.2, yoyo: true, duration: 250, repeat: -1 });
+          this.time.delayedCall(out.durationMs, () => { if (txt.active) txt.destroy(); });
+        } else if (out.kind === 'waveStarted') {
+          this.currentWave = out.wave;
         }
-      } else if (this.enemies.length === 0) {
-        if (this.currentWave < this.totalWaves) {
-          this.currentWave++;
-          this.enemiesToSpawn = this.currentWave * 5;
-          this.spawnTimer = 3000; // wait 3s before next wave starts
-        } else {
-          // status is guaranteed 'playing' here (update returns early otherwise),
-          // so this transition — and the victory sound — fires exactly once.
+      }
+
+      if (this.waveManager.allSpawnsDone && livingEnemiesCount === 0) {
+        if (this.status === 'playing') {
           try { this.sound.play('sfx-victory'); } catch (e) {}
           this.endBattle('won');
         }
@@ -853,12 +861,23 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private spawnEnemy() {
+  private spawnEnemy(enemyId: EnemyId = 'grunt', wave: number = 1) {
     // Scatter across the lane (X); spawn just above the visible top of the
     // screen so enemies enter from the top edge of what the player sees.
     const x = Phaser.Math.Between(50, GAME_WIDTH - 50);
     const y = this.cameras.main.scrollY - ENEMY_SPAWN_Y_OFFSET;
-    const enemy = new Enemy(this, x, y, ENEMY_DEFINITIONS['grunt']);
+    
+    const def = { ...ENEMY_DEFINITIONS[enemyId] };
+    const mult = waveStatMultipliers(wave);
+    
+    // Bosses are authored at wave-20 power, minion stats scale up.
+    if (!def.id.startsWith('boss_')) {
+      def.maxHp = Math.round(def.maxHp * mult.hp);
+      def.damage = Math.round(def.damage * mult.damage);
+      def.speed = def.speed * mult.speed;
+    }
+    
+    const enemy = new Enemy(this, x, y, def);
     this.enemies.push(enemy);
   }
 
@@ -930,10 +949,14 @@ export class GameScene extends Phaser.Scene {
   }
 
   private addVoices(amount: number) {
-    if (this.isSandbox) return;
+    if (this.isSandbox || this.status !== 'playing') return;
     
     this.voicesCount += amount;
     if (this.voicesCount >= this.maxVoicesCount) {
+      if (this.dropIndex >= this.totalWaves) {
+        this.voicesCount = this.maxVoicesCount; // Cap it
+        return;
+      }
       this.voicesCount = 0;
       
       // Pause game
@@ -966,6 +989,7 @@ export class GameScene extends Phaser.Scene {
       hasOpenSlot: this.heroes.length < MAX_ACTIVE_HEROES,
       barrierHp: this.shield.hp,
       barrierMaxHp: this.shield.maxHp,
+      currentWave: this.currentWave,
     };
 
     const rng = makeRng((Date.now() ^ (this.dropRollSeed++ * 0x9e3779b1)) >>> 0);

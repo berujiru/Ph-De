@@ -35,8 +35,8 @@ function createDummyEnemy(id = 'enemy', x = 0, y = 0, hp = 100): ISkillEnemy {
 
 function createDummyContext(heroes: ISkillHero[] = [], enemies: ISkillEnemy[] = []): SkillContext {
   return {
-    GAME_WIDTH: 800,
-    GAME_HEIGHT: 600,
+    GAME_WIDTH: 1080,
+    GAME_HEIGHT: 1920,
     heroes,
     enemies,
     onVisual: vi.fn(),
@@ -120,7 +120,7 @@ describe('Hero Skills', () => {
     expect(e2.hp).toBe(50); // Untouched
   });
   
-  it('fisherfolk (Lambat) drags enemies to GAME_HEIGHT / 2', () => {
+  it('fisherfolk (Lambat) drags enemies to GAME_WIDTH / 2', () => {
     const h1 = createDummyHero('fisherfolk');
     const e1 = createDummyEnemy('e1', 0, 0);
     
@@ -128,8 +128,8 @@ describe('Hero Skills', () => {
     
     applyHeroSkill('fisherfolk', h1, ctx);
     
-    // In our logic, the pure state Y is immediately updated so tests can read it
-    expect(e1.y).toBe(300); // GAME_HEIGHT is 600
+    // In our logic, the pure state X is immediately updated so tests can read it
+    expect(e1.x).toBe(540); // GAME_WIDTH is 1080
   });
 
   it('sales_lady (Closing Sale) executes low HP enemies', () => {

@@ -92,15 +92,15 @@ export class HeroModel extends UnitModel {
    * texture's frame 0.
    */
   private applyRestingFrame(): void {
-    const useFirstFrame = (animKey: string): boolean => {
+    const applyAnimFrame = (animKey: string): boolean => {
       if (!this.scene.anims.exists(animKey)) return false;
       const frame = this.scene.anims.get(animKey).frames[0]?.frame;
       if (!frame) return false;
       this.bodySprite.setTexture(frame.texture.key, frame.name);
       return true;
     };
-    if (useFirstFrame(`${this.spriteBaseKey}-idle`)) return;
-    if (useFirstFrame(`${this.spriteBaseKey}-attack`)) return;
+    if (applyAnimFrame(`${this.spriteBaseKey}-idle`)) return;
+    if (applyAnimFrame(`${this.spriteBaseKey}-attack`)) return;
     this.bodySprite.setTexture(this.spriteBaseKey!, 0);
   }
 

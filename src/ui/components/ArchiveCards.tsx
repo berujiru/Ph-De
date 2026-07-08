@@ -16,7 +16,7 @@ export const HERO_PLACEHOLDER_SRC = '/assets/heroes/hero-placeholder.svg';
 /** Photo-studio backdrop so the dark hero silhouette reads as a portrait. */
 export const PORTRAIT_BG = 'radial-gradient(circle at 50% 34%, #e2e8f0 0%, #94a3b8 52%, #475569 100%)';
 export const PORTRAIT_BG_LOCKED = 'radial-gradient(circle at 50% 34%, #64748b 0%, #334155 55%, #1e293b 100%)';
-
+// eslint-disable-next-line react-refresh/only-export-components
 export const hexColor = (color: number) => `#${color.toString(16).padStart(6, '0')}`;
 
 /**
@@ -70,13 +70,13 @@ const MINI_BOSS_IDS = new Set<EnemyId>([
 ]);
 
 export type EnemyTier = 'Minion' | 'Mini-Boss' | 'Boss';
-
+// eslint-disable-next-line react-refresh/only-export-components
 export function enemyTier(def: EnemyDefinition): EnemyTier {
   if (def.id.startsWith('boss_')) return 'Boss';
   if (MINI_BOSS_IDS.has(def.id)) return 'Mini-Boss';
   return 'Minion';
 }
-
+// eslint-disable-next-line react-refresh/only-export-components
 export const TIER_COLOR: Record<EnemyTier, string> = {
   Minion: theme.colors.textMuted,
   'Mini-Boss': theme.colors.accent,
@@ -84,6 +84,7 @@ export const TIER_COLOR: Record<EnemyTier, string> = {
 };
 
 /** Derive the mechanic blurb from the enemy's data flags — no hardcoded table. */
+// eslint-disable-next-line react-refresh/only-export-components
 export function enemyMechanic(def: EnemyDefinition): string {
   if (def.activeSkill) return `Boss skill — ${def.activeSkill.name}.`;
   if (def.stealth) return 'Untargetable until revealed or splashed.';

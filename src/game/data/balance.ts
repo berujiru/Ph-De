@@ -127,30 +127,30 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   grunt: {
     id: 'grunt',
     name: 'Grunt',
-    speed: 60,
-    maxHp: 40,
+    speed: 70,
+    maxHp: 45,
     reward: 5,
-    damage: 5,
+    damage: 6,
     attackRateMs: 1500,
     color: 0xef4444,
   },
   runner: {
     id: 'runner',
     name: 'Runner',
-    speed: 110,
-    maxHp: 20,
+    speed: 130,
+    maxHp: 25,
     reward: 4,
-    damage: 3,
-    attackRateMs: 800,
+    damage: 4,
+    attackRateMs: 900,
     color: 0xeab308,
   },
   brute: {
     id: 'brute',
     name: 'Brute',
-    speed: 40,
-    maxHp: 150,
+    speed: 45,
+    maxHp: 180,
     reward: 15,
-    damage: 15,
+    damage: 16,
     attackRateMs: 2500,
     color: 0x7c3aed,
     sizeClass: 'miniboss',
@@ -168,8 +168,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   ghost_employee: {
     id: 'ghost_employee',
     name: 'Ghost Employee',
-    speed: 50,
-    maxHp: 60,
+    speed: 60,
+    maxHp: 70,
     reward: 8,
     damage: 8,
     attackRateMs: 1500,
@@ -179,20 +179,20 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   illegal_logger: {
     id: 'illegal_logger',
     name: 'Illegal Logger',
-    speed: 30,
-    maxHp: 200,
+    speed: 40,
+    maxHp: 240,
     reward: 20,
-    damage: 15,
-    attackRateMs: 2500,
+    damage: 10,
+    attackRateMs: 2800,
     color: 0x8b4513,
-    barrierDamageMultiplier: 10,
+    barrierDamageMultiplier: 5,
     sizeClass: 'miniboss',
   },
   epal: {
     id: 'epal',
     name: 'Epal',
-    speed: 40,
-    maxHp: 150,
+    speed: 55,
+    maxHp: 160,
     reward: 15,
     damage: 10,
     attackRateMs: 2000,
@@ -203,8 +203,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   the_overpriced: {
     id: 'the_overpriced',
     name: 'The Overpriced',
-    speed: 25,
-    maxHp: 50,
+    speed: 40,
+    maxHp: 60,
     reward: 10,
     damage: 8,
     attackRateMs: 3000,
@@ -214,8 +214,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   kickback_courier: {
     id: 'kickback_courier',
     name: 'Kickback Courier',
-    speed: 90,
-    maxHp: 80,
+    speed: 110,
+    maxHp: 90,
     reward: 5, // drops extra on death in code
     damage: 5,
     attackRateMs: 1500,
@@ -225,8 +225,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   shell_company: {
     id: 'shell_company',
     name: 'Shell Company',
-    speed: 35,
-    maxHp: 120,
+    speed: 45,
+    maxHp: 130,
     reward: 12,
     damage: 8,
     attackRateMs: 2000,
@@ -236,10 +236,10 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   crony_bodyguard: {
     id: 'crony_bodyguard',
     name: 'Crony',
-    speed: 40,
-    maxHp: 250,
+    speed: 45,
+    maxHp: 280,
     reward: 20,
-    damage: 5,
+    damage: 6,
     attackRateMs: 2500,
     color: 0x0f172a,
     tauntAura: true,
@@ -248,10 +248,10 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   hoarder: {
     id: 'hoarder',
     name: 'Hoarder',
-    speed: 20,
-    maxHp: 300,
+    speed: 35,
+    maxHp: 340,
     reward: 25,
-    damage: 20,
+    damage: 18,
     attackRateMs: 4000,
     color: 0xca8a04,
     dropObstacleOnDeath: true,
@@ -260,10 +260,10 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   land_grabber: {
     id: 'land_grabber',
     name: 'Land Grabber',
-    speed: 30,
-    maxHp: 200,
+    speed: 40,
+    maxHp: 220,
     reward: 18,
-    damage: 15,
+    damage: 14,
     attackRateMs: 3000,
     color: 0x4d7c0f,
     knockbackPulseCooldown: 5000,
@@ -272,8 +272,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   tender_rigger: {
     id: 'tender_rigger',
     name: 'Tender Rigger',
-    speed: 40,
-    maxHp: 100,
+    speed: 50,
+    maxHp: 110,
     reward: 15,
     damage: 12,
     attackRateMs: 2000,
@@ -283,7 +283,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_flood_control: {
     id: 'boss_flood_control',
     name: 'Ghost Flood Control',
-    speed: 15,
+    speed: 30,
     maxHp: 800,
     reward: 50,
     damage: 30,
@@ -294,7 +294,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_pork_barrel: {
     id: 'boss_pork_barrel',
     name: 'Pork Barrel',
-    speed: 10,
+    speed: 30,
     maxHp: 1200,
     reward: 100,
     damage: 50,
@@ -305,7 +305,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_troll_farm: {
     id: 'boss_troll_farm',
     name: 'Troll Farm',
-    speed: 10,
+    speed: 30,
     maxHp: 700,
     reward: 50,
     damage: 15,
@@ -316,7 +316,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_vote_buying: {
     id: 'boss_vote_buying',
     name: 'Vote Buying',
-    speed: 20,
+    speed: 35,
     maxHp: 600,
     reward: 75,
     damage: 20,
@@ -327,7 +327,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_nepotism: {
     id: 'boss_nepotism',
     name: 'Nepotism',
-    speed: 15,
+    speed: 30,
     maxHp: 900,
     reward: 80,
     damage: 25,
@@ -349,7 +349,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_budget_insertion: {
     id: 'boss_budget_insertion',
     name: 'Budget Insertion',
-    speed: 12,
+    speed: 30,
     maxHp: 1000,
     reward: 100,
     damage: 40,
@@ -360,7 +360,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_smuggling: {
     id: 'boss_smuggling',
     name: 'Smuggling',
-    speed: 25,
+    speed: 35,
     maxHp: 750,
     reward: 80,
     damage: 25,
@@ -381,7 +381,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_dynasty_2: {
     id: 'boss_dynasty_2',
     name: 'The Dynasty (Schemer)',
-    speed: 25,
+    speed: 35,
     maxHp: 600,
     reward: 0,
     damage: 30,
@@ -392,7 +392,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_dynasty_1: {
     id: 'boss_dynasty_1',
     name: 'The Dynasty (Bruiser)',
-    speed: 15,
+    speed: 30,
     maxHp: 800,
     reward: 0,
     damage: 50,
@@ -403,7 +403,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_ang_sistema: {
     id: 'boss_ang_sistema',
     name: 'Ang Sistema',
-    speed: 10,
+    speed: 30,
     maxHp: 2500,
     reward: 500,
     damage: 80,
@@ -417,7 +417,9 @@ export const STARTING_GOLD = 150;
 export const STARTING_LIVES = 20;
 
 export const BARRICADE_DEFAULTS = {
-  maxHp: 500,
+  // Sized for the 20-wave battle: wave-scaled minions chew through anything
+  // smaller before the finale (see WAVE_SCALING in data/waves.ts).
+  maxHp: 750,
   width: 30,
 };
 
@@ -512,7 +514,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackKind: 'ranged',
     attackStyle: 'projectile',
     range: GLOBAL_RANGE_PX, // Eden — global, hits anywhere on screen
-    damage: 14,
+    damage: 12, // global range taxes DPS — Eden is the floor, not the carry
     attackRateMs: 1300,
     color: 0x3b82f6,
     purpose: 'Reliable all-rounder — hurls megaphones at the frontmost anomaly. Always deployed, she is your steady damage floor.',
@@ -541,9 +543,9 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'boomerang',
-    range: 950,
-    damage: 12,
-    attackRateMs: 1400,
+    range: 1250,
+    damage: 8, // per-hit; boomerang double-taps on the return
+    attackRateMs: 1500,
     color: 0x8b5cf6,
     purpose: 'Two-hit boomerang ruler (out and back) that marks anomalies for bonus damage — strong against single tough targets.',
     signatureSkill: { name: 'Recess', description: 'Silences enemy auras in a radius.' },
@@ -557,8 +559,8 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'pierce',
-    range: 850,
-    damage: 9,
+    range: 1000,
+    damage: 7, // per-hit; lands on up to basePierce+1 enemies in a line
     attackRateMs: 1100,
     basePierce: 2,
     color: 0xf59e0b,
@@ -574,9 +576,9 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Wind',
     attackKind: 'melee',
     attackStyle: 'melee-cleave',
-    range: 180,
-    damage: 20,
-    attackRateMs: 1200,
+    range: 275,
+    damage: 22, // top melee DPS — frontline risk pays
+    attackRateMs: 1250,
     color: 0x10b981,
     purpose: 'Frontline cleaver — revs into clustered enemies and hits Bosses extra hard. A durable bruiser, not a sniper.',
     signatureSkill: { name: 'Barya Lang Po', description: 'Tosses coin shrapnel for massive shotgun AoE damage.' },
@@ -605,7 +607,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Earth',
     attackKind: 'melee',
     attackStyle: 'linear-wave',
-    range: 220,
+    range: 300,
     damage: 16,
     attackRateMs: 2200,
     color: 0xa8a29e,
@@ -620,8 +622,8 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Frost',
     attackKind: 'ranged',
     attackStyle: 'lobbed',
-    range: 620,
-    damage: 12,
+    range: 725,
+    damage: 11,
     attackRateMs: 1700,
     color: 0xe2e8f0,
     purpose: 'Lobs scalding syrup that slows and splashes a small area; strips enemy speed buffs off whatever it hits.',
@@ -636,7 +638,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Holy',
     attackKind: 'ranged',
     attackStyle: 'projectile',
-    range: 780,
+    range: 950,
     damage: 8,
     attackRateMs: 1500,
     color: 0xfca5a5,
@@ -652,8 +654,8 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'summoner',
-    range: 220,
-    damage: 15,
+    range: 325,
+    damage: 18, // summoner damage = wall HP knob, not DPS
     attackRateMs: 5000,
     color: 0xd97706,
     purpose: 'Builds Yero barricades that body-block the path (wall HP scales with his damage). Buys time, not damage.',
@@ -667,9 +669,9 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Lightning',
     attackKind: 'ranged',
     attackStyle: 'chain',
-    range: 1100,
-    damage: 16,
-    attackRateMs: 1400,
+    range: 1400, // longest non-global reach — sniper tier taxes the DPS
+    damage: 13,
+    attackRateMs: 1600,
     baseChain: 3,
     color: 0xfef08a,
     purpose: 'Headset feedback arcs to 3 enemies at once and can target Stealth; excellent against Wet clumps.',
@@ -683,8 +685,8 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'melee',
     attackStyle: 'melee-cleave',
-    range: 200,
-    damage: 20,
+    range: 250,
+    damage: 21,
     attackRateMs: 1300,
     color: 0x1e3a8a,
     purpose: 'Batuta bruiser who holds the frontline and cleaves enemies in front; deals double damage to Stealth anomalies.',
@@ -698,9 +700,9 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Earth',
     attackKind: 'melee',
     attackStyle: 'melee-cleave',
-    range: 200,
-    damage: 17,
-    attackRateMs: 1500,
+    range: 250,
+    damage: 19,
+    attackRateMs: 1400,
     color: 0x15803d,
     purpose: 'Scythe cleaver that periodically Roots enemies in place; his Harvest skill detonates their stacked ailments.',
     signatureSkill: { name: 'Harvest', description: 'Deals massive burst damage based on enemy ailments.' },
@@ -713,8 +715,8 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'pierce',
-    range: 780,
-    damage: 12,
+    range: 1025,
+    damage: 9, // per-hit across up to 5 pierced enemies — group DPS is the payoff
     attackRateMs: 1300,
     basePierce: 5,
     color: 0xf43f5e,
@@ -741,8 +743,8 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Wind',
     attackKind: 'ranged',
     attackStyle: 'beam',
-    range: 850,
-    damage: 5,
+    range: 1000,
+    damage: 4,
     attackRateMs: 500, // Very fast — fastest attacker in the game
     color: 0xec4899,
     purpose: 'Machine-gun sales pitch — the fastest attack in the game, chipping the whole line and executing low-HP stragglers.',
@@ -756,7 +758,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Frost',
     attackKind: 'ranged',
     attackStyle: 'trap',
-    range: 550,
+    range: 625,
     damage: 12,
     attackRateMs: 3000,
     color: 0xf472b6,
@@ -771,8 +773,8 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Lightning',
     attackKind: 'ranged',
     attackStyle: 'chain',
-    range: 850,
-    damage: 15,
+    range: 1125,
+    damage: 14,
     attackRateMs: 1600,
     baseChain: 3,
     color: 0x38bdf8,
@@ -787,8 +789,8 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Fire',
     attackKind: 'ranged',
     attackStyle: 'lobbed',
-    range: 660,
-    damage: 14,
+    range: 775,
+    damage: 13,
     attackRateMs: 1800,
     color: 0xef4444,
     purpose: 'Lobs hot pandesal that explodes in fire splash and leaves a burning zone — sustained AoE against packed waves.',
@@ -802,8 +804,8 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'vortex',
-    range: 550,
-    damage: 7,
+    range: 650,
+    damage: 8,
     attackRateMs: 3800,
     color: 0x475569,
     purpose: 'Whistle-and-STOP crowd control — magnetically pulls enemies into a tight clump for the squad to blast. Low damage, high setup.',
@@ -817,8 +819,8 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Water',
     attackKind: 'ranged',
     attackStyle: 'linear-wave',
-    range: 700,
-    damage: 11,
+    range: 900,
+    damage: 10,
     attackRateMs: 2400,
     color: 0x2563eb,
     purpose: 'High-pressure wave that hits the whole line, nudges enemies back, and soaks them Wet for combo setups.',
@@ -832,8 +834,8 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Wind',
     attackKind: 'ranged',
     attackStyle: 'boomerang',
-    range: 950,
-    damage: 13,
+    range: 1300,
+    damage: 9, // per-hit; two-tap plus Rush Hour ramp is the real DPS
     attackRateMs: 1500,
     color: 0x22c55e,
     purpose: 'Returning parcels hit twice and ramp up the longer they focus one target — a single-target melter that grows mid-fight.',
@@ -862,17 +864,22 @@ export const MAX_ACTIVE_HEROES = 5;
 export const VOICE_DROP_TUNING = {
   /** Kills required for the very first drop. Small, so a companion arrives fast. */
   firstDropCost: 2,
-  /** How many drop EVENTS a full clear should yield (4 fill Eden's squad, ~2 are enhancements). */
-  targetDropsPerRun: 6,
+  /**
+   * How many drop EVENTS a full clear should yield (4 fill Eden's squad, the
+   * rest are enhancements). Must stay <= TOTAL_WAVES (data/waves.ts) — at most
+   * one drop per wave on average; tests/unit/balance.test.ts enforces it.
+   */
+  targetDropsPerRun: 20,
   /** Floor on the per-drop increment so late drops never get cheaper than this. */
   minIncrement: 1,
 } as const;
 
 /**
- * Total kills a run offers, from the wave structure. Base prototype:
- * wave N spawns N * baseWaveSize enemies, so pool = baseWaveSize * T(T+1)/2.
- * (T=3, baseWaveSize=5 -> 30.) Split/summon spawns are bonus on top — the
- * pool is intentionally the *authored* kill count, not the runtime maximum.
+ * @deprecated The prototype's triangular wave structure (wave N = N * 5
+ * grunts) is gone — battles now run the authored 20-wave table, so the pool
+ * comes from `authoredKillCount(buildWaveTable(...))` in data/waves.ts.
+ * Split/summon spawns remain bonus on top — the pool is intentionally the
+ * *authored* kill count, not the runtime maximum.
  */
 export function computeKillPool(totalWaves: number, baseWaveSize = 5): number {
   return (baseWaveSize * totalWaves * (totalWaves + 1)) / 2;
@@ -1009,18 +1016,32 @@ export const GLOBAL_DROP_DEFS: Record<GlobalDropKind, GlobalDropSpec> = {
   },
   moraleHeal: {
     kind: 'moraleHeal', title: 'Barrier Patch',
-    purpose: 'Restore 50 Barrier integrity instantly.',
-    rarity: 'common', magnitude: 50,
+    purpose: 'Restore 150 Barrier integrity instantly.',
+    rarity: 'common', magnitude: 150,
   },
 };
 
 /**
- * Base pull weight per rarity. Later waves should multiply rare/epic weights
- * (docs/WORLD_AND_HEROES.md rule 6, "rarity scales with waves") — the RNG owns
- * that scaling; these are the wave-1 baselines.
+ * Base pull weight per rarity — the wave-1 baselines. Later waves multiply
+ * rare/epic weights via `rarityWeightsForWave` (docs/WORLD_AND_HEROES.md
+ * rule 6, "rarity scales with waves").
  */
 export const DROP_RARITY_WEIGHTS: Record<DropRarity, number> = {
   common: 100,
   rare: 35,
   epic: 10,
 };
+
+/**
+ * Rarity weights for a drop rolled on the given wave (1-based). Common stays
+ * flat while rare/epic grow linearly, so late-battle drops skew exciting:
+ * by wave 20 rare is ~2x and epic ~2.9x their baseline pull.
+ */
+export function rarityWeightsForWave(wave: number): Record<DropRarity, number> {
+  const n = Math.max(0, wave - 1);
+  return {
+    common: DROP_RARITY_WEIGHTS.common,
+    rare: DROP_RARITY_WEIGHTS.rare * (1 + 0.05 * n),
+    epic: DROP_RARITY_WEIGHTS.epic * (1 + 0.10 * n),
+  };
+}

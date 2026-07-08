@@ -15,6 +15,7 @@ function projectileHero(overrides: Partial<ActiveHeroState> = {}): ActiveHeroSta
 
 function baseCtx(overrides: Partial<DropContext> = {}): DropContext {
   return {
+    currentWave: 1,
     activeHeroes: [projectileHero()],
     availableRecruits: [{ id: 'teacher', name: 'Teacher', purpose: 'Teaches' }],
     hasOpenSlot: true,
