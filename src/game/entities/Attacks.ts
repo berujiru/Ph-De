@@ -63,8 +63,8 @@ export class ProjectileAttack extends Attack {
     this.target = target;
     this.maxHits = 1 + this.modifiers.bonusPierce;
     this.trail = new MotionTrail(scene, color);
-    this.visual = scene.add.circle(x, y, 6, color);
-    this.visual.setStrokeStyle(2, OUTLINE_COLOR, 1);
+    this.visual = scene.add.circle(x, y, 30, color);
+    this.visual.setStrokeStyle(4, OUTLINE_COLOR, 1);
     const dx = target.x - x;
     const dy = target.y - y;
     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -78,7 +78,7 @@ export class ProjectileAttack extends Attack {
     super.upgrade(newMods);
     this.maxHits = 1 + this.modifiers.bonusPierce;
     if (newMods.bonusRadius) {
-      this.visual.setRadius(6 + this.modifiers.bonusRadius);
+      this.visual.setRadius(30 + this.modifiers.bonusRadius);
     }
   }
 
@@ -105,7 +105,7 @@ export class ProjectileAttack extends Attack {
         if (!enemy.isDead && !this.hitEnemies.has(enemy)) {
           const dx = enemy.x - this.visual.x;
           const dy = enemy.y - this.visual.y;
-          const collisionRadius = 20 + this.modifiers.bonusRadius;
+          const collisionRadius = 50 + this.modifiers.bonusRadius;
           if (dx * dx + dy * dy < collisionRadius * collisionRadius) {
             enemy.takeDamage(this.totalDamage);
             this.hitEnemies.add(enemy);
@@ -153,10 +153,10 @@ export class PierceAttack extends Attack {
     // Total pass-throughs = basePierce + bonusPierce (guard against bad data).
     this.maxHits = Math.max(1, basePierce + this.modifiers.bonusPierce);
     // A long lance/streak behind a bright tip so pierce reads as a spear, not a dot.
-    this.lance = scene.add.rectangle(x, y, 40, 5, color, 0.85);
-    this.lance.setStrokeStyle(2, OUTLINE_COLOR, 1);
-    this.visual = scene.add.circle(x, y, 5, 0xffffff);
-    this.visual.setStrokeStyle(2, OUTLINE_COLOR, 1);
+    this.lance = scene.add.rectangle(x, y, 160, 20, color, 0.85);
+    this.lance.setStrokeStyle(4, OUTLINE_COLOR, 1);
+    this.visual = scene.add.circle(x, y, 20, 0xffffff);
+    this.visual.setStrokeStyle(4, OUTLINE_COLOR, 1);
 
     // Snapshot the firing vector ONCE; the shot never curves after this.
     const dx = target.x - x;
@@ -185,8 +185,9 @@ export class PierceAttack extends Attack {
         if (!enemy.isDead && !this.hitEnemies.has(enemy)) {
           const dx = enemy.x - this.visual.x;
           const dy = enemy.y - this.visual.y;
-          const collisionRadius = 20;
-          if (dx * dx + dy * dy < collisionRadius * collisionRadius) {
+          const distSq = dx * dx + dy * dy;
+          const collisionRadius = 50;
+          if (distSq < collisionRadius * collisionRadius) {
             enemy.takeDamage(this.totalDamage);
             this.hitEnemies.add(enemy);
             this.hitCount++;
@@ -348,11 +349,11 @@ export class BoomerangAttack extends Attack {
     super(scene, 'BoomerangAttack', damage, modifiers);
     this.hero = hero;
     this.trail = new MotionTrail(scene, color);
-    this.visual = scene.add.circle(hero.x, hero.y, 8 + this.modifiers.bonusRadius, color);
-    this.visual.setStrokeStyle(2, OUTLINE_COLOR, 1);
+    this.visual = scene.add.circle(hero.x, hero.y, 35 + this.modifiers.bonusRadius, color);
+    this.visual.setStrokeStyle(4, OUTLINE_COLOR, 1);
     // A spinning crossbar so the boomerang visibly tumbles as it flies.
-    this.blade = scene.add.rectangle(hero.x, hero.y, 26 + this.modifiers.bonusRadius * 2, 5, color, 0.9);
-    this.blade.setStrokeStyle(2, OUTLINE_COLOR, 1);
+    this.blade = scene.add.rectangle(hero.x, hero.y, 100 + this.modifiers.bonusRadius * 2, 20, color, 0.9);
+    this.blade.setStrokeStyle(4, OUTLINE_COLOR, 1);
 
     this.startX = hero.x;
     this.startY = hero.y;
@@ -407,7 +408,7 @@ export class BoomerangAttack extends Attack {
         if (!hitSet.has(enemy)) {
           const edx = enemy.x - this.visual.x;
           const edy = enemy.y - this.visual.y;
-          const collisionRadius = 20 + this.modifiers.bonusRadius;
+          const collisionRadius = 50 + this.modifiers.bonusRadius;
           if (edx * edx + edy * edy < collisionRadius * collisionRadius) {
             enemy.takeDamage(this.totalDamage);
             hitSet.add(enemy);
@@ -617,9 +618,9 @@ export class LobbedAttack extends Attack {
     this.targetY = target.y;
 
     // Ground shadow that tracks the landing spot — sells the arc height.
-    this.shadow = scene.add.ellipse(startX, startY, 16, 6, 0x000000, 0.35);
-    this.visual = scene.add.circle(startX, startY, 6, color);
-    this.visual.setStrokeStyle(2, OUTLINE_COLOR, 1);
+    this.shadow = scene.add.ellipse(startX, startY, 60, 20, 0x000000, 0.35);
+    this.visual = scene.add.circle(startX, startY, 30, color);
+    this.visual.setStrokeStyle(4, OUTLINE_COLOR, 1);
   }
 
   update(_time: number, delta: number) {

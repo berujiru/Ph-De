@@ -269,4 +269,8 @@ export class HeroModel extends UnitModel {
       onComplete: () => onComplete?.(),
     });
   }
+
+  public setFlipX(flip: boolean): void {
+    this.bodySprite.setFlipX(flip);
+  }
 }

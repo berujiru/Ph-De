@@ -191,6 +191,17 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     // frame so it drives both locomotion and attacking.
     const target = this.findTargetInRange(enemies);
 
+    // Smoothly rotate the HeroModel to face the target, or face forward (up) if no target
+    if (target) {
+      // Instead of raw 2D rotation (which breaks the oblique perspective and makes them 
+      // look like they are lying flat on the ground), we simply flip them horizontally 
+      // to "face" left or right depending on where the enemy is.
+      this.model.setFlipX(target.x < this.x);
+    } else {
+      // Default to facing right (or neutral) when marching
+      this.model.setFlipX(false);
+    }
+
     // While an enemy is in range, hold a ready idle between shots instead of
     // flickering back to walk each time an attack finishes. Only march
     // (walk / run) when there's nothing in range to shoot.
