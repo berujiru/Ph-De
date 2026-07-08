@@ -614,6 +614,40 @@ export class GameScene extends Phaser.Scene {
               // Right side
               new TrafficLight(this, GAME_WIDTH - 30, y, evt.duration);
             }
+          } else if (evt.type === 'flashlightCone') {
+            const hero = evt.hero;
+            const length = evt.length;
+            const angle = evt.angle; // Added angle to payload
+            const spreadAngle = Math.PI / 6; // 30 degrees each side = 60 degrees total
+            
+            const graphics = this.add.graphics();
+            graphics.fillStyle(0xfffbeb, 0.4); // Bright light yellow
+            graphics.beginPath();
+            
+            // Cone starts slightly in front of hero
+            const startX = hero.x + Math.cos(angle) * 20;
+            const startY = hero.y + Math.sin(angle) * 20;
+            graphics.moveTo(startX, startY); 
+            
+            // Calculate base points using trig
+            const p1X = startX + Math.cos(angle - spreadAngle) * length;
+            const p1Y = startY + Math.sin(angle - spreadAngle) * length;
+            const p2X = startX + Math.cos(angle + spreadAngle) * length;
+            const p2Y = startY + Math.sin(angle + spreadAngle) * length;
+            
+            graphics.lineTo(p1X, p1Y);
+            graphics.lineTo(p2X, p2Y);
+            graphics.closePath();
+            graphics.fillPath();
+            graphics.setBlendMode(Phaser.BlendModes.ADD);
+
+            this.tweens.add({
+              targets: graphics,
+              alpha: 0,
+              duration: evt.duration,
+              ease: 'Quad.easeIn',
+              onComplete: () => graphics.destroy()
+            });
           }
         }
       });

@@ -28,7 +28,10 @@ export interface ISkillEnemy {
   };
   silenceTimer: number;
   takeDamage: (amount: number) => void;
-  applyAilment: (type: string, amount: number, duration: number) => void;
+  /** Inflicts a status effect with accumulation value and active duration in ms. */
+  applyAilment(type: string, amount: number, durationMs: number): void;
+  /** Forcefully removes stealth from the enemy, making them visible and targetable. */
+  revealStealth(): void;
 }
 
 export interface SkillVisualEvent {
@@ -83,6 +86,41 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     for (const e of enemies) {
       if (!e.isDead) {
         e.applyAilment('stun', 1, stunDuration);
+      }
+    }
+  } else if (skillId === 'security_guard') {
+    // Flash: Cone of light that heavily slows all enemies
+    const coneLength = 800; // configurable for voice drops
+    const slowDuration = 5000; // default 5s
+    
+    // Find target to aim at (closest or most advanced enemy)
+    const validEnemies = enemies.filter(e => !e.isDead);
+    validEnemies.sort((a, b) => b.y - a.y);
+    const target = validEnemies[0];
+    
+    // Calculate angle towards target, default to straight UP (-Math.PI / 2)
+    const targetAngle = target ? Math.atan2(target.y - hero.y, target.x - hero.x) : -Math.PI / 2;
+    
+    // Dispatch visual event
+    onVisual({ type: 'flashlightCone', hero, length: coneLength, duration: slowDuration, angle: targetAngle });
+    
+    // Apply slow to enemies in the cone
+    for (const e of validEnemies) {
+      const dx = e.x - hero.x;
+      const dy = e.y - hero.y;
+      const distSq = dx * dx + dy * dy;
+      
+      if (distSq <= coneLength * coneLength) {
+        let eAngle = Math.atan2(dy, dx);
+        let diff = eAngle - targetAngle;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        
+        // 60-degree cone (30 degrees or ~0.52 radians on either side)
+        if (Math.abs(diff) <= Math.PI / 6) {
+          e.applyAilment('slow', 1, slowDuration);
+          e.revealStealth(); // Reveal invisible enemies
+        }
       }
     }
   } else if (skillId === 'teacher') {

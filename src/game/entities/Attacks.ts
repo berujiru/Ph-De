@@ -218,8 +218,7 @@ export class PierceAttack extends Attack {
 }
 
 export class MeleeCleaveAttack extends Attack {
-  private visual: Phaser.GameObjects.Arc;
-  private lifeTimeMs = 150;
+  private lifeTimeMs = 250;
   private ageMs = 0;
   private maxRadius: number;
 
@@ -230,9 +229,22 @@ export class MeleeCleaveAttack extends Attack {
     const dy = target.y - y;
     const angleRad = Math.atan2(dy, dx);
     const angleDeg = Phaser.Math.RadToDeg(angleRad);
-    // Start small and expand — a bold-edged crescent slash.
-    this.visual = scene.add.arc(x, y, 10, angleDeg - 45, angleDeg + 45, false, color, 0.8);
-    this.visual.setStrokeStyle(3, 0xffffff, 0.9);
+    
+    // Multiple ripple visual
+    for (let i = 0; i < 3; i++) {
+      const arc = scene.add.arc(x, y, 10, angleDeg - 45, angleDeg + 45, false, color, 0.8);
+      arc.setStrokeStyle(3, 0xffffff, 0.9);
+      
+      scene.tweens.add({
+        targets: arc,
+        radius: this.maxRadius,
+        alpha: 0,
+        duration: 200,
+        delay: i * 40,
+        ease: 'Quad.easeOut',
+        onComplete: () => arc.destroy()
+      });
+    }
 
     const enemies = (scene as any).enemies as Enemy[];
     if (enemies) {
@@ -258,12 +270,8 @@ export class MeleeCleaveAttack extends Attack {
   update(_time: number, delta: number) {
     if (this.isDead) return;
     this.ageMs += delta;
-    const progress = Math.min(1, this.ageMs / this.lifeTimeMs);
-    this.visual.setRadius(10 + (this.maxRadius - 10) * progress);
-    this.visual.setAlpha(0.8 * (1 - progress));
     if (this.ageMs >= this.lifeTimeMs) {
       this.isDead = true;
-      this.visual.destroy();
       this.destroy();
     }
   }

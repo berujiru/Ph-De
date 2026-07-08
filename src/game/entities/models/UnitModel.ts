@@ -139,6 +139,19 @@ export abstract class UnitModel extends Phaser.GameObjects.Container {
     }
   }
 
+  /**
+   * Adjusts the playback speed of both sprite animations and fallback tweens.
+   * Useful for applying slow/chill debuffs.
+   */
+  public setTimeScale(scale: number): void {
+    if (this.animatedBody && this.animatedBody.anims) {
+      this.animatedBody.anims.timeScale = scale;
+    }
+    for (const tween of this.locomotionTweens) {
+      tween.timeScale = scale;
+    }
+  }
+
   /** Resume the current animation/tweens visually */
   resume(): void {
     if (this.animatedBody) {

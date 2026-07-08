@@ -78,7 +78,8 @@ export type SkillVisualEvent =
   | { type: 'projectileVolley', hero: any, target: any, damageType: string }
   | { type: 'healShield', amount: number }
   | { type: 'expandingCircle', x: number, y: number, color: string, maxRadius: number, duration: number }
-  | { type: 'trafficLights', duration: number };
+  | { type: 'trafficLights', duration: number }
+  | { type: 'flashlightCone', hero: any, length: number, duration: number, angle: number };
 
 export interface UiToGameEvents extends Record<string, unknown> {
   startWave: undefined;

@@ -152,6 +152,13 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     this.model.resume();
   }
 
+  revealStealth(): void {
+    if (this.isStealthed) {
+      this.isStealthed = false;
+      this.setAlpha(1); // Restore opacity
+    }
+  }
+
   applySpeedBuff(_durationMs: number = 4000) {
     if (this.isDead) return;
     
@@ -533,6 +540,9 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
         }
       }
     }
+    
+    // Apply calculated speed multiplier to the animation playback rate natively
+    this.model.setTimeScale(speedMult);
 
     // Ailment Visual Overlays (Spawn particles every 500ms if active)
     this.overlayTimer -= delta;
