@@ -74,14 +74,15 @@ export interface GameToUiEvents extends Record<string, unknown> {
 
 export type SkillVisualEvent = 
   | { type: 'text', x: number, y: number, text: string, color: string }
-  | { type: 'dragTo', target: { x: number, y: number }, x: number, duration: number }
+  | { type: 'dragTo', target: { x: number, y: number }, x: number, y?: number, duration: number, delay?: number, ease?: string }
   | { type: 'projectileVolley', hero: any, target: any, damageType: string }
   | { type: 'healShield', amount: number }
   | { type: 'expandingCircle', x: number, y: number, color: string, maxRadius: number, duration: number }
   | { type: 'trafficLights', duration: number }
   | { type: 'flashlightCone', hero: any, length: number, duration: number, angle: number }
   | { type: 'spawnTornado', x: number, y: number, damage: number, pullRadius: number, duration: number, speed: number }
-  | { type: 'spawnMolotovPatch', startX: number, startY: number, targetX: number, targetY: number, radius: number, damage: number, duration: number }
+  | { type: 'spawnLambatVortex', x: number, y: number, pullDelay: number, pullDuration: number, scale?: number }
+  | { type: 'applyAilment', target: any, ailment: string, amount: number, duration: number, delay?: number }
   | { type: 'aoeRoot', x: number, y: number, radius: number, duration: number, damage: number };
 
 export interface UiToGameEvents extends Record<string, unknown> {

@@ -286,16 +286,16 @@ export class VortexAttack extends Attack {
   private tickRateMs = 500;
   private timeSinceLastTick = 0;
 
-  constructor(scene: Phaser.Scene, _x: number, _y: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
-    super(scene, 'VortexAttack', damage, modifiers);
+  constructor(scene: Phaser.Scene, _x: number, _y: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>, damageType: string = 'Physical') {
+    super(scene, 'VortexAttack', damage, modifiers, damageType);
     const radius = 100 + this.modifiers.bonusRadius;
     // Spawn at target location so it traps enemies there
     this.visual = scene.add.circle(target.x, target.y, radius, color, 0.3);
     this.visual.setStrokeStyle(3, color, 0.9);
     // Two open arcs that spin to sell the suction.
     for (let i = 0; i < 2; i++) {
-      const arc = scene.add.arc(target.x, target.y, radius * (0.55 + i * 0.3), 0, 200, false, 0xffffff, 0);
-      arc.setStrokeStyle(3, 0xffffff, 0.5);
+      const arc = scene.add.arc(target.x, target.y, radius * (0.55 + i * 0.3), 0, 200, false, color, 0);
+      arc.setStrokeStyle(3, color, 0.7);
       arc.setRotation(i * Math.PI);
       this.swirls.push(arc);
     }
@@ -321,12 +321,18 @@ export class VortexAttack extends Attack {
         const distSq = dx * dx + dy * dy;
         
         if (distSq <= radius * radius) {
-          // Pull enemy
-          enemy.x += dx * 0.05;
-          enemy.y += dy * 0.05;
+          // Pull enemy (reduced force so it doesn't instantly snap them, acts like a mini gravity well)
+          enemy.x += dx * 0.015;
+          enemy.y += dy * 0.015;
           
           if (this.timeSinceLastTick >= this.tickRateMs) {
-            enemy.takeDamage(this.totalDamage * 0.5);
+            enemy.takeDamage(this.totalDamage * 0.5, this.damageType);
+            if (this.damageType === 'Water') {
+              enemy.applyAilment('wet', 1, 4000);
+            }
+            if (this.modifiers.onHitAilment) {
+              enemy.applyAilment(this.modifiers.onHitAilment.type, 1, this.modifiers.onHitAilment.duration);
+            }
           }
         }
       }

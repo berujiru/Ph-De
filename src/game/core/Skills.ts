@@ -208,13 +208,57 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       }
     }
   } else if (skillId === 'fisherfolk') {
-    // Lambat: Drag enemies to the lane's horizontal center (collapses their
-    // spread across X into a line so follow-up AoE lands cleanly).
-    for (const e of enemies) {
-      if (!e.isDead) {
-        onVisual({ type: 'dragTo', target: e, x: GAME_WIDTH / 2, duration: 500 });
-        // Update pure state (tests will read this)
-        e.x = GAME_WIDTH / 2;
+    // Lambat: Drag enemies to the lane's horizontal center.
+    // The visual vortex lasts 1500ms, and drag starts at 1000ms.
+    const centerX = GAME_WIDTH / 2;
+    const aliveEnemies = enemies.filter(e => !e.isDead);
+    let targetY = GAME_HEIGHT / 2;
+    
+    if (aliveEnemies.length > 0) {
+      // Target the Y of the first alive enemy
+      targetY = aliveEnemies[0].y;
+    } else {
+      // Fallback to a point in front of the hero if no enemies
+      targetY = hero.y > GAME_HEIGHT / 2 ? hero.y - 150 : hero.y + 150;
+    }
+
+    const bonusRadius = hero.modifiers?.bonusRadius || 0;
+    const bonusDamage = hero.modifiers?.bonusDamage || 0;
+    
+    // Base radius is 400. Increases by 3px per point of bonusRadius.
+    const pullRadius = 400 + bonusRadius * 3;
+    const visualScale = pullRadius / 100;
+    // Delay before pulling scales with bonusDamage (50ms per point of damage)
+    const baseDelay = 400;
+    const pullDelay = baseDelay + bonusDamage * 50;
+    const pullDuration = 600;
+    const totalAnimTime = pullDelay + pullDuration;
+    
+    onVisual({ type: 'spawnLambatVortex', x: centerX, y: targetY, pullDelay, pullDuration, scale: visualScale });
+    
+    // Fixed drag distance
+    const dragDistance = 300;
+
+    for (const e of aliveEnemies) {
+      const dx = centerX - e.x;
+      const dy = targetY - e.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      
+      if (dist > 0 && dist <= pullRadius) {
+        // Move them towards the center by up to `dragDistance`
+        const moveDist = Math.min(dist, dragDistance);
+        const ratio = moveDist / dist;
+        const newX = e.x + dx * ratio;
+        const newY = e.y + dy * ratio;
+
+        onVisual({ type: 'dragTo', target: e, x: newX, y: newY, duration: pullDuration, delay: pullDelay, ease: 'Sine.easeIn' });
+        
+        // Immobilize them silently during the entire spell animation
+        e.applyAilment('dragged', 1, totalAnimTime);
+        
+        // Stun for 1s (+ bonus). Apply it exactly when the drag finishes.
+        const stunDur = 1000 + bonusDamage * 20;
+        onVisual({ type: 'applyAilment', target: e, ailment: 'stun', amount: 1, duration: stunDur, delay: totalAnimTime });
       }
     }
   } else if (skillId === 'street_sweeper') {

@@ -137,8 +137,9 @@ describe('Hero Skills', () => {
     
     applyHeroSkill('fisherfolk', h1, ctx);
     
-    // In our logic, the pure state X is immediately updated so tests can read it
-    expect(e1.x).toBe(540); // GAME_WIDTH is 1080
+    // The pure state is no longer teleported instantly to allow the visual tween to work.
+    // Instead we verify that a dragTo event was dispatched for the enemy.
+    expect(ctx.visualEvents.some((evt: any) => evt.type === 'dragTo' && evt.target === e1)).toBe(true);
   });
 
   it('sales_lady (Closing Sale) executes low HP enemies', () => {

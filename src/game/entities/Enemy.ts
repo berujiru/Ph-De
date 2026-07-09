@@ -11,7 +11,7 @@ import { cameraPunch } from './fx/CameraPunch';
 import { SpriteAura } from './fx/SpriteAura';
 import { FX } from '../data/level';
 
-export type AilmentType = 'burn' | 'slow' | 'wet' | 'freeze' | 'stun' | 'poison' | 'bleed' | 'rot' | 'sleep' | 'curse' | 'knockback' | 'armorShred' | 'muted' | 'root';
+export type AilmentType = 'burn' | 'slow' | 'wet' | 'freeze' | 'stun' | 'poison' | 'bleed' | 'rot' | 'sleep' | 'curse' | 'knockback' | 'armorShred' | 'muted' | 'root' | 'dragged';
 
 const AILMENT_ICONS: Record<AilmentType, string> = {
   burn: '🔥',
@@ -27,7 +27,8 @@ const AILMENT_ICONS: Record<AilmentType, string> = {
   knockback: '💨',
   armorShred: '🛡️',
   muted: '😶',
-  root: '🌱'
+  root: '🌱',
+  dragged: '' // hidden
 };
 
 const AILMENT_OVERLAYS: Record<AilmentType, string> = {
@@ -44,7 +45,8 @@ const AILMENT_OVERLAYS: Record<AilmentType, string> = {
   knockback: '🌬️',
   armorShred: '🔨',
   muted: '🔇',
-  root: '🌿'
+  root: '🌿',
+  dragged: '' // hidden
 };
 
 export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
@@ -532,7 +534,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
           }
         } else {
           // Ailment active effects
-          if (type === 'freeze' || type === 'stun') {
+          if (type === 'freeze' || type === 'stun' || type === 'dragged') {
             isStunnedOrFrozen = true;
           } else if (type === 'root') {
             speedMult = 0; // completely halted, but can still attack

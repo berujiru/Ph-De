@@ -385,7 +385,9 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
     const fx = scene.add.text(evt.x || 0, evt.y || 0, evt.text || '', { color: evt.color || '#fff', fontStyle: 'bold' }).setOrigin(0.5);
     scene.tweens.add({ targets: fx, y: (evt.y || 0) - 30, alpha: 0, duration: 1000, onComplete: () => fx.destroy() });
   } else if (evt.type === 'dragTo') {
-    scene.tweens.add({ targets: evt.target, x: evt.x, duration: evt.duration || 500 });
+    const tweenProps: any = { targets: evt.target, x: evt.x, duration: evt.duration || 500, delay: evt.delay || 0 };
+    if (evt.y !== undefined) tweenProps.y = evt.y;
+    scene.tweens.add(tweenProps);
   } else if (evt.type === 'spawnObstacle') {
     const block = scene.add.rectangle(evt.x, evt.y, evt.width, evt.height, parseInt((evt.color || '#000').replace('#', '0x')));
     scene.time.delayedCall(evt.duration || 5000, () => block.destroy());
@@ -729,5 +731,32 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
         }
       }
     });
+  } else if (evt.type === 'spawnLambatVortex') {
+    const vortex = scene.add.image(evt.x, evt.y, 'lambat_vortex');
+    const scale = evt.scale || 2.5;
+    vortex.setScale(scale); // Dynamic size based on radius
+    vortex.setAlpha(1);
+    
+    // 1. Hold size for pullDelay, then shrink to 0 over pullDuration
+    scene.tweens.add({
+      targets: vortex,
+      scale: 0,
+      delay: evt.pullDelay,
+      duration: evt.pullDuration,
+      ease: 'Sine.easeIn',
+      onComplete: () => vortex.destroy()
+    });
+  } else if (evt.type === 'applyAilment') {
+    if (evt.delay) {
+      scene.time.delayedCall(evt.delay, () => {
+        if (evt.target && !evt.target.isDead && typeof evt.target.applyAilment === 'function') {
+          evt.target.applyAilment(evt.ailment, evt.amount, evt.duration);
+        }
+      });
+    } else {
+      if (evt.target && !evt.target.isDead && typeof evt.target.applyAilment === 'function') {
+        evt.target.applyAilment(evt.ailment, evt.amount, evt.duration);
+      }
+    }
   }
 }

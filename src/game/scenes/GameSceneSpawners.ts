@@ -78,7 +78,7 @@ export function spawnHero(scene: GameScene, id: HeroId, passiveOverride?: string
     if (h.definition.attackStyle === 'melee-cleave') {
       attack = new MeleeCleaveAttack(scene, h.x, h.y, target, h.damage, h.range, color, mods);
     } else if (h.definition.attackStyle === 'vortex') {
-      attack = new VortexAttack(scene, h.x, h.y, target, h.damage, color, mods);
+      attack = new VortexAttack(scene, h.x, h.y, target, h.damage, color, mods, damageType);
     } else if (h.definition.attackStyle === 'boomerang') {
       attack = new BoomerangAttack(scene, h, target, h.damage, color, mods);
       h.playProjectileLaunch();
