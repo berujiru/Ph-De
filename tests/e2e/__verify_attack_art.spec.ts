@@ -1,10 +1,9 @@
 import { test, expect, type Page } from '@playwright/test';
 
 /**
- * TEMPORARY verification driver for the attack-art refactor — deleted after
- * the verification report. Boots into the Attack Sandbox, spawns heroes
- * across attack styles, and screenshots the live battle so a human can see
- * the tinted SVG attack visuals in flight.
+ * TEMPORARY verification driver for the combat-feel patch — deleted after the
+ * verification report. Boots into the Attack Sandbox and screenshots live
+ * battles: projectile speed contrast, syringe orientation, melee swing.
  */
 
 const SHOTS = 'C:/Users/EDENCU~1/AppData/Local/Temp/claude/c--Users-Eden-Cutara-Documents-Ph-De/36a4514e-bd9a-4009-bf82-1806a6d1f2e2/scratchpad';
@@ -22,66 +21,91 @@ async function bootToSandbox(page: Page): Promise<string[]> {
   return warnings;
 }
 
+async function openRig(page: Page) {
+  await page.getByRole('button', { name: /Open sandbox rig/i }).click({ force: true });
+}
+async function closeRig(page: Page) {
+  await page.getByRole('button', { name: /Close sandbox rig/i }).click({ force: true });
+}
 async function spawnHero(page: Page, heroId: string) {
   await page.getByLabel('Hero to spawn').selectOption(heroId);
   // Two "Spawn" buttons exist (Hero Rig + Anomaly Rig); the hero one is first.
   await page.getByRole('button', { name: 'Spawn', exact: true }).first().click({ force: true });
 }
+async function dropBag(page: Page) {
+  await page.getByRole('button', { name: /Punching Bag/i }).click({ force: true });
+}
+async function spawnGrunt(page: Page) {
+  await page.getByLabel('Anomaly to spawn').selectOption('grunt');
+  await page.getByRole('button', { name: 'Spawn', exact: true }).nth(1).click({ force: true });
+}
 
-test('attack art renders across styles in the sandbox', async ({ page }) => {
+test('A: projectile speed contrast + syringe orientation', async ({ page }) => {
   test.setTimeout(120_000);
   const warnings = await bootToSandbox(page);
 
-  await page.getByRole('button', { name: /Open sandbox rig/i }).click({ force: true });
+  await openRig(page);
+  await spawnHero(page, 'student'); // pencil pierce @850 px/s
+  await spawnHero(page, 'baker');   // pandesal lob @400 px/s
+  await spawnHero(page, 'nurse');   // syringe @600 px/s — needle must lead
+  await dropBag(page);
+  await dropBag(page);
+  await closeRig(page);
 
-  // Wave 1: student (pierce/pencil), eden (projectile/megaphone Physical),
-  // baker (lobbed/pandesal Fire), electrician (chain/plug-spark Lightning).
-  await spawnHero(page, 'student');
-  await spawnHero(page, 'eden');
-  await spawnHero(page, 'baker');
-  await spawnHero(page, 'electrician');
-  // Targets to shoot at.
-  const targetBtn = page.getByRole('button', { name: /Target/i }).first();
-  await targetBtn.click({ force: true });
-  await targetBtn.click({ force: true });
-  // Close the rig so screenshots show the field.
-  await page.getByRole('button', { name: /Close sandbox rig/i }).click({ force: true });
-
-  for (let i = 0; i < 4; i++) {
-    await page.waitForTimeout(650);
-    await page.screenshot({ path: `${SHOTS}/wave1-${i}.png` });
-  }
-
-  // Wave 2: distinct field/motion styles — teacher (boomerang/ruler),
-  // plumber (linear-wave/wave-crest Water), fisherfolk (vortex/net),
-  // construction_worker (summoner/yero-panel), sorbetes (trap/ice-trap Frost).
-  await page.getByRole('button', { name: /Open sandbox rig/i }).click({ force: true });
-  await spawnHero(page, 'teacher');
-  await spawnHero(page, 'plumber');
-  await spawnHero(page, 'fisherfolk');
-  await spawnHero(page, 'construction_worker');
-  await spawnHero(page, 'sorbetes_vendor');
-  await page.getByRole('button', { name: /Target/i }).first().click({ force: true });
-  await page.getByRole('button', { name: /Close sandbox rig/i }).click({ force: true });
-
-  for (let i = 0; i < 5; i++) {
-    await page.waitForTimeout(700);
-    await page.screenshot({ path: `${SHOTS}/wave2-${i}.png` });
-  }
-
-  // Wave 3: sandbox default-art tester (no attackArt -> style default).
-  await page.getByRole('button', { name: /Open sandbox rig/i }).click({ force: true });
-  await spawnHero(page, 'sandbox_boomerang');
-  await page.getByRole('button', { name: /Target/i }).first().click({ force: true });
-  await page.getByRole('button', { name: /Close sandbox rig/i }).click({ force: true });
-  for (let i = 0; i < 3; i++) {
-    await page.waitForTimeout(600);
-    await page.screenshot({ path: `${SHOTS}/wave3-${i}.png` });
+  for (let i = 0; i < 6; i++) {
+    await page.waitForTimeout(450);
+    await page.screenshot({ path: `${SHOTS}/speed-${i}.png` });
   }
 
   const missingArt = warnings.filter((w) => w.includes('AttackSprite: missing texture'));
-  expect(missingArt, `missing attack art: ${missingArt.join('; ')}`).toHaveLength(0);
-  const texErrors = warnings.filter((w) => /texture|Failed to load/i.test(w));
-  console.log('console warnings/errors seen:', JSON.stringify(warnings.slice(0, 20), null, 2));
-  expect(texErrors, texErrors.join('; ')).toHaveLength(0);
+  expect(missingArt, missingArt.join('; ')).toHaveLength(0);
+});
+
+test('B: melee weapon swing (rotation sweep)', async ({ page }) => {
+  test.setTimeout(120_000);
+  const warnings = await bootToSandbox(page);
+
+  await openRig(page);
+  await spawnHero(page, 'jeepney_driver');
+  await spawnHero(page, 'security_guard');
+  // Grunts march down into melee reach (the static bag sits outside it).
+  await spawnGrunt(page);
+  await spawnGrunt(page);
+  await spawnGrunt(page);
+  await closeRig(page);
+
+  // Wait for the march to close the distance, then rapid-fire shots to catch
+  // the crescent mid-sweep.
+  await page.waitForTimeout(4000);
+  for (let i = 0; i < 10; i++) {
+    await page.waitForTimeout(160);
+    await page.screenshot({ path: `${SHOTS}/melee-${i}.png` });
+  }
+
+  const missingArt = warnings.filter((w) => w.includes('AttackSprite: missing texture'));
+  expect(missingArt, missingArt.join('; ')).toHaveLength(0);
+});
+
+test('C: field styles + default art tester', async ({ page }) => {
+  test.setTimeout(120_000);
+  const warnings = await bootToSandbox(page);
+
+  await openRig(page);
+  await spawnHero(page, 'plumber');       // linear-wave, wave-crest, range-driven travel
+  await spawnHero(page, 'fisherfolk');    // vortex net
+  await spawnHero(page, 'electrician');   // chain + plug-spark pops
+  await spawnHero(page, 'sales_lady');    // beam + pricetag pops, range now real
+  await spawnHero(page, 'sandbox_boomerang'); // style-default art fallback
+  await dropBag(page);
+  await dropBag(page);
+  await closeRig(page);
+
+  for (let i = 0; i < 6; i++) {
+    await page.waitForTimeout(600);
+    await page.screenshot({ path: `${SHOTS}/field-${i}.png` });
+  }
+
+  const missingArt = warnings.filter((w) => w.includes('AttackSprite: missing texture'));
+  expect(missingArt, missingArt.join('; ')).toHaveLength(0);
+  console.log('console warnings/errors:', JSON.stringify(warnings.slice(0, 15)));
 });

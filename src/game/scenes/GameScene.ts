@@ -98,6 +98,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.load.image('hero-base', '/assets/heroes/hero-base.svg');
     this.load.image('enemy-base', '/assets/enemies/enemy-base.svg');
+    this.load.aseprite('boss_troll_farm', '/assets/enemies/boss_troll_farm.png', '/assets/enemies/boss_troll_farm.json');
     this.load.image('kamote_rider', '/assets/fx/kamote_rider.svg');
     this.load.image('water_wave', '/assets/fx/water_wave.svg');
     this.load.image('tornado', '/assets/fx/tornado.svg');

@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
-  <!-- Nurse: flying syringe — plunger at the back, needle pointing +X. -->
-  <rect x="4" y="58" width="8" height="12" rx="3" fill="#cccccc" stroke="#0f172a" stroke-width="3"/>
-  <rect x="10" y="61" width="18" height="6" rx="3" fill="#999999"/>
-  <rect x="26" y="50" width="6" height="28" rx="3" fill="#cccccc" stroke="#0f172a" stroke-width="3"/>
-  <rect x="32" y="48" width="56" height="32" rx="7" fill="#ffffff" stroke="#0f172a" stroke-width="5"/>
-  <rect x="36" y="54" width="30" height="20" rx="4" fill="#e6e6e6"/>
-  <path d="M48 48 V60 M60 48 V56 M72 48 V60" stroke="#0f172a" stroke-width="3" fill="none" stroke-opacity="0.7"/>
-  <rect x="88" y="56" width="10" height="16" rx="3" fill="#cccccc" stroke="#0f172a" stroke-width="3"/>
-  <rect x="98" y="61" width="26" height="6" rx="3" fill="#e6e6e6"/>
-  <path d="M124 61 L127 64 L124 67 Z" fill="#ffffff"/>
-  <circle cx="116" cy="46" r="5" fill="#ffffff"/>
-  <circle cx="106" cy="38" r="4" fill="#e6e6e6"/>
+  <!-- Nurse: syringe dart. Heavy plunger at the BACK (-X), long dominant needle
+       at the FRONT (+X) so the flight direction reads instantly at small sizes. -->
+  <rect x="2" y="50" width="26" height="5" rx="2.5" fill="#e6e6e6"/>
+  <rect x="6" y="74" width="22" height="5" rx="2.5" fill="#cccccc"/>
+  <rect x="18" y="46" width="8" height="36" rx="4" fill="#cccccc" stroke="#0f172a" stroke-width="4"/>
+  <rect x="24" y="60" width="14" height="8" rx="4" fill="#999999"/>
+  <rect x="36" y="48" width="38" height="32" rx="7" fill="#ffffff" stroke="#0f172a" stroke-width="5"/>
+  <rect x="40" y="54" width="20" height="20" rx="4" fill="#e6e6e6"/>
+  <path d="M50 48 V58 M62 48 V54" stroke="#0f172a" stroke-width="3" fill="none" stroke-opacity="0.7"/>
+  <path d="M74 52 L86 58 L86 70 L74 76 Z" fill="#cccccc" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
+  <rect x="86" y="60" width="28" height="8" rx="2" fill="#ffffff" stroke="#0f172a" stroke-width="3"/>
+  <path d="M112 58 L127 64 L112 70 Z" fill="#ffffff" stroke="#0f172a" stroke-width="3" stroke-linejoin="round"/>
 </svg>

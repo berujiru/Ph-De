@@ -4,6 +4,7 @@ import { theme } from '../theme';
 import { uiToGameEvents, gameToUiEvents } from '../../game/core/GameEvents';
 import type { GameStateSnapshot } from '../../game/core/GameEvents';
 import { HERO_DEFINITIONS, type HeroId } from '../../game/data/heroes';
+import { ENEMY_DEFINITIONS, type EnemyId } from '../../game/data/enemies';
 import {
   BackIcon,
   LightningIcon,
@@ -332,7 +333,27 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
           <RigSection label="Anomaly Rig">
             <select
               value={selectedEnemy}
-              onChange={(e) => setSelectedEnemy(e.target.value)}
+              onChange={(e) => {
+                const newId = e.target.value;
+                setSelectedEnemy(newId);
+                const def = ENEMY_DEFINITIONS[newId as EnemyId];
+                if (def) {
+                   if (def.stealth) setSelectedPassive('stealth');
+                   else if (def.barrierDamageMultiplier) setSelectedPassive('barrierShred');
+                   else if (def.moraleAura) setSelectedPassive('moraleAura');
+                   else if (def.fakeHpPadding) setSelectedPassive('fakeHp');
+                   else if (def.stealVoicesPerSecond) setSelectedPassive('stealVoices');
+                   else if (def.splitOnDeathCount) setSelectedPassive('splitOnDeath');
+                   else if (def.tauntAura) setSelectedPassive('taunt');
+                   else if (def.dropObstacleOnDeath) setSelectedPassive('dropObstacle');
+                   else if (def.knockbackPulseCooldown) setSelectedPassive('knockback');
+                   else if (def.hitImmunityCount) setSelectedPassive('hitImmunity');
+                   else setSelectedPassive('none');
+
+                   if (def.activeSkill) setSelectedSkill(def.activeSkill.effect);
+                   else setSelectedSkill('none');
+                }
+              }}
               aria-label="Anomaly to spawn"
               style={glassSelect}
             >

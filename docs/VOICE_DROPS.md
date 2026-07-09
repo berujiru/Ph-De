@@ -29,9 +29,9 @@ DPS worker" rule in `docs/PROGRESSION.md`.
 
 | Band | Target DPS | Who | Why |
 |---|---|---|---|
-| **Frontline bruiser** | 15–17 | jeepney_driver, security_guard | Melee-range risk (holds at the shield front) is paid back in raw DPS |
-| **Standard ranged DPS** | 9–13 | eden, teacher, call_center_agent, electrician, delivery_rider, fishball_vendor, sales_lady, farmer | The workhorse band; safe positioning, honest numbers |
-| **AoE / multi-hit** | 7–11 *per hit* | street_sweeper, taho_vendor, baker, plumber, student | Lower per-hit because they hit many; effective DPS climbs with enemy count |
+| **Frontline bruiser** | 15–17 | jeepney_driver | Melee-range risk (holds at the shield front) is paid back in raw DPS |
+| **Standard ranged DPS** | 9–13 | eden, teacher, call_center_agent, delivery_rider, farmer | The workhorse band; safe positioning, honest numbers |
+| **AoE / multi-hit** | 7–11 *per hit* | security_guard, street_sweeper, taho_vendor, baker, plumber, student, electrician, fishball_vendor, sales_lady | Lower per-hit because they hit many; effective DPS climbs with enemy count |
 | **Control / enabler** | 2–6 | fisherfolk, traffic_enforcer, sorbetes_vendor | Damage is not the job — Wet/pull/freeze setup is. Deliberately weak stat sticks |
 | **Support striker** | ~5 (0.5x) | nurse | Heals/buffs carry the kit; still deals real damage (never zero) |
 | **Utility / summoner** | ~0 direct | construction_worker | `damage` is repurposed as wall HP (`summonHp = damage × 10`); value is blocking, not DPS |
@@ -41,36 +41,38 @@ DPS worker" rule in `docs/PROGRESSION.md`.
 Each `attackStyle` has a lane for **DPS shape**, **range**, and **attack rate**.
 These are the guardrails a new hero of that style should land inside.
 
+Range is calibrated to the **portrait battlefield**: the visible field spans
+≈1344 px above the shield (ranged heroes stand ~shield+150), so `range 800`
+covers roughly half the screen and `1400` is sniper-tier (~93%). Eden's
+`GLOBAL_RANGE_PX = 1920` covers everything. Flight speed is a separate,
+per-hero knob: `projectileSpeed` (px/s) on the definition, defaults per style
+in `src/game/data/attackSpeed.ts` — heavy projectiles ~400, sharp fast ones
+~850, guardrail [250, 900] enforced in `tests/unit/balance.test.ts`.
+
 | attackStyle | Range band (px) | Rate band (ms) | DPS shape | Notes |
 |---|---|---|---|---|
-| `projectile` | 220–320 | 1300–1600 | single-target, reliable | Eden anchors the top of the range band at 320 |
-| `pierce` | 220–260 | 1100–1300 | line, multi-hit | Per-hit low; see the pierce spec below |
-| `boomerang` | 250–280 | 1400–1600 | two hits (out + back) | Effective DPS ~1.8x the single-hit figure |
-| `beam` | 230–250 | 400–600 | fast, low per-hit, hits a line | sales_lady owns "fastest attack in the game" |
-| `chain` | 240–320 | 1400–1700 | primary + arcs | Longest ranged band; shines on grouped/Wet enemies |
-| `melee-cleave` | 90–110 | 1200–1500 | frontline arc | `range` **is the cleave radius** — keep it melee-band, never 200+ |
-| `lobbed` | 170–200 | 1700–1900 | splash on impact | Moderate single, splash bonus |
-| `vortex` | 160–200 | 3500–4000 | area DoT + pull | Control band — low DPS by design |
-| `trap` | 150–180 | 3000 | placed, delayed area | Zone denial |
-| `linear-wave` | 110–220 | 2200–2500 | horizontal line sweep | Melee sweepers use the low range band; ranged (plumber) the high |
-| `summoner` | 100–110 | 5000 | no direct DPS | `damage` = wall HP |
+| `projectile` | 1050–1400 | 1300–1600 | single-target, reliable | Eden anchors global at 1920; call_center_agent owns sniper 1400 |
+| `pierce` | 1000–1100 | 1100–2200 | line, multi-hit | Per-hit low; heavy multi-pierce (Tuhog 5) pays with a slow rate |
+| `boomerang` | 1250–1300 | 1400–1600 | two hits (out + back) | Effective DPS ~1.8x the single-hit figure |
+| `beam` | 1100 | 600 | fast, low per-hit, hits a line | sales_lady owns "fastest attack in the game" (~2x everyone) |
+| `chain` | 900–1150 | 1800–2000 | primary + arcs | Bounce hop is `CHAIN_BOUNCE_RANGE_PX` (420) between targets |
+| `melee-cleave` | 420–560 | 1400–1500 | frontline arc | `range` **is the cleave radius** — short by design; risk pays in DPS |
+| `lobbed` | 900–950 | 1700–1900 | splash on impact | Moderate single, splash bonus |
+| `vortex` | 800–850 | 3500–6500 | area DoT + pull | Control band — low DPS by design |
+| `trap` | 800 | 3000 | placed, delayed area | Zone denial |
+| `linear-wave` | 1050 | 2200–2500 | horizontal line sweep | Wave travel distance = hero `range` |
+| `summoner` | 400 | 5000 | no direct DPS | `damage` = wall HP |
 
-### Outliers fixed this pass
+### Recalibration note (2026-07)
 
-- **Eden `range: 1000` → `320`.** 1000 let her hit clear across the 960-wide
-  viewport before enemies engaged, trivializing positioning. 320 lets her
-  strike enemies shortly before they reach the shield without sniping the
-  whole field. (The formation math in `core/RallyMarch.ts` self-corrects hold
-  position from range, so this only changes reach, not where she stands.)
-- **security_guard / farmer `range: 200` → `100`.** Melee-cleave uses `range`
-  as the swing radius; 200 was a ranged-sized swing on a melee unit. Now they
-  read as frontline bruisers.
-- **jeepney_driver `range: 50` → `90`, street_sweeper `range: 50` → `110`.**
-  Nudged into the melee/short cleave band so their arcs actually catch a clump.
-
-All other changes are DPS-band normalizations (see the table above). Passives
-and signature skills were left as-authored — they're already role-differentiated
-and their text matches the calibrated numbers.
+Ranges were re-laddered for the portrait field (most heroes had limited reach —
+old bands were landscape-era) and the overpowered outliers were slowed via
+`attackRateMs`: jeepney_driver 1250→1400 (17.6 DPS busted the bruiser band),
+security_guard 1300→1450, farmer 1400→1800 and electrician 1600→2000 (multi-hit
+chain on top of top-band per-hit DPS), fishball_vendor 1300→1600 (5-pierce line
+clear), sales_lady 500→600 (still ~2x the fastest). security_guard now reads
+against the AoE/multi-hit band, not the bruiser band. Damage values were left
+untouched. Passives and signature skills were left as-authored.
 
 ---
 

@@ -54,6 +54,13 @@ export interface HeroDefinition {
    * art (sandbox testers do this).
    */
   attackArt?: string;
+  /**
+   * Flight speed of this hero's basic-attack projectile in px/s (flight
+   * styles only: projectile/pierce/boomerang/lobbed/linear-wave). Omit to use
+   * the style default in src/game/data/attackSpeed.ts. Heavy projectiles
+   * fly slow (~400), light sharp ones fast (~850).
+   */
+  projectileSpeed?: number;
   canSeeStealth?: boolean;
   cutInDurationMs?: number;
   /** Top/bottom inset for the framed cut-in. 0 = fullscreen height. */
@@ -109,6 +116,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     signatureSkill: { name: 'Rally', shortName: 'Rally', description: 'Massive attack speed buff to all deployed heroes.' },
     passive: { name: 'Voice of the People', description: 'Generates 1 Voice every 10 seconds.' },
     attackArt: 'megaphone',
+    projectileSpeed: 550,
     portraitKey: 'eden_cutin', // 8x5 sheet, 40 frames. Master: docs/references/eden_cutin.png
     // (1024px/frame); shipped sheet is downscaled to 512px/frame (4096x2560) to
     // stay within mobile WebGL texture/VRAM limits under Capacitor.
@@ -139,6 +147,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     signatureSkill: { name: 'Silence', shortName: 'Silence', description: 'Silences all enemy auras globally for 10 seconds.' },
     passive: { name: 'Fact Check', description: 'Instantly pops and destroys Fake HP padding.' },
     attackArt: 'ruler',
+    projectileSpeed: 450,
   },
   student: {
     id: 'student',
@@ -147,7 +156,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'pierce',
-    range: 1000,
+    range: 1050,
     damage: 7, // per-hit; lands on up to basePierce+1 enemies in a line
     attackRateMs: 1100,
     basePierce: 2,
@@ -156,6 +165,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     signatureSkill: { name: 'Cramming', shortName: 'Cramming', description: 'Self-buffs Attack Speed for 10s and instantly hurls a rapid burst of randomized elemental projectiles.' },
     passive: { name: 'Overachiever', description: 'Enhancement drops apply at 1.5x potency.' },
     attackArt: 'pencil',
+    projectileSpeed: 850,
   },
   jeepney_driver: {
     id: 'jeepney_driver',
@@ -164,9 +174,9 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Wind',
     attackKind: 'melee',
     attackStyle: 'melee-cleave',
-    range: 500,
+    range: 550,
     damage: 22, // top melee DPS — frontline risk pays
-    attackRateMs: 1250,
+    attackRateMs: 1400, // slowed 2026-07: 17.6 DPS busted the bruiser band
     color: 0x10b981,
     purpose: 'Frontline cleaver — revs into clustered enemies and hits Bosses extra hard. A durable bruiser, not a sniper.',
     signatureSkill: { name: 'Barya Lang Po', shortName: 'Barya', description: 'Tosses coin shrapnel for massive shotgun AoE damage.' },
@@ -180,7 +190,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Water',
     attackKind: 'ranged',
     attackStyle: 'vortex',
-    range: 700,
+    range: 850,
     damage: 8,
     attackRateMs: 3500,
     color: 0x0ea5e9,
@@ -196,12 +206,13 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Earth',
     attackKind: 'ranged',
     attackStyle: 'pierce',
-    range: 850,
+    range: 1000,
     basePierce: 1,
     damage: 16,
     attackRateMs: 2200,
     color: 0xa8a29e,
     attackArt: 'debris',
+    projectileSpeed: 450,
     purpose: 'Throws gathered debris at enemies from a distance.',
     signatureSkill: { name: 'Dust Storm', shortName: 'Dust', description: 'Spawns a moving leaf tornado that chases enemies, pulling them in and dealing DoT. Size and damage scale with voice drops.' },
     passive: { name: 'Recycled Waste', description: 'Attacks pierce through 1 additional enemy.' },
@@ -213,7 +224,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Fire',
     attackKind: 'ranged',
     attackStyle: 'lobbed',
-    range: 725,
+    range: 900,
     damage: 11,
     attackRateMs: 1700,
     color: 0xe2e8f0,
@@ -221,6 +232,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     signatureSkill: { name: 'Hot Syrup', shortName: 'Syrup', description: 'Throws a Molotov creating a 20s AoE fire patch that deals DoT.' },
     passive: { name: 'Sweet Tooth', description: 'Drops 1 extra Voice when killing an Elite/Boss.' },
     attackArt: 'taho-cup',
+    projectileSpeed: 450,
   },
   nurse: {
     id: 'nurse',
@@ -229,7 +241,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Holy',
     attackKind: 'ranged',
     attackStyle: 'projectile',
-    range: 950,
+    range: 1050,
     damage: 8,
     attackRateMs: 1500,
     color: 0xfca5a5,
@@ -237,6 +249,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     signatureSkill: { name: 'Heal', shortName: 'Heal', description: 'Restores 150 HP to the barricade.' },
     passive: { name: 'Triage', description: 'Heals the barrier continuously 1 HP per second.' },
     attackArt: 'syringe',
+    projectileSpeed: 600,
   },
   construction_worker: {
     id: 'construction_worker',
@@ -245,7 +258,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'summoner',
-    range: 325,
+    range: 400,
     damage: 18, // summoner damage = wall HP knob, not DPS
     attackRateMs: 5000,
     color: 0xd97706,
@@ -266,6 +279,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 1600,
     color: 0xfef08a,
     attackArt: 'headset-wave',
+    projectileSpeed: 800,
     purpose: 'Headset feedback shoots projectile attacks at distant enemies and can target Stealth.',
     signatureSkill: { name: 'Put-on-hold', description: 'Deals damage and applies a 5s Root in a small AoE.' },
     passive: { name: 'Graveyard Shift', description: 'Can see and directly target Stealthed enemies.' },
@@ -277,9 +291,9 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'melee',
     attackStyle: 'melee-cleave',
-    range: 350,
+    range: 420,
     damage: 16,
-    attackRateMs: 1300,
+    attackRateMs: 1450, // slowed 2026-07: melee AoE sat above the multi-hit band
     color: 0x1e3a8a,
     purpose: 'Batuta bruiser who holds the frontline and cleaves enemies in front; deals double damage to Stealth anomalies.',
     canSeeStealth: true,
@@ -294,9 +308,9 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Earth',
     attackKind: 'ranged',
     attackStyle: 'chain',
-    range: 700,
+    range: 900,
     damage: 19,
-    attackRateMs: 1400,
+    attackRateMs: 1800, // slowed 2026-07: 13.6/hit on a multi-hit chain was OP
     color: 0x15803d,
     purpose: 'Chain-lightning ranged attacker whose Tree of Life periodically roots and lightly damages enemies in a large AoE.',
     signatureSkill: { name: 'Tree of Life', description: 'Summons a Golden Tree that periodically Roots and damages nearby enemies.' },
@@ -310,15 +324,16 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'pierce',
-    range: 1025,
+    range: 1100,
     damage: 9, // per-hit across up to 5 pierced enemies — group DPS is the payoff
-    attackRateMs: 1300,
+    attackRateMs: 1600, // slowed 2026-07: 5-pierce line clear was OP at 1300
     basePierce: 5,
     color: 0xf43f5e,
     purpose: 'Skewers a whole line — one Tuhog throw pierces up to 5 anomalies. The squad\'s premier line-clearer.',
     signatureSkill: { name: 'Spicy Sauce', description: 'Ignites all pierced enemies, causing panic.' },
     passive: { name: 'Tuhog', description: 'Attacks pierce up to 5 enemies in a line.' },
     attackArt: 'skewer',
+    projectileSpeed: 750,
   },
   sandbox_projectile: { id: 'sandbox_projectile', name: 'Test: Projectile', profession: 'Tester', damageType: 'Physical', attackKind: 'ranged', attackStyle: 'projectile', range: 500, damage: 20, attackRateMs: 1000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
   sandbox_melee_cleave: { id: 'sandbox_melee_cleave', name: 'Test: Melee Cleave', profession: 'Tester', damageType: 'Physical', attackKind: 'melee', attackStyle: 'melee-cleave', range: 700, damage: 20, attackRateMs: 1000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
@@ -338,9 +353,9 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Wind',
     attackKind: 'ranged',
     attackStyle: 'beam',
-    range: 1000,
+    range: 1100,
     damage: 4,
-    attackRateMs: 500, // Very fast — fastest attacker in the game
+    attackRateMs: 600, // Still the fastest attacker in the game by ~2x
     color: 0xec4899,
     purpose: 'Machine-gun sales pitch — the fastest attack in the game, chipping the whole line and executing low-HP stragglers.',
     signatureSkill: { name: 'Closing Sale', description: 'Instantly executes any enemy below 15% HP.' },
@@ -354,7 +369,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Frost',
     attackKind: 'ranged',
     attackStyle: 'trap',
-    range: 625,
+    range: 800,
     damage: 12,
     attackRateMs: 3000,
     color: 0xf472b6,
@@ -370,9 +385,9 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Lightning',
     attackKind: 'ranged',
     attackStyle: 'chain',
-    range: 1125,
+    range: 1150,
     damage: 14,
-    attackRateMs: 1600,
+    attackRateMs: 2000, // slowed 2026-07: guaranteed 5-bounce group clear was OP
     baseChain: 5,
     color: 0x38bdf8,
     purpose: 'Jumper cables that always bounce to 5 nearby targets — reliable, steady horde clear.',
@@ -387,7 +402,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Fire',
     attackKind: 'ranged',
     attackStyle: 'lobbed',
-    range: 775,
+    range: 950,
     damage: 13,
     attackRateMs: 1800,
     color: 0xef4444,
@@ -395,6 +410,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     signatureSkill: { name: 'Dough Knead', description: 'Flattens enemies, reducing their armor and damage by 50%.' },
     passive: { name: 'Fresh out the Oven', description: 'Attacks leave a burning zone on the ground.' },
     attackArt: 'pandesal',
+    projectileSpeed: 400,
   },
   traffic_enforcer: {
     id: 'traffic_enforcer',
@@ -403,7 +419,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'vortex',
-    range: 650,
+    range: 800,
     damage: 8,
     attackRateMs: 6500,
     color: 0x475569,
@@ -419,7 +435,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Water',
     attackKind: 'ranged',
     attackStyle: 'linear-wave',
-    range: 900,
+    range: 1050,
     damage: 10,
     attackRateMs: 2400,
     color: 0x2563eb,
@@ -443,5 +459,6 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     signatureSkill: { name: 'Dine & Dash', description: 'Summons 3 riders that rev up before sweeping the lane, leaving a trail, dealing heavy damage, and knocking enemies back.' },
     passive: { name: 'Rush Hour', description: 'Attack speed ramps up the longer they attack the same target.' },
     attackArt: 'parcel',
+    projectileSpeed: 400,
   }
 };

@@ -13,6 +13,7 @@ import { FX, GAME_WIDTH, GAME_HEIGHT, RALLY, ENEMY_SPAWN_Y_OFFSET } from '../dat
 import { applyHeroSkill, type SkillVisualEvent } from '../core/Skills';
 import { DAMAGE_TYPE_COLORS, type DamageType } from '../core/Damage';
 import { attackArtKey, resolveAttackArt } from '../data/attackArt';
+import { resolveAttackSpeed } from '../data/attackSpeed';
 import {
   Attack,
   ProjectileAttack,
@@ -464,11 +465,13 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
       tint: DAMAGE_TYPE_COLORS[evt.damageType as DamageType] || 0xffffff,
     };
 
+    const volleySpeed = resolveAttackSpeed(h.definition);
+
     let attack: Attack;
     if (h.definition.attackStyle === 'pierce') {
-      attack = new PierceAttack(scene, h.muzzleX, h.muzzleY, evt.target, h.damage, visual, h.definition.basePierce ?? 1, h.modifiers, evt.damageType as any);
+      attack = new PierceAttack(scene, h.muzzleX, h.muzzleY, evt.target, h.damage, visual, volleySpeed, h.definition.basePierce ?? 1, h.modifiers, evt.damageType as any);
     } else {
-      attack = new ProjectileAttack(scene, h.muzzleX, h.muzzleY, evt.target, h.damage, visual, h.modifiers, evt.damageType as any);
+      attack = new ProjectileAttack(scene, h.muzzleX, h.muzzleY, evt.target, h.damage, visual, volleySpeed, h.modifiers, evt.damageType as any);
     }
     
     scene.attacks.push(attack);

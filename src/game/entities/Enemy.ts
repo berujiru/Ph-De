@@ -11,6 +11,7 @@ import { spawnShockwaveRing } from './fx/ShockwaveRing';
 import { cameraPunch } from './fx/CameraPunch';
 import { SpriteAura } from './fx/SpriteAura';
 import { FX } from '../data/level';
+import { EnemyAI } from '../core/EnemyAI';
 
 export type AilmentType = 'burn' | 'slow' | 'wet' | 'freeze' | 'stun' | 'poison' | 'bleed' | 'rot' | 'sleep' | 'curse' | 'knockback' | 'armorShred' | 'muted' | 'root' | 'dragged';
 
@@ -61,6 +62,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
   private attackCooldown = 0;
   /** Render height (px) from the unit's size tier — offsets hang off this. */
   private readonly sizePx: number;
+  private botAi?: EnemyAI;
 
   // Passives
   public isStealthed = false;
@@ -144,6 +146,10 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
 
       const dragLabel = scene.add.text(0, 15, 'DRAG ME', { fontSize: '24px', color: '#ffffff', stroke: '#000000', strokeThickness: 3 }).setOrigin(0.5);
       this.add(dragLabel);
+    }
+    
+    if (definition.ai) {
+      this.botAi = new EnemyAI(this, definition.ai);
     }
   }
 
@@ -315,7 +321,10 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       if (this.mutedIcon) {
         this.scene.tweens.add({ targets: this.mutedIcon, alpha: 0, duration: 400 });
       }
-      this.scene.tweens.add({ targets: this, alpha: 0, duration: 300 });
+      const toFade = this.list.filter(c => c !== this.model);
+      if (toFade.length > 0) {
+        this.scene.tweens.add({ targets: toFade, alpha: 0, duration: 300 });
+      }
       this.model.setState('death', { onComplete: () => this.destroy() });
     }
   }
@@ -588,6 +597,15 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       this.model.setState('stunned');
       return;
     }
+    
+    if (this.botAi) {
+      this.botAi.update(delta);
+    }
+    
+    if (this.model.modelState === 'cast') {
+      // Cannot move or attack while casting a skill.
+      return;
+    }
 
     // Check if in range of any summon
     let targetSummon: Summon | null = null;
@@ -602,6 +620,14 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
 
     if (targetSummon) {
       // Reached a summon, stop moving and start attacking
+      if (this.definition.selfDestructOnBarrier) {
+        const dmg = this.definition.selfDestructDamage ?? (this.definition.damage * (this.definition.barrierDamageMultiplier || 1));
+        targetSummon.takeDamage(dmg);
+        this.hp = 0;
+        this.takeDamage(0);
+        return;
+      }
+      
       this.model.setState('idle');
       this.attackCooldown -= delta;
       if (this.attackCooldown <= 0) {
@@ -614,6 +640,14 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       // attack. attackRangePx 0 (default) = the old melee contact point, which
       // RALLY.formation.enemyContactAheadPx relies on.
       this.y = shield.y - shield.height / 2 - this.sizePx / 2 - (this.definition.attackRangePx ?? 0);
+
+      if (this.definition.selfDestructOnBarrier) {
+        const dmg = this.definition.selfDestructDamage ?? (this.definition.damage * (this.definition.barrierDamageMultiplier || 1));
+        shield.takeDamage(dmg);
+        this.hp = 0;
+        this.takeDamage(0);
+        return;
+      }
 
       this.model.setState('idle');
       this.attackCooldown -= delta;

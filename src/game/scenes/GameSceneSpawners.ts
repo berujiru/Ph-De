@@ -24,6 +24,7 @@ import {
 } from '../entities/Attacks';
 import { DAMAGE_TYPE_COLORS, type DamageType } from '../core/Damage';
 import { attackArtKey, resolveAttackArt } from '../data/attackArt';
+import { resolveAttackSpeed } from '../data/attackSpeed';
 
 export function spawnEnemy(scene: GameScene, enemyId: EnemyId = 'grunt', wave: number = 1) {
   // Scatter across the lane (X); spawn just above the visible top of the
@@ -76,36 +77,38 @@ export function spawnHero(scene: GameScene, id: HeroId, passiveOverride?: string
     // authored white/grayscale so the tint colors it cleanly.
     const tint = overrideColor ?? DAMAGE_TYPE_COLORS[damageType as DamageType];
     const visual = { artKey: attackArtKey(resolveAttackArt(h.definition)), tint };
+    // Per-hero projectile flight speed (style default when unset).
+    const speed = resolveAttackSpeed(h.definition);
     // Persisted per-hero upgrade mods land on every Attack this hero spawns.
     const mods = h.modifiers;
 
     if (h.definition.attackStyle === 'melee-cleave') {
-      attack = new MeleeCleaveAttack(scene, h.x, h.y, target, h.damage, h.range, visual, mods);
+      attack = new MeleeCleaveAttack(scene, h.x, h.y, target, h.damage, h.range, visual, mods, damageType);
     } else if (h.definition.attackStyle === 'vortex') {
       attack = new VortexAttack(scene, h.x, h.y, target, h.damage, visual, mods, damageType);
     } else if (h.definition.attackStyle === 'boomerang') {
-      attack = new BoomerangAttack(scene, h, target, h.damage, visual, mods);
+      attack = new BoomerangAttack(scene, h, target, h.damage, visual, speed, mods, damageType);
       h.playProjectileLaunch();
     } else if (h.definition.attackStyle === 'chain') {
-      attack = new ChainAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, h.definition.baseChain ?? 1, mods);
+      attack = new ChainAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, h.definition.baseChain ?? 1, mods, damageType);
     } else if (h.definition.attackStyle === 'summoner') {
       attack = new SummonAttack(scene, h.x, h.y, target, h.damage, visual, mods);
     } else if (h.definition.attackStyle === 'beam') {
-      attack = new BeamAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, mods);
+      attack = new BeamAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, h.range, mods, damageType);
     } else if (h.definition.attackStyle === 'lobbed') {
-      attack = new LobbedAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, mods);
+      attack = new LobbedAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, speed, mods, damageType);
       h.playProjectileLaunch();
     } else if (h.definition.attackStyle === 'linear-wave') {
-      attack = new LinearWaveAttack(scene, target.x, h.muzzleY, h.damage, visual, mods);
+      attack = new LinearWaveAttack(scene, target.x, h.muzzleY, h.damage, visual, speed, h.range, mods, damageType);
     } else if (h.definition.attackStyle === 'trap') {
-      attack = new TrapAttack(scene, h.x, h.y, target, h.damage, visual, mods);
+      attack = new TrapAttack(scene, h.x, h.y, target, h.damage, visual, mods, damageType);
     } else if (h.definition.attackStyle === 'pierce') {
       // Non-homing straight-line shot; pass-throughs = basePierce + bonusPierce.
-      attack = new PierceAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, h.definition.basePierce ?? 1, mods, damageType);
+      attack = new PierceAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, speed, h.definition.basePierce ?? 1, mods, damageType);
       h.playProjectileLaunch();
     } else {
       // Plain projectile — homes, expires on first hit (+bonusPierce).
-      attack = new ProjectileAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, mods, damageType);
+      attack = new ProjectileAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, speed, mods, damageType);
       h.playProjectileLaunch();
     }
 

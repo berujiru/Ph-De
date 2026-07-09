@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ENEMY_DEFINITIONS } from '../../src/game/data/enemies';
 import { HERO_DEFINITIONS } from '../../src/game/data/heroes';
+import { resolveAttackSpeed } from '../../src/game/data/attackSpeed';
 import { VOICE_DROP_TUNING, computeKillPool, voiceDropCost } from '../../src/game/data/drops';
 
 /** How many drops actually land as kills accumulate across a pool of `pool`. */
@@ -44,6 +45,16 @@ describe('balance data invariants', () => {
     for (const definition of Object.values(HERO_DEFINITIONS)) {
       expect(definition.damage).toBeGreaterThan(0);
       expect(definition.attackRateMs).toBeGreaterThan(0);
+    }
+  });
+
+  it('every flight-style hero resolves a projectile speed within [250, 900] px/s', () => {
+    const flightStyles = new Set(['projectile', 'pierce', 'boomerang', 'lobbed', 'linear-wave']);
+    for (const definition of Object.values(HERO_DEFINITIONS)) {
+      if (definition.id.startsWith('sandbox_') || !flightStyles.has(definition.attackStyle)) continue;
+      const speed = resolveAttackSpeed(definition);
+      expect(speed, `${definition.id} projectile speed`).toBeGreaterThanOrEqual(250);
+      expect(speed, `${definition.id} projectile speed`).toBeLessThanOrEqual(900);
     }
   });
 

@@ -43,6 +43,8 @@ export interface EnemyDefinition {
   stealVoicesPerSecond?: number;
   splitOnDeathCount?: number;
   tauntAura?: boolean;
+  selfDestructOnBarrier?: boolean;
+  selfDestructDamage?: number;
   dropObstacleOnDeath?: boolean;
   knockbackPulseCooldown?: number;
   hitImmunityCount?: number;
@@ -52,6 +54,11 @@ export interface EnemyDefinition {
   activeSkill?: {
     name: string;
     effect: 'flood' | 'devour' | 'summonSwarm' | 'summonShieldbearer' | 'sirenBurst' | 'smuggleHp' | 'economyHeist' | 'scatterFakeGold' | 'resurrectAll';
+  };
+  ai?: {
+    skillCooldownMs?: number;
+    initialSkillDelayMs?: number;
+    castCondition?: 'always' | 'halfHp';
   };
 }
 
@@ -281,7 +288,14 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     damage: 15,
     attackRateMs: 4000,
     color: 0x3f3f46,
-    activeSkill: { name: 'Deploy Trolls', effect: 'summonSwarm' }
+    selfDestructOnBarrier: true,
+    selfDestructDamage: 200,
+    activeSkill: { name: 'Deploy Trolls', effect: 'summonSwarm' },
+    ai: {
+      skillCooldownMs: 8000,
+      initialSkillDelayMs: 4000,
+      castCondition: 'always'
+    }
   },
   boss_vote_buying: {
     id: 'boss_vote_buying',
