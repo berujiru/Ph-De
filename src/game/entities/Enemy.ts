@@ -610,11 +610,11 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
         this.attackCooldown = this.getEffectiveAttackRateMs();
         this.model.setState('attack');
       }
-    } else if (this.y >= shield.y - shield.height / 2 - (this.definition.attackRangePx ?? 0)) {
+    } else if (this.y + this.sizePx / 2 >= shield.y - shield.height / 2 - (this.definition.attackRangePx ?? 0)) {
       // Within fixed attack range of the shield's front (top) edge — halt and
       // attack. attackRangePx 0 (default) = the old melee contact point, which
       // RALLY.formation.enemyContactAheadPx relies on.
-      this.y = shield.y - shield.height / 2 - (this.definition.attackRangePx ?? 0);
+      this.y = shield.y - shield.height / 2 - this.sizePx / 2 - (this.definition.attackRangePx ?? 0);
 
       this.model.setState('idle');
       this.attackCooldown -= delta;
