@@ -593,5 +593,91 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
   } else if (evt.type === 'aoeRoot') {
     const attack = new AoeRootFieldAttack(scene, evt.x, evt.y, evt.radius, evt.duration, evt.damage);
     scene.attacks.push(attack);
+  } else if (evt.type === 'spawnTornado') {
+    const tornado = scene.add.image(evt.x, evt.y, 'tornado');
+    
+    const scale = Math.max(0.5, evt.pullRadius / 50);
+    tornado.setScale(scale);
+    tornado.setAlpha(0);
+
+    // Fade in
+    scene.tweens.add({
+      targets: tornado,
+      alpha: 1,
+      duration: 300
+    });
+    
+    // Spin animation
+    scene.tweens.add({
+      targets: tornado,
+      angle: 360,
+      duration: 1000,
+      repeat: -1
+    });
+
+    const endTime = scene.time.now + evt.duration;
+    
+    const tornadoTimer = scene.time.addEvent({
+      delay: 100, // Tick every 100ms
+      loop: true,
+      callback: () => {
+        if (scene.time.now >= endTime || scene.status !== 'playing') {
+          tornadoTimer.remove();
+          scene.tweens.add({
+            targets: tornado,
+            alpha: 0,
+            scale: 0,
+            duration: 300,
+            onComplete: () => tornado.destroy()
+          });
+          return;
+        }
+
+        // 1. Move towards nearest enemy
+        let nearestEnemy = null;
+        let minDistSq = Infinity;
+        for (const e of scene.enemies) {
+          if (e.isDead) continue;
+          const distSq = Phaser.Math.Distance.Squared(tornado.x, tornado.y, e.x, e.y);
+          if (distSq < minDistSq) {
+            minDistSq = distSq;
+            nearestEnemy = e;
+          }
+        }
+
+        if (nearestEnemy) {
+          const angle = Phaser.Math.Angle.Between(tornado.x, tornado.y, nearestEnemy.x, nearestEnemy.y);
+          // Move speed pixels per second => speed / 10 per 100ms
+          const nextX = tornado.x + Math.cos(angle) * (evt.speed / 10);
+          const nextY = tornado.y + Math.sin(angle) * (evt.speed / 10);
+          
+          scene.tweens.add({
+            targets: tornado,
+            x: nextX,
+            y: nextY,
+            duration: 100,
+            ease: 'Linear'
+          });
+        }
+
+        // 2. Pull and damage enemies within radius
+        const hitRadiusSq = evt.pullRadius * evt.pullRadius;
+        for (const e of scene.enemies) {
+          if (e.isDead) continue;
+          const distSq = Phaser.Math.Distance.Squared(tornado.x, tornado.y, e.x, e.y);
+          if (distSq <= hitRadiusSq) {
+            // Apply damage tick (deal `damage` per second -> `damage`/10 per 100ms)
+            e.takeDamage(evt.damage / 10);
+            
+            if (!e.isDead) {
+               // Pull slightly towards tornado center
+               const pullAngle = Phaser.Math.Angle.Between(e.x, e.y, tornado.x, tornado.y);
+               e.x += Math.cos(pullAngle) * 5;
+               e.y += Math.sin(pullAngle) * 5;
+            }
+          }
+        }
+      }
+    });
   }
 }

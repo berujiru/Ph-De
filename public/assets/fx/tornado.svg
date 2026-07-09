@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <!-- Base soft glow -->
+    <radialGradient id="vortexGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f8fafc" stop-opacity="0.15" />
+      <stop offset="30%" stop-color="#cbd5e1" stop-opacity="0.1" />
+      <stop offset="70%" stop-color="#94a3b8" stop-opacity="0.05" />
+      <stop offset="100%" stop-color="#64748b" stop-opacity="0" />
+    </radialGradient>
+    
+    <!-- Inner dense swirl -->
+    <radialGradient id="innerSwirl" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.1" />
+      <stop offset="50%" stop-color="#e2e8f0" stop-opacity="0.05" />
+      <stop offset="100%" stop-color="#94a3b8" stop-opacity="0" />
+    </radialGradient>
+    
+    <!-- Outer dusty swirl -->
+    <radialGradient id="outerDust" cx="50%" cy="50%" r="50%">
+      <stop offset="40%" stop-color="#94a3b8" stop-opacity="0.08" />
+      <stop offset="80%" stop-color="#cbd5e1" stop-opacity="0.03" />
+      <stop offset="100%" stop-color="#f8fafc" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Layer 1: The wide outer dusty base -->
+  <circle cx="50" cy="50" r="48" fill="url(#outerDust)" />
+
+  <!-- Layer 2: Swirling dust patches (soft filled shapes, no strokes) -->
+  <path d="M 50 10 Q 75 15 85 45 Q 65 30 50 25 Q 35 20 50 10 Z" fill="#cbd5e1" opacity="0.05" transform="rotate(20, 50, 50)" />
+  <path d="M 15 60 Q 20 85 50 90 Q 40 70 30 65 Q 20 60 15 60 Z" fill="#94a3b8" opacity="0.05" transform="rotate(45, 50, 50)" />
+  <path d="M 85 65 Q 75 85 50 80 Q 65 65 75 55 Q 85 45 85 65 Z" fill="#e2e8f0" opacity="0.08" transform="rotate(110, 50, 50)" />
+
+  <!-- Layer 3: Main glowing vortex body -->
+  <circle cx="50" cy="50" r="35" fill="url(#vortexGlow)" />
+
+  <!-- Layer 4: Inner dense spinning core with irregular shape -->
+  <path d="M 50 25 C 65 25 70 40 70 50 C 70 65 60 72 50 72 C 35 72 28 60 28 50 C 28 40 35 25 50 25 Z" fill="url(#innerSwirl)" transform="rotate(-30, 50, 50)" />
+  
+  <!-- Layer 5: Small sweeping motion blurs near the core -->
+  <path d="M 40 30 Q 60 30 65 50 Q 55 40 40 38 Z" fill="#ffffff" opacity="0.05" transform="rotate(80, 50, 50)" />
+  <path d="M 50 70 Q 30 70 25 50 Q 35 60 50 62 Z" fill="#ffffff" opacity="0.03" transform="rotate(-60, 50, 50)" />
+
+  <!-- Layer 6: Debris (leaves and trash) caught in the swirling layers -->
+  <g>
+    <!-- Deepest leaf -->
+    <path d="M 75 35 Q 72 32 74 28 Q 78 30 75 35 Z" fill="#4d7c0f" opacity="0.4" transform="rotate(45, 75, 35)"/>
+    
+    <!-- Mid-layer leaves -->
+    <path d="M 25 65 Q 22 62 24 58 Q 28 60 25 65 Z" fill="#84cc16" opacity="0.7" transform="rotate(-30, 25, 65)"/>
+    <path d="M 40 18 Q 37 15 39 11 Q 43 13 40 18 Z" fill="#65a30d" opacity="0.8" transform="rotate(110, 40, 18)"/>
+    
+    <!-- Topmost leaf near core -->
+    <path d="M 58 60 Q 55 57 57 53 Q 61 55 58 60 Z" fill="#a3e635" opacity="0.9" transform="rotate(15, 58, 60)"/>
+
+    <!-- Trash 1: Crumpled paper (white/grey polygon) slightly blurred/transparent -->
+    <polygon points="32,38 35,35 39,37 37,41 33,42" fill="#f1f5f9" opacity="0.8" transform="rotate(25, 35, 38)" />
+
+    <!-- Trash 2: Candy wrapper -->
+    <polygon points="70,55 74,53 76,56 72,59" fill="#ef4444" opacity="0.75" transform="rotate(-20, 73, 56)" />
+    
+    <!-- Trash 3: Small dirt particles -->
+    <circle cx="45" cy="80" r="2.5" fill="#78350f" opacity="0.5" />
+    <circle cx="48" cy="83" r="1.5" fill="#78350f" opacity="0.7" />
+    <circle cx="28" cy="45" r="2" fill="#713f12" opacity="0.6" />
+
+    <!-- Trash 4: Blue plastic scrap -->
+    <path d="M 38 45 L 42 47 L 40 50 Z" fill="#3b82f6" opacity="0.85" transform="rotate(85, 40, 47)"/>
+  </g>
+</svg>

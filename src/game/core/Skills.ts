@@ -218,13 +218,17 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       }
     }
   } else if (skillId === 'street_sweeper') {
-    // Dust Storm: Blind/Slow all
-    for (const e of enemies) {
-      if (!e.isDead) {
-        e.definition.speed *= 0.5;
-        e.definition.damage *= 0.5;
-      }
-    }
+    // Dust Storm: Spawns a tornado that chases enemies, pulls them in, and deals DoT.
+    const bonusRadius = hero.modifiers?.bonusRadius || 0;
+    onVisual({
+      type: 'spawnTornado',
+      x: hero.x,
+      y: hero.y,
+      damage: hero.damage,
+      pullRadius: 250 + bonusRadius,
+      duration: 8000,
+      speed: 300 + bonusRadius
+    });
   } else if (skillId === 'taho_vendor') {
     // Hot Syrup: Strip speed buffs
     for (const e of enemies) {
