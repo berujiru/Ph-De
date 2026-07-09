@@ -17,6 +17,7 @@ import {
   ProjectileAttack,
   PierceAttack,
   RollingBlackoutWaveAttack,
+  FlushWaveAttack,
   AoeRootFieldAttack
 } from '../entities/Attacks';
 import { TrafficLight } from '../entities/fx/TrafficLight';
@@ -465,6 +466,9 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
     }
   } else if (evt.type === 'rollingBlackoutWave') {
     const attack = new RollingBlackoutWaveAttack(scene, scene.shield.y, evt.damage, 0x38bdf8);
+    scene.attacks.push(attack);
+  } else if (evt.type === 'flushWave') {
+    const attack = new FlushWaveAttack(scene, scene.shield.y, evt.damage, evt.numWaves, evt.knockback);
     scene.attacks.push(attack);
   } else if (evt.type === 'expandingCircle') {
     const baseColor = Phaser.Display.Color.HexStringToColor(evt.color).color;

@@ -705,33 +705,62 @@ export class LobbedAttack extends Attack {
 export class LinearWaveAttack extends Attack {
   private speed = 300;
   private maxTravelPx = 900;
-  private startX: number;
+  private startY: number;
   private visual: Phaser.GameObjects.Rectangle;
   private edge: Phaser.GameObjects.Rectangle;
   private hitEnemies = new Set<Enemy>();
 
   constructor(scene: Phaser.Scene, x: number, y: number, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'LinearWaveAttack', damage, modifiers);
-    const waveWidth = 40;
-    const waveHeight = 150 + this.modifiers.bonusRadius * 2;
-    this.startX = x;
-    // Translucent body with a bright, outlined leading edge — reads as a rolling
-    // shockwave rather than a plain sliding block.
-    this.visual = scene.add.rectangle(x, y, waveWidth, waveHeight, color, 0.55);
+    const waveWidth = 150 + this.modifiers.bonusRadius * 2;
+    const waveHeight = 40;
+    this.startY = y;
+    
+    // Translucent body with a bright leading edge
+    this.visual = scene.add.rectangle(x, y, waveWidth, waveHeight, color, 0.6);
     this.visual.setStrokeStyle(2, OUTLINE_COLOR, 0.8);
-    this.edge = scene.add.rectangle(x + waveWidth / 2, y, 6, waveHeight, 0xffffff, 0.85);
+    this.edge = scene.add.rectangle(x, y - waveHeight / 2, waveWidth, 6, 0xffffff, 0.9);
+
+    // Animation improvement: pulse width slightly as it travels
+    scene.tweens.add({
+      targets: [this.visual, this.edge],
+      scaleX: 1.15,
+      yoyo: true,
+      repeat: -1,
+      duration: 200,
+      ease: 'Sine.easeInOut'
+    });
   }
 
   update(_time: number, delta: number) {
     if (this.isDead) return;
-    this.visual.x += this.speed * (delta / 1000);
-    this.edge.setPosition(this.visual.x + this.visual.width / 2, this.visual.y);
+    
+    this.visual.y -= this.speed * (delta / 1000);
+    this.edge.setPosition(this.visual.x, this.visual.y - this.visual.height / 2);
+
+    // Improve animation: spawn trailing particles
+    const particle = this.scene.add.circle(
+      this.visual.x + Phaser.Math.Between(-this.visual.width/2, this.visual.width/2),
+      this.visual.y + this.visual.height/2,
+      Phaser.Math.Between(2, 6),
+      0xffffff,
+      0.6
+    );
+    this.scene.tweens.add({
+      targets: particle,
+      y: particle.y + 30,
+      alpha: 0,
+      scale: 0,
+      duration: 500,
+      onComplete: () => particle.destroy()
+    });
 
     const enemies = (this.scene as any).enemies as Enemy[];
     if (enemies) {
       for (const enemy of enemies) {
         if (!enemy.isDead && !this.hitEnemies.has(enemy)) {
-          if (Math.abs(enemy.x - this.visual.x) < this.visual.width / 2 + 15 &&
+          // Expanded hit box to account for visual scale pulse
+          if (Math.abs(enemy.x - this.visual.x) < (this.visual.width * 1.15) / 2 + 15 &&
               Math.abs(enemy.y - this.visual.y) < this.visual.height / 2 + 15) {
             enemy.takeDamage(this.totalDamage);
             this.hitEnemies.add(enemy);
@@ -740,7 +769,7 @@ export class LinearWaveAttack extends Attack {
       }
     }
     
-    if (this.visual.x - this.startX > this.maxTravelPx) {
+    if (this.startY - this.visual.y > this.maxTravelPx) {
       this.isDead = true;
       this.edge.destroy();
       this.visual.destroy();
@@ -996,6 +1025,109 @@ export class RollingBlackoutWaveAttack extends Attack {
           // If enemy's y is close to the wave's y
           if (Math.abs(enemy.y - this.waveGraphic.y) < 60) {
             enemy.takeDamage(this.totalDamage);
+            this.hitEnemies.add(enemy);
+          }
+        }
+      }
+    }
+  }
+}
+
+export class FlushWaveAttack extends Attack {
+  private speed = 300;
+  private hitEnemies = new Set<Enemy>();
+  private knockbackDist: number;
+  private startY: number;
+  private visual: Phaser.GameObjects.Rectangle;
+  private edge: Phaser.GameObjects.Rectangle;
+
+  constructor(scene: Phaser.Scene, y: number, damage: number, numWaves: number, knockback: number) {
+    super(scene, 'FlushWaveAttack', damage);
+    this.knockbackDist = knockback;
+    this.startY = y;
+
+    // Plumber's color (water)
+    const color = 0x38bdf8;
+    const waveWidth = scene.scale.width + 200; // Massive width to cover screen
+    const waveHeight = 80 + (numWaves * 15);   // Scale height based on drops
+
+    this.visual = scene.add.rectangle(scene.scale.width / 2, y, waveWidth, waveHeight, color, 0.65);
+    this.visual.setStrokeStyle(2, OUTLINE_COLOR, 0.8);
+    this.visual.setDepth(30);
+
+    this.edge = scene.add.rectangle(scene.scale.width / 2, y - waveHeight / 2, waveWidth, 12, 0xffffff, 0.9);
+    this.edge.setDepth(31);
+
+    // Pulse width animation
+    scene.tweens.add({
+      targets: [this.visual, this.edge],
+      scaleX: 1.05,
+      yoyo: true,
+      repeat: -1,
+      duration: 300,
+      ease: 'Sine.easeInOut'
+    });
+  }
+
+  update(_time: number, delta: number) {
+    if (this.isDead) return;
+
+    this.visual.y -= this.speed * (delta / 1000);
+    this.edge.setPosition(this.visual.x, this.visual.y - this.visual.height / 2);
+
+    // Fade out only at the very end of its travel
+    const deathY = this.scene.cameras.main.scrollY - 200;
+    const distToDeath = this.visual.y - deathY;
+    const fadeRatio = distToDeath < 250 ? Math.max(0, distToDeath / 250) : 1;
+    
+    this.visual.setAlpha(0.65 * fadeRatio);
+    this.edge.setAlpha(0.9 * fadeRatio);
+
+    // Trail particles
+    if (fadeRatio > 0.1) {
+      const particle = this.scene.add.circle(
+        this.visual.x + Phaser.Math.Between(-this.visual.width/2, this.visual.width/2),
+        this.visual.y + this.visual.height/2,
+        Phaser.Math.Between(4, 12),
+        0xffffff,
+        0.5 * fadeRatio
+      );
+      particle.setDepth(29);
+      this.scene.tweens.add({
+        targets: particle,
+        y: particle.y + 40,
+        alpha: 0,
+        scale: 0,
+        duration: 700,
+        onComplete: () => particle.destroy()
+      });
+    }
+
+    if (this.visual.y < this.scene.cameras.main.scrollY - 200) {
+      this.isDead = true;
+      this.edge.destroy();
+      this.visual.destroy();
+      this.destroy();
+      return;
+    }
+
+    const enemies = (this.scene as any).enemies as Enemy[];
+    if (enemies) {
+      for (const enemy of enemies) {
+        if (!enemy.isDead && !this.hitEnemies.has(enemy)) {
+          const distY = Math.abs(enemy.y - this.visual.y);
+          
+          if (distY < this.visual.height / 2 + 30) {
+            enemy.takeDamage(this.totalDamage);
+            enemy.applyAilment('slow', 100, 4000);
+            
+            this.scene.tweens.add({
+              targets: enemy,
+              y: enemy.y - this.knockbackDist,
+              duration: 300,
+              ease: 'Power2'
+            });
+
             this.hitEnemies.add(enemy);
           }
         }

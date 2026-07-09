@@ -406,7 +406,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 2400,
     color: 0x2563eb,
     purpose: 'High-pressure wave that hits the whole line, nudges enemies back, and soaks them Wet for combo setups.',
-    signatureSkill: { name: 'Flush', description: 'Sends a massive wave that instantly washes away all enemy Summons.' },
+    signatureSkill: { name: 'Flush', description: 'Sends 3 water waves sweeping up the lane, dealing damage, knocking enemies back, and leaving a lingering slow.' },
     passive: { name: 'High Pressure', description: 'Normal attacks push enemies backward slightly.' },
   },
   delivery_rider: {

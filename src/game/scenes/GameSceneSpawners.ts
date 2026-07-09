@@ -92,7 +92,7 @@ export function spawnHero(scene: GameScene, id: HeroId, passiveOverride?: string
       attack = new LobbedAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, color, mods);
       h.playProjectileLaunch();
     } else if (h.definition.attackStyle === 'linear-wave') {
-      attack = new LinearWaveAttack(scene, h.muzzleX, h.muzzleY, h.damage, color, mods);
+      attack = new LinearWaveAttack(scene, target.x, h.muzzleY, h.damage, color, mods);
     } else if (h.definition.attackStyle === 'trap') {
       attack = new TrapAttack(scene, h.x, h.y, target, h.damage, color, mods);
     } else if (h.definition.attackStyle === 'pierce') {

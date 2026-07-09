@@ -294,12 +294,21 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       }
     }
   } else if (skillId === 'plumber') {
-    // Flush: Wash away summons
-    for (const e of enemies) {
-      if (!e.isDead && (e.id === 'grunt' || e.id === 'the_overpriced')) {
-        e.takeDamage(9999);
-      }
-    }
+    const bonusProjectiles = hero.modifiers?.bonusProjectiles || 0;
+    const bonusDamage = hero.modifiers?.bonusDamage || 0;
+    const bonusPierce = hero.modifiers?.bonusPierce || 0;
+
+    const numWaves = 3 + bonusProjectiles;
+    const damage = (hero.damage * 0.8) + (bonusDamage * 2);
+    const knockback = 100 + bonusPierce * 30;
+
+    onVisual({
+      type: 'flushWave',
+      numWaves,
+      damage,
+      knockback,
+      color: 0x2563eb
+    });
   } else if (skillId === 'delivery_rider') {
     // Dine & Dash — sweep UP the lane toward the enemies, spread across X.
     const bonusRadius = hero.modifiers?.bonusRadius || 0;
