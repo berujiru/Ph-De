@@ -7,6 +7,7 @@ import type { ISkillEnemy } from '../core/Skills';
 import { EnemyModel } from './models/EnemyModel';
 import { spawnDamageNumber } from './fx/FloatingText';
 import { spawnHitSpark, spawnDeathBurst } from './fx/ImpactFx';
+import { spawnShockwaveRing } from './fx/ShockwaveRing';
 import { cameraPunch } from './fx/CameraPunch';
 import { SpriteAura } from './fx/SpriteAura';
 import { FX } from '../data/level';
@@ -433,13 +434,12 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       this.definition.speed *= 3;
 
       // Visual cue
-      const flash = this.scene.add.circle(this.x, this.y, 30, 0xef4444, 0.5);
-      this.scene.tweens.add({
-        targets: flash,
-        scale: 4,
-        alpha: 0,
-        duration: 1000,
-        onComplete: () => flash.destroy()
+      spawnShockwaveRing(this.scene, {
+        x: this.x, y: this.y,
+        color: 0xef4444,
+        startRadius: 30, endRadius: 120,
+        fillAlpha: 0.5, strokeWidth: 0,
+        durationMs: 1000, ease: 'Linear',
       });
 
       // Reset after 3 seconds
@@ -482,13 +482,12 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
         this.scene.events.emit('heroKnockback', { source: this, force: 100 });
 
         // Visual pulse
-        const wave = this.scene.add.circle(this.x, this.y, 15, this.definition.color, 0.5);
-        this.scene.tweens.add({
-          targets: wave,
-          scale: 4,
-          alpha: 0,
-          duration: 500,
-          onComplete: () => wave.destroy()
+        spawnShockwaveRing(this.scene, {
+          x: this.x, y: this.y,
+          color: this.definition.color,
+          startRadius: 15, endRadius: 60,
+          fillAlpha: 0.5, strokeWidth: 0,
+          durationMs: 500, ease: 'Linear',
         });
       }
     }

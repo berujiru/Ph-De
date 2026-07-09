@@ -4,6 +4,9 @@ import { Summon } from './Summon';
 import { GAME_WIDTH, WORLD_HEIGHT } from '../data/level';
 import { MotionTrail } from './fx/MotionTrail';
 import { spawnHitSpark } from './fx/ImpactFx';
+import { spawnShockwaveRing } from './fx/ShockwaveRing';
+import { AreaOverlay } from './fx/AreaOverlay';
+import { LaneWave } from './fx/LaneWave';
 
 /** Bold cel-shaded outline every attack shape wears against the dark field. */
 const OUTLINE_COLOR = 0x0f172a;
@@ -684,22 +687,19 @@ export class LobbedAttack extends Attack {
     }
 
     // Crater flash: a filled pop plus an expanding shockwave ring and sparks.
-    const flash = this.scene.add.circle(this.targetX, this.targetY, radius, 0xffaa00, 0.5);
-    this.scene.tweens.add({
-      targets: flash,
-      alpha: 0,
-      duration: 200,
-      onComplete: () => flash.destroy()
+    spawnShockwaveRing(this.scene, {
+      x: this.targetX, y: this.targetY,
+      color: 0xffaa00,
+      startRadius: radius, endRadius: radius,
+      fillAlpha: 0.5, strokeWidth: 0,
+      durationMs: 200, ease: 'Linear',
     });
-    const ring = this.scene.add.circle(this.targetX, this.targetY, radius * 0.5, 0xffaa00, 0);
-    ring.setStrokeStyle(3, 0xffd27f, 0.9);
-    this.scene.tweens.add({
-      targets: ring,
-      scale: 2,
-      alpha: 0,
-      duration: 260,
-      ease: 'Quad.easeOut',
-      onComplete: () => ring.destroy()
+    spawnShockwaveRing(this.scene, {
+      x: this.targetX, y: this.targetY,
+      color: 0xffaa00,
+      startRadius: radius * 0.5, endRadius: radius,
+      strokeWidth: 3, strokeColor: 0xffd27f, strokeAlpha: 0.9,
+      durationMs: 260,
     });
     spawnHitSpark(this.scene, this.targetX, this.targetY, 0xffd27f);
 
@@ -714,73 +714,47 @@ export class LinearWaveAttack extends Attack {
   private speed = 300;
   private maxTravelPx = 900;
   private startY: number;
-  private visual: Phaser.GameObjects.Rectangle;
-  private edge: Phaser.GameObjects.Rectangle;
+  private wave: LaneWave;
   private hitEnemies = new Set<Enemy>();
 
   constructor(scene: Phaser.Scene, x: number, y: number, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'LinearWaveAttack', damage, modifiers);
-    const waveWidth = 150 + this.modifiers.bonusRadius * 2;
-    const waveHeight = 40;
     this.startY = y;
-    
-    // Translucent body with a bright leading edge
-    this.visual = scene.add.rectangle(x, y, waveWidth, waveHeight, color, 0.6);
-    this.visual.setStrokeStyle(2, OUTLINE_COLOR, 0.8);
-    this.edge = scene.add.rectangle(x, y - waveHeight / 2, waveWidth, 6, 0xffffff, 0.9);
 
-    // Animation improvement: pulse width slightly as it travels
-    scene.tweens.add({
-      targets: [this.visual, this.edge],
-      scaleX: 1.15,
-      yoyo: true,
-      repeat: -1,
-      duration: 200,
-      ease: 'Sine.easeInOut'
+    this.wave = new LaneWave(scene, {
+      x, y,
+      width: 150 + this.modifiers.bonusRadius * 2,
+      height: 40,
+      color,
+      bodyAlpha: 0.6,
+      pulse: { scaleX: 1.15, durationMs: 200 },
+      particles: { minRadius: 2, maxRadius: 6, alpha: 0.6, fallPx: 30, durationMs: 500 },
     });
   }
 
   update(_time: number, delta: number) {
     if (this.isDead) return;
-    
-    this.visual.y -= this.speed * (delta / 1000);
-    this.edge.setPosition(this.visual.x, this.visual.y - this.visual.height / 2);
 
-    // Improve animation: spawn trailing particles
-    const particle = this.scene.add.circle(
-      this.visual.x + Phaser.Math.Between(-this.visual.width/2, this.visual.width/2),
-      this.visual.y + this.visual.height/2,
-      Phaser.Math.Between(2, 6),
-      0xffffff,
-      0.6
-    );
-    this.scene.tweens.add({
-      targets: particle,
-      y: particle.y + 30,
-      alpha: 0,
-      scale: 0,
-      duration: 500,
-      onComplete: () => particle.destroy()
-    });
+    this.wave.setY(this.wave.y - this.speed * (delta / 1000));
+    this.wave.emitTrailParticle();
 
     const enemies = (this.scene as any).enemies as Enemy[];
     if (enemies) {
       for (const enemy of enemies) {
         if (!enemy.isDead && !this.hitEnemies.has(enemy)) {
           // Expanded hit box to account for visual scale pulse
-          if (Math.abs(enemy.x - this.visual.x) < (this.visual.width * 1.15) / 2 + 15 &&
-              Math.abs(enemy.y - this.visual.y) < this.visual.height / 2 + 15) {
+          if (Math.abs(enemy.x - this.wave.x) < (this.wave.width * 1.15) / 2 + 15 &&
+              Math.abs(enemy.y - this.wave.y) < this.wave.height / 2 + 15) {
             enemy.takeDamage(this.totalDamage);
             this.hitEnemies.add(enemy);
           }
         }
       }
     }
-    
-    if (this.startY - this.visual.y > this.maxTravelPx) {
+
+    if (this.startY - this.wave.y > this.maxTravelPx) {
       this.isDead = true;
-      this.edge.destroy();
-      this.visual.destroy();
+      this.wave.destroy();
       this.destroy();
     }
   }
@@ -846,22 +820,19 @@ export class TrapAttack extends Attack {
       }
     }
     
-    const flash = this.scene.add.circle(this.visual.x, this.visual.y, radius, 0xff0000, 0.5);
-    this.scene.tweens.add({
-      targets: flash,
-      alpha: 0,
-      duration: 200,
-      onComplete: () => flash.destroy()
+    spawnShockwaveRing(this.scene, {
+      x: this.visual.x, y: this.visual.y,
+      color: 0xff0000,
+      startRadius: radius, endRadius: radius,
+      fillAlpha: 0.5, strokeWidth: 0,
+      durationMs: 200, ease: 'Linear',
     });
-    const ring = this.scene.add.circle(this.visual.x, this.visual.y, radius * 0.5, 0xff0000, 0);
-    ring.setStrokeStyle(3, 0xfca5a5, 0.9);
-    this.scene.tweens.add({
-      targets: ring,
-      scale: 2,
-      alpha: 0,
-      duration: 260,
-      ease: 'Quad.easeOut',
-      onComplete: () => ring.destroy()
+    spawnShockwaveRing(this.scene, {
+      x: this.visual.x, y: this.visual.y,
+      color: 0xff0000,
+      startRadius: radius * 0.5, endRadius: radius,
+      strokeWidth: 3, strokeColor: 0xfca5a5, strokeAlpha: 0.9,
+      durationMs: 260,
     });
     spawnHitSpark(this.scene, this.visual.x, this.visual.y, 0xfca5a5);
 
@@ -879,9 +850,7 @@ export class AoeRootFieldAttack extends Attack {
   private radius: number;
   private xPos: number;
   private yPos: number;
-  private groundVisual: Phaser.GameObjects.Graphics;
-  private lightningIcon: Phaser.GameObjects.Text;
-  private pulsingCircles: Phaser.GameObjects.Graphics;
+  private overlay: AreaOverlay;
 
   constructor(scene: Phaser.Scene, x: number, y: number, radius: number, duration: number, damage: number) {
     super(scene, 'AoeRootFieldAttack', damage);
@@ -889,41 +858,13 @@ export class AoeRootFieldAttack extends Attack {
     this.yPos = y;
     this.radius = radius;
     this.durationMs = duration;
-    
-    // Outer glowing ring (STATIC)
-    this.groundVisual = scene.add.graphics();
-    this.groundVisual.setPosition(x, y);
-    this.groundVisual.lineStyle(6, 0xeab308, 0.8);
-    this.groundVisual.strokeCircle(0, 0, radius);
 
-    // Pulsing circle lines within the AoE
-    this.pulsingCircles = scene.add.graphics();
-    this.pulsingCircles.setPosition(x, y);
-    this.pulsingCircles.lineStyle(2, 0xfef08a, 0.6);
-    this.pulsingCircles.strokeCircle(0, 0, radius * 0.4);
-    this.pulsingCircles.strokeCircle(0, 0, radius * 0.8);
-    
-    scene.tweens.add({
-      targets: this.pulsingCircles,
-      scaleX: 1.15,
-      scaleY: 1.15,
-      alpha: 0.3,
-      duration: 800,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut'
-    });
-
-    // 1 big lightning icon in the middle
-    this.lightningIcon = scene.add.text(x, y, '⚡', { fontSize: '42px' }).setOrigin(0.5);
-    scene.tweens.add({
-      targets: this.lightningIcon,
-      scaleX: 1.15,
-      scaleY: 1.15,
-      duration: 500,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut'
+    this.overlay = new AreaOverlay(scene, {
+      x, y, radius,
+      strokeColor: 0xeab308, strokeWidth: 6, strokeAlpha: 0.8,
+      innerRings: { fractions: [0.4, 0.8], color: 0xfef08a, width: 2, alpha: 0.6 },
+      pulse: { scale: 1.15, alphaTo: 0.3, durationMs: 800 },
+      centerIcon: { text: '⚡', fontSize: '42px' },
     });
   }
 
@@ -932,9 +873,7 @@ export class AoeRootFieldAttack extends Attack {
     this.ageMs += delta;
     if (this.ageMs >= this.durationMs) {
       this.isDead = true;
-      this.groundVisual.destroy();
-      this.pulsingCircles.destroy();
-      this.lightningIcon.destroy();
+      this.overlay.destroy();
       this.destroy();
       return;
     }
@@ -967,7 +906,7 @@ export class AoeFirePatchAttack extends Attack {
   private radius: number;
   private xPos: number;
   private yPos: number;
-  private groundVisual: Phaser.GameObjects.Graphics;
+  private overlay: AreaOverlay;
 
   constructor(scene: Phaser.Scene, x: number, y: number, radius: number, duration: number, damage: number) {
     super(scene, 'AoeFirePatchAttack', damage);
@@ -975,29 +914,13 @@ export class AoeFirePatchAttack extends Attack {
     this.yPos = y;
     this.radius = radius;
     this.durationMs = duration;
-    
+
     // Very subtle border, mostly a glowing puddle
-    this.groundVisual = scene.add.graphics();
-    this.groundVisual.setPosition(x, y);
-    
-    // Fill with soft orange/red
-    this.groundVisual.fillStyle(0xff4500, 0.25);
-    this.groundVisual.fillCircle(0, 0, radius);
-    
-    // Faint stroke
-    this.groundVisual.lineStyle(2, 0xffa500, 0.15);
-    this.groundVisual.strokeCircle(0, 0, radius);
-    
-    // Pulsing effect
-    scene.tweens.add({
-      targets: this.groundVisual,
-      alpha: 0.6,
-      scaleX: 1.05,
-      scaleY: 1.05,
-      duration: 1000,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut'
+    this.overlay = new AreaOverlay(scene, {
+      x, y, radius,
+      fillColor: 0xff4500, fillAlpha: 0.25,
+      strokeColor: 0xffa500, strokeWidth: 2, strokeAlpha: 0.15,
+      pulse: { scale: 1.05, alphaTo: 0.6, durationMs: 1000 },
     });
   }
 
@@ -1005,10 +928,10 @@ export class AoeFirePatchAttack extends Attack {
     if (this.isDead) return;
     this.ageMs += delta;
     this.lastTickMs += delta;
-    
+
     if (this.ageMs >= this.durationMs) {
       this.isDead = true;
-      this.groundVisual.destroy();
+      this.overlay.destroy();
       this.destroy();
       return;
     }
@@ -1028,6 +951,155 @@ export class AoeFirePatchAttack extends Attack {
                 enemy.takeDamage(this.damage);
               }
             }
+          }
+        }
+      }
+    }
+  }
+}
+
+export class TornadoAttack extends Attack {
+  private durationMs: number;
+  private ageMs = 0;
+  private tickMs = 0;
+  private pullRadius: number;
+  private speed: number;
+  private xPos: number;
+  private yPos: number;
+  private overlay: AreaOverlay;
+
+  constructor(scene: Phaser.Scene, x: number, y: number, damage: number, pullRadius: number, duration: number, speed: number) {
+    super(scene, 'TornadoAttack', damage);
+    this.xPos = x;
+    this.yPos = y;
+    this.pullRadius = pullRadius;
+    this.durationMs = duration;
+    this.speed = speed;
+
+    this.overlay = new AreaOverlay(scene, {
+      x, y,
+      radius: pullRadius,
+      svgKey: 'tornado',
+      svgScale: Math.max(0.5, pullRadius / 50),
+      svgSpin: 360,
+      enter: { durationMs: 300 },
+    });
+  }
+
+  update(_time: number, delta: number) {
+    if (this.isDead) return;
+    this.ageMs += delta;
+    if (this.ageMs >= this.durationMs) {
+      this.isDead = true;
+      this.overlay.fadeOutAndDestroy(300, true);
+      this.destroy();
+      return;
+    }
+
+    const enemies = (this.scene as any).enemies as Enemy[];
+
+    // Chase the nearest living enemy, smoothly per frame.
+    let nearest: Enemy | null = null;
+    let minDistSq = Infinity;
+    if (enemies) {
+      for (const e of enemies) {
+        if (e.isDead) continue;
+        const dx = e.x - this.xPos;
+        const dy = e.y - this.yPos;
+        const distSq = dx * dx + dy * dy;
+        if (distSq < minDistSq) {
+          minDistSq = distSq;
+          nearest = e;
+        }
+      }
+    }
+    if (nearest) {
+      const angle = Math.atan2(nearest.y - this.yPos, nearest.x - this.xPos);
+      const step = this.speed * (delta / 1000);
+      this.xPos += Math.cos(angle) * step;
+      this.yPos += Math.sin(angle) * step;
+      this.overlay.setPosition(this.xPos, this.yPos);
+    }
+
+    // Damage + pull tick every 100ms (damage is per second, so 1/10 per tick).
+    this.tickMs += delta;
+    if (this.tickMs >= 100) {
+      this.tickMs -= 100;
+      if (enemies) {
+        const radiusSq = this.pullRadius * this.pullRadius;
+        for (const e of enemies) {
+          if (e.isDead) continue;
+          const dx = e.x - this.xPos;
+          const dy = e.y - this.yPos;
+          if (dx * dx + dy * dy <= radiusSq) {
+            e.takeDamage(this.damage / 10);
+            if (!e.isDead) {
+              const pullAngle = Math.atan2(this.yPos - e.y, this.xPos - e.x);
+              e.x += Math.cos(pullAngle) * 5;
+              e.y += Math.sin(pullAngle) * 5;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+export class TreeOfLifeFieldAttack extends Attack {
+  private durationMs: number;
+  private ageMs = 0;
+  private tickMs = 0;
+  private radius: number;
+  private xPos: number;
+  private yPos: number;
+  private overlay: AreaOverlay;
+
+  constructor(scene: Phaser.Scene, x: number, y: number, radius: number, duration: number, damage: number) {
+    super(scene, 'TreeOfLifeFieldAttack', damage);
+    this.xPos = x;
+    this.yPos = y;
+    this.radius = radius;
+    this.durationMs = duration;
+
+    this.overlay = new AreaOverlay(scene, {
+      x, y, radius,
+      fillColor: 0xfef08a, fillAlpha: 0.15,
+      strokeColor: 0xeab308, strokeWidth: 2, strokeAlpha: 0.5,
+      svgKey: 'tree_of_life',
+      svgOriginY: 1,
+      svgPulse: true,
+      enter: { durationMs: 500, ease: 'Back.out', fromScale: 0.5 },
+    });
+  }
+
+  update(_time: number, delta: number) {
+    if (this.isDead) return;
+    this.ageMs += delta;
+    if (this.ageMs >= this.durationMs) {
+      this.isDead = true;
+      this.overlay.fadeOutAndDestroy(1000);
+      this.destroy();
+      return;
+    }
+
+    // Root + damage pulse every 2 seconds.
+    this.tickMs += delta;
+    if (this.tickMs >= 2000) {
+      this.tickMs -= 2000;
+      this.overlay.pulseOnce();
+
+      const enemies = (this.scene as any).enemies as Enemy[];
+      if (enemies) {
+        const radiusSq = this.radius * this.radius;
+        for (const e of enemies) {
+          if (e.isDead) continue;
+          const dx = e.x - this.xPos;
+          const dy = e.y - this.yPos;
+          if (dx * dx + dy * dy <= radiusSq) {
+            e.applyAilment('root', 100, 1000);
+            e.takeDamage(this.damage);
+            const txt = this.scene.add.text(e.x, e.y - 30, 'ROOTED!', { color: '#22c55e', fontStyle: 'bold' }).setOrigin(0.5);
+            this.scene.tweens.add({ targets: txt, y: e.y - 60, alpha: 0, duration: 1000, onComplete: () => txt.destroy() });
           }
         }
       }
@@ -1120,74 +1192,44 @@ export class FlushWaveAttack extends Attack {
   private speed = 300;
   private hitEnemies = new Set<Enemy>();
   private knockbackDist: number;
-  private visual: Phaser.GameObjects.Rectangle;
-  private edge: Phaser.GameObjects.Rectangle;
+  private wave: LaneWave;
 
   constructor(scene: Phaser.Scene, y: number, damage: number, numWaves: number, knockback: number) {
     super(scene, 'FlushWaveAttack', damage);
     this.knockbackDist = knockback;
 
-    // Plumber's color (water)
-    const color = 0x38bdf8;
-    const waveWidth = scene.scale.width + 200; // Massive width to cover screen
-    const waveHeight = 80 + (numWaves * 15);   // Scale height based on drops
-
-    this.visual = scene.add.rectangle(scene.scale.width / 2, y, waveWidth, waveHeight, color, 0.65);
-    this.visual.setStrokeStyle(2, OUTLINE_COLOR, 0.8);
-    this.visual.setDepth(30);
-
-    this.edge = scene.add.rectangle(scene.scale.width / 2, y - waveHeight / 2, waveWidth, 12, 0xffffff, 0.9);
-    this.edge.setDepth(31);
-
-    // Pulse width animation
-    scene.tweens.add({
-      targets: [this.visual, this.edge],
-      scaleX: 1.05,
-      yoyo: true,
-      repeat: -1,
-      duration: 300,
-      ease: 'Sine.easeInOut'
+    this.wave = new LaneWave(scene, {
+      x: scene.scale.width / 2,
+      y,
+      width: scene.scale.width + 200, // Massive width to cover screen
+      height: 80 + (numWaves * 15),   // Scale height based on drops
+      color: 0x38bdf8,                // Plumber's color (water)
+      bodyAlpha: 0.65,
+      edgeHeight: 12,
+      pulse: { scaleX: 1.05, durationMs: 300 },
+      particles: { minRadius: 4, maxRadius: 12, alpha: 0.5, fallPx: 40, durationMs: 700, depth: 29 },
+      depth: { body: 30, edge: 31 },
     });
   }
 
   update(_time: number, delta: number) {
     if (this.isDead) return;
 
-    this.visual.y -= this.speed * (delta / 1000);
-    this.edge.setPosition(this.visual.x, this.visual.y - this.visual.height / 2);
+    this.wave.setY(this.wave.y - this.speed * (delta / 1000));
 
     // Fade out only at the very end of its travel
     const deathY = this.scene.cameras.main.scrollY - 200;
-    const distToDeath = this.visual.y - deathY;
+    const distToDeath = this.wave.y - deathY;
     const fadeRatio = distToDeath < 250 ? Math.max(0, distToDeath / 250) : 1;
-    
-    this.visual.setAlpha(0.65 * fadeRatio);
-    this.edge.setAlpha(0.9 * fadeRatio);
+    this.wave.setFade(fadeRatio);
 
-    // Trail particles
     if (fadeRatio > 0.1) {
-      const particle = this.scene.add.circle(
-        this.visual.x + Phaser.Math.Between(-this.visual.width/2, this.visual.width/2),
-        this.visual.y + this.visual.height/2,
-        Phaser.Math.Between(4, 12),
-        0xffffff,
-        0.5 * fadeRatio
-      );
-      particle.setDepth(29);
-      this.scene.tweens.add({
-        targets: particle,
-        y: particle.y + 40,
-        alpha: 0,
-        scale: 0,
-        duration: 700,
-        onComplete: () => particle.destroy()
-      });
+      this.wave.emitTrailParticle(fadeRatio);
     }
 
-    if (this.visual.y < this.scene.cameras.main.scrollY - 200) {
+    if (this.wave.y < this.scene.cameras.main.scrollY - 200) {
       this.isDead = true;
-      this.edge.destroy();
-      this.visual.destroy();
+      this.wave.destroy();
       this.destroy();
       return;
     }
@@ -1196,12 +1238,12 @@ export class FlushWaveAttack extends Attack {
     if (enemies) {
       for (const enemy of enemies) {
         if (!enemy.isDead && !this.hitEnemies.has(enemy)) {
-          const distY = Math.abs(enemy.y - this.visual.y);
-          
-          if (distY < this.visual.height / 2 + 30) {
+          const distY = Math.abs(enemy.y - this.wave.y);
+
+          if (distY < this.wave.height / 2 + 30) {
             enemy.takeDamage(this.totalDamage);
             enemy.applyAilment('slow', 100, 4000);
-            
+
             this.scene.tweens.add({
               targets: enemy,
               y: enemy.y - this.knockbackDist,

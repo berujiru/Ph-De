@@ -30,6 +30,16 @@ type-specific special case anywhere outside `src/game/data/balance.ts`, stop
 entity/scene code. Flag it to the game-designer agent if the data model
 doesn't support it yet.
 
+Ground/area skill visuals (AoE circles, cones, expanding rings, lane waves,
+SVG ground images) go through the shared components in
+`src/game/entities/fx/` — `AreaOverlay`, `spawnConeFlash`,
+`spawnShockwaveRing`, `LaneWave`. A new inline `scene.add.graphics()` /
+`scene.add.circle()` ground-effect block in `scenes/` or a new bespoke
+drawing in an `Attack` constructor is a review-blocker; per-skill differences
+(size, color, duration, `svgKey`) are event-payload data, not new drawing
+code. The canonical rule + component catalog is in `docs/ADDING_HEROES.md`
+Step C.
+
 When a new enemy needs actual behavior (armor, flying, shields, split-on-
 death — not just a new stat combination), `docs/ADDING_ENEMIES.md`'s "when
 you need more than data" section has the concrete pattern for where each
@@ -86,3 +96,8 @@ Format: `{"changed_files": [...], "events_added": [...], "ready_for_ui": true, "
   this.enemies.filter(...)`) calling `.destroy()` — don't call `.destroy()`
   on an entity and also leave it in `this.enemies`/`this.towers`, that's a
   dangling reference to a destroyed Phaser object.
+- Timed fields (DoT patches, root fields, chasing hazards) are `Attack`
+  subclasses ticked by `update(delta)` from `GameScene.update` — never
+  `scene.time.addEvent` loops. `addEvent` runs on wall-clock, so the field
+  keeps dealing damage while the game is paused and ignores the game-speed
+  multiplier.

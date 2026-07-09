@@ -19,9 +19,14 @@ import {
   RollingBlackoutWaveAttack,
   FlushWaveAttack,
   AoeRootFieldAttack,
-  AoeFirePatchAttack
+  AoeFirePatchAttack,
+  TornadoAttack,
+  TreeOfLifeFieldAttack
 } from '../entities/Attacks';
 import { TrafficLight } from '../entities/fx/TrafficLight';
+import { spawnShockwaveRing } from '../entities/fx/ShockwaveRing';
+import { spawnConeFlash } from '../entities/fx/ConeFlash';
+import { AreaOverlay } from '../entities/fx/AreaOverlay';
 
 export function setupUIEvents(scene: GameScene): () => void {
   const unsubStart = uiToGameEvents.on('startWave', () => {
@@ -475,22 +480,21 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
     scene.attacks.push(attack);
   } else if (evt.type === 'expandingCircle') {
     const baseColor = Phaser.Display.Color.HexStringToColor(evt.color).color;
-    
-    for (let i = 0; i < 4; i++) {
-      const circle = scene.add.circle(evt.x, evt.y, 10, baseColor, 0.15);
-      circle.setStrokeStyle(8 - (i * 1.5), baseColor, 0.8);
-      circle.setBlendMode(Phaser.BlendModes.ADD);
-      
-      scene.tweens.add({
-        targets: circle,
-        radius: evt.maxRadius,
-        alpha: 0,
-        duration: evt.duration * 1.2,
-        delay: i * 150, 
-        ease: 'Sine.easeOut',
-        onComplete: () => circle.destroy()
-      });
-    }
+    spawnShockwaveRing(scene, {
+      x: evt.x, y: evt.y,
+      color: baseColor,
+      startRadius: 10,
+      endRadius: evt.maxRadius,
+      rings: 4,
+      ringDelayMs: 150,
+      durationMs: evt.duration * 1.2,
+      fillAlpha: 0.15,
+      strokeWidth: 8,
+      strokeWidthStep: 1.5,
+      strokeAlpha: 0.8,
+      blendMode: Phaser.BlendModes.ADD,
+      ease: 'Sine.easeOut',
+    });
   } else if (evt.type === 'trafficLights') {
     const startY = RALLY.shieldStartY - 20;
     const endY = scene.cameras.main.scrollY + 100;
@@ -506,35 +510,18 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
     const hero = evt.hero;
     const length = evt.length;
     const angle = evt.angle;
-    const spreadAngle = Math.PI / 6; 
-    
-    const graphics = scene.add.graphics();
-    graphics.fillStyle(0x10b981, 0.1); 
-    graphics.beginPath();
-    
-    const startX = hero.x + Math.cos(angle) * 20;
-    const startY = hero.y + Math.sin(angle) * 20;
-    graphics.moveTo(startX, startY); 
-    
-    const p1X = startX + Math.cos(angle - spreadAngle) * length;
-    const p1Y = startY + Math.sin(angle - spreadAngle) * length;
-    const p2X = startX + Math.cos(angle + spreadAngle) * length;
-    const p2Y = startY + Math.sin(angle + spreadAngle) * length;
-    
-    graphics.lineTo(p1X, p1Y);
-    graphics.lineTo(p2X, p2Y);
-    graphics.closePath();
-    graphics.fillPath();
-    graphics.setBlendMode(Phaser.BlendModes.ADD);
+    const spreadAngle = Math.PI / 6;
 
-    scene.tweens.add({
-      targets: graphics,
-      alpha: 0,
-      duration: 300,
-      ease: 'Power2',
-      onComplete: () => graphics.destroy()
+    spawnConeFlash(scene, {
+      x: hero.x, y: hero.y,
+      angle, length,
+      color: 0x10b981, alpha: 0.1,
+      fadeMs: 300, ease: 'Power2',
     });
 
+    // Coin shrapnel scattering inside the cone — unique to this skill.
+    const startX = hero.x + Math.cos(angle) * 20;
+    const startY = hero.y + Math.sin(angle) * 20;
     for (let i = 0; i < 12; i++) {
       const pAngle = angle + (Math.random() * spreadAngle * 2) - spreadAngle;
       const travelDuration = 250 + Math.random() * 150; 
@@ -562,36 +549,11 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
       });
     }
   } else if (evt.type === 'flashlightCone') {
-    const hero = evt.hero;
-    const length = evt.length;
-    const angle = evt.angle; 
-    const spreadAngle = Math.PI / 6; 
-    
-    const graphics = scene.add.graphics();
-    graphics.fillStyle(0xfffbeb, 0.4); 
-    graphics.beginPath();
-    
-    const startX = hero.x + Math.cos(angle) * 20;
-    const startY = hero.y + Math.sin(angle) * 20;
-    graphics.moveTo(startX, startY); 
-    
-    const p1X = startX + Math.cos(angle - spreadAngle) * length;
-    const p1Y = startY + Math.sin(angle - spreadAngle) * length;
-    const p2X = startX + Math.cos(angle + spreadAngle) * length;
-    const p2Y = startY + Math.sin(angle + spreadAngle) * length;
-    
-    graphics.lineTo(p1X, p1Y);
-    graphics.lineTo(p2X, p2Y);
-    graphics.closePath();
-    graphics.fillPath();
-    graphics.setBlendMode(Phaser.BlendModes.ADD);
-
-    scene.tweens.add({
-      targets: graphics,
-      alpha: 0,
-      duration: evt.duration,
-      ease: 'Quad.easeIn',
-      onComplete: () => graphics.destroy()
+    spawnConeFlash(scene, {
+      x: evt.hero.x, y: evt.hero.y,
+      angle: evt.angle, length: evt.length,
+      color: 0xfffbeb, alpha: 0.4,
+      fadeMs: evt.duration, ease: 'Quad.easeIn',
     });
   } else if (evt.type === 'aoeRoot') {
     const attack = new AoeRootFieldAttack(scene, evt.x, evt.y, evt.radius, evt.duration, evt.damage);
@@ -627,17 +589,15 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
         molotov.destroy();
         
         // 2. Splash visual
-        const splash = scene.add.graphics();
-        splash.setPosition(evt.targetX, evt.targetY);
-        splash.fillStyle(0xff4500, 0.8);
-        splash.fillCircle(0, 0, evt.radius * 0.3);
-        scene.tweens.add({
-          targets: splash,
-          scaleX: 2,
-          scaleY: 2,
-          alpha: 0,
-          duration: 300,
-          onComplete: () => splash.destroy()
+        spawnShockwaveRing(scene, {
+          x: evt.targetX, y: evt.targetY,
+          color: 0xff4500,
+          startRadius: evt.radius * 0.3,
+          endRadius: evt.radius * 0.6,
+          fillAlpha: 0.8,
+          strokeWidth: 0,
+          durationMs: 300,
+          ease: 'Linear',
         });
 
         // 3. Spawn actual DoT patch
@@ -646,174 +606,19 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
       }
     });
   } else if (evt.type === 'spawnTornado') {
-    const tornado = scene.add.image(evt.x, evt.y, 'tornado');
-    
-    const scale = Math.max(0.5, evt.pullRadius / 50);
-    tornado.setScale(scale);
-    tornado.setAlpha(0);
-
-    // Fade in
-    scene.tweens.add({
-      targets: tornado,
-      alpha: 1,
-      duration: 300
-    });
-    
-    // Spin animation
-    scene.tweens.add({
-      targets: tornado,
-      angle: 360,
-      duration: 1000,
-      repeat: -1
-    });
-
-    const endTime = scene.time.now + evt.duration;
-    
-    const tornadoTimer = scene.time.addEvent({
-      delay: 100, // Tick every 100ms
-      loop: true,
-      callback: () => {
-        if (scene.time.now >= endTime || scene.status !== 'playing') {
-          tornadoTimer.remove();
-          scene.tweens.add({
-            targets: tornado,
-            alpha: 0,
-            scale: 0,
-            duration: 300,
-            onComplete: () => tornado.destroy()
-          });
-          return;
-        }
-
-        // 1. Move towards nearest enemy
-        let nearestEnemy = null;
-        let minDistSq = Infinity;
-        for (const e of scene.enemies) {
-          if (e.isDead) continue;
-          const distSq = Phaser.Math.Distance.Squared(tornado.x, tornado.y, e.x, e.y);
-          if (distSq < minDistSq) {
-            minDistSq = distSq;
-            nearestEnemy = e;
-          }
-        }
-
-        if (nearestEnemy) {
-          const angle = Phaser.Math.Angle.Between(tornado.x, tornado.y, nearestEnemy.x, nearestEnemy.y);
-          // Move speed pixels per second => speed / 10 per 100ms
-          const nextX = tornado.x + Math.cos(angle) * (evt.speed / 10);
-          const nextY = tornado.y + Math.sin(angle) * (evt.speed / 10);
-          
-          scene.tweens.add({
-            targets: tornado,
-            x: nextX,
-            y: nextY,
-            duration: 100,
-            ease: 'Linear'
-          });
-        }
-
-        // 2. Pull and damage enemies within radius
-        const hitRadiusSq = evt.pullRadius * evt.pullRadius;
-        for (const e of scene.enemies) {
-          if (e.isDead) continue;
-          const distSq = Phaser.Math.Distance.Squared(tornado.x, tornado.y, e.x, e.y);
-          if (distSq <= hitRadiusSq) {
-            // Apply damage tick (deal `damage` per second -> `damage`/10 per 100ms)
-            e.takeDamage(evt.damage / 10);
-            
-            if (!e.isDead) {
-               // Pull slightly towards tornado center
-               const pullAngle = Phaser.Math.Angle.Between(e.x, e.y, tornado.x, tornado.y);
-               e.x += Math.cos(pullAngle) * 5;
-               e.y += Math.sin(pullAngle) * 5;
-            }
-          }
-        }
-      }
-    });
+    const attack = new TornadoAttack(scene, evt.x, evt.y, evt.damage, evt.pullRadius, evt.duration, evt.speed);
+    scene.attacks.push(attack);
   } else if (evt.type === 'spawnTreeOfLife') {
-    // Add an AoE circle to make the range visible
-    const aoeCircle = scene.add.circle(evt.x, evt.y, evt.radius, 0xfef08a, 0.15);
-    aoeCircle.setStrokeStyle(2, 0xeab308, 0.5);
-
-    const tree = scene.add.image(evt.x, evt.y, 'tree_of_life');
-    tree.setOrigin(0.5, 1);
-    tree.setAlpha(0);
-    tree.setScale(0.5);
-
-    scene.tweens.add({
-      targets: [tree, aoeCircle],
-      alpha: 1,
-      scale: 1,
-      duration: 500,
-      ease: 'Back.out'
-    });
-
-    const endTime = scene.time.now + evt.duration;
-    
-    const treeTimer = scene.time.addEvent({
-      delay: 2000, 
-      loop: true,
-      callback: () => {
-        if (scene.time.now >= endTime || scene.status !== 'playing') {
-          treeTimer.remove();
-          scene.tweens.add({
-            targets: [tree, aoeCircle],
-            alpha: 0,
-            duration: 1000,
-            onComplete: () => {
-              tree.destroy();
-              aoeCircle.destroy();
-            }
-          });
-          return;
-        }
-
-        scene.tweens.add({
-          targets: tree,
-          scale: 1.1,
-          duration: 200,
-          yoyo: true
-        });
-
-        // Pulse the AoE circle
-        scene.tweens.add({
-          targets: aoeCircle,
-          fillAlpha: 0.3,
-          duration: 200,
-          yoyo: true
-        });
-
-        const hitRadiusSq = evt.radius * evt.radius;
-        for (const e of scene.enemies) {
-          if (e.isDead) continue;
-          const distSq = Phaser.Math.Distance.Squared(tree.x, tree.y, e.x, e.y);
-          if (distSq <= hitRadiusSq) {
-            if (typeof e.applyAilment === 'function') {
-              e.applyAilment('root', 100, 1000); // 1000ms duration
-            } else {
-              e.activeAilments['root'] = 1000;
-            }
-            e.takeDamage(evt.damage);
-            handleSkillVisualEffect(scene, { type: 'text', x: e.x, y: e.y - 30, text: 'ROOTED!', color: '#22c55e' });
-          }
-        }
-      }
-    });
+    const attack = new TreeOfLifeFieldAttack(scene, evt.x, evt.y, evt.radius, evt.duration, evt.damage);
+    scene.attacks.push(attack);
   } else if (evt.type === 'spawnLambatVortex') {
-    const vortex = scene.add.image(evt.x, evt.y, 'lambat_vortex');
-    const scale = evt.scale || 2.5;
-    vortex.setScale(scale); // Dynamic size based on radius
-    vortex.setAlpha(1);
-    
-    // 1. Hold size for pullDelay, then shrink to 0 over pullDuration
-    scene.tweens.add({
-      targets: vortex,
-      scale: 0,
-      delay: evt.pullDelay,
-      duration: evt.pullDuration,
-      ease: 'Sine.easeIn',
-      onComplete: () => vortex.destroy()
+    // Hold size for pullDelay, then shrink to 0 over pullDuration.
+    new AreaOverlay(scene, {
+      x: evt.x, y: evt.y,
+      radius: 0, // pure SVG overlay, no disc
+      svgKey: 'lambat_vortex',
+      svgScale: evt.scale || 2.5,
+      exit: { mode: 'shrink', durationMs: evt.pullDuration, delayMs: evt.pullDelay, ease: 'Sine.easeIn' },
     });
   } else if (evt.type === 'spawnDoughBarrier') {
     scene.shield.doughBarrierActive = true;

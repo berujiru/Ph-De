@@ -1,4 +1,8 @@
 import type { DamageType } from './Damage';
+import { isPointInCone } from './Geometry';
+
+/** Standard skill cone spread: 60° total (30° on either side of the aim). */
+export const SKILL_CONE_HALF_ANGLE = Math.PI / 6;
 
 export interface ISkillHero {
   id: string;
@@ -107,21 +111,9 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     
     // Apply slow to enemies in the cone
     for (const e of validEnemies) {
-      const dx = e.x - hero.x;
-      const dy = e.y - hero.y;
-      const distSq = dx * dx + dy * dy;
-      
-      if (distSq <= coneLength * coneLength) {
-        let eAngle = Math.atan2(dy, dx);
-        let diff = eAngle - targetAngle;
-        while (diff < -Math.PI) diff += Math.PI * 2;
-        while (diff > Math.PI) diff -= Math.PI * 2;
-        
-        // 60-degree cone (30 degrees or ~0.52 radians on either side)
-        if (Math.abs(diff) <= Math.PI / 6) {
-          e.applyAilment('slow', 1, slowDuration);
-          e.revealStealth(); // Reveal invisible enemies
-        }
+      if (isPointInCone(e.x, e.y, hero.x, hero.y, targetAngle, SKILL_CONE_HALF_ANGLE, coneLength)) {
+        e.applyAilment('slow', 1, slowDuration);
+        e.revealStealth(); // Reveal invisible enemies
       }
     }
   } else if (skillId === 'call_center_agent') {
@@ -191,20 +183,8 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     
     // Apply damage to enemies in the cone
     for (const e of validEnemies) {
-      const dx = e.x - hero.x;
-      const dy = e.y - hero.y;
-      const distSq = dx * dx + dy * dy;
-      
-      if (distSq <= coneLength * coneLength) {
-        let eAngle = Math.atan2(dy, dx);
-        let diff = eAngle - targetAngle;
-        while (diff < -Math.PI) diff += Math.PI * 2;
-        while (diff > Math.PI) diff -= Math.PI * 2;
-        
-        // 60-degree cone (30 degrees or ~0.52 radians on either side)
-        if (Math.abs(diff) <= Math.PI / 6) {
-          e.takeDamage(hero.damage * 3);
-        }
+      if (isPointInCone(e.x, e.y, hero.x, hero.y, targetAngle, SKILL_CONE_HALF_ANGLE, coneLength)) {
+        e.takeDamage(hero.damage * 3);
       }
     }
   } else if (skillId === 'fisherfolk') {
@@ -303,13 +283,6 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     // above the visible bottom front line.
     onVisual({ type: 'spawnObstacle', x: GAME_WIDTH / 2, y: GAME_HEIGHT - 150, width: 200, height: 20, color: '#d97706', duration: 5000 });
 
-  } else if (skillId === 'security_guard') {
-    // Flashlight: Wide cone slow — enemies ahead of (above) the hero.
-    for (const e of enemies) {
-      if (!e.isDead && e.y < hero.y && hero.y - e.y < 400) {
-        e.activeAilments['slow'] = 100;
-      }
-    }
   } else if (skillId === 'farmer') {
     // Tree of Life: Summon an AoE golden tree that periodically roots and damages
     let target = null;
@@ -363,13 +336,6 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
   } else if (skillId === 'baker') {
     // Dough Knead: Summons a Dough Barrier in front of the shield for 5s.
     onVisual({ type: 'spawnDoughBarrier', duration: 15000 });
-  } else if (skillId === 'traffic_enforcer') {
-    // STOP!: Hard stun
-    for (const e of enemies) {
-      if (!e.isDead && dist(hero.x, hero.y, e.x, e.y) < 250) {
-        e.activeAilments['freeze'] = 100;
-      }
-    }
   } else if (skillId === 'plumber') {
     const bonusProjectiles = hero.modifiers?.bonusProjectiles || 0;
     const bonusDamage = hero.modifiers?.bonusDamage || 0;

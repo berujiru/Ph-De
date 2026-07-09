@@ -110,6 +110,34 @@ Implement the hero's signature Active Skill and/or Passive.
 - Locate the `applyHeroSkill()` function and add an `if (skillId === '[hero_id]')` block.
 - Locate the `applyHeroPassive()` function and implement the passive triggers.
 - Ensure any visual side effects use the `onVisual` event callback (e.g., floating text, screen flashes) to maintain strict separation of concerns.
+- Cone hit-tests use `isPointInCone` from `src/game/core/Geometry.ts` with
+  `SKILL_CONE_HALF_ANGLE` — never inline the angle math.
+
+**Ground/area visuals MUST use the shared FX components in
+`src/game/entities/fx/`** — this is the canonical rule; the agent docs point
+here:
+
+| Component | Use for |
+|---|---|
+| `AreaOverlay` | Circular AoE fields: flat disc sized to the gameplay radius, optional inner telegraph rings, optional SVG ground image via `svgKey` (vortex, tornado, tree), pulse/enter/exit options, center icon. |
+| `spawnConeFlash` | Cone-shaped skill flashes (flashlight, coin shotgun). Geometry mirrors `isPointInCone`. |
+| `spawnShockwaveRing` | Expanding rings and impact flashes (skill blasts, explosions, enemy pulses). Fire-and-forget. |
+| `LaneWave` | Linear/rectangular waves sweeping the lane (body + leading edge + trail particles). The owning `Attack` keeps movement and hit logic. |
+
+- Emit an `onVisual` event from `Skills.ts` carrying the per-skill size /
+  color / duration; the matching `handleSkillVisualEffect` branch in
+  `GameSceneEvents.ts` must be a thin adapter (a few lines) into one of these
+  components — never inline `scene.add.graphics()` / `scene.add.circle()`
+  ground drawing in `scenes/`.
+- Persistent fields that tick gameplay (damage / root / heal over time) are
+  `Attack` subclasses in `entities/Attacks.ts` driven by `update(delta)` (see
+  `AoeFirePatchAttack`, `TornadoAttack`, `TreeOfLifeFieldAttack`) — **never**
+  `scene.time.addEvent` loops, which run on wall-clock and ignore pause and
+  game speed. The Attack owns an `AreaOverlay` for its visuals and destroys it
+  on expiry.
+- Skill SVG ground images live in `public/assets/fx/` and are preloaded in
+  `GameScene.preload()`; pass the key as `svgKey`. (`water_wave` is preloaded
+  and currently unused — a ready-made candidate for water/wave skills.)
 
 ### Step D: Animation states (already wired — no code needed)
 The model layer is `Phaser.GameObjects.Sprite`-based. `HeroModel` already routes

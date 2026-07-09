@@ -60,6 +60,13 @@ and you always label them as placeholder-quality.
    `GameScene.preload()` (atlas key === the hero's `spriteKey`), and confirm
    `createHeroAnimations()` picks it up. **No `HeroModel` code is needed** for a
    normal character — the sprite-sheet path is already generic.
+   Skill ground-effect SVGs (vortexes, patches, flourishes) land in
+   `public/assets/fx/` with a `this.load.image(key, ...)` line in
+   `GameScene.preload()` — that asset + preload line is your whole lane; the
+   gameplay-engineer consumes the key via the shared `AreaOverlay` component's
+   `svgKey` option (`src/game/entities/fx/AreaOverlay.ts`), so never add
+   drawing or tween code for it. Author these SVGs sized to the skill's
+   gameplay radius (see `docs/ART_AND_AUDIO_GUIDELINES.md` §D).
 3. **Procedural placeholders (optional).** When asked, write a small script or
    SVG set that emits distinct multi-frame placeholder sheets per state so a
    character reads uniquely before real art exists. Placeholder quality only.

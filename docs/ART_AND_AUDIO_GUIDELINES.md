@@ -64,6 +64,8 @@ When a hero casts their signature skill, the game pauses, and a large 2D sprite 
 ### D. Skill VFX Effect Sheet (on-field)
 The effect the skill spawns on the lane, separate from the character sheet. **Standard: one `fx` row, 10 frames, one-shot (~1.0 s)** — full spec in `docs/CHARACTER_VISUAL_PROMPT_GUIDE.md` → *Animation Standards → Skill VFX*. Compose as a **flat ground element** (ring/scorch/wave on the lane) **plus a vertical flourish** (uplift/column/spray) so it reads under the oblique camera; transparent background, sized to the skill's gameplay radius.
 
+At runtime the engine composites on-field ground FX with the shared `AreaOverlay` component (`src/game/entities/fx/AreaOverlay.ts`): the flat disc/rings are drawn procedurally at the gameplay radius, and the vertical flourish is the SVG you supply, layered via `svgKey` and scaled with `svgScale` — so author the SVG at the gameplay radius and let the engine handle sizing, pulsing, and lifetime.
+
 ---
 
 ## 3. Enemy Asset Requirements
