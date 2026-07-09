@@ -421,7 +421,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 1500,
     color: 0x22c55e,
     purpose: 'Returning parcels hit twice and ramp up the longer they focus one target — a single-target melter that grows mid-fight.',
-    signatureSkill: { name: 'Kamote Riders', description: 'Summons 3 AI riders that crash into the horde and explode.' },
+    signatureSkill: { name: 'Dine & Dash', description: 'Summons 3 riders that rev up before sweeping the lane, leaving a trail, dealing heavy damage, and knocking enemies back.' },
     passive: { name: 'Rush Hour', description: 'Attack speed ramps up the longer they attack the same target.' },
     projectileColor: 0x86efac,
   }

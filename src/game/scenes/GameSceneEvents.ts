@@ -394,19 +394,57 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
     const blackout = scene.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, parseInt((evt.color || '#000').replace('#', '0x')), evt.alpha || 0.5).setScrollFactor(0);
     scene.time.delayedCall(evt.duration || 3000, () => blackout.destroy());
   } else if (evt.type === 'spawnRider') {
-    const rider = scene.add.circle(evt.x, evt.y, 8, 0x22c55e);
-    scene.tweens.add({
-      targets: rider,
-      y: evt.targetY,
-      duration: evt.duration || 1000,
-      onComplete: () => {
-        rider.destroy();
-        for (const e of scene.enemies) {
-          if (!e.isDead && Phaser.Math.Distance.Between(rider.x, rider.y, e.x, e.y) < 100) {
-            e.takeDamage(evt.damage || 10);
+    // 1. Create a bike model using the loaded SVG asset
+    const rider = scene.add.image(evt.x, evt.y, 'kamote_rider');
+    rider.setScale(1);
+
+    const hitEnemies = new Set();
+    const hitRadius = evt.hitRadius || 40;
+    const knockback = evt.knockback || 200;
+
+    // 2. Play delay then charge
+    scene.time.delayedCall(evt.delay || 500, () => {
+      scene.tweens.add({
+        targets: rider,
+        y: evt.targetY,
+        duration: evt.duration || 1000,
+        ease: 'Linear',
+        onUpdate: () => {
+          // Trail effect: spawn a fading exhaust rectangle at current position
+          const trail = scene.add.rectangle(rider.x, rider.y + 15, 8, 8, 0x94a3b8, 0.6);
+          scene.tweens.add({
+            targets: trail,
+            alpha: 0,
+            scale: 2,
+            duration: 400,
+            onComplete: () => trail.destroy()
+          });
+
+          // Collision detection during the sweep
+          for (const e of scene.enemies) {
+            if (!e.isDead && !hitEnemies.has(e)) {
+              if (Math.abs(e.x - rider.x) < hitRadius && Math.abs(e.y - rider.y) < hitRadius) {
+                hitEnemies.add(e);
+                e.takeDamage(evt.damage || 10);
+                
+                // Knockback effect
+                if (!e.isDead) {
+                  scene.tweens.add({
+                    targets: e,
+                    // Push up (lower Y value)
+                    y: e.y - knockback,
+                    duration: 200,
+                    ease: 'Cubic.easeOut'
+                  });
+                }
+              }
+            }
           }
+        },
+        onComplete: () => {
+          rider.destroy();
         }
-      }
+      });
     });
   } else if (evt.type === 'projectileVolley') {
     const h = evt.hero as Hero;

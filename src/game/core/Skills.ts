@@ -10,6 +10,7 @@ export interface ISkillHero {
   isSkillReady: boolean;
   hasRallyBuff?: boolean;
   applyBuff?: (type: string, durationMs?: number, color?: number, iconText?: string) => void;
+  modifiers?: { bonusDamage: number, bonusPierce: number, bonusRadius: number, bonusChain: number };
 }
 
 export interface ISkillEnemy {
@@ -300,9 +301,17 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       }
     }
   } else if (skillId === 'delivery_rider') {
-    // Kamote Riders — sweep UP the lane toward the enemies, spread across X.
+    // Dine & Dash — sweep UP the lane toward the enemies, spread across X.
+    const bonusRadius = hero.modifiers?.bonusRadius || 0;
+    const bonusDamage = hero.modifiers?.bonusDamage || 0;
+    const bonusPierce = hero.modifiers?.bonusPierce || 0;
+
+    const hitRadius = 80 + bonusRadius * 10;
+    const knockback = 200 + bonusPierce * 50;
+    const damage = (hero.damage + bonusDamage) * 4;
+
     for(let i=0; i<3; i++) {
-      onVisual({ type: 'spawnRider', x: hero.x + (i-1)*30, y: hero.y, targetY: hero.y - 1500, duration: 1000, damage: hero.damage * 2 });
+      onVisual({ type: 'spawnRider', x: hero.x + (i-1)*40, y: hero.y, targetY: hero.y - 1500, duration: 1000, damage, delay: 500, knockback, hitRadius });
     }
   }
 }
