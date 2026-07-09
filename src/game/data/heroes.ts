@@ -106,7 +106,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     // (1024px/frame); shipped sheet is downscaled to 512px/frame (4096x2560) to
     // stay within mobile WebGL texture/VRAM limits under Capacitor.
     spriteKey: 'eden', // Aseprite atlas key — loaded in GameScene.preload once eden.png/.json exist.
-    cutInDurationMs: 3500, // Full 40-frame cut-in playthrough
+    cutInDurationMs: 1500, // Full 40-frame cut-in playthrough
     cutInMarginY: 0, // Fullscreen cut-in
     cutInMarginX: 0,
     cutInArtScale: 1,
