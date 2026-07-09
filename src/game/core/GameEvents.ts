@@ -80,6 +80,8 @@ export type SkillVisualEvent =
   | { type: 'expandingCircle', x: number, y: number, color: string, maxRadius: number, duration: number }
   | { type: 'trafficLights', duration: number }
   | { type: 'flashlightCone', hero: any, length: number, duration: number, angle: number }
+  | { type: 'spawnTornado', x: number, y: number, damage: number, pullRadius: number, duration: number, speed: number }
+  | { type: 'spawnMolotovPatch', startX: number, startY: number, targetX: number, targetY: number, radius: number, damage: number, duration: number }
   | { type: 'aoeRoot', x: number, y: number, radius: number, duration: number, damage: number };
 
 export interface UiToGameEvents extends Record<string, unknown> {

@@ -13,6 +13,7 @@ export interface AttackModifiers {
   bonusPierce: number;
   bonusRadius: number;
   bonusChain: number;
+  bonusProjectiles?: number;
 }
 
 export abstract class Attack extends Phaser.GameObjects.GameObject {
@@ -952,6 +953,81 @@ export class AoeRootFieldAttack extends Attack {
   }
 }
 
+export class AoeFirePatchAttack extends Attack {
+  private durationMs: number;
+  private ageMs = 0;
+  private lastTickMs = 0;
+  private radius: number;
+  private xPos: number;
+  private yPos: number;
+  private groundVisual: Phaser.GameObjects.Graphics;
+
+  constructor(scene: Phaser.Scene, x: number, y: number, radius: number, duration: number, damage: number) {
+    super(scene, 'AoeFirePatchAttack', damage);
+    this.xPos = x;
+    this.yPos = y;
+    this.radius = radius;
+    this.durationMs = duration;
+    
+    // Very subtle border, mostly a glowing puddle
+    this.groundVisual = scene.add.graphics();
+    this.groundVisual.setPosition(x, y);
+    
+    // Fill with soft orange/red
+    this.groundVisual.fillStyle(0xff4500, 0.25);
+    this.groundVisual.fillCircle(0, 0, radius);
+    
+    // Faint stroke
+    this.groundVisual.lineStyle(2, 0xffa500, 0.15);
+    this.groundVisual.strokeCircle(0, 0, radius);
+    
+    // Pulsing effect
+    scene.tweens.add({
+      targets: this.groundVisual,
+      alpha: 0.6,
+      scaleX: 1.05,
+      scaleY: 1.05,
+      duration: 1000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+  }
+
+  update(_time: number, delta: number) {
+    if (this.isDead) return;
+    this.ageMs += delta;
+    this.lastTickMs += delta;
+    
+    if (this.ageMs >= this.durationMs) {
+      this.isDead = true;
+      this.groundVisual.destroy();
+      this.destroy();
+      return;
+    }
+
+    // Apply DoT every 1 second
+    if (this.lastTickMs >= 1000) {
+      this.lastTickMs -= 1000;
+      const enemies = (this.scene as any).enemies as Enemy[];
+      if (enemies) {
+        for (const enemy of enemies) {
+          if (!enemy.isDead) {
+            const dx = enemy.x - this.xPos;
+            const dy = enemy.y - this.yPos;
+            if (dx * dx + dy * dy <= this.radius * this.radius) {
+              enemy.applyAilment('burn', 1, 1000);
+              if (this.damage > 0) {
+                enemy.takeDamage(this.damage);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 export class RollingBlackoutWaveAttack extends Attack {
   private speed = 1200;
   private hitEnemies = new Set<Enemy>();
@@ -1037,14 +1113,12 @@ export class FlushWaveAttack extends Attack {
   private speed = 300;
   private hitEnemies = new Set<Enemy>();
   private knockbackDist: number;
-  private startY: number;
   private visual: Phaser.GameObjects.Rectangle;
   private edge: Phaser.GameObjects.Rectangle;
 
   constructor(scene: Phaser.Scene, y: number, damage: number, numWaves: number, knockback: number) {
     super(scene, 'FlushWaveAttack', damage);
     this.knockbackDist = knockback;
-    this.startY = y;
 
     // Plumber's color (water)
     const color = 0x38bdf8;

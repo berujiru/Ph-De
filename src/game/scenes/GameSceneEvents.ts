@@ -18,7 +18,8 @@ import {
   PierceAttack,
   RollingBlackoutWaveAttack,
   FlushWaveAttack,
-  AoeRootFieldAttack
+  AoeRootFieldAttack,
+  AoeFirePatchAttack
 } from '../entities/Attacks';
 import { TrafficLight } from '../entities/fx/TrafficLight';
 
@@ -593,6 +594,55 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
   } else if (evt.type === 'aoeRoot') {
     const attack = new AoeRootFieldAttack(scene, evt.x, evt.y, evt.radius, evt.duration, evt.damage);
     scene.attacks.push(attack);
+  } else if (evt.type === 'spawnMolotovPatch') {
+    // 1. Arc animation
+    const molotov = scene.add.image(evt.startX, evt.startY, 'molotov');
+    molotov.setOrigin(0.5, 0.5);
+    molotov.setScale(0.8); // Scale up visual as requested
+
+    const dx = evt.targetX - evt.startX;
+    const controlX = evt.startX + dx / 2;
+    const controlY = Math.min(evt.startY, evt.targetY) - 150; // arc height
+
+    const curve = new Phaser.Curves.QuadraticBezier(
+      new Phaser.Math.Vector2(evt.startX, evt.startY),
+      new Phaser.Math.Vector2(controlX, controlY),
+      new Phaser.Math.Vector2(evt.targetX, evt.targetY)
+    );
+
+    const pathData = { t: 0 };
+    scene.tweens.add({
+      targets: pathData,
+      t: 1,
+      duration: 600,
+      ease: 'Sine.easeIn',
+      onUpdate: () => {
+        const p = curve.getPoint(pathData.t);
+        molotov.setPosition(p.x, p.y);
+        molotov.rotation += 0.1;
+      },
+      onComplete: () => {
+        molotov.destroy();
+        
+        // 2. Splash visual
+        const splash = scene.add.graphics();
+        splash.setPosition(evt.targetX, evt.targetY);
+        splash.fillStyle(0xff4500, 0.8);
+        splash.fillCircle(0, 0, evt.radius * 0.3);
+        scene.tweens.add({
+          targets: splash,
+          scaleX: 2,
+          scaleY: 2,
+          alpha: 0,
+          duration: 300,
+          onComplete: () => splash.destroy()
+        });
+
+        // 3. Spawn actual DoT patch
+        const attack = new AoeFirePatchAttack(scene, evt.targetX, evt.targetY, evt.radius, evt.duration, evt.damage);
+        scene.attacks.push(attack);
+      }
+    });
   } else if (evt.type === 'spawnTornado') {
     const tornado = scene.add.image(evt.x, evt.y, 'tornado');
     

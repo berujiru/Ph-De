@@ -230,12 +230,26 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       speed: 300 + bonusRadius
     });
   } else if (skillId === 'taho_vendor') {
-    // Hot Syrup: Strip speed buffs
-    for (const e of enemies) {
-      if (!e.isDead && e.definition.speed > 25) { 
-        e.definition.speed = 10;
-      }
+    // Hot Syrup: Throws a Molotov creating a 20s AoE fire patch that deals DoT
+    let targetX = GAME_WIDTH / 2;
+    let targetY = GAME_HEIGHT / 2;
+    const target = enemies.find(e => !e.isDead);
+    if (target) {
+      targetX = target.x;
+      targetY = target.y;
     }
+    const bonusRadius = hero.modifiers?.bonusRadius || 0;
+    const bonusDamage = hero.modifiers?.bonusDamage || 0;
+    onVisual({
+      type: 'spawnMolotovPatch',
+      startX: hero.x,
+      startY: hero.y,
+      targetX,
+      targetY,
+      radius: 120 + (bonusRadius * 30),
+      damage: (hero.damage + bonusDamage * 2) * 0.5,
+      duration: 20000
+    });
   } else if (skillId === 'nurse') {
     // Heal: Restores barrier HP and shows a green aura
     onVisual({ type: 'healShield', amount: 150 });

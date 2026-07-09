@@ -30,7 +30,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
    * bonusRadius). Passed into every Attack this hero spawns so pierce/chain/
    * radius upgrades reach future shots. Starts at zero. See docs/VOICE_DROPS.md.
    */
-  public modifiers: AttackModifiers = { bonusDamage: 0, bonusPierce: 0, bonusRadius: 0, bonusChain: 0 };
+  public modifiers: AttackModifiers = { bonusDamage: 0, bonusPierce: 0, bonusRadius: 0, bonusChain: 0, bonusProjectiles: 0 };
 
   /** How many times each upgrade kind has been applied — feeds the "no dead
    *  drops" / maxStacks filter in core/Drops.ts. */
