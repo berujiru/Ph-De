@@ -101,6 +101,7 @@ export class GameScene extends Phaser.Scene {
     this.load.image('water_wave', '/assets/fx/water_wave.svg');
     this.load.image('tornado', '/assets/fx/tornado.svg');
     this.load.image('molotov', '/assets/fx/molotov.svg');
+    this.load.image('dough-barrier', '/assets/fx/dough-barrier.svg');
     this.load.image('lambat_vortex', '/assets/fx/lambat_vortex.svg');
     this.load.image('tree_of_life', '/assets/fx/tree_of_life.svg');
 
@@ -384,6 +385,7 @@ export class GameScene extends Phaser.Scene {
     const snapshot: GameStateSnapshot = {
       barrierHp: this.shield.hp,
       maxBarrierHp: this.shield.maxHp,
+      doughBarrierActive: this.shield.doughBarrierActive,
       voicesCount: this.voicesCount,
       maxVoicesCount: this.maxVoicesCount,
       waveActive: this.waveActive,
@@ -397,7 +399,8 @@ export class GameScene extends Phaser.Scene {
         passiveOverride: h.passiveOverride,
         isSkillReady: h.isSkillReady && !this.comboQueue.includes(h)
       })),
-      activeEnemies: activeEnemies
+      activeEnemies: activeEnemies,
+      shieldScreenYRatio: (this.shield.y - this.cameras.main.scrollY) / this.cameras.main.height
     };
     const serialized = JSON.stringify(snapshot);
     if (!force && serialized === this.lastSnapshot) return;

@@ -815,6 +815,11 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
       ease: 'Sine.easeIn',
       onComplete: () => vortex.destroy()
     });
+  } else if (evt.type === 'spawnDoughBarrier') {
+    scene.shield.doughBarrierActive = true;
+    scene.time.delayedCall(evt.duration, () => {
+      scene.shield.doughBarrierActive = false;
+    });
   } else if (evt.type === 'applyAilment') {
     if (evt.delay) {
       scene.time.delayedCall(evt.delay, () => {

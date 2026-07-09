@@ -10,7 +10,7 @@ export interface ISkillHero {
   isSkillReady: boolean;
   hasRallyBuff?: boolean;
   applyBuff?: (type: string, durationMs?: number, color?: number, iconText?: string) => void;
-  modifiers?: { bonusDamage: number, bonusPierce: number, bonusRadius: number, bonusChain: number };
+  modifiers?: { bonusDamage: number, bonusPierce: number, bonusRadius: number, bonusChain: number, bonusProjectiles?: number };
 }
 
 export interface ISkillEnemy {
@@ -361,10 +361,8 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     // High damage, no debuff. Starting from barrier all the way to top.
     onVisual({ type: 'rollingBlackoutWave', damage: hero.damage * 2 });
   } else if (skillId === 'baker') {
-    // Dough Knead: Flatten damage
-    for (const e of enemies) {
-      if (!e.isDead) e.definition.damage *= 0.5;
-    }
+    // Dough Knead: Summons a Dough Barrier in front of the shield for 5s.
+    onVisual({ type: 'spawnDoughBarrier', duration: 15000 });
   } else if (skillId === 'traffic_enforcer') {
     // STOP!: Hard stun
     for (const e of enemies) {

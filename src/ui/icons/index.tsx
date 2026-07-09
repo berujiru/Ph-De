@@ -8,6 +8,11 @@
  * - Icons inherit color from CSS `color` — pick the theme token at the
  *   usage site by *meaning* (gold = currency, danger = loss, etc.).
  */
+export { LambatIcon } from './LambatIcon';
+export { MolotovIcon } from './MolotovIcon';
+export { DoughBarrierIcon } from './DoughBarrierIcon';
+export { DefaultShieldIcon } from './DefaultShieldIcon';
+
 import type { ComponentType, ReactNode } from 'react';
 
 export interface IconProps {

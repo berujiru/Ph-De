@@ -44,6 +44,8 @@ export interface GameStateSnapshot {
   status: 'playing' | 'won' | 'lost';
   activeHeroes: ActiveHeroInfo[];
   activeEnemies: ActiveEnemyInfo[];
+  doughBarrierActive?: boolean;
+  shieldScreenYRatio?: number;
 }
 
 /** Rarity tiers for RNG drops (docs/WORLD_AND_HEROES.md "RNG rules"). */
@@ -84,7 +86,8 @@ export type SkillVisualEvent =
   | { type: 'spawnLambatVortex', x: number, y: number, pullDelay: number, pullDuration: number, scale?: number }
   | { type: 'applyAilment', target: any, ailment: string, amount: number, duration: number, delay?: number }
   | { type: 'aoeRoot', x: number, y: number, radius: number, duration: number, damage: number }
-  | { type: 'spawnTreeOfLife', x: number, y: number, radius: number, duration: number, damage: number };
+  | { type: 'spawnTreeOfLife', x: number, y: number, radius: number, duration: number, damage: number }
+  | { type: 'spawnDoughBarrier', duration: number };
 
 export interface UiToGameEvents extends Record<string, unknown> {
   startWave: undefined;

@@ -14,6 +14,7 @@ export interface AttackModifiers {
   bonusRadius: number;
   bonusChain: number;
   bonusProjectiles?: number;
+  onHitAilment?: { type: string, duration: number };
 }
 
 export abstract class Attack extends Phaser.GameObjects.GameObject {

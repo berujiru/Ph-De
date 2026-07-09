@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" width="500" height="120" fill="none">
+  <defs>
+    <radialGradient id="doughGradient" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#fde047" />
+      <stop offset="60%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </radialGradient>
+  </defs>
+
+  <!-- Main Dough Body (Top-Down Oblique Baguette shape) -->
+  <path
+    d="M 40 75 Q 250 45 460 75 Q 480 85 460 95 Q 250 110 40 95 Q 20 85 40 75 Z"
+    fill="url(#doughGradient)"
+  />
+  
+  <!-- 3D Crust Overlap (Front Face) -->
+  <path
+    d="M 40 75 Q 250 90 460 75 Q 470 85 460 95 Q 250 110 40 95 Q 30 85 40 75 Z"
+    fill="#b45309"
+    opacity="0.5"
+  />
+  
+  <!-- Dimples / Air bubbles / Cuts -->
+  <path d="M 100 65 Q 120 75 140 65" stroke="#b45309" stroke-width="4" stroke-linecap="round" opacity="0.6" />
+  <path d="M 220 60 Q 250 70 280 60" stroke="#b45309" stroke-width="4" stroke-linecap="round" opacity="0.6" />
+  <path d="M 360 65 Q 380 75 400 65" stroke="#b45309" stroke-width="4" stroke-linecap="round" opacity="0.6" />
+  
+  <ellipse cx="120" cy="70" rx="8" ry="4" fill="#b45309" opacity="0.5" />
+  <ellipse cx="280" cy="65" rx="10" ry="5" fill="#b45309" opacity="0.4" />
+  <ellipse cx="380" cy="70" rx="6" ry="3" fill="#b45309" opacity="0.5" />
+</svg>
