@@ -731,6 +731,75 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
         }
       }
     });
+  } else if (evt.type === 'spawnTreeOfLife') {
+    // Add an AoE circle to make the range visible
+    const aoeCircle = scene.add.circle(evt.x, evt.y, evt.radius, 0xfef08a, 0.15);
+    aoeCircle.setStrokeStyle(2, 0xeab308, 0.5);
+
+    const tree = scene.add.image(evt.x, evt.y, 'tree_of_life');
+    tree.setOrigin(0.5, 1);
+    tree.setAlpha(0);
+    tree.setScale(0.5);
+
+    scene.tweens.add({
+      targets: [tree, aoeCircle],
+      alpha: 1,
+      scale: 1,
+      duration: 500,
+      ease: 'Back.out'
+    });
+
+    const endTime = scene.time.now + evt.duration;
+    
+    const treeTimer = scene.time.addEvent({
+      delay: 2000, 
+      loop: true,
+      callback: () => {
+        if (scene.time.now >= endTime || scene.status !== 'playing') {
+          treeTimer.remove();
+          scene.tweens.add({
+            targets: [tree, aoeCircle],
+            alpha: 0,
+            duration: 1000,
+            onComplete: () => {
+              tree.destroy();
+              aoeCircle.destroy();
+            }
+          });
+          return;
+        }
+
+        scene.tweens.add({
+          targets: tree,
+          scale: 1.1,
+          duration: 200,
+          yoyo: true
+        });
+
+        // Pulse the AoE circle
+        scene.tweens.add({
+          targets: aoeCircle,
+          fillAlpha: 0.3,
+          duration: 200,
+          yoyo: true
+        });
+
+        const hitRadiusSq = evt.radius * evt.radius;
+        for (const e of scene.enemies) {
+          if (e.isDead) continue;
+          const distSq = Phaser.Math.Distance.Squared(tree.x, tree.y, e.x, e.y);
+          if (distSq <= hitRadiusSq) {
+            if (typeof e.applyAilment === 'function') {
+              e.applyAilment('root', 100, 1000); // 1000ms duration
+            } else {
+              e.activeAilments['root'] = 1000;
+            }
+            e.takeDamage(evt.damage);
+            handleSkillVisualEffect(scene, { type: 'text', x: e.x, y: e.y - 30, text: 'ROOTED!', color: '#22c55e' });
+          }
+        }
+      }
+    });
   } else if (evt.type === 'spawnLambatVortex') {
     const vortex = scene.add.image(evt.x, evt.y, 'lambat_vortex');
     const scale = evt.scale || 2.5;

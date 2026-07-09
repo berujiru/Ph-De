@@ -102,6 +102,7 @@ export class GameScene extends Phaser.Scene {
     this.load.image('tornado', '/assets/fx/tornado.svg');
     this.load.image('molotov', '/assets/fx/molotov.svg');
     this.load.image('lambat_vortex', '/assets/fx/lambat_vortex.svg');
+    this.load.image('tree_of_life', '/assets/fx/tree_of_life.svg');
 
     for (const heroId of Object.keys(HERO_DEFINITIONS) as HeroId[]) {
       const skin = getSelectedSkin(heroId);

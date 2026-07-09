@@ -83,7 +83,8 @@ export type SkillVisualEvent =
   | { type: 'spawnTornado', x: number, y: number, damage: number, pullRadius: number, duration: number, speed: number }
   | { type: 'spawnLambatVortex', x: number, y: number, pullDelay: number, pullDuration: number, scale?: number }
   | { type: 'applyAilment', target: any, ailment: string, amount: number, duration: number, delay?: number }
-  | { type: 'aoeRoot', x: number, y: number, radius: number, duration: number, damage: number };
+  | { type: 'aoeRoot', x: number, y: number, radius: number, duration: number, damage: number }
+  | { type: 'spawnTreeOfLife', x: number, y: number, radius: number, duration: number, damage: number };
 
 export interface UiToGameEvents extends Record<string, unknown> {
   startWave: undefined;

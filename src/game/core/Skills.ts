@@ -311,15 +311,32 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       }
     }
   } else if (skillId === 'farmer') {
-    // Harvest: Damage per ailment
+    // Tree of Life: Summon an AoE golden tree that periodically roots and damages
+    let target = null;
+    let highestScore = -Infinity;
+
     for (const e of enemies) {
       if (!e.isDead) {
-        const ailmentCount = Object.values(e.activeAilments).filter(v => v > 0).length;
-        if (ailmentCount > 0) {
-          e.takeDamage(hero.damage * 5 * ailmentCount);
+        const distToHero = dist(hero.x, hero.y, e.x, e.y);
+        const score = (e.definition.maxHp * 10000) + e.hp - distToHero;
+        if (score > highestScore) {
+          highestScore = score;
+          target = e;
         }
       }
     }
+
+    const tx = target ? target.x : GAME_WIDTH / 2;
+    const ty = target ? target.y : GAME_HEIGHT / 2;
+
+    onVisual({
+      type: 'spawnTreeOfLife',
+      x: tx,
+      y: ty,
+      radius: 150,
+      duration: 30000,
+      damage: hero.damage * 0.2
+    });
   } else if (skillId === 'fishball_vendor') {
     // Spicy Sauce: Ignite in front — a narrow column directly ahead (above) the hero.
     for (const e of enemies) {
