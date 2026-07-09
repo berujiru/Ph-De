@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Security Guard: batuta (baton) swung from the pivot at x=0; tip reaches the
+       far edge so sprite length == cleave range. Faint arc sells the sweep. -->
+  <path d="M10 12 A76 76 0 0 1 10 116 A110 110 0 0 0 10 12 Z" fill="#e6e6e6" fill-opacity="0.3"/>
+  <rect x="2" y="55" width="24" height="18" rx="8" fill="#999999" stroke="#0f172a" stroke-width="4"/>
+  <rect x="22" y="57" width="8" height="14" fill="#cccccc"/>
+  <rect x="28" y="53" width="94" height="22" rx="11" fill="#ffffff" stroke="#0f172a" stroke-width="5"/>
+  <rect x="36" y="58" width="70" height="5" rx="2.5" fill="#cccccc"/>
+  <circle cx="114" cy="64" r="5" fill="#e6e6e6"/>
+</svg>

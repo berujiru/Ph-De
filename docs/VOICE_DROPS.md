@@ -51,17 +51,23 @@ in `src/game/data/attackSpeed.ts` — heavy projectiles ~400, sharp fast ones
 
 | attackStyle | Range band (px) | Rate band (ms) | DPS shape | Notes |
 |---|---|---|---|---|
-| `projectile` | 1050–1400 | 1300–1600 | single-target, reliable | Eden anchors global at 1920; call_center_agent owns sniper 1400 |
-| `pierce` | 1000–1100 | 1100–2200 | line, multi-hit | Per-hit low; heavy multi-pierce (Tuhog 5) pays with a slow rate |
-| `boomerang` | 1250–1300 | 1400–1600 | two hits (out + back) | Effective DPS ~1.8x the single-hit figure |
-| `beam` | 1100 | 600 | fast, low per-hit, hits a line | sales_lady owns "fastest attack in the game" (~2x everyone) |
-| `chain` | 900–1150 | 1800–2000 | primary + arcs | Bounce hop is `CHAIN_BOUNCE_RANGE_PX` (420) between targets |
+| `projectile` | 1200–1500 | 1300–1600 | single-target, reliable | Eden anchors global at 1920; call_center_agent owns sniper 1500 |
+| `pierce` | 1150–1250 | 1100–2200 | line, multi-hit | Per-hit low; heavy multi-pierce (Tuhog 5) pays with a slow rate |
+| `boomerang` | 1350–1400 | 1400–1600 | two hits (out + back) | Effective DPS ~1.8x the single-hit figure |
+| `beam` | 1250 | 600 | fast, low per-hit, hits a line | sales_lady owns "fastest attack in the game" (~2x everyone) |
+| `chain` | 1050–1250 | 1800–2000 | primary + arcs | Bounce hop is `CHAIN_BOUNCE_RANGE_PX` (420) between targets |
 | `melee-cleave` | 420–560 | 1400–1500 | frontline arc | `range` **is the cleave radius** — short by design; risk pays in DPS |
-| `lobbed` | 900–950 | 1700–1900 | splash on impact | Moderate single, splash bonus |
-| `vortex` | 800–850 | 3500–6500 | area DoT + pull | Control band — low DPS by design |
-| `trap` | 800 | 3000 | placed, delayed area | Zone denial |
-| `linear-wave` | 1050 | 2200–2500 | horizontal line sweep | Wave travel distance = hero `range` |
+| `lobbed` | 1050–1100 | 1700–1900 | splash on impact | Moderate single, splash bonus |
+| `vortex` | 900–950 | 3500–6500 | area DoT + pull | Control band — low DPS by design |
+| `trap` | 900 | 3000 | placed, delayed area | Zone denial |
+| `linear-wave` | 1200 | 2200–2500 | horizontal line sweep | Wave travel distance = hero `range` |
 | `summoner` | 400 | 5000 | no direct DPS | `damage` = wall HP |
+
+In-flight sprite size is its own knob: `projectileSizePx` on the definition,
+defaults per style in `STYLE_DEFAULT_SIZE` (`src/game/data/attackArt.ts`) —
+projectiles ~48 px, pierce lances ~104 px, boomerangs ~72 px. Keep shots
+smaller than enemy bodies; only naturally long silhouettes (skewer 120,
+pencil 88) override upward.
 
 ### Recalibration note (2026-07)
 

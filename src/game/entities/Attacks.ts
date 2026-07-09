@@ -18,6 +18,8 @@ import { AttackSprite, popAttackIcon } from './fx/AttackSprite';
 export interface AttackVisual {
   artKey: string;
   tint: number;
+  /** In-flight sprite length px (resolveAttackSize); 0 for styles that size by gameplay. */
+  sizePx: number;
 }
 
 export interface AttackModifiers {
@@ -70,6 +72,7 @@ export class ProjectileAttack extends Attack {
   private vy = 0;
   private visual: AttackSprite;
   private trail: MotionTrail;
+  private baseLength: number;
   private hitCount = 0;
   private maxHits: number;
   private hitEnemies = new Set<Enemy>();
@@ -80,8 +83,8 @@ export class ProjectileAttack extends Attack {
     this.target = target;
     this.maxHits = 1 + this.modifiers.bonusPierce;
     this.trail = new MotionTrail(scene, visual.tint);
-    // Length 64 ≈ the old radius-30 circle plus its outline.
-    this.visual = new AttackSprite(scene, { x, y, artKey: visual.artKey, tint: visual.tint, lengthPx: 64 });
+    this.baseLength = visual.sizePx;
+    this.visual = new AttackSprite(scene, { x, y, artKey: visual.artKey, tint: visual.tint, lengthPx: this.baseLength });
     const dx = target.x - x;
     const dy = target.y - y;
     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -96,7 +99,7 @@ export class ProjectileAttack extends Attack {
     super.upgrade(newMods);
     this.maxHits = 1 + this.modifiers.bonusPierce;
     if (newMods.bonusRadius) {
-      this.visual.setLength(64 + this.modifiers.bonusRadius * 2);
+      this.visual.setLength(this.baseLength + this.modifiers.bonusRadius * 2);
     }
   }
 
@@ -170,9 +173,8 @@ export class PierceAttack extends Attack {
     this.speed = speed;
     // Total pass-throughs = basePierce + bonusPierce (guard against bad data).
     this.maxHits = Math.max(1, basePierce + this.modifiers.bonusPierce);
-    // One long oriented lance so pierce reads as a spear, not a dot
-    // (length ≈ the old 160px streak + 20px tip).
-    this.visual = new AttackSprite(scene, { x, y, artKey: visual.artKey, tint: visual.tint, lengthPx: 190 });
+    // One long oriented lance so pierce reads as a spear, not a dot.
+    this.visual = new AttackSprite(scene, { x, y, artKey: visual.artKey, tint: visual.tint, lengthPx: visual.sizePx });
 
     // Snapshot the firing vector ONCE; the shot never curves after this.
     const dx = target.x - x;
@@ -392,7 +394,7 @@ export class BoomerangAttack extends Attack {
     this.visual = new AttackSprite(scene, {
       x: hero.x, y: hero.y,
       artKey: visual.artKey, tint: visual.tint,
-      lengthPx: 100 + this.modifiers.bonusRadius * 2,
+      lengthPx: visual.sizePx + this.modifiers.bonusRadius * 2,
       spinDegPerSec: 1030,
     });
 
@@ -673,7 +675,7 @@ export class LobbedAttack extends Attack {
     // Ground shadow that tracks the landing spot — sells the arc height.
     this.shadow = scene.add.ellipse(startX, startY, 60, 20, 0x000000, 0.35);
     // Slow tumble so the thrown object reads as airborne.
-    this.visual = new AttackSprite(scene, { x: startX, y: startY, artKey: visual.artKey, tint: visual.tint, lengthPx: 60, spinDegPerSec: 240 });
+    this.visual = new AttackSprite(scene, { x: startX, y: startY, artKey: visual.artKey, tint: visual.tint, lengthPx: visual.sizePx, spinDegPerSec: 240 });
   }
 
   update(_time: number, delta: number) {
@@ -801,7 +803,7 @@ export class TrapAttack extends Attack {
     const trapX = target.x - 50;
     const trapY = target.y;
     // Small static armed-trap marker in the hero's art.
-    this.visual = new AttackSprite(scene, { x: trapX, y: trapY, artKey: visual.artKey, tint: visual.tint, lengthPx: 44 });
+    this.visual = new AttackSprite(scene, { x: trapX, y: trapY, artKey: visual.artKey, tint: visual.tint, lengthPx: visual.sizePx });
     // A pulsing hazard ring telegraphs the armed trap's footprint.
     const explosionRadius = 80 + this.modifiers.bonusRadius;
     this.telegraph = scene.add.circle(trapX, trapY, explosionRadius, visual.tint, 0);

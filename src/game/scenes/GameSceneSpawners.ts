@@ -23,7 +23,7 @@ import {
   TrapAttack
 } from '../entities/Attacks';
 import { DAMAGE_TYPE_COLORS, type DamageType } from '../core/Damage';
-import { attackArtKey, resolveAttackArt } from '../data/attackArt';
+import { attackArtKey, resolveAttackArt, resolveAttackSize } from '../data/attackArt';
 import { resolveAttackSpeed } from '../data/attackSpeed';
 
 export function spawnEnemy(scene: GameScene, enemyId: EnemyId = 'grunt', wave: number = 1) {
@@ -76,7 +76,7 @@ export function spawnHero(scene: GameScene, id: HeroId, passiveOverride?: string
     // Tint = damage-type color; art = the hero's attackArt (or style default),
     // authored white/grayscale so the tint colors it cleanly.
     const tint = overrideColor ?? DAMAGE_TYPE_COLORS[damageType as DamageType];
-    const visual = { artKey: attackArtKey(resolveAttackArt(h.definition)), tint };
+    const visual = { artKey: attackArtKey(resolveAttackArt(h.definition)), tint, sizePx: resolveAttackSize(h.definition) };
     // Per-hero projectile flight speed (style default when unset).
     const speed = resolveAttackSpeed(h.definition);
     // Persisted per-hero upgrade mods land on every Attack this hero spawns.

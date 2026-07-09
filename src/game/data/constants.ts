@@ -2,7 +2,7 @@
  * "Global" range for the portrait battlefield — covers the full 1080×1920
  * viewport, so a hero with this range can hit anything on screen. Eden's
  * anchor value; other heroes ladder below it (melee cleave radius ≈420–560,
- * short ≈800–950, standard ≈1000–1150, sniper 1400). Mirrors GAME_HEIGHT
+ * short ≈900–1050, standard ≈1150–1300, sniper 1500). Mirrors GAME_HEIGHT
  * (level.ts imports balance, so the literal lives here to avoid a circular
  * import).
  */

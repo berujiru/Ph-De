@@ -12,7 +12,7 @@ import { cameraPunch } from '../entities/fx/CameraPunch';
 import { FX, GAME_WIDTH, GAME_HEIGHT, RALLY, ENEMY_SPAWN_Y_OFFSET } from '../data/level';
 import { applyHeroSkill, type SkillVisualEvent } from '../core/Skills';
 import { DAMAGE_TYPE_COLORS, type DamageType } from '../core/Damage';
-import { attackArtKey, resolveAttackArt } from '../data/attackArt';
+import { attackArtKey, resolveAttackArt, resolveAttackSize } from '../data/attackArt';
 import { resolveAttackSpeed } from '../data/attackSpeed';
 import {
   Attack,
@@ -463,6 +463,7 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
     const visual = {
       artKey: attackArtKey(resolveAttackArt(h.definition)),
       tint: DAMAGE_TYPE_COLORS[evt.damageType as DamageType] || 0xffffff,
+      sizePx: resolveAttackSize(h.definition),
     };
 
     const volleySpeed = resolveAttackSpeed(h.definition);

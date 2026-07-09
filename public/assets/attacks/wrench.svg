@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Jeepney Driver: big lug wrench swung from the pivot at x=0; open jaw at the
+       far edge so sprite length == cleave range. Faint arc sells the sweep. -->
+  <path d="M10 12 A76 76 0 0 1 10 116 A110 110 0 0 0 10 12 Z" fill="#e6e6e6" fill-opacity="0.3"/>
+  <circle cx="12" cy="64" r="11" fill="#cccccc" stroke="#0f172a" stroke-width="4"/>
+  <circle cx="12" cy="64" r="4" fill="#0f172a"/>
+  <rect x="18" y="56" width="82" height="16" rx="6" fill="#ffffff" stroke="#0f172a" stroke-width="5"/>
+  <rect x="26" y="60" width="62" height="4" rx="2" fill="#cccccc"/>
+  <path d="M96 42 Q126 42 126 56 L108 60 L108 68 L126 72 Q126 86 96 86 Q88 74 88 64 Q88 54 96 42 Z"
+        fill="#ffffff" stroke="#0f172a" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M98 50 Q112 48 118 52" fill="none" stroke="#cccccc" stroke-width="4" stroke-linecap="round"/>
+</svg>

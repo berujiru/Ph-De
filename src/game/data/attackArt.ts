@@ -29,6 +29,32 @@ export const STYLE_DEFAULT_ART: Record<AttackStyle, string> = {
   summoner: 'default-summoner',
 };
 
+/**
+ * In-flight sprite length (px along +X) per style — deliberately smaller than
+ * enemy bodies so projectiles read as shots, not floats. Heroes override via
+ * `HeroDefinition.projectileSizePx` (e.g. naturally long skewers/pencils).
+ * Styles whose visual is sized by gameplay (cleave range, vortex radius,
+ * lane width, summon footprint, chain/beam impact icons) are 0 — unused.
+ */
+export const STYLE_DEFAULT_SIZE: Record<AttackStyle, number> = {
+  projectile: 48,
+  pierce: 104,
+  boomerang: 72,
+  lobbed: 48,
+  trap: 44,
+  'melee-cleave': 0,
+  chain: 0,
+  beam: 0,
+  vortex: 0,
+  'linear-wave': 0,
+  summoner: 0,
+};
+
+/** The in-flight sprite length a hero's basic attack renders at. */
+export function resolveAttackSize(def: Pick<HeroDefinition, 'projectileSizePx' | 'attackStyle'>): number {
+  return def.projectileSizePx ?? STYLE_DEFAULT_SIZE[def.attackStyle];
+}
+
 /** Texture key for a stem; namespaced so it can't collide with fx/hero keys. */
 export function attackArtKey(stem: string): string {
   return `atk-${stem}`;

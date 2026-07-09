@@ -94,10 +94,14 @@ for any damage type. The registry is `src/game/data/attackArt.ts`:
   RGB, so any baked-in hue corrupts the damage-type color. Full spec:
   `docs/ART_AND_AUDIO_GUIDELINES.md` → *Basic-Attack SVGs*.
 - How each style uses the art: projectile/pierce/boomerang/lobbed/trap fly it
-  as the body (`AttackSprite`), melee-cleave sweeps it, vortex spins it inside
-  an `AreaOverlay`, linear-wave stretches it via `LaneWave`, summoner shows it
-  as the barricade, and chain/beam pop it as strike/muzzle icons
-  (`popAttackIcon`).
+  as the body (`AttackSprite`), melee-cleave sweeps it through the damage arc,
+  vortex spins it inside an `AreaOverlay`, linear-wave stretches it via
+  `LaneWave`, summoner shows it as the barricade, and chain/beam pop it as
+  strike/muzzle icons (`popAttackIcon`).
+- Two sibling knobs on the definition: `projectileSpeed` (px/s flight speed,
+  defaults in `src/game/data/attackSpeed.ts`) and `projectileSizePx`
+  (in-flight sprite length, defaults in `STYLE_DEFAULT_SIZE`); bands are in
+  `docs/VOICE_DROPS.md` §1.
 
 ### Step B: Register the Skin (`src/game/data/skins.ts`)
 No `GameScene` code is needed — hero sheets load data-driven. Add one

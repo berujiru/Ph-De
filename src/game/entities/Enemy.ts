@@ -623,6 +623,10 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       if (this.definition.selfDestructOnBarrier) {
         const dmg = this.definition.selfDestructDamage ?? (this.definition.damage * (this.definition.barrierDamageMultiplier || 1));
         targetSummon.takeDamage(dmg);
+        spawnShockwaveRing(this.scene, {
+          x: this.x, y: this.y, color: 0xef4444, endRadius: 100, strokeWidth: 8, fillAlpha: 0.3, durationMs: 400
+        });
+        cameraPunch(this.scene, FX.cameraShake.shieldHit);
         this.hp = 0;
         this.takeDamage(0);
         return;
@@ -644,6 +648,10 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       if (this.definition.selfDestructOnBarrier) {
         const dmg = this.definition.selfDestructDamage ?? (this.definition.damage * (this.definition.barrierDamageMultiplier || 1));
         shield.takeDamage(dmg);
+        spawnShockwaveRing(this.scene, {
+          x: this.x, y: this.y, color: 0xef4444, endRadius: 100, strokeWidth: 8, fillAlpha: 0.3, durationMs: 400
+        });
+        cameraPunch(this.scene, FX.cameraShake.shieldHit);
         this.hp = 0;
         this.takeDamage(0);
         return;

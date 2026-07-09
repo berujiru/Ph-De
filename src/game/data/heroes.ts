@@ -61,6 +61,12 @@ export interface HeroDefinition {
    * fly slow (~400), light sharp ones fast (~850).
    */
   projectileSpeed?: number;
+  /**
+   * In-flight sprite length in px (along the art's +X). Omit to use the
+   * style default in STYLE_DEFAULT_SIZE (attackArt.ts). Override for
+   * naturally long silhouettes (skewer, pencil) or compact ones.
+   */
+  projectileSizePx?: number;
   canSeeStealth?: boolean;
   cutInDurationMs?: number;
   /** Top/bottom inset for the framed cut-in. 0 = fullscreen height. */
@@ -139,7 +145,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'boomerang',
-    range: 1250,
+    range: 1350,
     damage: 8, // per-hit; boomerang double-taps on the return
     attackRateMs: 1500,
     color: 0x8b5cf6,
@@ -148,6 +154,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     passive: { name: 'Fact Check', description: 'Instantly pops and destroys Fake HP padding.' },
     attackArt: 'ruler',
     projectileSpeed: 450,
+    projectileSizePx: 84, // rulers are long by nature
   },
   student: {
     id: 'student',
@@ -156,7 +163,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'pierce',
-    range: 1050,
+    range: 1200,
     damage: 7, // per-hit; lands on up to basePierce+1 enemies in a line
     attackRateMs: 1100,
     basePierce: 2,
@@ -166,6 +173,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     passive: { name: 'Overachiever', description: 'Enhancement drops apply at 1.5x potency.' },
     attackArt: 'pencil',
     projectileSpeed: 850,
+    projectileSizePx: 88, // slim dart, not a jousting lance
   },
   jeepney_driver: {
     id: 'jeepney_driver',
@@ -181,7 +189,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     purpose: 'Frontline cleaver — revs into clustered enemies and hits Bosses extra hard. A durable bruiser, not a sniper.',
     signatureSkill: { name: 'Barya Lang Po', shortName: 'Barya', description: 'Tosses coin shrapnel for massive shotgun AoE damage.' },
     passive: { name: 'Hari ng Kalsada', description: 'Deals bonus damage to Bosses.' },
-    attackArt: 'wheel-swipe',
+    attackArt: 'wrench',
   },
   fisherfolk: {
     id: 'fisherfolk',
@@ -190,7 +198,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Water',
     attackKind: 'ranged',
     attackStyle: 'vortex',
-    range: 850,
+    range: 950,
     damage: 8,
     attackRateMs: 3500,
     color: 0x0ea5e9,
@@ -206,13 +214,14 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Earth',
     attackKind: 'ranged',
     attackStyle: 'pierce',
-    range: 1000,
+    range: 1150,
     basePierce: 1,
     damage: 16,
     attackRateMs: 2200,
     color: 0xa8a29e,
     attackArt: 'debris',
     projectileSpeed: 450,
+    projectileSizePx: 92, // loose clump reads better a touch wide
     purpose: 'Throws gathered debris at enemies from a distance.',
     signatureSkill: { name: 'Dust Storm', shortName: 'Dust', description: 'Spawns a moving leaf tornado that chases enemies, pulling them in and dealing DoT. Size and damage scale with voice drops.' },
     passive: { name: 'Recycled Waste', description: 'Attacks pierce through 1 additional enemy.' },
@@ -224,7 +233,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Fire',
     attackKind: 'ranged',
     attackStyle: 'lobbed',
-    range: 900,
+    range: 1050,
     damage: 11,
     attackRateMs: 1700,
     color: 0xe2e8f0,
@@ -241,7 +250,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Holy',
     attackKind: 'ranged',
     attackStyle: 'projectile',
-    range: 1050,
+    range: 1200,
     damage: 8,
     attackRateMs: 1500,
     color: 0xfca5a5,
@@ -250,6 +259,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     passive: { name: 'Triage', description: 'Heals the barrier continuously 1 HP per second.' },
     attackArt: 'syringe',
     projectileSpeed: 600,
+    projectileSizePx: 56, // syringe dart stays needle-thin
   },
   construction_worker: {
     id: 'construction_worker',
@@ -274,7 +284,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Lightning',
     attackKind: 'ranged',
     attackStyle: 'projectile',
-    range: 1400, // longest non-global reach — sniper tier taxes the DPS
+    range: 1500, // longest non-global reach — sniper tier taxes the DPS
     damage: 13,
     attackRateMs: 1600,
     color: 0xfef08a,
@@ -299,7 +309,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     canSeeStealth: true,
     signatureSkill: { name: 'Flash', description: 'Casts a wide cone that heavily slows all enemies.' },
     passive: { name: 'Night Watch', description: 'Deals double damage to Stealthed enemies.' },
-    attackArt: 'batuta-swipe',
+    attackArt: 'batuta',
   },
   farmer: {
     id: 'farmer',
@@ -308,7 +318,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Earth',
     attackKind: 'ranged',
     attackStyle: 'chain',
-    range: 900,
+    range: 1050,
     damage: 19,
     attackRateMs: 1800, // slowed 2026-07: 13.6/hit on a multi-hit chain was OP
     color: 0x15803d,
@@ -324,7 +334,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'pierce',
-    range: 1100,
+    range: 1250,
     damage: 9, // per-hit across up to 5 pierced enemies — group DPS is the payoff
     attackRateMs: 1600, // slowed 2026-07: 5-pierce line clear was OP at 1300
     basePierce: 5,
@@ -334,6 +344,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     passive: { name: 'Tuhog', description: 'Attacks pierce up to 5 enemies in a line.' },
     attackArt: 'skewer',
     projectileSpeed: 750,
+    projectileSizePx: 120, // the Tuhog skewer is the long one on purpose
   },
   sandbox_projectile: { id: 'sandbox_projectile', name: 'Test: Projectile', profession: 'Tester', damageType: 'Physical', attackKind: 'ranged', attackStyle: 'projectile', range: 500, damage: 20, attackRateMs: 1000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
   sandbox_melee_cleave: { id: 'sandbox_melee_cleave', name: 'Test: Melee Cleave', profession: 'Tester', damageType: 'Physical', attackKind: 'melee', attackStyle: 'melee-cleave', range: 700, damage: 20, attackRateMs: 1000, color: 0x9ca3af, signatureSkill: { name: 'None', description: '' } },
@@ -353,7 +364,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Wind',
     attackKind: 'ranged',
     attackStyle: 'beam',
-    range: 1100,
+    range: 1250,
     damage: 4,
     attackRateMs: 600, // Still the fastest attacker in the game by ~2x
     color: 0xec4899,
@@ -369,7 +380,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Frost',
     attackKind: 'ranged',
     attackStyle: 'trap',
-    range: 800,
+    range: 900,
     damage: 12,
     attackRateMs: 3000,
     color: 0xf472b6,
@@ -385,7 +396,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Lightning',
     attackKind: 'ranged',
     attackStyle: 'chain',
-    range: 1150,
+    range: 1250,
     damage: 14,
     attackRateMs: 2000, // slowed 2026-07: guaranteed 5-bounce group clear was OP
     baseChain: 5,
@@ -402,7 +413,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Fire',
     attackKind: 'ranged',
     attackStyle: 'lobbed',
-    range: 950,
+    range: 1100,
     damage: 13,
     attackRateMs: 1800,
     color: 0xef4444,
@@ -419,7 +430,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'vortex',
-    range: 800,
+    range: 900,
     damage: 8,
     attackRateMs: 6500,
     color: 0x475569,
@@ -435,7 +446,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Water',
     attackKind: 'ranged',
     attackStyle: 'linear-wave',
-    range: 1050,
+    range: 1200,
     damage: 10,
     attackRateMs: 2400,
     color: 0x2563eb,
@@ -451,7 +462,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Wind',
     attackKind: 'ranged',
     attackStyle: 'boomerang',
-    range: 1300,
+    range: 1400,
     damage: 9, // per-hit; two-tap plus Rush Hour ramp is the real DPS
     attackRateMs: 1500,
     color: 0x22c55e,
@@ -460,5 +471,6 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     passive: { name: 'Rush Hour', description: 'Attack speed ramps up the longer they attack the same target.' },
     attackArt: 'parcel',
     projectileSpeed: 400,
+    projectileSizePx: 64, // boxy parcel, compact
   }
 };
