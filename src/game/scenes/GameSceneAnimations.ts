@@ -35,6 +35,28 @@ export function createHeroAnimations(scene: Phaser.Scene): void {
 /** Same as createHeroAnimations(), for enemies (top-front sprite sheets). */
 export function createEnemyAnimations(scene: Phaser.Scene): void {
   createAtlasAnimations(scene, Object.values(ENEMY_DEFINITIONS).map(d => d.spriteKey ?? d.id));
+
+  // Custom manual sprite sheet configuration for Grunt
+  if (scene.textures.exists('grunt') && !scene.anims.exists('grunt-march')) {
+    scene.anims.create({
+      key: 'grunt-march',
+      frames: scene.anims.generateFrameNumbers('grunt', { start: 0, end: 23 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'grunt-attack',
+      frames: scene.anims.generateFrameNumbers('grunt', { start: 24, end: 36 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'grunt-death',
+      frames: scene.anims.generateFrameNumbers('grunt', { start: 54, end: 71 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
 }
 
 /** Manually generate animations for sprite sheets without a JSON atlas. */
