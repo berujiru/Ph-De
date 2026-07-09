@@ -225,7 +225,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     color: 0xfca5a5,
     purpose: 'Support striker — alcohol sprays heal any ally summon they pass through, and hit undead anomalies for +50%.',
     signatureSkill: { name: 'Heal', shortName: 'Heal', description: 'Restores 150 HP to the barricade.' },
-    passive: { name: 'Triage', description: 'Projectiles passing through ally summons heal them.' },
+    passive: { name: 'Triage', description: 'Heals the barrier continuously 1 HP per second.' },
     projectileColor: 0xfecaca,
   },
   construction_worker: {

@@ -44,6 +44,8 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   /** Small per-hero stagger (along the march axis) so ranged heroes don't stack on one pixel. */
   private formationJitterY: number;
 
+  private passiveTimer = 0;
+
   private model: HeroModel;
   private skillAura: SkillAura;
   private spriteAura: SpriteAura;
@@ -243,6 +245,21 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
       this.activeBuffs[type] = duration - delta;
       if (this.activeBuffs[type] <= 0) {
         this.removeBuff(type);
+      }
+    }
+
+    // Process Continuous Passives (e.g. Nurse healing)
+    this.passiveTimer += delta;
+    if (this.passiveTimer >= 1000) {
+      const ticks = Math.floor(this.passiveTimer / 1000);
+      this.passiveTimer -= ticks * 1000;
+      
+      const activePassive = this.passiveOverride || this.id;
+      if (activePassive === 'nurse') {
+        const gs = this.scene as any;
+        if (gs.healShield) {
+          gs.healShield(1 * ticks);
+        }
       }
     }
 
