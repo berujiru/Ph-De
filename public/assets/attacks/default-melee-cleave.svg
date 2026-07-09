@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Crescent slash bulging toward +X; rendered with origin at the left edge so it sweeps out from the hero. -->
+  <path d="M36 10 A70 70 0 0 1 36 118 A104 104 0 0 0 36 10 Z"
+        fill="#ffffff" stroke="#0f172a" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M40 26 A52 52 0 0 1 40 102" fill="none" stroke="#cccccc" stroke-width="6" stroke-linecap="round"/>
+</svg>

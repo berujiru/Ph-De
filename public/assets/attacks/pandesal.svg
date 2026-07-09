@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Baker: hot pandesal bun with heat lines rising off the crust. -->
+  <path d="M34 20 Q40 6 50 16 M60 18 Q66 4 76 14 M86 20 Q92 6 102 16"
+        fill="none" stroke="#cccccc" stroke-width="5" stroke-linecap="round"/>
+  <ellipse cx="64" cy="76" rx="44" ry="32" fill="#ffffff" stroke="#0f172a" stroke-width="6"/>
+  <path d="M28 84 Q64 100 100 84 Q92 106 64 108 Q36 106 28 84 Z" fill="#cccccc" fill-opacity="0.6"/>
+  <path d="M40 64 Q64 52 88 64" fill="none" stroke="#e6e6e6" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="50" cy="58" r="3" fill="#e6e6e6"/>
+  <circle cx="66" cy="52" r="3" fill="#e6e6e6"/>
+  <circle cx="80" cy="58" r="3" fill="#e6e6e6"/>
+</svg>

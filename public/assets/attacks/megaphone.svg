@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Eden: hurled megaphone, horn pointing +X with sound arcs. -->
+  <rect x="6" y="52" width="26" height="26" rx="7" fill="#e6e6e6" stroke="#0f172a" stroke-width="5"/>
+  <path d="M30 46 L84 24 L84 104 L30 82 Z" fill="#ffffff" stroke="#0f172a" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M36 52 L74 38 L74 52 L36 62 Z" fill="#cccccc" fill-opacity="0.7"/>
+  <rect x="82" y="20" width="10" height="88" rx="5" fill="#cccccc" stroke="#0f172a" stroke-width="4"/>
+  <path d="M100 46 A26 26 0 0 1 100 82" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>
+  <path d="M112 38 A38 38 0 0 1 112 90" fill="none" stroke="#e6e6e6" stroke-width="6" stroke-linecap="round"/>
+</svg>

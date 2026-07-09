@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Farmer: roots bursting from the ground at each chain strike point. -->
+  <ellipse cx="64" cy="106" rx="40" ry="12" fill="#cccccc" fill-opacity="0.6"/>
+  <path d="M64 104 Q60 70 64 44 L70 46 Q68 74 72 104 Z" fill="#ffffff" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M60 100 Q42 84 34 56 L42 52 Q50 78 66 94 Z" fill="#e6e6e6" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M70 98 Q88 84 96 58 L88 54 Q80 78 66 92 Z" fill="#e6e6e6" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M56 102 Q38 100 24 88" fill="none" stroke="#cccccc" stroke-width="5" stroke-linecap="round"/>
+  <path d="M74 102 Q92 100 106 90" fill="none" stroke="#cccccc" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="66" cy="38" r="7" fill="#ffffff" stroke="#0f172a" stroke-width="3"/>
+  <circle cx="38" cy="48" r="5" fill="#e6e6e6"/>
+  <circle cx="94" cy="50" r="5" fill="#e6e6e6"/>
+</svg>

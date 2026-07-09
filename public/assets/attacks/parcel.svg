@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Delivery Rider: taped parcel box with motion arcs; two-tap boomerang delivery. -->
+  <path d="M10 34 A46 46 0 0 0 10 94" fill="none" stroke="#cccccc" stroke-width="5" stroke-linecap="round"/>
+  <path d="M22 42 A34 34 0 0 0 22 86" fill="none" stroke="#e6e6e6" stroke-width="5" stroke-linecap="round"/>
+  <rect x="38" y="34" width="72" height="60" rx="5" fill="#ffffff" stroke="#0f172a" stroke-width="6"/>
+  <rect x="68" y="34" width="12" height="60" fill="#e6e6e6"/>
+  <rect x="38" y="58" width="72" height="12" fill="#e6e6e6"/>
+  <rect x="46" y="42" width="16" height="8" rx="2" fill="#cccccc"/>
+</svg>

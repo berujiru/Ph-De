@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Teacher: tick-marked wooden ruler; tumbles like a boomerang in flight. -->
+  <rect x="4" y="50" width="120" height="28" rx="4" fill="#ffffff" stroke="#0f172a" stroke-width="5"/>
+  <rect x="8" y="54" width="112" height="8" fill="#e6e6e6"/>
+  <path d="M20 50 V64 M36 50 V58 M52 50 V64 M68 50 V58 M84 50 V64 M100 50 V58 M114 50 V64"
+        stroke="#0f172a" stroke-width="3" fill="none"/>
+</svg>

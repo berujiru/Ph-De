@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Bent chevron: two arms meeting in an elbow; tumbles in flight so orientation is loose. -->
+  <path d="M18 38 L86 38 Q94 38 94 46 L94 112 L68 112 L68 64 L18 64 Z"
+        fill="#ffffff" stroke="#0f172a" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="26" y="44" width="54" height="6" rx="3" fill="#cccccc"/>
+  <rect x="74" y="58" width="6" height="44" rx="3" fill="#cccccc"/>
+</svg>

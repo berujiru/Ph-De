@@ -7,9 +7,18 @@ import { spawnHitSpark } from './fx/ImpactFx';
 import { spawnShockwaveRing } from './fx/ShockwaveRing';
 import { AreaOverlay } from './fx/AreaOverlay';
 import { LaneWave } from './fx/LaneWave';
+import { AttackSprite, popAttackIcon } from './fx/AttackSprite';
 
-/** Bold cel-shaded outline every attack shape wears against the dark field. */
-const OUTLINE_COLOR = 0x0f172a;
+/**
+ * Per-hero attack art + resolved damage-type tint, passed in by the spawner
+ * (GameSceneSpawners resolves DAMAGE_TYPE_COLORS[damageType] and the hero's
+ * attackArt registry key). Basic-attack classes render with this instead of
+ * hard-coded procedural shapes.
+ */
+export interface AttackVisual {
+  artKey: string;
+  tint: number;
+}
 
 export interface AttackModifiers {
   bonusDamage: number;
@@ -59,19 +68,19 @@ export class ProjectileAttack extends Attack {
   private speed = 500;
   private vx = 0;
   private vy = 0;
-  private visual: Phaser.GameObjects.Arc;
+  private visual: AttackSprite;
   private trail: MotionTrail;
   private hitCount = 0;
   private maxHits: number;
   private hitEnemies = new Set<Enemy>();
 
-  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>, damageType: string = 'Physical') {
+  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy, damage: number, visual: AttackVisual, modifiers?: Partial<AttackModifiers>, damageType: string = 'Physical') {
     super(scene, 'ProjectileAttack', damage, modifiers, damageType);
     this.target = target;
     this.maxHits = 1 + this.modifiers.bonusPierce;
-    this.trail = new MotionTrail(scene, color);
-    this.visual = scene.add.circle(x, y, 30, color);
-    this.visual.setStrokeStyle(4, OUTLINE_COLOR, 1);
+    this.trail = new MotionTrail(scene, visual.tint);
+    // Length 64 ≈ the old radius-30 circle plus its outline.
+    this.visual = new AttackSprite(scene, { x, y, artKey: visual.artKey, tint: visual.tint, lengthPx: 64 });
     const dx = target.x - x;
     const dy = target.y - y;
     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -79,13 +88,14 @@ export class ProjectileAttack extends Attack {
       this.vx = (dx / dist) * this.speed;
       this.vy = (dy / dist) * this.speed;
     }
+    this.visual.pointAlong(this.vx, this.vy);
   }
 
   public upgrade(newMods: Partial<AttackModifiers>) {
     super.upgrade(newMods);
     this.maxHits = 1 + this.modifiers.bonusPierce;
     if (newMods.bonusRadius) {
-      this.visual.setRadius(30 + this.modifiers.bonusRadius);
+      this.visual.setLength(64 + this.modifiers.bonusRadius * 2);
     }
   }
 
@@ -102,8 +112,8 @@ export class ProjectileAttack extends Attack {
       }
     }
     const dt = delta / 1000;
-    this.visual.x += this.vx * dt;
-    this.visual.y += this.vy * dt;
+    this.visual.setPosition(this.visual.x + this.vx * dt, this.visual.y + this.vy * dt);
+    this.visual.pointAlong(this.vx, this.vy);
     this.trail.update(this.visual.x, this.visual.y, this.vx, this.vy);
 
     const enemies = (this.scene as any).enemies as Enemy[];
@@ -149,21 +159,18 @@ export class PierceAttack extends Attack {
   private speed = 500;
   private vx = 0;
   private vy = 0;
-  private visual: Phaser.GameObjects.Arc;
-  private lance: Phaser.GameObjects.Rectangle;
+  private visual: AttackSprite;
   private hitCount = 0;
   private maxHits: number;
   private hitEnemies = new Set<Enemy>();
 
-  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy | { x: number, y: number }, damage: number, color: number, basePierce: number, modifiers?: Partial<AttackModifiers>, damageType: string = 'Physical') {
+  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy | { x: number, y: number }, damage: number, visual: AttackVisual, basePierce: number, modifiers?: Partial<AttackModifiers>, damageType: string = 'Physical') {
     super(scene, 'PierceAttack', damage, modifiers, damageType);
     // Total pass-throughs = basePierce + bonusPierce (guard against bad data).
     this.maxHits = Math.max(1, basePierce + this.modifiers.bonusPierce);
-    // A long lance/streak behind a bright tip so pierce reads as a spear, not a dot.
-    this.lance = scene.add.rectangle(x, y, 160, 20, color, 0.85);
-    this.lance.setStrokeStyle(4, OUTLINE_COLOR, 1);
-    this.visual = scene.add.circle(x, y, 20, color);
-    this.visual.setStrokeStyle(4, OUTLINE_COLOR, 1);
+    // One long oriented lance so pierce reads as a spear, not a dot
+    // (length ≈ the old 160px streak + 20px tip).
+    this.visual = new AttackSprite(scene, { x, y, artKey: visual.artKey, tint: visual.tint, lengthPx: 190 });
 
     // Snapshot the firing vector ONCE; the shot never curves after this.
     const dx = target.x - x;
@@ -175,16 +182,13 @@ export class PierceAttack extends Attack {
     } else {
       this.vx = this.speed; // degenerate case: fire straight up-lane
     }
-    this.lance.setRotation(Math.atan2(this.vy, this.vx));
+    this.visual.pointAlong(this.vx, this.vy);
   }
 
   update(_time: number, delta: number) {
     if (this.isDead) return;
     const dt = delta / 1000;
-    this.visual.x += this.vx * dt;
-    this.visual.y += this.vy * dt;
-    // Trail the lance body a little behind the tip.
-    this.lance.setPosition(this.visual.x - this.vx / this.speed * 18, this.visual.y - this.vy / this.speed * 18);
+    this.visual.setPosition(this.visual.x + this.vx * dt, this.visual.y + this.vy * dt);
 
     const nx = -this.vy;
     const ny = this.vx;
@@ -216,7 +220,6 @@ export class PierceAttack extends Attack {
 
   private die() {
     this.isDead = true;
-    this.lance.destroy();
     this.visual.destroy();
     this.destroy();
   }
@@ -227,29 +230,27 @@ export class MeleeCleaveAttack extends Attack {
   private ageMs = 0;
   private maxRadius: number;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy, damage: number, range: number, color: number, modifiers?: Partial<AttackModifiers>) {
+  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy, damage: number, range: number, visual: AttackVisual, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'MeleeCleaveAttack', damage, modifiers);
     this.maxRadius = range + this.modifiers.bonusRadius;
     const dx = target.x - x;
     const dy = target.y - y;
     const angleRad = Math.atan2(dy, dx);
-    const angleDeg = Phaser.Math.RadToDeg(angleRad);
-    
-    // Multiple ripple visual
-    for (let i = 0; i < 3; i++) {
-      const arc = scene.add.arc(x, y, 10, angleDeg - 45, angleDeg + 45, false, color, 0.8);
-      arc.setStrokeStyle(3, 0xffffff, 0.9);
-      
-      scene.tweens.add({
-        targets: arc,
-        radius: this.maxRadius,
-        alpha: 0,
-        duration: 200,
-        delay: i * 40,
-        ease: 'Quad.easeOut',
-        onComplete: () => arc.destroy()
-      });
-    }
+
+    // One swipe sprite rooted at the hero, sweeping out over the cleave range.
+    const swipe = new AttackSprite(scene, { x, y, artKey: visual.artKey, tint: visual.tint, lengthPx: this.maxRadius, alpha: 0.9 });
+    swipe.image.setOrigin(0, 0.5); // emanate from the hero, not the art center
+    swipe.pointAlong(dx, dy);
+    const fullScale = swipe.image.scale;
+    swipe.image.setScale(fullScale * 0.4);
+    scene.tweens.add({
+      targets: swipe.image,
+      scale: fullScale,
+      alpha: 0,
+      duration: 200,
+      ease: 'Quad.easeOut',
+      onComplete: () => swipe.destroy(),
+    });
 
     const enemies = (scene as any).enemies as Enemy[];
     if (enemies) {
@@ -283,26 +284,29 @@ export class MeleeCleaveAttack extends Attack {
 }
 
 export class VortexAttack extends Attack {
-  private visual: Phaser.GameObjects.Arc;
-  private swirls: Phaser.GameObjects.Arc[] = [];
+  private overlay: AreaOverlay;
+  private xPos: number;
+  private yPos: number;
   private lifeTimeMs = 3000;
   private ageMs = 0;
   private tickRateMs = 500;
   private timeSinceLastTick = 0;
 
-  constructor(scene: Phaser.Scene, _x: number, _y: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>, damageType: string = 'Physical') {
+  constructor(scene: Phaser.Scene, _x: number, _y: number, target: Enemy, damage: number, visual: AttackVisual, modifiers?: Partial<AttackModifiers>, damageType: string = 'Physical') {
     super(scene, 'VortexAttack', damage, modifiers, damageType);
     const radius = 100 + this.modifiers.bonusRadius;
     // Spawn at target location so it traps enemies there
-    this.visual = scene.add.circle(target.x, target.y, radius, color, 0.3);
-    this.visual.setStrokeStyle(3, color, 0.9);
-    // Two open arcs that spin to sell the suction.
-    for (let i = 0; i < 2; i++) {
-      const arc = scene.add.arc(target.x, target.y, radius * (0.55 + i * 0.3), 0, 200, false, color, 0);
-      arc.setStrokeStyle(3, color, 0.7);
-      arc.setRotation(i * Math.PI);
-      this.swirls.push(arc);
-    }
+    this.xPos = target.x;
+    this.yPos = target.y;
+    this.overlay = new AreaOverlay(scene, {
+      x: target.x, y: target.y, radius,
+      fillColor: visual.tint, fillAlpha: 0.25,
+      strokeColor: visual.tint, strokeWidth: 3, strokeAlpha: 0.9,
+      svgKey: visual.artKey, svgTint: visual.tint,
+      svgScale: (radius * 2) / 128, // art is authored at 128px, cover the disc
+      svgSpin: 90,
+      enter: { durationMs: 200 },
+    });
   }
 
   update(_time: number, delta: number) {
@@ -310,18 +314,14 @@ export class VortexAttack extends Attack {
     this.ageMs += delta;
     this.timeSinceLastTick += delta;
 
-    this.visual.setAlpha(0.3 + 0.1 * Math.sin(this.ageMs / 100));
-    for (let i = 0; i < this.swirls.length; i++) {
-      this.swirls[i].rotation += (delta / 1000) * (i === 0 ? 5 : -3.5);
-    }
     const radius = 100 + this.modifiers.bonusRadius;
-    
+
     const enemies = (this.scene as any).enemies as Enemy[];
     if (enemies) {
       for (const enemy of enemies) {
         if (enemy.isDead) continue;
-        const dx = this.visual.x - enemy.x;
-        const dy = this.visual.y - enemy.y;
+        const dx = this.xPos - enemy.x;
+        const dy = this.yPos - enemy.y;
         const distSq = dx * dx + dy * dy;
         
         if (distSq <= radius * radius) {
@@ -345,11 +345,10 @@ export class VortexAttack extends Attack {
     if (this.timeSinceLastTick >= this.tickRateMs) {
       this.timeSinceLastTick -= this.tickRateMs;
     }
-    
+
     if (this.ageMs >= this.lifeTimeMs) {
       this.isDead = true;
-      this.visual.destroy();
-      for (const swirl of this.swirls) swirl.destroy();
+      this.overlay.fadeOutAndDestroy(200);
       this.destroy();
     }
   }
@@ -357,8 +356,7 @@ export class VortexAttack extends Attack {
 
 export class BoomerangAttack extends Attack {
   private speed = 400;
-  private visual: Phaser.GameObjects.Arc;
-  private blade: Phaser.GameObjects.Rectangle;
+  private visual: AttackSprite;
   private trail: MotionTrail;
   private flightState: 'outward' | 'returning' = 'outward';
   private startX: number;
@@ -369,15 +367,17 @@ export class BoomerangAttack extends Attack {
   private hitEnemiesOutward = new Set<Enemy>();
   private hitEnemiesReturning = new Set<Enemy>();
 
-  constructor(scene: Phaser.Scene, hero: import('./Hero').Hero, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
+  constructor(scene: Phaser.Scene, hero: import('./Hero').Hero, target: Enemy, damage: number, visual: AttackVisual, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'BoomerangAttack', damage, modifiers);
     this.hero = hero;
-    this.trail = new MotionTrail(scene, color);
-    this.visual = scene.add.circle(hero.x, hero.y, 35 + this.modifiers.bonusRadius, color);
-    this.visual.setStrokeStyle(4, OUTLINE_COLOR, 1);
-    // A spinning crossbar so the boomerang visibly tumbles as it flies.
-    this.blade = scene.add.rectangle(hero.x, hero.y, 100 + this.modifiers.bonusRadius * 2, 20, color, 0.9);
-    this.blade.setStrokeStyle(4, OUTLINE_COLOR, 1);
+    this.trail = new MotionTrail(scene, visual.tint);
+    // Tumbling sprite (spin rate ≈ the old 18 rad/s crossbar).
+    this.visual = new AttackSprite(scene, {
+      x: hero.x, y: hero.y,
+      artKey: visual.artKey, tint: visual.tint,
+      lengthPx: 100 + this.modifiers.bonusRadius * 2,
+      spinDegPerSec: 1030,
+    });
 
     this.startX = hero.x;
     this.startY = hero.y;
@@ -415,13 +415,11 @@ export class BoomerangAttack extends Attack {
         return;
       }
     } else {
-      this.visual.x += (dx / dist) * this.speed * dt;
-      this.visual.y += (dy / dist) * this.speed * dt;
+      this.visual.setPosition(this.visual.x + (dx / dist) * this.speed * dt, this.visual.y + (dy / dist) * this.speed * dt);
     }
 
-    // Spin the blade, keep it on the core, and stream a trail behind the flight.
-    this.blade.setPosition(this.visual.x, this.visual.y);
-    this.blade.rotation += dt * 18;
+    // Tumble the art and stream a trail behind the flight.
+    this.visual.update(delta);
     this.trail.update(this.visual.x, this.visual.y, dx, dy);
 
     const enemies = (this.scene as any).enemies as Enemy[];
@@ -445,7 +443,6 @@ export class BoomerangAttack extends Attack {
   private die() {
     this.isDead = true;
     this.trail.destroy();
-    this.blade.destroy();
     this.visual.destroy();
     this.destroy();
   }
@@ -455,7 +452,7 @@ export class ChainAttack extends Attack {
   private ageMs = 0;
   private lines: Phaser.GameObjects.Line[] = [];
   
-  constructor(scene: Phaser.Scene, startX: number, startY: number, target: Enemy, damage: number, color: number, baseChain: number, modifiers?: Partial<AttackModifiers>) {
+  constructor(scene: Phaser.Scene, startX: number, startY: number, target: Enemy, damage: number, visual: AttackVisual, baseChain: number, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'ChainAttack', damage, modifiers);
 
     let currentTarget = target;
@@ -474,9 +471,12 @@ export class ChainAttack extends Attack {
       hitEnemies.add(currentTarget);
 
       // Crackling multi-segment arc between the two points, with a wider soft
-      // glow underneath and a bright white core over it.
-      this.drawCrackle(scene, currentX, currentY, currentTarget.x, currentTarget.y, color, 14, 0.4);
+      // glow underneath and a bright white core over it. The per-hero art pops
+      // at each strike point (procedural lightning stays — it reads better in
+      // motion than any static texture).
+      this.drawCrackle(scene, currentX, currentY, currentTarget.x, currentTarget.y, visual.tint, 14, 0.4);
       this.drawCrackle(scene, currentX, currentY, currentTarget.x, currentTarget.y, 0xffffff, 5, 1);
+      popAttackIcon(scene, currentTarget.x, currentTarget.y, visual.artKey, visual.tint, 48, 150);
 
       currentX = currentTarget.x;
       currentY = currentTarget.y;
@@ -543,12 +543,12 @@ export class ChainAttack extends Attack {
 }
 
 export class SummonAttack extends Attack {
-  constructor(scene: Phaser.Scene, _x: number, _y: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
+  constructor(scene: Phaser.Scene, _x: number, _y: number, target: Enemy, damage: number, visual: AttackVisual, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'SummonAttack', damage, modifiers);
-    
+
     // Total damage stat is repurposed as maxHP for summons
     const summonHp = this.totalDamage * 10;
-    const summon = new Summon(scene, target.x, target.y, summonHp, color);
+    const summon = new Summon(scene, target.x, target.y, summonHp, visual.tint, { artKey: visual.artKey, tint: visual.tint });
     
     if ((scene as any).summons) {
       (scene as any).summons.push(summon);
@@ -566,7 +566,7 @@ export class BeamAttack extends Attack {
   private visual: Phaser.GameObjects.Line;
   private glow: Phaser.GameObjects.Line;
 
-  constructor(scene: Phaser.Scene, startX: number, startY: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
+  constructor(scene: Phaser.Scene, startX: number, startY: number, target: Enemy, damage: number, visual: AttackVisual, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'BeamAttack', damage, modifiers);
 
     const range = 1000;
@@ -582,10 +582,13 @@ export class BeamAttack extends Attack {
     }
 
     // Layered look: a wide translucent glow with a bright white core over it.
-    this.glow = scene.add.line(0, 0, startX, startY, endX, endY, color, 0.35).setOrigin(0, 0);
+    // The beam is a 150ms flash — stroke + per-hero icons reads better than a
+    // stretched texture, so the art pops at the muzzle and at each enemy hit.
+    this.glow = scene.add.line(0, 0, startX, startY, endX, endY, visual.tint, 0.35).setOrigin(0, 0);
     this.glow.setLineWidth(12 + this.modifiers.bonusRadius * 2);
     this.visual = scene.add.line(0, 0, startX, startY, endX, endY, 0xffffff).setOrigin(0, 0);
     this.visual.setLineWidth(4 + this.modifiers.bonusRadius);
+    popAttackIcon(scene, startX, startY, visual.artKey, visual.tint, 40, 150);
 
     // Hit half-width grows with bonusRadius so the `radius` upgrade actually
     // changes what the beam catches (not just its drawn thickness).
@@ -606,6 +609,7 @@ export class BeamAttack extends Attack {
           const edy = enemy.y - projY;
           if (edx * edx + edy * edy < hitHalfWidthSq) {
             enemy.takeDamage(this.totalDamage);
+            popAttackIcon(scene, enemy.x, enemy.y, visual.artKey, visual.tint, 36, 150);
           }
         }
       }
@@ -634,10 +638,10 @@ export class LobbedAttack extends Attack {
   private targetY: number;
   private progress = 0;
   private travelTimeMs = 600;
-  private visual: Phaser.GameObjects.Arc;
+  private visual: AttackSprite;
   private shadow: Phaser.GameObjects.Ellipse;
 
-  constructor(scene: Phaser.Scene, startX: number, startY: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
+  constructor(scene: Phaser.Scene, startX: number, startY: number, target: Enemy, damage: number, visual: AttackVisual, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'LobbedAttack', damage, modifiers);
     this.startX = startX;
     this.startY = startY;
@@ -646,8 +650,8 @@ export class LobbedAttack extends Attack {
 
     // Ground shadow that tracks the landing spot — sells the arc height.
     this.shadow = scene.add.ellipse(startX, startY, 60, 20, 0x000000, 0.35);
-    this.visual = scene.add.circle(startX, startY, 30, color);
-    this.visual.setStrokeStyle(4, OUTLINE_COLOR, 1);
+    // Slow tumble so the thrown object reads as airborne.
+    this.visual = new AttackSprite(scene, { x: startX, y: startY, artKey: visual.artKey, tint: visual.tint, lengthPx: 60, spinDegPerSec: 240 });
   }
 
   update(_time: number, delta: number) {
@@ -662,8 +666,10 @@ export class LobbedAttack extends Attack {
       const baseY = this.startY + (this.targetY - this.startY) * this.progress;
       const arc = Math.sin(this.progress * Math.PI) * 100;
 
-      this.visual.x = baseX;
-      this.visual.y = baseY - arc;
+      this.visual.setPosition(baseX, baseY - arc);
+      // Scale up mid-arc so the throw reads as gaining height; tumble as it flies.
+      this.visual.flightScale(1 + Math.sin(this.progress * Math.PI) * 0.35);
+      this.visual.update(delta);
       // Shadow stays on the ground line and tightens as the shot descends.
       this.shadow.setPosition(baseX, baseY);
       const tightness = 1 - Math.sin(this.progress * Math.PI) * 0.5;
@@ -717,7 +723,7 @@ export class LinearWaveAttack extends Attack {
   private wave: LaneWave;
   private hitEnemies = new Set<Enemy>();
 
-  constructor(scene: Phaser.Scene, x: number, y: number, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
+  constructor(scene: Phaser.Scene, x: number, y: number, damage: number, visual: AttackVisual, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'LinearWaveAttack', damage, modifiers);
     this.startY = y;
 
@@ -725,8 +731,10 @@ export class LinearWaveAttack extends Attack {
       x, y,
       width: 150 + this.modifiers.bonusRadius * 2,
       height: 40,
-      color,
-      bodyAlpha: 0.6,
+      color: visual.tint,
+      svgKey: visual.artKey,
+      svgTint: visual.tint,
+      bodyAlpha: 0.9,
       pulse: { scaleX: 1.15, durationMs: 200 },
       particles: { minRadius: 2, maxRadius: 6, alpha: 0.6, fallPx: 30, durationMs: 500 },
     });
@@ -761,19 +769,19 @@ export class LinearWaveAttack extends Attack {
 }
 
 export class TrapAttack extends Attack {
-  private visual: Phaser.GameObjects.Arc;
+  private visual: AttackSprite;
   private telegraph: Phaser.GameObjects.Arc;
 
-  constructor(scene: Phaser.Scene, _x: number, _y: number, target: Enemy, damage: number, color: number, modifiers?: Partial<AttackModifiers>) {
+  constructor(scene: Phaser.Scene, _x: number, _y: number, target: Enemy, damage: number, visual: AttackVisual, modifiers?: Partial<AttackModifiers>) {
     super(scene, 'TrapAttack', damage, modifiers);
     const trapX = target.x - 50;
     const trapY = target.y;
-    this.visual = scene.add.circle(trapX, trapY, 10, color, 0.4);
-    this.visual.setStrokeStyle(2, OUTLINE_COLOR, 0.9);
+    // Small static armed-trap marker in the hero's art.
+    this.visual = new AttackSprite(scene, { x: trapX, y: trapY, artKey: visual.artKey, tint: visual.tint, lengthPx: 44 });
     // A pulsing hazard ring telegraphs the armed trap's footprint.
     const explosionRadius = 80 + this.modifiers.bonusRadius;
-    this.telegraph = scene.add.circle(trapX, trapY, explosionRadius, color, 0);
-    this.telegraph.setStrokeStyle(2, color, 0.5);
+    this.telegraph = scene.add.circle(trapX, trapY, explosionRadius, visual.tint, 0);
+    this.telegraph.setStrokeStyle(2, visual.tint, 0.5);
     scene.tweens.add({
       targets: this.telegraph,
       alpha: { from: 0.6, to: 0.15 },

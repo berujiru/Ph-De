@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Spark burst: strike-point impact icon for chain attacks. -->
+  <path d="M64 8 L74 48 L114 38 L84 64 L114 90 L74 80 L64 120 L54 80 L14 90 L44 64 L14 38 L54 48 Z"
+        fill="#ffffff" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="64" cy="64" r="14" fill="#e6e6e6"/>
+  <circle cx="64" cy="64" r="6" fill="#ffffff"/>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Plumber: high-pressure crest with a rolled curl; stretched across the lane by LaneWave. -->
+  <path d="M0 56 Q14 38 30 54 Q44 40 62 52 Q80 36 96 52 Q112 42 128 56 L128 100 L0 100 Z"
+        fill="#ffffff" stroke="#0f172a" stroke-width="4"/>
+  <path d="M0 74 Q22 62 44 74 T88 74 T128 74 L128 100 L0 100 Z" fill="#cccccc" fill-opacity="0.65"/>
+  <path d="M30 54 Q38 44 48 50 Q42 56 36 56" fill="#e6e6e6"/>
+  <path d="M96 52 Q104 42 114 48 Q108 54 102 54" fill="#e6e6e6"/>
+  <circle cx="18" cy="46" r="5" fill="#ffffff"/>
+  <circle cx="70" cy="42" r="6" fill="#ffffff"/>
+  <circle cx="118" cy="46" r="4" fill="#ffffff"/>
+</svg>

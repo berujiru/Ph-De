@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Sales Lady: price tag flashing at the pitch's muzzle and hits. -->
+  <path d="M22 64 L50 34 L104 34 Q114 34 114 44 L114 84 Q114 94 104 94 L50 94 Z"
+        fill="#ffffff" stroke="#0f172a" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="46" cy="64" r="7" fill="#0f172a"/>
+  <path d="M66 50 V78 M62 54 Q74 46 78 56 Q80 64 66 64 Q52 64 54 72 Q58 82 70 74"
+        fill="none" stroke="#999999" stroke-width="5" stroke-linecap="round"/>
+  <path d="M92 52 L96 62 L106 66 L96 70 L92 80 L88 70 L78 66 L88 62 Z" fill="#e6e6e6"/>
+  <path d="M116 20 L120 30 M124 44 L116 48 M104 14 L100 24" stroke="#e6e6e6" stroke-width="4" stroke-linecap="round" fill="none"/>
+</svg>

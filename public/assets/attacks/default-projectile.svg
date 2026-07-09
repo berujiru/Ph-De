@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Comet orb: trail tapers left, orb nose points +X. White/grayscale only (runtime tint). -->
+  <path d="M6 64 L62 46 L62 82 Z" fill="#cccccc" fill-opacity="0.5"/>
+  <path d="M24 64 L66 52 L66 76 Z" fill="#e6e6e6" fill-opacity="0.75"/>
+  <circle cx="88" cy="64" r="30" fill="#ffffff" stroke="#0f172a" stroke-width="6"/>
+  <circle cx="81" cy="71" r="20" fill="#cccccc" fill-opacity="0.55"/>
+  <circle cx="97" cy="55" r="9" fill="#ffffff"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Traffic Enforcer: whistle at the eye of a pulling swirl. -->
+  <path d="M64 10 A54 54 0 1 1 10 64" fill="none" stroke="#e6e6e6" stroke-width="7" stroke-linecap="round"/>
+  <path d="M64 26 A38 38 0 1 0 102 64" fill="none" stroke="#cccccc" stroke-width="6" stroke-linecap="round"/>
+  <rect x="62" y="46" width="34" height="14" rx="7" fill="#e6e6e6" stroke="#0f172a" stroke-width="4"/>
+  <circle cx="58" cy="70" r="22" fill="#ffffff" stroke="#0f172a" stroke-width="5"/>
+  <circle cx="58" cy="70" r="7" fill="#0f172a"/>
+</svg>

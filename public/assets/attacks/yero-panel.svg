@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Construction Worker: corrugated yero sheet barricade (drawn wide; Summon squashes to footprint). -->
+  <rect x="8" y="28" width="112" height="72" rx="4" fill="#ffffff" stroke="#0f172a" stroke-width="6"/>
+  <rect x="20" y="34" width="10" height="60" fill="#e6e6e6"/>
+  <rect x="40" y="34" width="10" height="60" fill="#cccccc"/>
+  <rect x="60" y="34" width="10" height="60" fill="#e6e6e6"/>
+  <rect x="80" y="34" width="10" height="60" fill="#cccccc"/>
+  <rect x="100" y="34" width="10" height="60" fill="#e6e6e6"/>
+  <rect x="4" y="100" width="24" height="14" rx="3" fill="#999999" stroke="#0f172a" stroke-width="4"/>
+  <rect x="100" y="100" width="24" height="14" rx="3" fill="#999999" stroke="#0f172a" stroke-width="4"/>
+</svg>

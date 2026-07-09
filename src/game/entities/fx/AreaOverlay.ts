@@ -33,6 +33,8 @@ export interface AreaOverlayConfig {
   /** Preloaded texture key for an SVG ground image layered above the disc. */
   svgKey?: string;
   svgScale?: number;
+  /** Tint for white/grayscale attack-art SVGs; omit for baked-color FX art. */
+  svgTint?: number;
   /** 1 = "standing" flourish rooted at (x,y) (tree); 0.5 = flat (vortex). */
   svgOriginY?: number;
   /** Continuous rotation of the SVG in degrees per second (tornado). */
@@ -90,6 +92,7 @@ export class AreaOverlay extends Phaser.GameObjects.Container {
       this.svg = scene.add.image(0, 0, cfg.svgKey);
       this.svg.setOrigin(0.5, cfg.svgOriginY ?? 0.5);
       this.svg.setScale(this.baseSvgScale);
+      if (cfg.svgTint !== undefined) this.svg.setTint(cfg.svgTint);
       this.add(this.svg);
       if (cfg.svgSpin) {
         scene.tweens.add({

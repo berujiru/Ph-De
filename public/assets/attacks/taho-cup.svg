@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Taho Vendor: lobbed taho cup, syrup sloshing out the top. -->
+  <path d="M84 26 Q96 18 106 24" fill="none" stroke="#cccccc" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="110" cy="28" r="6" fill="#ffffff"/>
+  <circle cx="94" cy="14" r="5" fill="#e6e6e6"/>
+  <path d="M36 40 L92 40 L84 106 L44 106 Z" fill="#ffffff" stroke="#0f172a" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="32" y="32" width="64" height="12" rx="6" fill="#e6e6e6" stroke="#0f172a" stroke-width="4"/>
+  <path d="M42 58 L86 58 L82 78 L46 78 Z" fill="#cccccc" fill-opacity="0.7"/>
+  <circle cx="56" cy="90" r="5" fill="#e6e6e6"/>
+  <circle cx="72" cy="92" r="4" fill="#e6e6e6"/>
+</svg>

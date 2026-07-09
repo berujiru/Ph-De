@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Round bomb with a lit fuse spark. -->
+  <path d="M60 30 Q64 16 78 14" fill="none" stroke="#999999" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="83" cy="12" r="6" fill="#ffffff"/>
+  <rect x="50" y="28" width="20" height="14" rx="4" fill="#e6e6e6" stroke="#0f172a" stroke-width="4"/>
+  <circle cx="60" cy="76" r="34" fill="#ffffff" stroke="#0f172a" stroke-width="6"/>
+  <circle cx="51" cy="84" r="22" fill="#cccccc" fill-opacity="0.55"/>
+  <circle cx="72" cy="64" r="8" fill="#ffffff"/>
+</svg>

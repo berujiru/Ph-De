@@ -66,6 +66,31 @@ The effect the skill spawns on the lane, separate from the character sheet. **St
 
 At runtime the engine composites on-field ground FX with the shared `AreaOverlay` component (`src/game/entities/fx/AreaOverlay.ts`): the flat disc/rings are drawn procedurally at the gameplay radius, and the vertical flourish is the SVG you supply, layered via `svgKey` and scaled with `svgScale` — so author the SVG at the gameplay radius and let the engine handle sizing, pulsing, and lifetime.
 
+### E. Basic-Attack SVGs (tintable)
+
+Every hero's **basic attack** renders a reusable SVG from
+`public/assets/attacks/<stem>.svg`, tinted at runtime with
+`DAMAGE_TYPE_COLORS[damageType]` — one file serves every damage type (the
+Student's Cramming randomizes the type per shot and only the tint changes).
+Registry and per-style fallbacks live in `src/game/data/attackArt.ts`; wiring
+steps are in `docs/ADDING_HEROES.md` → *Step A2*.
+
+Authoring rules (mechanically enforced by `tests/unit/attackArt.test.ts`):
+- `viewBox="0 0 128 128"` with matching `width`/`height` attributes (Phaser
+  rasterizes `load.image` SVGs at intrinsic size).
+- Art centered, "nose" pointing **+X** — the engine rotates the sprite along
+  the flight vector. Elongated shapes (pierce lances, slashes, wave bands) use
+  the full width.
+- **White/grayscale only**: `#ffffff` for the brightest surfaces, pure grays
+  (`#e6e6e6`, `#cccccc`, `#999999` — `r == g == b`) plus `fill-opacity` for
+  shading. `setTint` **multiplies** the texture's RGB, so any baked-in hue
+  corrupts the damage-type color. The near-black cel outline `#0f172a` is the
+  one allowed non-gray (it survives multiplication). Grayscale gradients are
+  fine; no color gradients, no external refs.
+- **Contrast with skill FX (§2D)**: signature-skill FX in `public/assets/fx/`
+  keep their bespoke **baked colors** and are never tinted — skill identity is
+  authored color, basic-attack identity is silhouette + damage-type tint.
+
 ---
 
 ## 3. Enemy Asset Requirements

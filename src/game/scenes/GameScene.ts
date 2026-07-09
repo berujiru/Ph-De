@@ -9,6 +9,7 @@ import { BARRICADE_DEFAULTS } from '../data/constants';
 import { enemySizeClass } from '../data/enemies';
 import { computeKillPool, voiceDropCost } from '../data/drops';
 import { type HeroId, HERO_DEFINITIONS } from '../data/heroes';
+import { allAttackArtStems, attackArtKey, attackArtPath } from '../data/attackArt';
 import { GAME_HEIGHT, GAME_WIDTH, WORLD_HEIGHT, RALLY, PARALLAX } from '../data/level';
 import { getMapSkinForStage, type MapSkin } from '../data/mapSkins';
 import { WaveManager } from '../core/WaveManager';
@@ -104,6 +105,12 @@ export class GameScene extends Phaser.Scene {
     this.load.image('dough-barrier', '/assets/fx/dough-barrier.svg');
     this.load.image('lambat_vortex', '/assets/fx/lambat_vortex.svg');
     this.load.image('tree_of_life', '/assets/fx/tree_of_life.svg');
+
+    // Basic-attack art: white/grayscale SVGs tinted by damage type at runtime.
+    // The list is derived from hero data + style defaults (attackArt.ts).
+    for (const stem of allAttackArtStems(HERO_DEFINITIONS)) {
+      this.load.image(attackArtKey(stem), attackArtPath(stem));
+    }
 
     for (const heroId of Object.keys(HERO_DEFINITIONS) as HeroId[]) {
       const skin = getSelectedSkin(heroId);

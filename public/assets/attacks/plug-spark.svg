@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Electrician: jumper plug arcing a spark at each chain strike point. -->
+  <path d="M6 88 Q20 96 30 78" fill="none" stroke="#cccccc" stroke-width="6" stroke-linecap="round"/>
+  <rect x="26" y="48" width="40" height="32" rx="9" fill="#ffffff" stroke="#0f172a" stroke-width="5"/>
+  <rect x="62" y="52" width="26" height="8" rx="4" fill="#e6e6e6" stroke="#0f172a" stroke-width="3"/>
+  <rect x="62" y="68" width="26" height="8" rx="4" fill="#e6e6e6" stroke="#0f172a" stroke-width="3"/>
+  <path d="M104 36 L96 58 L108 58 L94 88 L100 66 L88 66 Z"
+        fill="#ffffff" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="114" cy="46" r="4" fill="#e6e6e6"/>
+  <circle cx="108" cy="80" r="4" fill="#e6e6e6"/>
+</svg>

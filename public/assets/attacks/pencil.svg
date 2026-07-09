@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Student: sharpened pencil dart — long piercing lance, graphite tip at +X. -->
+  <rect x="2" y="52" width="26" height="5" rx="2.5" fill="#e6e6e6"/>
+  <rect x="6" y="72" width="22" height="5" rx="2.5" fill="#cccccc"/>
+  <rect x="20" y="52" width="14" height="24" rx="6" fill="#cccccc" stroke="#0f172a" stroke-width="4"/>
+  <rect x="32" y="51" width="10" height="26" fill="#999999" stroke="#0f172a" stroke-width="3"/>
+  <rect x="40" y="50" width="56" height="28" fill="#ffffff" stroke="#0f172a" stroke-width="4"/>
+  <rect x="42" y="54" width="52" height="6" fill="#e6e6e6"/>
+  <rect x="42" y="68" width="52" height="6" fill="#e6e6e6"/>
+  <path d="M96 50 L118 60 L118 68 L96 78 Z" fill="#e6e6e6" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M116 59 L126 64 L116 69 Z" fill="#0f172a"/>
+</svg>

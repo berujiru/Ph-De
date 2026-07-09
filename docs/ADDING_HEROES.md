@@ -69,6 +69,7 @@ Add the new hero to the `HeroId` type and the `HERO_DEFINITIONS` record.
     damage: 15,
     attackRateMs: 1200,
     color: 0xffffff, // Fallback color
+    attackArt: '[stem]', // Basic-attack SVG stem — see "Attack art" below
     portraitKey: '[hero_id]_portrait',
     spriteKey: '[hero_id]',
     purpose: 'What this hero does best.',
@@ -76,6 +77,27 @@ Add the new hero to the `HeroId` type and the `HERO_DEFINITIONS` record.
     passive: { name: 'Passive Name', description: 'Effect.' }
   },
 ```
+
+### Step A2: Attack art (`public/assets/attacks/[stem].svg`)
+Every hero's basic attack renders a reusable SVG, tinted at runtime with
+`DAMAGE_TYPE_COLORS[damageType]` (`src/game/core/Damage.ts`) — one file works
+for any damage type. The registry is `src/game/data/attackArt.ts`:
+- Set `attackArt: '[stem]'` in the hero definition and drop
+  `public/assets/attacks/[stem].svg`. Preload is derived automatically
+  (`allAttackArtStems()` in `GameScene.preload()`) — nothing to hand-register.
+- Omit `attackArt` and the hero uses its attack style's default from
+  `STYLE_DEFAULT_ART` (this is what the sandbox testers do); a missing texture
+  also falls back softly at runtime with a console warning.
+- **Authoring contract** (enforced by `tests/unit/attackArt.test.ts`): 128×128
+  viewBox, art pointing **+X**, fills/strokes white or pure grayscale
+  (`r == g == b`) plus the near-black outline `#0f172a` — `setTint` multiplies
+  RGB, so any baked-in hue corrupts the damage-type color. Full spec:
+  `docs/ART_AND_AUDIO_GUIDELINES.md` → *Basic-Attack SVGs*.
+- How each style uses the art: projectile/pierce/boomerang/lobbed/trap fly it
+  as the body (`AttackSprite`), melee-cleave sweeps it, vortex spins it inside
+  an `AreaOverlay`, linear-wave stretches it via `LaneWave`, summoner shows it
+  as the barricade, and chain/beam pop it as strike/muzzle icons
+  (`popAttackIcon`).
 
 ### Step B: Register the Skin (`src/game/data/skins.ts`)
 No `GameScene` code is needed — hero sheets load data-driven. Add one
@@ -119,10 +141,11 @@ here:
 
 | Component | Use for |
 |---|---|
-| `AreaOverlay` | Circular AoE fields: flat disc sized to the gameplay radius, optional inner telegraph rings, optional SVG ground image via `svgKey` (vortex, tornado, tree), pulse/enter/exit options, center icon. |
+| `AreaOverlay` | Circular AoE fields: flat disc sized to the gameplay radius, optional inner telegraph rings, optional SVG ground image via `svgKey` (vortex, tornado, tree; add `svgTint` for white/grayscale attack art), pulse/enter/exit options, center icon. |
 | `spawnConeFlash` | Cone-shaped skill flashes (flashlight, coin shotgun). Geometry mirrors `isPointInCone`. |
 | `spawnShockwaveRing` | Expanding rings and impact flashes (skill blasts, explosions, enemy pulses). Fire-and-forget. |
-| `LaneWave` | Linear/rectangular waves sweeping the lane (body + leading edge + trail particles). The owning `Attack` keeps movement and hit logic. |
+| `LaneWave` | Linear/rectangular waves sweeping the lane (body + leading edge + trail particles; pass `svgKey`/`svgTint` to render the body as tinted attack art). The owning `Attack` keeps movement and hit logic. |
+| `AttackSprite` | The visual body of a moving basic attack: one tinted attack-art image with rotation-to-velocity, length scaling, tumble spin, and flight scale. The owning `Attack` keeps movement and hit logic. `popAttackIcon` (same file) is the one-shot strike/muzzle icon for chain/beam. |
 
 - Emit an `onVisual` event from `Skills.ts` carrying the per-skill size /
   color / duration; the matching `handleSkillVisualEffect` branch in
@@ -156,6 +179,9 @@ registered (Step B) and its sheet is in place, the hero animates with **no
 Before considering a hero "done", verify:
 - [ ] Added to `HeroId` union and `HERO_DEFINITIONS` in `heroes.ts`.
 - [ ] Base stats, `attackStyle`, and `damageType` match the design guidelines.
+- [ ] `attackArt` set and `public/assets/attacks/[stem].svg` exists, authored
+      white/grayscale per the tint contract (`tests/unit/attackArt.test.ts`
+      passes).
 - [ ] Default skin registered in `HERO_SKINS` (`src/game/data/skins.ts`) with
       correct frame ranges + `portraitFrame`, and the combined sheet is in
       `public/assets/heroes/`.

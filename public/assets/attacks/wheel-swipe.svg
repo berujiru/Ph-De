@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Jeepney Driver: cleave crescent carrying a steering wheel. -->
+  <path d="M36 10 A70 70 0 0 1 36 118 A104 104 0 0 0 36 10 Z"
+        fill="#e6e6e6" stroke="#0f172a" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="72" cy="64" r="26" fill="none" stroke="#ffffff" stroke-width="8"/>
+  <circle cx="72" cy="64" r="26" fill="none" stroke="#0f172a" stroke-width="2" stroke-opacity="0.6"/>
+  <path d="M72 40 V60 M50 76 L64 68 M94 76 L80 68" stroke="#ffffff" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="72" cy="64" r="8" fill="#ffffff" stroke="#0f172a" stroke-width="3"/>
+</svg>

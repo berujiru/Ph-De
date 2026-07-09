@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Spiked disc: armed ground trap. -->
+  <path d="M64 8 L74 34 L54 34 Z M120 64 L94 74 L94 54 Z M64 120 L54 94 L74 94 Z M8 64 L34 54 L34 74 Z
+           M103 25 L92 50 L78 36 Z M103 103 L78 92 L92 78 Z M25 103 L36 78 L50 92 Z M25 25 L50 36 L36 50 Z"
+        fill="#ffffff" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="64" cy="64" r="32" fill="#e6e6e6" stroke="#0f172a" stroke-width="5"/>
+  <circle cx="64" cy="64" r="18" fill="#cccccc"/>
+  <circle cx="64" cy="64" r="8" fill="#ffffff"/>
+</svg>

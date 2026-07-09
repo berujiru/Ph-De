@@ -4,17 +4,26 @@ export class Summon extends Phaser.GameObjects.Container {
   public isDead = false;
   public maxHp: number;
   public hp: number;
-  private shape: Phaser.GameObjects.Rectangle;
+  private shape: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image;
+  private color: number;
   private hpBarBg: Phaser.GameObjects.Rectangle;
   private hpBarFill: Phaser.GameObjects.Rectangle;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, maxHp: number, color: number) {
+  constructor(scene: Phaser.Scene, x: number, y: number, maxHp: number, color: number, art?: { artKey: string; tint: number }) {
     super(scene, x, y);
     this.maxHp = maxHp;
     this.hp = maxHp;
+    this.color = art?.tint ?? color;
 
     // The barricade shape (wider than tall, blocking the vertical lane)
-    this.shape = scene.add.rectangle(0, 0, 40, 16, color);
+    if (art && scene.textures.exists(art.artKey)) {
+      const img = scene.add.image(0, 0, art.artKey);
+      img.setDisplaySize(48, 20);
+      img.setTint(art.tint);
+      this.shape = img;
+    } else {
+      this.shape = scene.add.rectangle(0, 0, 40, 16, color);
+    }
     this.add(this.shape);
 
     // HP Bar
@@ -30,10 +39,10 @@ export class Summon extends Phaser.GameObjects.Container {
     if (this.isDead) return;
     this.hp -= amount;
 
-    // Flash white on hit
-    this.shape.setFillStyle(0xffffff);
+    // Flash white on hit, then restore the summon's own color
+    this.flashShape(0xffffff);
     this.scene.time.delayedCall(100, () => {
-      if (!this.isDead) this.shape.setFillStyle(0xd97706); // Default orange/brown color for Yero
+      if (!this.isDead) this.flashShape(this.color);
     });
 
     if (this.hp <= 0) {
@@ -45,6 +54,16 @@ export class Summon extends Phaser.GameObjects.Container {
       } else if (this.hp < this.maxHp * 0.6) {
         this.hpBarFill.setFillStyle(0xeab308); // Yellow
       }
+    }
+  }
+
+  private flashShape(color: number) {
+    if (this.shape instanceof Phaser.GameObjects.Image) {
+      this.shape.setTint(color);
+      // Flash reads as a solid fill, not a multiply, on the white flash frame.
+      if (color === 0xffffff) this.shape.setTintFill();
+    } else {
+      this.shape.setFillStyle(color);
     }
   }
 

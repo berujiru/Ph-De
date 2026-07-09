@@ -23,6 +23,7 @@ import {
   TrapAttack
 } from '../entities/Attacks';
 import { DAMAGE_TYPE_COLORS, type DamageType } from '../core/Damage';
+import { attackArtKey, resolveAttackArt } from '../data/attackArt';
 
 export function spawnEnemy(scene: GameScene, enemyId: EnemyId = 'grunt', wave: number = 1) {
   // Scatter across the lane (X); spawn just above the visible top of the
@@ -71,37 +72,40 @@ export function spawnHero(scene: GameScene, id: HeroId, passiveOverride?: string
       damageType = elements[Math.floor(Math.random() * elements.length)];
     }
 
-    const color = overrideColor ?? DAMAGE_TYPE_COLORS[damageType as DamageType] ?? h.definition.projectileColor ?? h.definition.color;
+    // Tint = damage-type color; art = the hero's attackArt (or style default),
+    // authored white/grayscale so the tint colors it cleanly.
+    const tint = overrideColor ?? DAMAGE_TYPE_COLORS[damageType as DamageType];
+    const visual = { artKey: attackArtKey(resolveAttackArt(h.definition)), tint };
     // Persisted per-hero upgrade mods land on every Attack this hero spawns.
     const mods = h.modifiers;
 
     if (h.definition.attackStyle === 'melee-cleave') {
-      attack = new MeleeCleaveAttack(scene, h.x, h.y, target, h.damage, h.range, color, mods);
+      attack = new MeleeCleaveAttack(scene, h.x, h.y, target, h.damage, h.range, visual, mods);
     } else if (h.definition.attackStyle === 'vortex') {
-      attack = new VortexAttack(scene, h.x, h.y, target, h.damage, color, mods, damageType);
+      attack = new VortexAttack(scene, h.x, h.y, target, h.damage, visual, mods, damageType);
     } else if (h.definition.attackStyle === 'boomerang') {
-      attack = new BoomerangAttack(scene, h, target, h.damage, color, mods);
+      attack = new BoomerangAttack(scene, h, target, h.damage, visual, mods);
       h.playProjectileLaunch();
     } else if (h.definition.attackStyle === 'chain') {
-      attack = new ChainAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, color, h.definition.baseChain ?? 1, mods);
+      attack = new ChainAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, h.definition.baseChain ?? 1, mods);
     } else if (h.definition.attackStyle === 'summoner') {
-      attack = new SummonAttack(scene, h.x, h.y, target, h.damage, color, mods);
+      attack = new SummonAttack(scene, h.x, h.y, target, h.damage, visual, mods);
     } else if (h.definition.attackStyle === 'beam') {
-      attack = new BeamAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, color, mods);
+      attack = new BeamAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, mods);
     } else if (h.definition.attackStyle === 'lobbed') {
-      attack = new LobbedAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, color, mods);
+      attack = new LobbedAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, mods);
       h.playProjectileLaunch();
     } else if (h.definition.attackStyle === 'linear-wave') {
-      attack = new LinearWaveAttack(scene, target.x, h.muzzleY, h.damage, color, mods);
+      attack = new LinearWaveAttack(scene, target.x, h.muzzleY, h.damage, visual, mods);
     } else if (h.definition.attackStyle === 'trap') {
-      attack = new TrapAttack(scene, h.x, h.y, target, h.damage, color, mods);
+      attack = new TrapAttack(scene, h.x, h.y, target, h.damage, visual, mods);
     } else if (h.definition.attackStyle === 'pierce') {
       // Non-homing straight-line shot; pass-throughs = basePierce + bonusPierce.
-      attack = new PierceAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, color, h.definition.basePierce ?? 1, mods, damageType);
+      attack = new PierceAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, h.definition.basePierce ?? 1, mods, damageType);
       h.playProjectileLaunch();
     } else {
       // Plain projectile — homes, expires on first hit (+bonusPierce).
-      attack = new ProjectileAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, color, mods, damageType);
+      attack = new ProjectileAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, mods, damageType);
       h.playProjectileLaunch();
     }
 
