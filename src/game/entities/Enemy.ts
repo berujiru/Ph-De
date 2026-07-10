@@ -93,6 +93,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
   private spriteAura: SpriteAura;
   private buffIcon: Phaser.GameObjects.Text | null = null;
   private attackSpeedBuffIcon: Phaser.GameObjects.Text | null = null;
+  private bossAuraImage?: Phaser.GameObjects.Image;
 
   constructor(scene: Phaser.Scene, x: number, y: number, definition: EnemyDefinition) {
     super(scene, x, y);
@@ -138,6 +139,19 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
 
     if (definition.id === 'sandbox_target') {
       this.setSize(sizePx, sizePx);
+    }
+
+    if (definition.id.startsWith('boss_')) {
+      this.bossAuraImage = scene.add.image(0, 0, 'boss_aura');
+      this.bossAuraImage.setTint(definition.color);
+      this.bossAuraImage.setAlpha(0.6);
+      this.bossAuraImage.setScale((sizePx * 2.5) / 200);
+      
+      // We want to add this at the very bottom (index 0) so it renders under the shadow and model
+      this.addAt(this.bossAuraImage, 0);
+    }
+
+    if (definition.id === 'sandbox_target') {
       this.setInteractive({ draggable: true });
       this.on('drag', (_pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
         this.x = dragX;
@@ -248,6 +262,12 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
 
   takeDamage(amount: number, _damageType: string = 'Physical') {
     if (this.isDead) return;
+
+    if (this.definition.evasionChance && Math.random() < this.definition.evasionChance) {
+      const missText = this.scene.add.text(this.x, this.y - 30, 'MISS', { fontSize: '24px', color: '#fff', fontStyle: 'bold', stroke: '#000000', strokeThickness: 4 }).setOrigin(0.5);
+      this.scene.tweens.add({ targets: missText, y: this.y - 50, alpha: 0, duration: 800, onComplete: () => missText.destroy() });
+      return;
+    }
 
     // Hit immunity completely blocks the hit
     if (this.hitImmunityCount > 0) {
@@ -442,6 +462,12 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       this.activeAilments['freeze'] = 0;
       this.definition.speed *= 3;
 
+      // Stun all heroes for 2 seconds
+      for (const hero of this.scene.heroes) {
+        hero.stun(2000);
+      }
+
+
       // Visual cue
       spawnShockwaveRing(this.scene, {
         x: this.x, y: this.y,
@@ -470,6 +496,10 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
 
   update(delta: number, shield: MoraleShield, summons: Summon[] = []) {
     if (this.isDead) return;
+
+    if (this.bossAuraImage) {
+      this.bossAuraImage.rotation += 0.001 * delta;
+    }
 
     // --- Periodic Passives ---
     if (this.definition.stealVoicesPerSecond) {

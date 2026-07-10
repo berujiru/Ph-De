@@ -16,6 +16,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   public definition: HeroDefinition;
   public isSkillReady = false;
   public isEvicted = false;
+  private stunTimer = 0;
   private evictionSign: Phaser.GameObjects.Container;
   private attackCooldown = 0;
   private pendingAttacks: { delayMs: number, originalTarget: Enemy }[] = [];
@@ -256,6 +257,16 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
 
   update(delta: number, enemies: Enemy[], shieldY: number) {
     if (this.isEvicted) return;
+
+    if (this.stunTimer > 0) {
+      this.stunTimer -= delta;
+      if (this.stunTimer > 0) {
+        if (this.model.getState() !== 'idle') {
+          this.model.setState('idle');
+        }
+        return;
+      }
+    }
     
     // Process Buff Durations
     for (const [type, duration] of Object.entries(this.activeBuffs)) {
@@ -453,5 +464,9 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     } else {
       this.skillAura.stop();
     }
+  }
+
+  stun(durationMs: number) {
+    this.stunTimer = Math.max(this.stunTimer, durationMs);
   }
 }

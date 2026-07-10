@@ -1,0 +1,28 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer Ring -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.8"/>
+  <circle cx="100" cy="100" r="90" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.4"/>
+  <circle cx="100" cy="100" r="85" fill="none" stroke="#ffffff" stroke-width="4" opacity="0.9"/>
+  
+  <!-- Dashed Ring -->
+  <circle cx="100" cy="100" r="75" fill="none" stroke="#ffffff" stroke-width="6" stroke-dasharray="8 8 2 8" opacity="0.7"/>
+
+  <!-- Hexagram -->
+  <polygon points="100,25 165,137 35,137" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.8"/>
+  <polygon points="100,175 35,62 165,62" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.8"/>
+  
+  <!-- Inner Circles -->
+  <circle cx="100" cy="100" r="45" fill="none" stroke="#ffffff" stroke-width="2" opacity="1"/>
+  <circle cx="100" cy="100" r="40" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.5" stroke-dasharray="4 4"/>
+  
+  <!-- Runes/Accents -->
+  <circle cx="100" cy="25" r="4" fill="#ffffff" />
+  <circle cx="165" cy="137" r="4" fill="#ffffff" />
+  <circle cx="35" cy="137" r="4" fill="#ffffff" />
+  <circle cx="100" cy="175" r="4" fill="#ffffff" />
+  <circle cx="35" cy="62" r="4" fill="#ffffff" />
+  <circle cx="165" cy="62" r="4" fill="#ffffff" />
+  
+  <!-- Core -->
+  <circle cx="100" cy="100" r="20" fill="#ffffff" opacity="0.3"/>
+</svg>

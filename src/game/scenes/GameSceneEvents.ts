@@ -223,8 +223,15 @@ export function setupInternalEvents(scene: GameScene) {
     for (let i = 0; i < count; i++) {
       const offsetX = (Math.random() - 0.5) * 40;
       const offsetY = (Math.random() - 0.5) * 40;
-      const def = { ...ENEMY_DEFINITIONS['grunt'] }; 
-      def.name = 'Dummy Corp';
+      
+      const spawnId = source.definition.splitOnDeathEnemyId ?? 'grunt';
+      const def = { ...ENEMY_DEFINITIONS[spawnId] }; 
+      
+      // Fallback name if it's the old shell_company behavior
+      if (spawnId === 'grunt' && source.definition.id === 'shell_company') {
+        def.name = 'Dummy Corp';
+      }
+      
       def.color = source.definition.color;
       const enemy = new Enemy(scene, source.x + offsetX, source.y + offsetY, def);
       scene.enemies.push(enemy);

@@ -1,4 +1,4 @@
-export type EnemyId = 'grunt' | 'runner' | 'brute' | 'sandbox_target' | 'ghost_employee' | 'bribery' | 'epal' | 'the_overpriced' | 'kickback_courier' | 'shell_company' | 'crony_bodyguard' | 'hoarder' | 'land_grabber' | 'tender_rigger' | 'boss_flood_control' | 'boss_pork_barrel' | 'boss_troll_farm' | 'boss_vote_buying' | 'boss_nepotism' | 'boss_wang_wang' | 'boss_budget_insertion' | 'boss_smuggling' | 'boss_dynasty_1' | 'boss_dynasty_2' | 'boss_dynasty_3' | 'boss_ang_sistema';
+export type EnemyId = 'grunt' | 'runner' | 'brute' | 'sandbox_target' | 'ghost_employee' | 'bribery' | 'epal' | 'the_overpriced' | 'kickback_courier' | 'shell_company' | 'crony_bodyguard' | 'hoarder' | 'land_grabber' | 'tender_rigger' | 'boss_flood_control' | 'boss_pork_barrel' | 'boss_troll_farm' | 'boss_vote_buying' | 'boss_nepotism' | 'boss_wang_wang' | 'boss_budget_insertion' | 'boss_smuggling' | 'boss_dynasty_1' | 'boss_dynasty_2' | 'boss_dynasty_3' | 'boss_ang_sistema' | 'minion_nepotism';
 
 /**
  * Per-enemy stats — every enemy type has its own value for each of these.
@@ -50,6 +50,10 @@ export interface EnemyDefinition {
   hitImmunityCount?: number;
   budgetCut?: boolean;
   privatePropertyStun?: boolean;
+  isRanged?: boolean;
+  attackRangePx?: number;
+  splitOnDeathEnemyId?: EnemyId;
+  evasionChance?: number;
   
   nextPhaseEnemyId?: EnemyId;
   
@@ -268,6 +272,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     damage: 30,
     attackRateMs: 5000,
     color: 0x0ea5e9,
+    stealth: true,
+    isRanged: true,
+    attackRangePx: 250,
     activeSkill: { name: 'Flash Flood', effect: 'flood' }
   },
   boss_pork_barrel: {
@@ -279,6 +286,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     damage: 50,
     attackRateMs: 6000,
     color: 0xdb2777,
+    tauntAura: true,
+    isRanged: true,
+    attackRangePx: 250,
     activeSkill: { name: 'Devour Funds', effect: 'devour' }
   },
   boss_troll_farm: {
@@ -292,6 +302,10 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     color: 0x3f3f46,
     selfDestructOnBarrier: true,
     selfDestructDamage: 200,
+    auraRange: 200,
+    moraleAura: true,
+    isRanged: true,
+    attackRangePx: 250,
     activeSkill: { name: 'Deploy Trolls', effect: 'summonSwarm' },
     ai: {
       skillCooldownMs: 8000,
@@ -308,6 +322,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     damage: 20,
     attackRateMs: 3500,
     color: 0xeab308,
+    stealVoicesPerSecond: 1,
+    isRanged: true,
+    attackRangePx: 250,
     activeSkill: { name: 'Bribe', effect: 'scatterFakeGold' }
   },
   boss_nepotism: {
@@ -319,6 +336,10 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     damage: 25,
     attackRateMs: 4500,
     color: 0x9333ea,
+    splitOnDeathCount: 3,
+    splitOnDeathEnemyId: 'minion_nepotism',
+    isRanged: true,
+    attackRangePx: 250,
     activeSkill: { name: 'Appoint Shieldbearer', effect: 'summonShieldbearer' }
   },
   boss_wang_wang: {
@@ -330,6 +351,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     damage: 35,
     attackRateMs: 2500,
     color: 0xef4444,
+    isRanged: true,
+    attackRangePx: 250,
     activeSkill: { name: 'VIP Convoy', effect: 'sirenBurst' }
   },
   boss_budget_insertion: {
@@ -341,6 +364,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     damage: 40,
     attackRateMs: 5000,
     color: 0x14b8a6,
+    fakeHpPadding: 1500,
+    isRanged: true,
+    attackRangePx: 250,
     activeSkill: { name: 'Smuggle Funds', effect: 'smuggleHp' }
   },
   boss_smuggling: {
@@ -352,6 +378,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     damage: 25,
     attackRateMs: 3000,
     color: 0xf59e0b,
+    evasionChance: 0.25,
+    isRanged: true,
+    attackRangePx: 250,
     activeSkill: { name: 'Economy Heist', effect: 'economyHeist' }
   },
   boss_dynasty_3: {
@@ -363,6 +392,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     damage: 20,
     attackRateMs: 1500,
     color: 0xd946ef,
+    stealVoicesPerSecond: 2,
+    isRanged: true,
+    attackRangePx: 250,
   },
   boss_dynasty_2: {
     id: 'boss_dynasty_2',
@@ -373,6 +405,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     damage: 30,
     attackRateMs: 3000,
     color: 0xa21caf,
+    hitImmunityCount: 20,
+    isRanged: true,
+    attackRangePx: 250,
     nextPhaseEnemyId: 'boss_dynasty_3',
   },
   boss_dynasty_1: {
@@ -384,6 +419,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     damage: 50,
     attackRateMs: 5000,
     color: 0x701a75,
+    tauntAura: true,
+    isRanged: true,
+    attackRangePx: 250,
     nextPhaseEnemyId: 'boss_dynasty_2',
   },
   boss_ang_sistema: {
@@ -395,6 +433,23 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     damage: 80,
     attackRateMs: 6000,
     color: 0x000000,
+    budgetCut: true,
+    tauntAura: true,
+    isRanged: true,
+    attackRangePx: 250,
     activeSkill: { name: 'Horde Convergence', effect: 'resurrectAll' }
   },
+  minion_nepotism: {
+    id: 'minion_nepotism',
+    name: 'Unqualified Relative',
+    sizeClass: 'minion',
+    speed: 30,
+    maxHp: 100,
+    reward: 5,
+    damage: 5,
+    attackRateMs: 2000,
+    color: 0x9333ea,
+    isRanged: true,
+    attackRangePx: 250,
+  }
 };
