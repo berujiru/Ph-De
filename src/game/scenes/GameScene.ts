@@ -32,6 +32,7 @@ export class GameScene extends Phaser.Scene {
   public currentAct: number | null = null;
   public currentStageIdx: number | null = null;
   public enemies: Enemy[] = [];
+  public seenEnemies: Set<string> = new Set();
   
   public get isBudgetCutActive(): boolean {
     return this.enemies.some(e => !e.isDead && e.definition.budgetCut);

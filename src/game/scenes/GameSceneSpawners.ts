@@ -25,6 +25,7 @@ import {
 import { DAMAGE_TYPE_COLORS, type DamageType } from '../core/Damage';
 import { attackArtKey, resolveAttackArt, resolveAttackSize } from '../data/attackArt';
 import { resolveAttackSpeed } from '../data/attackSpeed';
+import { gameToUiEvents } from '../core/GameEvents';
 
 export function spawnEnemy(scene: GameScene, enemyId: EnemyId = 'grunt', wave: number = 1) {
   // Scatter across the lane (X); spawn just above the visible top of the
@@ -44,6 +45,11 @@ export function spawnEnemy(scene: GameScene, enemyId: EnemyId = 'grunt', wave: n
   
   const enemy = new Enemy(scene, x, y, def);
   scene.enemies.push(enemy);
+
+  if (!scene.isSandbox && !scene.seenEnemies.has(enemyId)) {
+    scene.seenEnemies.add(enemyId);
+    gameToUiEvents.emit('enemyEncountered', { enemyId });
+  }
 }
 
 export function spawnSandboxTarget(scene: GameScene) {

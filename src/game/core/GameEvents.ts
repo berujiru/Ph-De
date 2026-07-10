@@ -73,6 +73,7 @@ export interface DropOption {
 export interface GameToUiEvents extends Record<string, unknown> {
   stateChanged: GameStateSnapshot;
   voicesFull: { options: DropOption[] };
+  enemyEncountered: { enemyId: string };
 }
 
 export type SkillVisualEvent = 

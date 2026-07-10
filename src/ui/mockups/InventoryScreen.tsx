@@ -6,16 +6,17 @@ import { metersLabel, metersPerSecondLabel } from '../../game/data/constants';
 import { HopeCoinIcon, RallyPermitIcon, LockIcon, SkullIcon, InfoIcon } from '../icons';
 import { BackButton } from '../components/BackButton';
 import {
-  EnemyCaseCard,
   HeroPolaroidCard,
   PORTRAIT_BG,
-  SkinPortrait,
   TIER_COLOR,
   TYPEWRITER_FONT,
   enemyMechanic,
   enemyTier,
   hexColor,
+  SkinPortrait,
+  EnemyCaseCard,
 } from '../components/ArchiveCards';
+import { EnemyTcgCard } from '../components/EnemyTcgCard';
 import { getSelectedSkin, setSelectedSkin, subscribeSkins } from '../../game/data/skinSelection';
 import { heroSkins } from '../../game/data/skins';
 
@@ -552,14 +553,6 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
 
       {/* Enemy Case File Modal (Truth Codex detail) */}
       {selectedEnemy && (() => {
-        const tier = enemyTier(selectedEnemy);
-        const stats = [
-          { label: 'Max HP', value: selectedEnemy.maxHp.toLocaleString() },
-          { label: 'Speed', value: metersPerSecondLabel(selectedEnemy.speed) },
-          { label: 'Barrier Dmg', value: `${selectedEnemy.damage}` },
-          { label: 'Attack Rate', value: `${(selectedEnemy.attackRateMs / 1000).toFixed(1)}s` },
-          { label: 'Bounty', value: `${selectedEnemy.reward}` },
-        ];
         return (
           <div
             onClick={() => setSelectedEnemy(null)}
@@ -571,135 +564,41 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
               zIndex: 1000,
               backdropFilter: 'blur(5px)',
               padding: '48px 20px',
-              overflowY: 'auto'
+              overflowY: 'auto',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}>
-            <div
-              onClick={(e) => e.stopPropagation()}
-              style={{
-                margin: 'auto',
-                backgroundColor: '#e5d5b5',
-                border: '1px solid #c2b291',
-                borderRadius: '4px 20px 4px 4px',
-                padding: 'clamp(20px, 4vw, 36px)',
-                width: '100%',
-                maxWidth: '480px',
-                position: 'relative',
-                boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
-                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(0,0,0,0.02) 20px, rgba(0,0,0,0.02) 21px)'
-              }}>
-              {/* Top Tab */}
-              <div style={{
-                position: 'absolute',
-                top: '-26px',
-                left: 0,
-                maxWidth: '100%',
-                backgroundColor: '#e5d5b5',
-                padding: '4px 16px',
-                border: '1px solid #c2b291',
-                borderBottom: 'none',
-                borderRadius: '8px 8px 0 0',
-                color: '#000',
-                fontWeight: 'bold',
-                fontSize: '11px',
-                letterSpacing: 1,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                fontFamily: TYPEWRITER_FONT,
-                boxShadow: '0 -2px 5px rgba(0,0,0,0.1)'
-              }}>
-                CASE FILE · LIE DEBUNKED
-              </div>
-
+            
+            <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
               <button
                 onClick={() => setSelectedEnemy(null)}
                 aria-label="Close case file"
                 style={{
                   position: 'absolute',
-                  top: '15px',
-                  right: '15px',
+                  top: '-40px',
+                  right: '0',
                   background: '#ef4444',
                   border: '2px solid #000',
                   color: '#fff',
                   fontSize: '20px',
                   fontWeight: 'bold',
-                  width: '40px',
-                  height: '40px',
-                  minHeight: 40,
+                  width: '32px',
+                  height: '32px',
                   cursor: 'pointer',
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
                   boxShadow: '2px 2px 0 #000',
-                  lineHeight: 1
+                  lineHeight: 1,
+                  zIndex: 10,
+                  borderRadius: '50%'
                 }}
               >
                 ×
               </button>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginBottom: 22, flexWrap: 'wrap' }}>
-                {/* Mugshot */}
-                <div style={{
-                  width: 110,
-                  height: 110,
-                  flexShrink: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '4px solid #1c1917',
-                  background: `radial-gradient(circle at 50% 40%, ${hexColor(selectedEnemy.color)} 0%, #1e293b 80%)`,
-                  transform: 'rotate(-2deg)',
-                  boxShadow: '2px 2px 10px rgba(0,0,0,0.3)',
-                  color: '#e2e8f0'
-                }}>
-                  <SkullIcon size={44} />
-                </div>
-
-                <div style={{ flex: 1, minWidth: 160, color: '#000' }}>
-                  <span style={{
-                    display: 'inline-block', fontSize: 10, fontWeight: 900, letterSpacing: 1,
-                    textTransform: 'uppercase', padding: '2px 8px', borderRadius: 4, marginBottom: 6,
-                    color: '#fff', backgroundColor: TIER_COLOR[tier]
-                  }}>
-                    {tier}
-                  </span>
-                  <h2 style={{ margin: 0, fontSize: 'clamp(20px, 5vw, 28px)', fontFamily: TYPEWRITER_FONT, textTransform: 'uppercase', borderBottom: '2px solid #000', paddingBottom: 5 }}>
-                    {selectedEnemy.name}
-                  </h2>
-                </div>
-              </div>
-
-              {/* Debrief */}
-              <div style={{
-                backgroundColor: 'rgba(255,255,255,0.5)',
-                border: '1px dashed #000',
-                padding: '12px 14px',
-                marginBottom: 18,
-                color: '#000',
-                fontFamily: TYPEWRITER_FONT,
-                fontSize: 14,
-                fontStyle: 'italic',
-                lineHeight: 1.5
-              }}>
-                "{enemyMechanic(selectedEnemy)}"
-              </div>
-
-              {/* Stat sheet */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: 8 }}>
-                {stats.map((stat) => (
-                  <div key={stat.label} style={{
-                    backgroundColor: 'rgba(255,255,255,0.55)',
-                    border: '1px solid #c2b291',
-                    borderRadius: 3,
-                    padding: '8px 6px',
-                    textAlign: 'center',
-                    color: '#000'
-                  }}>
-                    <div style={{ fontSize: 9, fontWeight: 900, letterSpacing: 0.5, textTransform: 'uppercase', color: '#57534e' }}>{stat.label}</div>
-                    <div style={{ fontSize: 18, fontWeight: 900, fontFamily: TYPEWRITER_FONT }}>{stat.value}</div>
-                  </div>
-                ))}
-              </div>
+              
+              <EnemyTcgCard enemyId={selectedEnemy.id} rotation={0} />
             </div>
           </div>
         );

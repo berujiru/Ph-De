@@ -43,6 +43,7 @@ import { SkinPortrait } from './ArchiveCards';
 import { getSelectedSkin } from '../../game/data/skinSelection';
 import { HERO_DEFINITIONS, type HeroId } from '../../game/data/heroes';
 import { IntelModal } from './IntelModal';
+import { EnemyTcgCard } from './EnemyTcgCard';
 
 interface RallyScreenProps {
   onReturnToMenu: () => void;
@@ -407,6 +408,7 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
   const [dropOptions, setDropOptions] = useState<DropOption[]>([]);
   const [surrenderConfirmOpen, setSurrenderConfirmOpen] = useState(false);
   const [intelOpen, setIntelOpen] = useState(false);
+  const [introducedEnemy, setIntroducedEnemy] = useState<string | null>(null);
   const lastSpeedRef = useRef(1);
   /** True only when the Intel modal itself paused the game (vs. the user's pause button). */
   const intelPausedGameRef = useRef(false);
@@ -414,9 +416,14 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
   useEffect(() => {
     const unsubState = gameToUiEvents.on('stateChanged', setState);
     const unsubVoices = gameToUiEvents.on('voicesFull', ({ options }) => setDropOptions(options));
+    const unsubEncounter = gameToUiEvents.on('enemyEncountered', ({ enemyId }) => {
+      uiToGameEvents.emit('setSpeed', { speed: 0 });
+      setIntroducedEnemy(enemyId);
+    });
     return () => {
       unsubState();
       unsubVoices();
+      unsubEncounter();
     };
   }, []);
 
@@ -1096,6 +1103,77 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
           enemies={state.activeEnemies || []}
           onClose={closeIntel}
         />
+      )}
+
+      {/* 5. Enemy Introduction Modal */}
+      {introducedEnemy && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 300,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 16,
+            pointerEvents: 'auto',
+            background: `radial-gradient(circle at 50% 50%, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.95) 100%)`,
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            animation: 'overlay-fade 0.3s ease both',
+          }}
+        >
+          <div style={{ marginBottom: 24, textAlign: 'center' }}>
+            <h1 style={{
+              margin: 0,
+              fontSize: 'clamp(24px, 5vw, 36px)',
+              fontWeight: 900,
+              textTransform: 'uppercase',
+              letterSpacing: 2,
+              color: theme.colors.accent,
+              textShadow: '0 2px 10px rgba(0,0,0,0.8)'
+            }}>
+              New Anomaly Detected
+            </h1>
+          </div>
+          
+          <EnemyTcgCard 
+            enemyId={introducedEnemy as any} 
+            rotation={-2} 
+            style={{ 
+              transformOrigin: 'center',
+              animation: 'placard-drop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both' 
+            }} 
+          />
+
+          <button
+            type="button"
+            className="hud-btn"
+            onClick={() => {
+              playBtnSound();
+              setIntroducedEnemy(null);
+              uiToGameEvents.emit('setSpeed', { speed: lastSpeedRef.current || 1 });
+            }}
+            style={{
+              marginTop: 32,
+              padding: '12px 32px',
+              borderRadius: 8,
+              border: `2px solid ${theme.colors.accent}`,
+              backgroundColor: 'rgba(0,0,0,0.6)',
+              color: theme.colors.textPrimary,
+              fontSize: 16,
+              fontWeight: 800,
+              letterSpacing: 1.5,
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              boxShadow: `0 4px 12px rgba(0,0,0,0.5)`,
+              animation: 'overlay-fade 0.3s ease 0.4s both'
+            }}
+          >
+            Acknowledge
+          </button>
+        </div>
       )}
     </div>
   );
