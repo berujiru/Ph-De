@@ -694,6 +694,7 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
                type="button"
                className="hud-btn"
                onClick={() => {
+                 if (state.skillsLocked) return;
                  playBtnSound();
                  uiToGameEvents.emit('queueHeroSkill', { heroId: hero.id });
                }}
@@ -702,9 +703,9 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
                  height: 64,
                  borderRadius: '50%',
                  backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                 border: `3px solid #ef4444`, // Fiery red
-                 boxShadow: `0 0 18px #ef4444, inset 0 0 10px #ef4444`,
-                 color: '#facc15', // Gold
+                 border: state.skillsLocked ? '2px solid rgba(255,255,255,0.8)' : `3px solid #ef4444`,
+                 boxShadow: state.skillsLocked ? 'none' : `0 0 18px #ef4444, inset 0 0 10px #ef4444`,
+                 color: '#facc15',
                  display: 'flex',
                  flexDirection: 'column',
                  alignItems: 'center',

@@ -1,4 +1,4 @@
-export type EnemyId = 'grunt' | 'runner' | 'brute' | 'sandbox_target' | 'ghost_employee' | 'illegal_logger' | 'epal' | 'the_overpriced' | 'kickback_courier' | 'shell_company' | 'crony_bodyguard' | 'hoarder' | 'land_grabber' | 'tender_rigger' | 'boss_flood_control' | 'boss_pork_barrel' | 'boss_troll_farm' | 'boss_vote_buying' | 'boss_nepotism' | 'boss_wang_wang' | 'boss_budget_insertion' | 'boss_smuggling' | 'boss_dynasty_1' | 'boss_dynasty_2' | 'boss_dynasty_3' | 'boss_ang_sistema';
+export type EnemyId = 'grunt' | 'runner' | 'brute' | 'sandbox_target' | 'ghost_employee' | 'bribery' | 'epal' | 'the_overpriced' | 'kickback_courier' | 'shell_company' | 'crony_bodyguard' | 'hoarder' | 'land_grabber' | 'tender_rigger' | 'boss_flood_control' | 'boss_pork_barrel' | 'boss_troll_farm' | 'boss_vote_buying' | 'boss_nepotism' | 'boss_wang_wang' | 'boss_budget_insertion' | 'boss_smuggling' | 'boss_dynasty_1' | 'boss_dynasty_2' | 'boss_dynasty_3' | 'boss_ang_sistema';
 
 /**
  * Per-enemy stats — every enemy type has its own value for each of these.
@@ -48,6 +48,7 @@ export interface EnemyDefinition {
   dropObstacleOnDeath?: boolean;
   knockbackPulseCooldown?: number;
   hitImmunityCount?: number;
+  budgetCut?: boolean;
   
   nextPhaseEnemyId?: EnemyId;
   
@@ -153,16 +154,16 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     color: 0xffffff,
     stealth: true,
   },
-  illegal_logger: {
-    id: 'illegal_logger',
-    name: 'Illegal Logger',
-    speed: 40,
-    maxHp: 240,
-    reward: 20,
-    damage: 10,
-    attackRateMs: 2800,
-    color: 0x8b4513,
-    barrierDamageMultiplier: 5,
+  bribery: {
+    id: 'bribery',
+    name: 'Bribery',
+    speed: 100,
+    maxHp: 80,
+    reward: 15,
+    damage: 4,
+    attackRateMs: 1500,
+    color: 0x16a34a,
+    budgetCut: true,
     sizeClass: 'miniboss',
   },
   epal: {

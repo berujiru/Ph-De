@@ -201,7 +201,7 @@ Mini-bosses introduce **passive mechanics** that force players to adapt their ta
 | **Shell Company** | Splitter | Suited corporate blob | Shatters into 3 Dummy Corps on death | Weak: Splash |
 | **Dummy / Crony** | Bodyguard | Inflated suit/shield | Taunt Aura: Redirects projectiles to itself | Weak: Earth (Shred) |
 | **Hoarder** | Cartel | Bloated merchant sitting on sacks | Drops a massive barricade on death blocking shots | Weak: Physical |
-| **Illegal Logger** | Destructor | Chainsaw-wielding brute | Deals 10x damage to Barricades | Weak: Water |
+| **Bribery** | Silencer | Slimy suited creature tossing dirty money | Budget Cut: Locks all Hero active skills while alive | Weak: Physical |
 | **Land Grabber** | Displacer | Earth-moving machine monster | Passively knocks back your frontline | Weak: Lightning |
 | **Tender Rigger** | Rigged Bidding | Monster wrapped in sealed envelopes | Immune to first 5 hits | Weak: Rapid-fire |
 

@@ -65,7 +65,7 @@ export function SkinPortrait({
 // ---- Enemy tiering + data-driven "lie debunked" blurbs ---------------------
 
 const MINI_BOSS_IDS = new Set<EnemyId>([
-  'ghost_employee', 'illegal_logger', 'epal', 'the_overpriced', 'kickback_courier',
+  'ghost_employee', 'bribery', 'epal', 'the_overpriced', 'kickback_courier',
   'shell_company', 'crony_bodyguard', 'hoarder', 'land_grabber', 'tender_rigger',
 ]);
 

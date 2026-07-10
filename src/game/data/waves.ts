@@ -93,7 +93,7 @@ export function buildWaveTable(bossId: EnemyId): WaveDefinition[] {
     { waveNumber: 11, events: [spawn('kickback_courier', 3, 900), spawn('ghost_employee', 4, 1100)] },
     { waveNumber: 12, events: [spawn('runner', 5, 700), spawn('tender_rigger', 3, 1300), spawn('epal', 1, 1000)] },
     { waveNumber: 13, events: [spawn('land_grabber', 2, 2000), spawn('grunt', 4, 1100), spawn('shell_company', 2, 1400)] },
-    { waveNumber: 14, events: [spawn('illegal_logger', 2, 2200), spawn('runner', 5, 700)] },
+    { waveNumber: 14, events: [spawn('bribery', 2, 2200), spawn('runner', 5, 700)] },
     { waveNumber: 15, events: [warning('mini-boss', '⚠ MINI-BOSS INCOMING ⚠'), spawn('hoarder', 1, 1000), spawn('crony_bodyguard', 2, 2500), spawn('grunt', 4, 1100)] },
     { waveNumber: 16, events: [warning('swarm', '⚠ SWARM INCOMING ⚠'), spawn('runner', 12, 500), spawn('kickback_courier', 2, 900)] },
     { waveNumber: 17, events: [spawn('brute', 3, 1800), spawn('ghost_employee', 3, 1000), spawn('the_overpriced', 2, 1500)] },

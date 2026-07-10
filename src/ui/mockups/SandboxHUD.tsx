@@ -367,7 +367,7 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
               <option value="shell_company">Shell Company (Splitter)</option>
               <option value="crony_bodyguard">Crony (Taunt)</option>
               <option value="hoarder">Hoarder (Obstacle Drop)</option>
-              <option value="illegal_logger">Illegal Logger (Destructor)</option>
+              <option value="bribery">Bribery (Budget Cut)</option>
               <option value="land_grabber">Land Grabber (Knockback)</option>
               <option value="tender_rigger">Tender Rigger (Immunity)</option>
               <option value="boss_flood_control">Ghost Flood Control</option>
@@ -489,6 +489,7 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
                type="button"
                className="hud-btn"
                onClick={() => {
+                 if (gameState?.skillsLocked) return;
                  playBtnSound();
                  uiToGameEvents.emit('queueHeroSkill', { heroId: hero.id });
                }}
@@ -497,17 +498,19 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
                  height: 64,
                  borderRadius: '50%',
                  backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                 border: `3px solid #ef4444`, // Fiery red
-                 boxShadow: `0 0 18px #ef4444, inset 0 0 10px #ef4444`,
-                 color: '#facc15', // Gold
+                 boxShadow: gameState?.skillsLocked ? 'none' : '0 4px 6px rgba(0,0,0,0.3)',
+                 border: gameState?.skillsLocked ? '2px solid rgba(255,255,255,0.8)' : `3px solid #ef4444`,
+                 color: '#facc15',
                  display: 'flex',
                  flexDirection: 'column',
                  alignItems: 'center',
                  justifyContent: 'center',
-                 animation: 'pulse-glow 1.5s infinite',
-                 cursor: 'pointer',
+                 animation: gameState?.skillsLocked ? 'none' : 'pulse-glow 1.5s infinite',
+                 cursor: gameState?.skillsLocked ? 'default' : 'pointer',
                  overflow: 'hidden',
-                 padding: 4
+                 padding: 4,
+                 opacity: gameState?.skillsLocked ? 0.4 : 1,
+                 filter: gameState?.skillsLocked ? 'grayscale(100%)' : 'none'
                }}
              >
                 <span style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase', textAlign: 'center', lineHeight: 1.1, textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>

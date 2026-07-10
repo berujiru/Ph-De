@@ -32,6 +32,10 @@ export class GameScene extends Phaser.Scene {
   public currentAct: number | null = null;
   public currentStageIdx: number | null = null;
   public enemies: Enemy[] = [];
+  
+  public get isBudgetCutActive(): boolean {
+    return this.enemies.some(e => !e.isDead && e.definition.budgetCut);
+  }
   public heroes: Hero[] = [];
   public attacks: Attack[] = [];
   public summons: Summon[] = [];
@@ -412,6 +416,7 @@ export class GameScene extends Phaser.Scene {
         isSkillReady: h.isSkillReady && !this.comboQueue.includes(h)
       })),
       activeEnemies: activeEnemies,
+      skillsLocked: this.isBudgetCutActive,
       shieldScreenYRatio: (this.shield.y - this.cameras.main.scrollY) / this.cameras.main.height
     };
     const serialized = JSON.stringify(snapshot);

@@ -44,6 +44,7 @@ export interface GameStateSnapshot {
   status: 'playing' | 'won' | 'lost';
   activeHeroes: ActiveHeroInfo[];
   activeEnemies: ActiveEnemyInfo[];
+  skillsLocked?: boolean;
   doughBarrierActive?: boolean;
   shieldScreenYRatio?: number;
 }

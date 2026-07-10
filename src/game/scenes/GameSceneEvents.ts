@@ -88,7 +88,7 @@ export function setupUIEvents(scene: GameScene): () => void {
   });
 
   const unsubTriggerHeroSkill = uiToGameEvents.on('triggerHeroSkill', ({ skill } = {}) => {
-    if (!scene.sys) return;
+    if (!scene.sys || scene.isBudgetCutActive) return;
     for (const h of scene.heroes) {
       h.isSkillReady = true; 
       h.useSkill(skill);
@@ -96,7 +96,7 @@ export function setupUIEvents(scene: GameScene): () => void {
   });
 
   const unsubQueueHeroSkill = uiToGameEvents.on('queueHeroSkill', ({ heroId }) => {
-    if (!scene.sys) return;
+    if (!scene.sys || scene.isBudgetCutActive) return;
     const hero = scene.heroes.find(h => h.id === heroId);
     if (hero && hero.isSkillReady && !scene.comboQueue.includes(hero)) {
       scene.comboQueue.push(hero);
