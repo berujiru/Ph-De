@@ -49,6 +49,7 @@ export interface EnemyDefinition {
   knockbackPulseCooldown?: number;
   hitImmunityCount?: number;
   budgetCut?: boolean;
+  privatePropertyStun?: boolean;
   
   nextPhaseEnemyId?: EnemyId;
   
@@ -244,7 +245,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     damage: 14,
     attackRateMs: 3000,
     color: 0x4d7c0f,
-    knockbackPulseCooldown: 5000,
+    privatePropertyStun: true,
     sizeClass: 'miniboss',
   },
   tender_rigger: {
@@ -256,7 +257,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     damage: 12,
     attackRateMs: 2000,
     color: 0xd946ef,
-    hitImmunityCount: 5,
+    hitImmunityCount: 20,
   },
   boss_flood_control: {
     id: 'boss_flood_control',

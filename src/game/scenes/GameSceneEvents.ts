@@ -98,9 +98,10 @@ export function setupUIEvents(scene: GameScene): () => void {
   const unsubQueueHeroSkill = uiToGameEvents.on('queueHeroSkill', ({ heroId }) => {
     if (!scene.sys || scene.isBudgetCutActive) return;
     const hero = scene.heroes.find(h => h.id === heroId);
-    if (hero && hero.isSkillReady && !scene.comboQueue.includes(hero)) {
+    if (hero && hero.isSkillReady && !hero.isEvicted && !scene.comboQueue.includes(hero)) {
       scene.comboQueue.push(hero);
       scene.emitState(true);
+      // Wait a frame before processing in case the player rapid-fires multiple clicks.
       if (!scene.isProcessingCombo) {
         scene.comboCount = 0;
         scene.processComboQueue();

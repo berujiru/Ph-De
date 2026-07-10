@@ -15,6 +15,8 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   public id: string;
   public definition: HeroDefinition;
   public isSkillReady = false;
+  public isEvicted = false;
+  private evictionSign: Phaser.GameObjects.Container;
   private attackCooldown = 0;
   private pendingAttacks: { delayMs: number, originalTarget: Enemy }[] = [];
   public attackRateMs: number;
@@ -101,6 +103,20 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.spriteAura = new SpriteAura(scene, 0xfacc15); // Default yellow
     // Add above the model
     this.add(this.spriteAura);
+
+    // Private property sign (eviction)
+    this.evictionSign = new Phaser.GameObjects.Container(scene, 0, 0);
+    const signRect = scene.add.rectangle(0, -20, 60, 40, 0xef4444).setStrokeStyle(2, 0xffffff);
+    const signText = scene.add.text(0, -20, 'PRIVATE\nPROPERTY', {
+      fontFamily: 'Inter, sans-serif',
+      fontSize: '9px',
+      color: '#ffffff',
+      fontWeight: 'bold',
+      align: 'center'
+    }).setOrigin(0.5);
+    this.evictionSign.add([signRect, signText]);
+    this.evictionSign.setVisible(false);
+    this.add(this.evictionSign);
 
     this.updateSkillButtonVisuals();
 
@@ -239,6 +255,8 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   }
 
   update(delta: number, enemies: Enemy[], shieldY: number) {
+    if (this.isEvicted) return;
+    
     // Process Buff Durations
     for (const [type, duration] of Object.entries(this.activeBuffs)) {
       if (duration === -1) continue; // Permanent buff
@@ -376,6 +394,22 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.model.resume();
     if (this.isSkillReady && this.skillAura) {
       this.skillAura.resume();
+    }
+  }
+
+  public setEvicted(evicted: boolean) {
+    if (this.isEvicted === evicted) return;
+    this.isEvicted = evicted;
+    if (evicted) {
+      this.model.setVisible(false);
+      this.evictionSign.setVisible(true);
+      // interrupt any current attack
+      this.attackCooldown = 0;
+      this.pendingAttacks = [];
+    } else {
+      this.model.setVisible(true);
+      this.evictionSign.setVisible(false);
+      this.model.setState('idle');
     }
   }
 

@@ -58,6 +58,11 @@ export class GameScene extends Phaser.Scene {
   public lastSnapshot = '';
   public isSandbox = false;
   public sandboxRespawnTimer = 0;
+
+  public propertyRouletteTimer = 0;
+  public propertyRouletteActive = false;
+  public currentRouletteIndex = 0;
+  public rouletteHighlighter!: Phaser.GameObjects.Graphics;
   public skillCutIn!: SkillCutIn;
   public comboQueue: Hero[] = [];
   public isProcessingCombo = false;
@@ -172,6 +177,7 @@ export class GameScene extends Phaser.Scene {
     for (const aoe of this.persistentAoe) aoe.destroy();
     if (this.parallax) this.parallax.destroy();
     if (this.shield) this.shield.destroy();
+    if (this.rouletteHighlighter) this.rouletteHighlighter.destroy();
 
     this.buildGame();
   }
@@ -231,6 +237,14 @@ export class GameScene extends Phaser.Scene {
 
     spawnHero(this, 'eden');
 
+    this.rouletteHighlighter = this.add.graphics();
+    this.rouletteHighlighter.lineStyle(4, 0xef4444);
+    // Draw a square roughly the size of a hero slot
+    this.rouletteHighlighter.strokeRect(-40, -40, 80, 80);
+    this.rouletteHighlighter.setVisible(false);
+    // Put above heroes
+    this.rouletteHighlighter.setDepth(100);
+
     this.emitState(true);
   }
 
@@ -238,6 +252,45 @@ export class GameScene extends Phaser.Scene {
     if (this.status !== 'playing' || this.isPaused || this.gameSpeed === 0) return;
 
     delta *= this.gameSpeed;
+
+    // Private property roulette logic
+    const hasLandGrabber = this.enemies.some(e => !e.isDead && e.definition.privatePropertyStun);
+    if (hasLandGrabber) {
+      const anyEvicted = this.heroes.some(h => h.isEvicted);
+      if (!anyEvicted && this.heroes.length > 0) {
+        if (!this.propertyRouletteActive) {
+          this.propertyRouletteActive = true;
+          this.propertyRouletteTimer = 2000;
+          this.currentRouletteIndex = 0;
+          this.rouletteHighlighter.setVisible(true);
+        }
+
+        if (this.propertyRouletteActive) {
+          this.propertyRouletteTimer -= delta;
+          if (_time % 200 < 50) { 
+             this.currentRouletteIndex = Math.floor(Math.random() * this.heroes.length);
+          }
+          const targetHero = this.heroes[this.currentRouletteIndex];
+          if (targetHero) {
+            this.rouletteHighlighter.setPosition(targetHero.x, targetHero.y);
+          }
+
+          if (this.propertyRouletteTimer <= 0) {
+             this.propertyRouletteActive = false;
+             this.rouletteHighlighter.setVisible(false);
+             if (targetHero) {
+                targetHero.setEvicted(true);
+             }
+          }
+        }
+      }
+    } else {
+      this.propertyRouletteActive = false;
+      this.rouletteHighlighter.setVisible(false);
+      for (const h of this.heroes) {
+         if (h.isEvicted) h.setEvicted(false);
+      }
+    }
 
     if (!this.waveActive && _time > 1000) {
       this.waveActive = true;

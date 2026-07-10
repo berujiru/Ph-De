@@ -202,8 +202,8 @@ Mini-bosses introduce **passive mechanics** that force players to adapt their ta
 | **Dummy / Crony** | Bodyguard | Inflated suit/shield | Taunt Aura: Redirects projectiles to itself | Weak: Earth (Shred) |
 | **Hoarder** | Cartel | Bloated merchant sitting on sacks | Drops a massive barricade on death blocking shots | Weak: Physical |
 | **Bribery** | Silencer | Slimy suited creature tossing dirty money | Budget Cut: Locks all Hero active skills while alive | Weak: Physical |
-| **Land Grabber** | Displacer | Earth-moving machine monster | Passively knocks back your frontline | Weak: Lightning |
-| **Tender Rigger** | Rigged Bidding | Monster wrapped in sealed envelopes | Immune to first 5 hits | Weak: Rapid-fire |
+| **Land Grabber** | Displacer | Earth-moving machine monster | Private Property: Targets a random hero slot via roulette. Evicts the hero and replaces them with a Private Property sign. | Weak: Lightning |
+| **Tender Rigger** | Rigged Bidding | Monster wrapped in sealed envelopes | Immune to first 20 hits | Weak: Rapid-fire |
 
 Exact multipliers are `balance.ts` data; this column is the design intent the enemy info card telegraphs. 
 
