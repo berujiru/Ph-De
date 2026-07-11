@@ -169,6 +169,34 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
       repeat: 0,
     });
   }
+
+  // Custom manual sprite sheet configuration for Troll Farm
+  if (scene.textures.exists('boss_troll_farm') && !scene.anims.exists('boss_troll_farm-march')) {
+    scene.anims.create({
+      key: 'boss_troll_farm-march',
+      frames: scene.anims.generateFrameNumbers('boss_troll_farm', { start: 0, end: 26 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'boss_troll_farm-attack',
+      frames: scene.anims.generateFrameNumbers('boss_troll_farm', { start: 27, end: 51 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'boss_troll_farm-cast',
+      frames: scene.anims.generateFrameNumbers('boss_troll_farm', { start: 27, end: 51 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'boss_troll_farm-death',
+      frames: scene.anims.generateFrameNumbers('boss_troll_farm', { start: 52, end: 74 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
 }
 
 /** Manually generate animations for sprite sheets without a JSON atlas. */
