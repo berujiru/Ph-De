@@ -132,6 +132,10 @@ export class GameScene extends Phaser.Scene {
       frameWidth: 256,
       frameHeight: 256,
     });
+    this.load.spritesheet('ghost_employee', '/assets/enemies/ghost_employee_sprite.png', {
+      frameWidth: 256,
+      frameHeight: 256,
+    });
     this.load.spritesheet('boss_flood_control', '/assets/enemies/ghost_flood_control.png', {
       frameWidth: 256,
       frameHeight: 256,

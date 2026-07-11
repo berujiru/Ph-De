@@ -168,6 +168,28 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
     });
   }
 
+  // Custom manual sprite sheet configuration for Ghost Employee
+  if (scene.textures.exists('ghost_employee') && !scene.anims.exists('ghost_employee-march')) {
+    scene.anims.create({
+      key: 'ghost_employee-march',
+      frames: scene.anims.generateFrameNumbers('ghost_employee', { start: 1, end: 23 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'ghost_employee-attack',
+      frames: scene.anims.generateFrameNumbers('ghost_employee', { start: 24, end: 35 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'ghost_employee-death',
+      frames: scene.anims.generateFrameNumbers('ghost_employee', { start: 60, end: 74 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
+
   // Custom manual sprite sheet configuration for Ghost Flood Control
   if (scene.textures.exists('boss_flood_control') && !scene.anims.exists('boss_flood_control-march')) {
     scene.anims.create({

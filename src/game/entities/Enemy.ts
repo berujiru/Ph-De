@@ -122,7 +122,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
 
     if (definition.stealth) {
       this.isStealthed = true;
-      this.setAlpha(0.3); // translucent
+      // this.setAlpha(0.3); // translucent visual removed per user request
     }
 
     if (definition.fakeHpPadding) {
@@ -287,7 +287,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     // Breaking stealth on hit
     if (this.isStealthed) {
       this.isStealthed = false;
-      this.setAlpha(1);
+      // this.setAlpha(1); // restored visual removed per user request
       // Small pop animation
       this.scene.tweens.add({ targets: this, scale: 1.2, yoyo: true, duration: 150 });
     }
