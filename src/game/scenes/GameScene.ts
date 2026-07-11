@@ -132,6 +132,14 @@ export class GameScene extends Phaser.Scene {
       frameWidth: 256,
       frameHeight: 256,
     });
+    this.load.spritesheet('boss_wang_wang', '/assets/enemies/wang_wang_sprite.png', {
+      frameWidth: 256,
+      frameHeight: 256,
+    });
+    this.load.spritesheet('boss_dynasty', '/assets/enemies/dynasty_sprite.png', {
+      frameWidth: 256,
+      frameHeight: 256,
+    });
     this.load.image('kamote_rider', '/assets/fx/kamote_rider.svg');
     this.load.image('water_wave', '/assets/fx/water_wave.svg');
     this.load.image('tornado', '/assets/fx/tornado.svg');

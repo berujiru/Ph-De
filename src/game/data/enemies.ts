@@ -402,6 +402,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     stealVoicesPerSecond: 2,
     isRanged: true,
     attackRangePx: 250,
+    spriteKey: 'boss_dynasty',
   },
   boss_dynasty_2: {
     id: 'boss_dynasty_2',
@@ -416,6 +417,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     isRanged: true,
     attackRangePx: 250,
     nextPhaseEnemyId: 'boss_dynasty_3',
+    spriteKey: 'boss_dynasty',
   },
   boss_dynasty_1: {
     id: 'boss_dynasty_1',
@@ -430,6 +432,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     isRanged: true,
     attackRangePx: 250,
     nextPhaseEnemyId: 'boss_dynasty_2',
+    spriteKey: 'boss_dynasty',
   },
   boss_ang_sistema: {
     id: 'boss_ang_sistema',

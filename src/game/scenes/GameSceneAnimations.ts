@@ -197,6 +197,62 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
       repeat: 0,
     });
   }
+
+  // Custom manual sprite sheet configuration for Wang-Wang
+  if (scene.textures.exists('boss_wang_wang') && !scene.anims.exists('boss_wang_wang-march')) {
+    scene.anims.create({
+      key: 'boss_wang_wang-march',
+      frames: scene.anims.generateFrameNumbers('boss_wang_wang', { start: 0, end: 26 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'boss_wang_wang-attack',
+      frames: scene.anims.generateFrameNumbers('boss_wang_wang', { start: 27, end: 51 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'boss_wang_wang-cast',
+      frames: scene.anims.generateFrameNumbers('boss_wang_wang', { start: 27, end: 51 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'boss_wang_wang-death',
+      frames: scene.anims.generateFrameNumbers('boss_wang_wang', { start: 52, end: 72 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
+
+  // Custom manual sprite sheet configuration for Dynasty Bosses
+  if (scene.textures.exists('boss_dynasty') && !scene.anims.exists('boss_dynasty-march')) {
+    scene.anims.create({
+      key: 'boss_dynasty-march',
+      frames: scene.anims.generateFrameNumbers('boss_dynasty', { start: 0, end: 25 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'boss_dynasty-attack',
+      frames: scene.anims.generateFrameNumbers('boss_dynasty', { start: 27, end: 52 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'boss_dynasty-cast',
+      frames: scene.anims.generateFrameNumbers('boss_dynasty', { start: 27, end: 52 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'boss_dynasty-death',
+      frames: scene.anims.generateFrameNumbers('boss_dynasty', { start: 53, end: 64 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
 }
 
 /** Manually generate animations for sprite sheets without a JSON atlas. */
