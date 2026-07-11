@@ -284,7 +284,7 @@ export class GameScene extends Phaser.Scene {
     this.currentWave = 1;
     this.totalWaves = TOTAL_WAVES;
     
-    this.waveManager = new WaveManager(buildWaveTable(bossForStage(this.currentAct, this.currentStageIdx)), INTER_WAVE_DELAY_MS);
+    this.waveManager = new WaveManager(buildWaveTable(bossForStage(this.currentAct, this.currentStageIdx), this.currentAct, this.currentStageIdx), INTER_WAVE_DELAY_MS);
     this.dropIndex = 0;
     this.dropRollSeed = 0;
     this.maxVoicesCount = voiceDropCost(0, computeKillPool(this.totalWaves));

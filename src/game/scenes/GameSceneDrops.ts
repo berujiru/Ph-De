@@ -1,6 +1,7 @@
 import type { GameScene } from './GameScene';
 import { MAX_ACTIVE_HEROES, GLOBAL_DROP_DEFS, UPGRADE_DEFS, computeKillPool, voiceDropCost, type UpgradeKind } from '../data/drops';
 import { HERO_DEFINITIONS, type HeroId } from '../data/heroes';
+import { recruitableHeroIdsForStage } from '../data/heroUnlocks';
 import { rollDrops, makeRng, type DropContext } from '../core/Drops';
 import { gameToUiEvents, type DropOption } from '../core/GameEvents';
 import { spawnHero } from './GameSceneSpawners';
@@ -29,8 +30,9 @@ export function addVoices(scene: GameScene, amount: number) {
 /** Assemble live battle state and roll 3 drop options via the pure roller. */
 export function rollDropOptions(scene: GameScene): DropOption[] {
   const activeIds = new Set(scene.heroes.map(h => h.id));
-  const availableRecruits = (Object.keys(HERO_DEFINITIONS) as HeroId[])
-    .filter(id => !id.startsWith('sandbox_') && !activeIds.has(id))
+  // Only heroes unlocked by this campaign stage may drop (data/heroUnlocks.ts).
+  const availableRecruits = recruitableHeroIdsForStage(scene.currentAct, scene.currentStageIdx)
+    .filter(id => !activeIds.has(id))
     .map(id => ({ id, name: HERO_DEFINITIONS[id].name, purpose: HERO_DEFINITIONS[id].purpose }));
 
   const ctx: DropContext = {

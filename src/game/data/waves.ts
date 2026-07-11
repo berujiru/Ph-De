@@ -1,4 +1,5 @@
 import type { EnemyId } from './enemies';
+import { gateEnemyForStage } from './enemyUnlocks';
 
 // ============================================================================
 // WAVE TABLE  (spec: docs/WAVE_ENGINE_SPEC.md)
@@ -68,8 +69,7 @@ export function bossForStage(act: number | null, stageIdx: number | null): Enemy
   return list[(stageIdx ?? 0) % list.length];
 }
 
-/** Shorthands keeping the table readable. */
-const spawn = (enemyId: EnemyId, count: number, intervalMs: number): WaveEvent => ({ type: 'spawn', enemyId, count, intervalMs });
+/** Shorthands keeping the table readable (`spawn` lives inside buildWaveTable — it gates per stage). */
 const delay = (durationMs: number): WaveEvent => ({ type: 'delay', durationMs });
 const warning = (alertType: 'boss' | 'swarm' | 'mini-boss', text: string, durationMs = 1500): WaveEvent => ({ type: 'warning', alertType, text, durationMs });
 
@@ -77,8 +77,19 @@ const warning = (alertType: 'boss' | 'swarm' | 'mini-boss', text: string, durati
  * The 20-wave battle script (155 authored kills). Wave 20 injects the stage's
  * boss. Split/summon spawns are bonus kills on top of the authored count —
  * excluded from the drop pool on purpose (see balance.ts kill-pool doctrine).
+ *
+ * Pass the campaign coordinates to gate the roster: enemies that haven't
+ * reached their debut stage (data/enemyUnlocks.ts) are substituted 1:1 with a
+ * same-role basic enemy, so early stages stay simple without changing the
+ * kill pool. Null coordinates (sandbox quick-start) run the full script.
  */
-export function buildWaveTable(bossId: EnemyId): WaveDefinition[] {
+export function buildWaveTable(
+  bossId: EnemyId,
+  act: number | null = null,
+  stageIdx: number | null = null,
+): WaveDefinition[] {
+  const spawn = (enemyId: EnemyId, count: number, intervalMs: number): WaveEvent =>
+    ({ type: 'spawn', enemyId: gateEnemyForStage(enemyId, act, stageIdx), count, intervalMs });
   return [
     { waveNumber: 1, events: [spawn('grunt', 4, 1600)] },
     { waveNumber: 2, events: [spawn('grunt', 5, 1500), spawn('runner', 2, 800)] },
