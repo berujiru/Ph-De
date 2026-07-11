@@ -57,6 +57,34 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
       repeat: 0,
     });
   }
+
+  // Custom manual sprite sheet configuration for Ghost Flood Control
+  if (scene.textures.exists('boss_flood_control') && !scene.anims.exists('boss_flood_control-march')) {
+    scene.anims.create({
+      key: 'boss_flood_control-march',
+      frames: scene.anims.generateFrameNumbers('boss_flood_control', { start: 0, end: 30 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'boss_flood_control-attack',
+      frames: scene.anims.generateFrameNumbers('boss_flood_control', { start: 31, end: 41 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'boss_flood_control-cast',
+      frames: scene.anims.generateFrameNumbers('boss_flood_control', { start: 31, end: 41 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'boss_flood_control-death',
+      frames: scene.anims.generateFrameNumbers('boss_flood_control', { start: 61, end: 71 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
 }
 
 /** Manually generate animations for sprite sheets without a JSON atlas. */

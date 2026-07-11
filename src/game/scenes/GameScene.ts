@@ -112,6 +112,10 @@ export class GameScene extends Phaser.Scene {
       frameWidth: 256,
       frameHeight: 256,
     });
+    this.load.spritesheet('boss_flood_control', '/assets/enemies/ghost_flood_control.png', {
+      frameWidth: 256,
+      frameHeight: 256,
+    });
     this.load.aseprite('boss_troll_farm', '/assets/enemies/boss_troll_farm.png', '/assets/enemies/boss_troll_farm.json');
     this.load.image('kamote_rider', '/assets/fx/kamote_rider.svg');
     this.load.image('water_wave', '/assets/fx/water_wave.svg');

@@ -144,11 +144,12 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     if (definition.id.startsWith('boss_')) {
       this.bossAuraImage = scene.add.image(0, 0, 'boss_aura');
       this.bossAuraImage.setTint(definition.color);
-      this.bossAuraImage.setAlpha(0.6);
+      this.bossAuraImage.setAlpha(0.4);
       this.bossAuraImage.setScale((sizePx * 2.5) / 200);
       
-      // We want to add this at the very bottom (index 0) so it renders under the shadow and model
-      this.addAt(this.bossAuraImage, 0);
+      // We want to add this at the very bottom so it renders under the shadow and model
+      this.add(this.bossAuraImage);
+      this.sendToBack(this.bossAuraImage);
     }
 
     if (definition.id === 'sandbox_target') {
@@ -463,7 +464,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       this.definition.speed *= 3;
 
       // Stun all heroes for 2 seconds
-      for (const hero of this.scene.heroes) {
+      for (const hero of (this.scene as any).heroes) {
         hero.stun(2000);
       }
 
@@ -498,7 +499,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     if (this.isDead) return;
 
     if (this.bossAuraImage) {
-      this.bossAuraImage.rotation += 0.001 * delta;
+      // this.bossAuraImage.rotation += 0.001 * delta;
     }
 
     // --- Periodic Passives ---
@@ -669,38 +670,75 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
         this.attackCooldown = this.getEffectiveAttackRateMs();
         this.model.setState('attack');
       }
-    } else if (this.y + this.sizePx / 2 >= shield.y - shield.height / 2 - (this.definition.attackRangePx ?? 0)) {
-      // Within fixed attack range of the shield's front (top) edge — halt and
-      // attack. attackRangePx 0 (default) = the old melee contact point, which
-      // RALLY.formation.enemyContactAheadPx relies on.
-      this.y = shield.y - shield.height / 2 - this.sizePx / 2 - (this.definition.attackRangePx ?? 0);
-
-      if (this.definition.selfDestructOnBarrier) {
-        const dmg = this.definition.selfDestructDamage ?? (this.definition.damage * (this.definition.barrierDamageMultiplier || 1));
-        shield.takeDamage(dmg);
-        spawnShockwaveRing(this.scene, {
-          x: this.x, y: this.y, color: 0xef4444, endRadius: 100, strokeWidth: 8, fillAlpha: 0.3, durationMs: 400
-        });
-        cameraPunch(this.scene, FX.cameraShake.shieldHit);
-        this.hp = 0;
-        this.takeDamage(0);
-        return;
-      }
-
-      this.model.setState('idle');
-      this.attackCooldown -= delta;
-      if (this.attackCooldown <= 0) {
-        const dmg = this.definition.damage * (this.definition.barrierDamageMultiplier || 1);
-        shield.takeDamage(dmg);
-        this.attackCooldown = this.getEffectiveAttackRateMs();
-        this.model.setState('attack');
-      }
-    } else if (moveSpeed > 0) {
-      // Move down toward the rally
-      this.y += moveSpeed * (delta / 1000);
-      this.model.setState(moveSpeed >= ENEMY_VISUALS.runSpeedThresholdPxPerSec ? 'run' : 'walk');
     } else {
-      this.model.setState('idle');
+      let stopY = shield.y - shield.height / 2 - (this.definition.attackRangePx ?? 0);
+      if (this.definition.id.startsWith('boss_')) {
+        stopY = this.scene.cameras.main.scrollY + this.scene.cameras.main.height / 2;
+      }
+      
+      if (this.y + this.sizePx / 2 >= stopY) {
+        // Within fixed attack range or center of screen — halt and attack.
+        this.y = stopY - this.sizePx / 2;
+
+        if (this.definition.selfDestructOnBarrier) {
+          const dmg = this.definition.selfDestructDamage ?? (this.definition.damage * (this.definition.barrierDamageMultiplier || 1));
+          shield.takeDamage(dmg);
+          spawnShockwaveRing(this.scene, {
+            x: this.x, y: this.y, color: 0xef4444, endRadius: 100, strokeWidth: 8, fillAlpha: 0.3, durationMs: 400
+          });
+          cameraPunch(this.scene, FX.cameraShake.shieldHit);
+          this.hp = 0;
+          this.takeDamage(0);
+          return;
+        }
+
+        this.model.setState('idle');
+        this.attackCooldown -= delta;
+        if (this.attackCooldown <= 0) {
+          const dmg = this.definition.damage * (this.definition.barrierDamageMultiplier || 1);
+          this.attackCooldown = this.getEffectiveAttackRateMs();
+          this.model.setState('attack');
+          
+          if (this.definition.id.startsWith('boss_') && this.definition.isRanged) {
+            // Fire 6 glowing spherical projectiles
+            for (let i = 0; i < 6; i++) {
+              const startX = this.x + (Math.random() * 60 - 30);
+              const startY = this.y + (Math.random() * 20 - 10);
+              const proj = this.scene.add.circle(startX, startY, 8, this.definition.color || 0xffffff);
+              proj.setStrokeStyle(2, 0xffffff);
+              
+              // Simple glow effect by adding a larger translucent circle behind it
+              const glow = this.scene.add.circle(startX, startY, 14, this.definition.color || 0xffffff, 0.4);
+              this.scene.add.existing(proj);
+              this.scene.add.existing(glow);
+              
+              const targetX = this.x + (Math.random() * 120 - 60);
+              
+              this.scene.tweens.add({
+                targets: [proj, glow],
+                x: targetX,
+                y: shield.y,
+                duration: 800 + Math.random() * 300, // Speed is consistent (around 800-1100ms)
+                ease: 'Sine.easeIn',
+                onComplete: () => {
+                  proj.destroy();
+                  glow.destroy();
+                  // Apply 1/6th of the damage per projectile so the total damage is the same
+                  shield.takeDamage(dmg / 6);
+                }
+              });
+            }
+          } else {
+            shield.takeDamage(dmg);
+          }
+        }
+      } else if (moveSpeed > 0) {
+        // Move down toward the rally
+        this.y += moveSpeed * (delta / 1000);
+        this.model.setState(moveSpeed >= ENEMY_VISUALS.runSpeedThresholdPxPerSec ? 'run' : 'walk');
+      } else {
+        this.model.setState('idle');
+      }
     }
   }
 }

@@ -208,13 +208,12 @@ export function setupInternalEvents(scene: GameScene) {
   scene.events.on('enemyFlood', () => {
     for (const enemy of scene.enemies) {
       enemy.definition.speed *= 2; 
-      const flash = scene.add.rectangle(enemy.x, enemy.y, 40, 40, 0x0ea5e9, 0.5);
-      scene.tweens.add({
-        targets: flash,
-        scale: 3,
-        alpha: 0,
-        duration: 500,
-        onComplete: () => flash.destroy()
+      spawnShockwaveRing(scene, {
+        x: enemy.x, y: enemy.y,
+        color: 0x0ea5e9,
+        startRadius: 20, endRadius: 60,
+        fillAlpha: 0.5, strokeWidth: 4,
+        durationMs: 500, ease: 'Linear'
       });
     }
   });

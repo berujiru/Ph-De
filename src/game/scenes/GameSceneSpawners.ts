@@ -30,7 +30,10 @@ import { gameToUiEvents } from '../core/GameEvents';
 export function spawnEnemy(scene: GameScene, enemyId: EnemyId = 'grunt', wave: number = 1) {
   // Scatter across the lane (X); spawn just above the visible top of the
   // screen so enemies enter from the top edge of what the player sees.
-  const x = Phaser.Math.Between(50, GAME_WIDTH - 50);
+  let x = Phaser.Math.Between(50, GAME_WIDTH - 50);
+  if (enemyId.startsWith('boss_')) {
+    x = GAME_WIDTH / 2;
+  }
   const y = scene.cameras.main.scrollY - ENEMY_SPAWN_Y_OFFSET;
   
   const def = { ...ENEMY_DEFINITIONS[enemyId] };

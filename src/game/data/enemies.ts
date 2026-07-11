@@ -51,7 +51,6 @@ export interface EnemyDefinition {
   budgetCut?: boolean;
   privatePropertyStun?: boolean;
   isRanged?: boolean;
-  attackRangePx?: number;
   splitOnDeathEnemyId?: EnemyId;
   evasionChance?: number;
   
@@ -272,7 +271,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     damage: 30,
     attackRateMs: 5000,
     color: 0x0ea5e9,
-    stealth: true,
+    fakeHpPadding: 200,
     isRanged: true,
     attackRangePx: 250,
     activeSkill: { name: 'Flash Flood', effect: 'flood' }
