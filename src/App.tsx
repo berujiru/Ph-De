@@ -68,6 +68,8 @@ function App() {
       
       {currentView === 'prep' && (
         <PreparationScreen 
+          act={selectedStage?.act}
+          stageIdx={selectedStage?.stageIdx}
           onBack={() => setCurrentView('campaign')}
           onDeploy={handleStartBattle}
         />

@@ -7,10 +7,14 @@ import {
   PlayIcon,
   RallyPermitIcon,
   SettingsIcon,
+  SkullIcon,
   StarIcon,
   StarOutlineIcon,
 } from '../icons';
 import { BackButton } from '../components/BackButton';
+import { bossForStage, buildWaveTable, isBossStage } from '../../game/data/waves';
+import { ENEMY_DEFINITIONS, enemySizeClass } from '../../game/data/enemies';
+import { ENEMY_INTRO_STAGE, type GatedEnemyId } from '../../game/data/enemyUnlocks';
 
 interface CampaignMapProps {
   onBack: () => void;
@@ -39,6 +43,23 @@ interface ActEntry {
 }
 
 const stage = (id: number, name: string, permitCost = 1): StageEntry => ({ id, name, permitCost });
+
+/**
+ * Mini-boss debuts by global stage id (data/enemyUnlocks.ts), derived from the
+ * authored wave script so the map only telegraphs anomalies that actually
+ * march (e.g. Red Tape is scheduled for Act 3 but not authored in yet).
+ */
+const AUTHORED_ENEMY_IDS = new Set(
+  buildWaveTable('boss_flood_control').flatMap((wave) =>
+    wave.events.flatMap((evt) => (evt.type === 'spawn' ? [evt.enemyId] : [])),
+  ),
+);
+const MINIBOSS_DEBUTS = new Map<number, string[]>();
+for (const [id, debutStage] of Object.entries(ENEMY_INTRO_STAGE) as [GatedEnemyId, number][]) {
+  if (!AUTHORED_ENEMY_IDS.has(id)) continue;
+  if (enemySizeClass(ENEMY_DEFINITIONS[id]) !== 'miniboss') continue;
+  MINIBOSS_DEBUTS.set(debutStage, [...(MINIBOSS_DEBUTS.get(debutStage) ?? []), ENEMY_DEFINITIONS[id].name]);
+}
 
 // Nested Data Structure for 4 Acts x 10 Stages + Finale
 const CAMPAIGN_DATA: ActEntry[] = [
@@ -433,6 +454,12 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                       const isLocked = HIGHEST_CLEARED_STAGE < stageEntry.id - 1;
                       const isLast = stageIdx === act.stages.length - 1;
                       const stars = MOCK_STAGE_STARS[stageEntry.id] ?? 0;
+                      // What anchors the stage's final wave (a boss only every
+                      // BOSS_STAGE_INTERVAL-th stage), and any anomaly that
+                      // debuts here (wave script + enemyUnlocks schedule).
+                      const hasBoss = isBossStage(act.id, stageIdx);
+                      const bossName = ENEMY_DEFINITIONS[bossForStage(act.id, stageIdx)].name;
+                      const minibossDebuts = MINIBOSS_DEBUTS.get(stageEntry.id) ?? [];
 
                       const nodeColor: string = isCleared
                         ? theme.colors.success
@@ -509,6 +536,48 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                                 }}
                               >
                                 {stageEntry.name}
+                              </div>
+                              {/* Threat telegraph: boss stages + mini-boss debuts */}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginTop: 5 }}>
+                                {hasBoss && (
+                                  <span
+                                    style={{
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: 4,
+                                      fontSize: 10,
+                                      fontWeight: 800,
+                                      letterSpacing: 0.5,
+                                      color: '#fca5a5',
+                                      backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                                      border: '1px solid rgba(239, 68, 68, 0.45)',
+                                      borderRadius: 999,
+                                      padding: '2px 8px',
+                                    }}
+                                  >
+                                    <SkullIcon size={10} /> BOSS: {bossName.toUpperCase()}
+                                  </span>
+                                )}
+                                {minibossDebuts.map((name) => (
+                                  <span
+                                    key={name}
+                                    style={{
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: 4,
+                                      fontSize: 10,
+                                      fontWeight: 800,
+                                      letterSpacing: 0.5,
+                                      color: '#fcd34d',
+                                      backgroundColor: 'rgba(245, 158, 11, 0.12)',
+                                      border: '1px solid rgba(245, 158, 11, 0.45)',
+                                      borderRadius: 999,
+                                      padding: '2px 8px',
+                                    }}
+                                  >
+                                    ⚠ NEW MINI-BOSS: {name.toUpperCase()}
+                                  </span>
+                                ))}
                               </div>
                             </div>
 

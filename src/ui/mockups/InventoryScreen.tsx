@@ -19,6 +19,8 @@ import {
 import { EnemyTcgCard } from '../components/EnemyTcgCard';
 import { getSelectedSkin, setSelectedSkin, subscribeSkins } from '../../game/data/skinSelection';
 import { heroSkins } from '../../game/data/skins';
+import { heroUnlockStage } from '../../game/data/heroUnlocks';
+import { actForStage } from '../../game/data/campaign';
 
 interface InventoryScreenProps {
   onBack: () => void;
@@ -28,6 +30,10 @@ type ArchiveTab = 'heroes' | 'codex';
 
 // Real anomalies only (drop the sandbox punching bag).
 const CODEX_ENEMIES = Object.values(ENEMY_DEFINITIONS).filter((def) => def.id !== 'sandbox_target');
+
+// Mock campaign progress (mirrors CampaignMap.tsx): heroes whose unlock stage
+// (data/heroUnlocks.ts) has been reached count as recruited into the movement.
+const HIGHEST_CLEARED_STAGE = 7;
 
 // Mock: which anomalies the player has actually faced (unlock-on-encounter).
 const FACED_ENEMY_IDS = new Set<EnemyId>([
@@ -45,7 +51,12 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
   useEffect(() => subscribeSkins(forceSkinRefresh), []);
 
   // Real workers only — the sandbox test dummies never belong in the roster.
-  const roster = Object.values(HERO_DEFINITIONS).filter((hero) => !hero.id.startsWith('sandbox_'));
+  // Sorted along the campaign's unlock ladder (data/heroUnlocks.ts): recruited
+  // workers first, then the still-locked ones in the order the movement will
+  // reach them. Ties (same stage) break alphabetically for a stable wall.
+  const roster = Object.values(HERO_DEFINITIONS)
+    .filter((hero) => !hero.id.startsWith('sandbox_'))
+    .sort((a, b) => heroUnlockStage(a.id) - heroUnlockStage(b.id) || a.name.localeCompare(b.name));
 
   const facedCount = CODEX_ENEMIES.filter((def) => FACED_ENEMY_IDS.has(def.id)).length;
 
@@ -199,8 +210,11 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
       {tab === 'heroes' && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(68px, 1fr))', gap: '8px 6px', padding: '6px 2px' }}>
           {roster.map((hero, idx) => {
-            // Mock unlocking and leveling logic
-            const isUnlocked = idx < 12;
+            // Unlock path comes from the campaign schedule (data/heroUnlocks.ts);
+            // cleared-stage progress and leveling are still mock.
+            const unlockStage = heroUnlockStage(hero.id);
+            const unlockAct = actForStage(unlockStage);
+            const isUnlocked = unlockStage <= HIGHEST_CLEARED_STAGE;
             const mockLevel = hero.id === 'eden' ? 3 : 1;
             const mockCards = hero.id === 'eden' ? 4 : 8;
             const mockCardsNeeded = mockLevel * 5;
@@ -216,6 +230,19 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 rotation={rotation}
                 skin={getSelectedSkin(hero.id)}
                 onClick={() => setSelectedHero(hero)}
+                lockedHint={
+                  <div style={{
+                    fontSize: '7.5px',
+                    fontWeight: 'bold',
+                    color: '#854d0e',
+                    backgroundColor: '#fef9c3',
+                    border: '1px solid #ca8a04',
+                    padding: '1px 5px',
+                    borderRadius: '10px'
+                  }}>
+                    JOINS: ACT {unlockAct} · STAGE {unlockStage}
+                  </div>
+                }
               >
                 <span style={{ fontSize: '7px', padding: '1px 4px', backgroundColor: '#e2e8f0', color: '#334155', border: '1px solid #cbd5e1', fontWeight: 'bold' }}>
                   {hero.damageType.toUpperCase()}
@@ -393,6 +420,9 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 </h2>
                 <div style={{ fontSize: '13px', fontWeight: 'bold', marginTop: '4px', color: '#334155' }}>
                   ROLE: {selectedHero.profession.toUpperCase()}
+                </div>
+                <div style={{ fontSize: '11px', fontWeight: 'bold', marginTop: '2px', color: '#64748b', fontFamily: TYPEWRITER_FONT }}>
+                  JOINS THE MOVEMENT: ACT {actForStage(heroUnlockStage(selectedHero.id))} · STAGE {heroUnlockStage(selectedHero.id)}
                 </div>
                 <div style={{ marginTop: '10px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   <span style={{ fontSize: '12px', padding: '2px 8px', border: '1px solid #000', fontWeight: 'bold' }}>

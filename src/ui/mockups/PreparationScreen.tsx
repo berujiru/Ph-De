@@ -13,8 +13,12 @@ import { BackButton } from '../components/BackButton';
 import { EnemyCaseCard, HeroPolaroidCard, SkinPortrait } from '../components/ArchiveCards';
 import { getSelectedSkin } from '../../game/data/skinSelection';
 import { HERO_DEFINITIONS, type HeroDefinition, type HeroId } from '../../game/data/heroes';
+import { buildWaveTable, bossForStage } from '../../game/data/waves';
+import { ENEMY_DEFINITIONS, type EnemyId } from '../../game/data/enemies';
 
 interface PreparationScreenProps {
+  act?: number;
+  stageIdx?: number;
   onBack: () => void;
   onDeploy: () => void;
 }
@@ -23,14 +27,6 @@ const MARKER_FONT = '"Segoe Print", "Bradley Hand", "Comic Sans MS", cursive';
 const TYPEWRITER_FONT = '"Courier New", Courier, monospace';
 
 // ---------------------------------------------------------------- mock data
-
-const STAGE = {
-  act: 'Act 1: The Grassroots',
-  id: 8,
-  name: 'Local Clinic',
-  map: '/assets/maps/map-barangay.svg',
-  permitCost: 1,
-};
 
 const MOCK_PERMITS = 3;
 
@@ -43,29 +39,22 @@ interface EnemyIntel {
   count: string;
 }
 
-const ENEMY_INTEL: EnemyIntel[] = [
-  {
-    name: 'Troll Bot',
-    form: 'Gremlin, cracked phone for a head',
-    note: 'Fragile swarm — comes in floods.',
-    weakTo: 'Fire',
-    count: 'x24',
-  },
-  {
-    name: 'Fixer',
-    form: 'Many-armed scuttler in folders',
-    note: 'Extremely fast. Rushes the Barrier.',
-    weakTo: 'Frost',
-    count: 'x9',
-  },
-  {
-    name: 'Red Tape',
-    form: 'Mummy wrapped in red ribbon',
-    note: 'High armor, slow. Shred it.',
-    weakTo: 'Earth',
-    count: 'x4',
-  },
-];
+const MOCK_WEAKNESSES: Record<string, HeroDefinition['damageType']> = {
+  grunt: 'Physical',
+  runner: 'Frost',
+  brute: 'Magic',
+  ghost_employee: 'Holy',
+  the_overpriced: 'Earth',
+  tender_rigger: 'Wind',
+  epal: 'Water',
+  shell_company: 'Lightning',
+  kickback_courier: 'Frost',
+  crony_bodyguard: 'Dark',
+  bribery: 'Magic',
+  land_grabber: 'Earth',
+  hoarder: 'Fire',
+  red_tape: 'Magic',
+};
 
 /** Heroes the movement has recruited so far (mock). */
 const UNLOCKED_HERO_IDS: readonly HeroId[] = [
@@ -153,9 +142,42 @@ interface CompanionHint {
   counters: string[];
 }
 
-export function PreparationScreen({ onBack, onDeploy }: PreparationScreenProps) {
+export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: PreparationScreenProps) {
   const [selectedAct, setSelectedAct] = useState<string>('people_power');
   const [actPickerOpen, setActPickerOpen] = useState(false);
+
+  const stageAct = act ?? 1;
+  const stageId = stageIdx ?? 0;
+  
+  const STAGE = {
+    act: `Act ${stageAct}`,
+    id: (stageAct - 1) * 10 + stageId + 1,
+    name: `Stage ${stageId + 1}`,
+    map: '/assets/maps/map-barangay.svg',
+    permitCost: 1,
+  };
+
+  // Build the wave table for this stage to find expected enemies
+  const waveTable = buildWaveTable(bossForStage(stageAct, stageId), stageAct, stageId);
+  const enemyCounts: Record<string, number> = {};
+  for (const wave of waveTable) {
+    for (const evt of wave.events) {
+      if (evt.type === 'spawn') {
+        enemyCounts[evt.enemyId] = (enemyCounts[evt.enemyId] || 0) + evt.count;
+      }
+    }
+  }
+
+  const ENEMY_INTEL: EnemyIntel[] = Object.entries(enemyCounts).map(([id, count]) => {
+    const def = ENEMY_DEFINITIONS[id as EnemyId];
+    return {
+      name: def?.name || id,
+      form: `${def?.sizeClass === 'boss' ? 'Boss' : def?.sizeClass === 'miniboss' ? 'Elite' : 'Swarm'} class`,
+      note: `HP: ${def?.maxHp || '?'} | DMG: ${def?.damage || '?'}`,
+      weakTo: MOCK_WEAKNESSES[id] || 'Physical',
+      count: `x${count}`,
+    };
+  }).sort((a, b) => parseInt(b.count.slice(1)) - parseInt(a.count.slice(1)));
 
   const roster = UNLOCKED_HERO_IDS.map((id) => HERO_DEFINITIONS[id]);
 

@@ -1,12 +1,15 @@
-import type { EnemyId } from './enemies';
+import { ENEMY_DEFINITIONS, enemySizeClass, type EnemyId } from './enemies';
 import { gateEnemyForStage } from './enemyUnlocks';
+import { globalStageNumber } from './campaign';
 
 // ============================================================================
 // WAVE TABLE  (spec: docs/WAVE_ENGINE_SPEC.md)
 // ----------------------------------------------------------------------------
 // Designer-authored 20-wave battle script consumed by core/WaveManager.ts.
-// Every battle runs this table; the only per-stage variable is which boss
-// anchors wave 20 (bossForStage). Difficulty grows two ways:
+// Every battle runs this table; per stage it varies by (a) which enemies are
+// already introduced (data/enemyUnlocks.ts gating) and (b) whether wave 20
+// fields the act boss (isBossStage — every BOSS_STAGE_INTERVAL-th stage) or a
+// mini-boss final push. Difficulty grows two ways:
 //   1. Composition — later waves mix tougher enemy types from the roster.
 //   2. Stats — waveStatMultipliers scales non-boss HP/damage/speed per wave.
 // ============================================================================
@@ -69,6 +72,45 @@ export function bossForStage(act: number | null, stageIdx: number | null): Enemy
   return list[(stageIdx ?? 0) % list.length];
 }
 
+/**
+ * A boss only anchors wave 20 every Nth stage.
+ */
+export const BOSS_STAGE_INTERVAL = 10;
+
+/** Whether this campaign stage's wave 20 fields the act boss. Non-campaign
+ *  battles (sandbox quick-start, null coordinates) keep the boss finale. */
+export function isBossStage(act: number | null, stageIdx: number | null): boolean {
+  if (act == null || stageIdx == null) return true;
+  if (act >= 5) return true; // the finale is always Ang Sistema
+  return globalStageNumber(act, stageIdx) % BOSS_STAGE_INTERVAL === 0;
+}
+
+/** Whether this campaign stage is one of the 3 mini-boss checkpoint stages in an act. */
+export function isMiniBossStage(act: number | null, stageIdx: number | null): boolean {
+  if (act == null || stageIdx == null) return false;
+  if (isBossStage(act, stageIdx)) return false;
+  // Stages 3, 6, 9 (1-based global stage numbers relative to their act)
+  const actStage = globalStageNumber(act, stageIdx) % BOSS_STAGE_INTERVAL;
+  return actStage === 3 || actStage === 6 || actStage === 9;
+}
+
+/**
+ * Drop warning events whose threat never actually spawns after gating: a
+ * 'mini-boss' alert needs a miniboss-class spawn in the wave, a 'boss' alert
+ * needs a boss. Keeps early stages from crying wolf over a pack of grunts.
+ */
+function honestWarnings(waves: WaveDefinition[]): WaveDefinition[] {
+  return waves.map((wave) => {
+    const spawnedIds = wave.events.flatMap((evt) => (evt.type === 'spawn' ? [evt.enemyId] : []));
+    const hasBoss = spawnedIds.some((id) => id.startsWith('boss_'));
+    const hasMiniboss = spawnedIds.some((id) => enemySizeClass(ENEMY_DEFINITIONS[id]) === 'miniboss');
+    const events = wave.events.filter((evt) =>
+      evt.type !== 'warning' ||
+      (evt.alertType === 'boss' ? hasBoss : evt.alertType === 'mini-boss' ? hasMiniboss : true));
+    return { ...wave, events };
+  });
+}
+
 /** Shorthands keeping the table readable (`spawn` lives inside buildWaveTable — it gates per stage). */
 const delay = (durationMs: number): WaveEvent => ({ type: 'delay', durationMs });
 const warning = (alertType: 'boss' | 'swarm' | 'mini-boss', text: string, durationMs = 1500): WaveEvent => ({ type: 'warning', alertType, text, durationMs });
@@ -81,7 +123,9 @@ const warning = (alertType: 'boss' | 'swarm' | 'mini-boss', text: string, durati
  * Pass the campaign coordinates to gate the roster: enemies that haven't
  * reached their debut stage (data/enemyUnlocks.ts) are substituted 1:1 with a
  * same-role basic enemy, so early stages stay simple without changing the
- * kill pool. Null coordinates (sandbox quick-start) run the full script.
+ * kill pool. The boss itself only appears on boss stages (isBossStage);
+ * other stages close on a mini-boss final push of the same spawn count.
+ * Null coordinates (sandbox quick-start) run the full boss script.
  */
 export function buildWaveTable(
   bossId: EnemyId,
@@ -90,7 +134,17 @@ export function buildWaveTable(
 ): WaveDefinition[] {
   const spawn = (enemyId: EnemyId, count: number, intervalMs: number): WaveEvent =>
     ({ type: 'spawn', enemyId: gateEnemyForStage(enemyId, act, stageIdx), count, intervalMs });
-  return [
+  
+  let finale: WaveEvent[];
+  if (isBossStage(act, stageIdx)) {
+    finale = [warning('boss', '⚠ BOSS INCOMING ⚠', 2000), delay(1500), spawn(bossId, 1, 1000), spawn('grunt', 4, 2000)];
+  } else if (isMiniBossStage(act, stageIdx)) {
+    finale = [warning('mini-boss', '⚠ FINAL PUSH ⚠', 2000), delay(1500), spawn('crony_bodyguard', 1, 1000), spawn('grunt', 4, 2000)];
+  } else {
+    finale = [warning('swarm', '⚠ FINAL WAVE ⚠', 2000), delay(1500), spawn('runner', 2, 800), spawn('grunt', 3, 1200)];
+  }
+
+  return honestWarnings([
     { waveNumber: 1, events: [spawn('grunt', 4, 1600)] },
     { waveNumber: 2, events: [spawn('grunt', 5, 1500), spawn('runner', 2, 800)] },
     { waveNumber: 3, events: [spawn('grunt', 5, 1400), spawn('runner', 3, 800)] },
@@ -109,9 +163,9 @@ export function buildWaveTable(
     { waveNumber: 16, events: [warning('swarm', '⚠ SWARM INCOMING ⚠'), spawn('runner', 12, 500), spawn('kickback_courier', 2, 900)] },
     { waveNumber: 17, events: [spawn('brute', 3, 1800), spawn('ghost_employee', 3, 1000), spawn('the_overpriced', 2, 1500)] },
     { waveNumber: 18, events: [spawn('land_grabber', 2, 2000), spawn('shell_company', 3, 1400), spawn('tender_rigger', 3, 1300)] },
-    { waveNumber: 19, events: [warning('mini-boss', '⚠ MINI-BOSS INCOMING ⚠'), spawn('hoarder', 1, 1000), spawn('crony_bodyguard', 2, 2200), spawn('epal', 2, 1000), spawn('runner', 5, 700)] },
-    { waveNumber: 20, events: [warning('boss', '⚠ BOSS INCOMING ⚠', 2000), delay(1500), spawn(bossId, 1, 1000), spawn('grunt', 4, 2000)] },
-  ];
+    { waveNumber: 19, events: [warning('swarm', '⚠ SWARM INCOMING ⚠'), spawn('shell_company', 3, 1400), spawn('epal', 2, 1000), spawn('runner', 5, 700)] },
+    { waveNumber: 20, events: finale },
+  ]);
 }
 
 /**

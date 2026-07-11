@@ -57,6 +57,14 @@ export const HERO_UNLOCK_STAGE: Record<RecruitableHeroId, number> = {
 export const RECRUITABLE_HERO_IDS = Object.keys(HERO_UNLOCK_STAGE) as RecruitableHeroId[];
 
 /**
+ * Unlock stage for any roster hero — Eden leads the movement from stage 1.
+ * UI convenience: the Archive roster shows where each worker joins.
+ */
+export function heroUnlockStage(id: HeroId): number {
+  return id === 'eden' ? 1 : HERO_UNLOCK_STAGE[id as RecruitableHeroId] ?? 1;
+}
+
+/**
  * Heroes the Voices RNG may offer in the given campaign battle. Non-campaign
  * battles (sandbox quick-start passes null coordinates) get the full roster.
  */

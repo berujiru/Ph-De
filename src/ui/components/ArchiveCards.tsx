@@ -122,6 +122,11 @@ export interface HeroPolaroidCardProps {
   onClick?: () => void;
   /** Extra content under the divider (damage chip, cards pill, counters…). */
   children?: ReactNode;
+  /**
+   * Shown under the divider while LOCKED (children only render unlocked, so
+   * the card stays spoiler-free) — e.g. the "JOINS: ACT 2 · STAGE 12" chip.
+   */
+  lockedHint?: ReactNode;
 }
 
 /** The pinned-polaroid hero card from the Movement Archive. */
@@ -134,6 +139,7 @@ export function HeroPolaroidCard({
   skin,
   onClick,
   children,
+  lockedHint,
 }: HeroPolaroidCardProps) {
   const interactive = unlocked && !!onClick;
   // Real portrait only when unlocked; otherwise the silhouette placeholder.
@@ -247,6 +253,12 @@ export function HeroPolaroidCard({
         {unlocked && children && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', borderTop: '1px dashed #cbd5e1', paddingTop: '4px' }}>
             {children}
+          </div>
+        )}
+
+        {!unlocked && lockedHint && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', borderTop: '1px dashed #cbd5e1', paddingTop: '4px' }}>
+            {lockedHint}
           </div>
         )}
       </div>

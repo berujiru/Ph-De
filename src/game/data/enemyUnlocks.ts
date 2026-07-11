@@ -23,43 +23,48 @@ export type GatedEnemyId =
 
 /**
  * First global stage (CampaignMap.tsx stage ids) where each anomaly may spawn.
- * Mechanics debut alongside their counters:
+ * One new threat at a time, debuting alongside its counter:
  *
- *   1  Street Corner    — grunt/runner/brute tutorial trio
- *   2  Alleyway Ambush  — Ghost Employee (stealth; the Sikyu starter counters)
- *   4  Basketball Court — The Overpriced (fake HP; Teacher joins here with Fact Check)
- *   5+ Act 1 back half  — hit-immunity, morale aura, split-on-death, voice theft
- *   Act 2 (11+)         — taunt, budget cut, stun, obstacle mini-bosses
+ *   1  Street Corner    — grunts only, the pure tutorial stage
+ *   2  Alleyway Ambush  — Runner (speed pressure)
+ *   3  Sari-Sari        — Brute (the first mini-boss checkpoint)
+ *   4  Basketball Court — Ghost Employee (stealth; the Sikyu starter counters)
+ *   5  Barangay Outpost — Tender Rigger
+ *   6  Act 1 back half  — The Overpriced (the second mini-boss checkpoint)
+ *   Act 2 (11+)         — Crony Bodyguard, Bribery
  *   Act 3 (21+)         — Red Tape (reserved; not in the authored table yet)
  */
 export const ENEMY_INTRO_STAGE: Record<GatedEnemyId, number> = {
   grunt: 1,
-  runner: 1,
-  brute: 1,
-  ghost_employee: 2,
-  the_overpriced: 4,
+  runner: 2,
+  brute: 3,
+  ghost_employee: 4,
   tender_rigger: 5,
-  epal: 6,
-  shell_company: 7,
-  kickback_courier: 9,
-  crony_bodyguard: 11,
-  bribery: 13,
-  land_grabber: 15,
-  hoarder: 17,
-  red_tape: 21,
+  the_overpriced: 6,
+  epal: 7,
+  shell_company: 8,
+  crony_bodyguard: 9,
+  kickback_courier: 10,
+  land_grabber: 11,
+  bribery: 12,
+  hoarder: 15,
+  red_tape: 18,
 };
 
 /**
  * What spawns instead while an enemy is still locked — the basic chassis with
  * the same battlefield role, so early stages keep the authored pacing:
- * walkers → grunt, fast movers → runner, mini-boss tanks → brute.
+ * walkers → grunt, fast movers → runner, mini-boss tanks → brute. Fallbacks
+ * CHAIN: if the fallback itself is still locked (e.g. brute before stage 5),
+ * gating keeps collapsing until it reaches an unlocked enemy — so stage 1 is
+ * pure grunts.
  */
 export const ENEMY_INTRO_FALLBACK: Record<GatedEnemyId, EnemyId> = {
   grunt: 'grunt',
-  runner: 'runner',
-  brute: 'brute',
+  runner: 'grunt',
   ghost_employee: 'grunt',
   the_overpriced: 'grunt',
+  brute: 'grunt',
   tender_rigger: 'grunt',
   epal: 'grunt',
   shell_company: 'grunt',
@@ -85,7 +90,13 @@ export function gateEnemyForStage(
   act: number | null,
   stageIdx: number | null,
 ): EnemyId {
-  if (act == null || stageIdx == null || !isGated(enemyId)) return enemyId;
+  if (act == null || stageIdx == null) return enemyId;
   const stage = globalStageNumber(act, stageIdx);
-  return ENEMY_INTRO_STAGE[enemyId] <= stage ? enemyId : ENEMY_INTRO_FALLBACK[enemyId];
+  let resolved = enemyId;
+  while (isGated(resolved) && ENEMY_INTRO_STAGE[resolved] > stage) {
+    const fallback = ENEMY_INTRO_FALLBACK[resolved];
+    if (fallback === resolved) break; // grunt is the floor
+    resolved = fallback;
+  }
+  return resolved;
 }
