@@ -146,6 +146,28 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
     });
   }
 
+  // Custom manual sprite sheet configuration for Epal
+  if (scene.textures.exists('epal') && !scene.anims.exists('epal-march')) {
+    scene.anims.create({
+      key: 'epal-march',
+      frames: scene.anims.generateFrameNumbers('epal', { start: 1, end: 12 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'epal-attack',
+      frames: scene.anims.generateFrameNumbers('epal', { start: 19, end: 30 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'epal-death',
+      frames: scene.anims.generateFrameNumbers('epal', { start: 57, end: 74 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
+
   // Custom manual sprite sheet configuration for Ghost Flood Control
   if (scene.textures.exists('boss_flood_control') && !scene.anims.exists('boss_flood_control-march')) {
     scene.anims.create({
