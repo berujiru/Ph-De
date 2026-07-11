@@ -141,6 +141,34 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
       repeat: 0,
     });
   }
+
+  // Custom manual sprite sheet configuration for Ang Sistema
+  if (scene.textures.exists('boss_ang_sistema') && !scene.anims.exists('boss_ang_sistema-march')) {
+    scene.anims.create({
+      key: 'boss_ang_sistema-march',
+      frames: scene.anims.generateFrameNumbers('boss_ang_sistema', { start: 0, end: 25 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'boss_ang_sistema-attack',
+      frames: scene.anims.generateFrameNumbers('boss_ang_sistema', { start: 26, end: 52 }),
+      frameRate: 20,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'boss_ang_sistema-cast',
+      frames: scene.anims.generateFrameNumbers('boss_ang_sistema', { start: 26, end: 52 }),
+      frameRate: 20,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'boss_ang_sistema-death',
+      frames: scene.anims.generateFrameNumbers('boss_ang_sistema', { start: 53, end: 74 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
 }
 
 /** Manually generate animations for sprite sheets without a JSON atlas. */

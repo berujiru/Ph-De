@@ -120,10 +120,15 @@ export abstract class UnitModel extends Phaser.GameObjects.Container {
     const sprite = this.animatedBody!;
     sprite.anims.timeScale = 1;
     sprite.once(`${Phaser.Animations.Events.ANIMATION_COMPLETE_KEY}${key}`, onComplete);
-    // repeat: 0 so a one-shot fires onComplete even if the tag was exported looping.
+    
+    // Respect the animation's configured repeat value (e.g. -1 for looping bosses)
+    // otherwise default to 0 so it fires onComplete even if accidentally exported looping.
+    const anim = this.scene?.anims?.get(key);
+    const repeat = anim && anim.repeat === -1 ? -1 : 0;
+    
     // An explicit duration overrides the sheet's frameRate so the clip fits the
     // requested time window (e.g. the attack cadence).
-    sprite.play({ key, repeat: 0, ...(durationMs !== undefined ? { duration: durationMs } : {}) });
+    sprite.play({ key, repeat, ...(durationMs !== undefined ? { duration: durationMs } : {}) });
     return true;
   }
 
