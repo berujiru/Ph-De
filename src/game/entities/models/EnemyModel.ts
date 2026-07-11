@@ -21,7 +21,7 @@ export class EnemyModel extends UnitModel {
   private baseScaleX = 1;
   private baseScaleY = 1;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, tint: number, spriteKey?: string, sizePx = 38) {
+  constructor(scene: Phaser.Scene, x: number, y: number, tint: number, spriteKey?: string, sizePx = 38, visualScale = 1) {
     super(scene, x, y);
     const f = sizePx / 38;
     this.f = f;
@@ -32,7 +32,21 @@ export class EnemyModel extends UnitModel {
     this.add(this.outline);
     const key = spriteKey && scene.textures.exists(spriteKey) ? spriteKey : 'enemy-base';
     this.bodySprite = scene.add.sprite(0, 0, key);
-    this.bodySprite.setDisplaySize(sizePx, sizePx);
+    
+    const renderSize = sizePx * visualScale;
+    this.bodySprite.setDisplaySize(renderSize, renderSize);
+    // Preserve aspect ratio if the frame is not square
+    if (this.bodySprite.width > 0 && this.bodySprite.height > 0) {
+      const aspect = this.bodySprite.width / this.bodySprite.height;
+      if (aspect < 1) {
+        // Taller than wide
+        this.bodySprite.setDisplaySize(renderSize * aspect, renderSize);
+      } else if (aspect > 1) {
+        // Wider than tall
+        this.bodySprite.setDisplaySize(renderSize, renderSize / aspect);
+      }
+    }
+    
     this.baseScaleX = this.bodySprite.scaleX;
     this.baseScaleY = this.bodySprite.scaleY;
     // Tint is the placeholder's per-enemy identity; a real sheet ships its own colors.

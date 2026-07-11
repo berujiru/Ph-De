@@ -33,6 +33,12 @@ export interface EnemyDefinition {
    * enemies so they read bigger than the swarm.
    */
   sizeClass?: 'minion' | 'miniboss' | 'boss';
+  
+  /**
+   * Optional visual scale multiplier. Applies only to the model's sprite rendering,
+   * keeping the logical sizePx (and thus aura sizes, collision) unchanged.
+   */
+  visualScale?: number;
 
   // Passive & Skill properties
   stealth?: boolean;
@@ -265,6 +271,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_flood_control: {
     id: 'boss_flood_control',
     name: 'Ghost Flood Control',
+    visualScale: 1.3,
     speed: 30,
     maxHp: 800,
     reward: 50,
@@ -366,6 +373,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     fakeHpPadding: 1500,
     isRanged: true,
     attackRangePx: 250,
+    visualScale: 1.8,
     activeSkill: { name: 'Smuggle Funds', effect: 'smuggleHp' }
   },
   boss_smuggling: {

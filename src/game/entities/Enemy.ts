@@ -105,7 +105,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     // minion < miniboss < boss (bosses tower over heroes).
     const sizePx = UNIT_RENDER_SIZES[enemySizeClass(definition)];
     this.sizePx = sizePx;
-    this.model = new EnemyModel(scene, 0, 0, definition.color, definition.spriteKey ?? definition.id, sizePx);
+    this.model = new EnemyModel(scene, 0, 0, definition.color, definition.spriteKey ?? definition.id, sizePx, definition.visualScale);
     this.add(this.model);
 
     const barY = -(sizePx / 2 + 8);

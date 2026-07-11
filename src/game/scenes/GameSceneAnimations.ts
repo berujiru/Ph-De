@@ -85,6 +85,34 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
       repeat: 0,
     });
   }
+
+  // Custom manual sprite sheet configuration for Budget Insertion
+  if (scene.textures.exists('boss_budget_insertion') && !scene.anims.exists('boss_budget_insertion-march')) {
+    scene.anims.create({
+      key: 'boss_budget_insertion-march',
+      frames: scene.anims.generateFrameNumbers('boss_budget_insertion', { start: 0, end: 23 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'boss_budget_insertion-attack',
+      frames: scene.anims.generateFrameNumbers('boss_budget_insertion', { start: 24, end: 49 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'boss_budget_insertion-cast',
+      frames: scene.anims.generateFrameNumbers('boss_budget_insertion', { start: 24, end: 49 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'boss_budget_insertion-death',
+      frames: scene.anims.generateFrameNumbers('boss_budget_insertion', { start: 49, end: 61 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
 }
 
 /** Manually generate animations for sprite sheets without a JSON atlas. */
