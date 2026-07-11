@@ -26,6 +26,9 @@ export class EnemyModel extends UnitModel {
     const f = sizePx / 38;
     this.f = f;
     this.shadow = scene.add.ellipse(0, 16 * f, 28 * f, 9 * f, 0x000000, 0.35);
+    if (spriteKey === 'hoarder') {
+      this.shadow.setVisible(false);
+    }
     this.add(this.shadow);
     this.outline = scene.add.circle(0, 0, 18 * f, 0x000000, 0);
     this.outline.setVisible(false);

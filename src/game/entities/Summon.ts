@@ -4,12 +4,12 @@ export class Summon extends Phaser.GameObjects.Container {
   public isDead = false;
   public maxHp: number;
   public hp: number;
-  private shape: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image;
+  private shape: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image | Phaser.GameObjects.Sprite;
   private color: number;
   private hpBarBg: Phaser.GameObjects.Rectangle;
   private hpBarFill: Phaser.GameObjects.Rectangle;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, maxHp: number, color: number, art?: { artKey: string; tint: number }) {
+  constructor(scene: Phaser.Scene, x: number, y: number, maxHp: number, color: number, art?: { artKey: string; tint: number; frame?: number; size?: number }) {
     super(scene, x, y);
     this.maxHp = maxHp;
     this.hp = maxHp;
@@ -17,9 +17,16 @@ export class Summon extends Phaser.GameObjects.Container {
 
     // The barricade shape (wider than tall, blocking the vertical lane)
     if (art && scene.textures.exists(art.artKey)) {
-      const img = scene.add.image(0, 0, art.artKey);
-      img.setDisplaySize(48, 20);
-      img.setTint(art.tint);
+      const img = scene.add.sprite(0, 0, art.artKey, art.frame);
+      if (art.frame !== undefined) {
+        const renderSize = art.size ?? 96;
+        img.setDisplaySize(renderSize, renderSize);
+      } else {
+        img.setDisplaySize(48, 20);
+      }
+      if (art.tint !== 0xffffff) {
+        img.setTint(art.tint);
+      }
       this.shape = img;
     } else {
       this.shape = scene.add.rectangle(0, 0, 40, 16, color);

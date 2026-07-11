@@ -61,7 +61,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
   public isDead = false;
   private attackCooldown = 0;
   /** Render height (px) from the unit's size tier — offsets hang off this. */
-  private readonly sizePx: number;
+  public readonly sizePx: number;
   private botAi?: EnemyAI;
 
   // Passives

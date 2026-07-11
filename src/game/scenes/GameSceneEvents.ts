@@ -238,8 +238,12 @@ export function setupInternalEvents(scene: GameScene) {
   });
 
   scene.events.on('enemyDeathDropObstacle', ({ source }: { source: Enemy }) => {
+    let art: any;
+    if (source.id === 'hoarder') {
+      art = { artKey: 'hoarder', tint: 0xffffff, frame: 84, size: source.sizePx };
+    }
     const barricadeDef = { name: 'Hoarder Junk', hp: 150, color: 0xca8a04 };
-    const summon = new Summon(scene, source.x, source.y, barricadeDef.hp, barricadeDef.color);
+    const summon = new Summon(scene, source.x, source.y, barricadeDef.hp, barricadeDef.color, art);
     scene.summons.push(summon);
   });
 

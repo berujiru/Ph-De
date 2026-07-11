@@ -190,6 +190,50 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
     });
   }
 
+  // Custom manual sprite sheet configuration for Hoarder
+  if (scene.textures.exists('hoarder') && !scene.anims.exists('hoarder-march')) {
+    scene.anims.create({
+      key: 'hoarder-march',
+      frames: scene.anims.generateFrameNumbers('hoarder', { start: 5, end: 27 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'hoarder-attack',
+      frames: scene.anims.generateFrameNumbers('hoarder', { start: 30, end: 47 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'hoarder-death',
+      frames: scene.anims.generateFrameNumbers('hoarder', { start: 74, end: 84 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
+
+  // Custom manual sprite sheet configuration for Land Grabber
+  if (scene.textures.exists('land_grabber') && !scene.anims.exists('land_grabber-march')) {
+    scene.anims.create({
+      key: 'land_grabber-march',
+      frames: scene.anims.generateFrameNumbers('land_grabber', { start: 9, end: 18 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'land_grabber-attack',
+      frames: scene.anims.generateFrameNumbers('land_grabber', { start: 25, end: 37 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'land_grabber-death',
+      frames: scene.anims.generateFrameNumbers('land_grabber', { start: 60, end: 74 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
+
   // Custom manual sprite sheet configuration for Ghost Flood Control
   if (scene.textures.exists('boss_flood_control') && !scene.anims.exists('boss_flood_control-march')) {
     scene.anims.create({
