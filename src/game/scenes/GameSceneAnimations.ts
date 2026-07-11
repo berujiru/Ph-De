@@ -281,6 +281,34 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
       repeat: 0,
     });
   }
+
+  // Custom manual sprite sheet configuration for Vote Buying
+  if (scene.textures.exists('boss_vote_buying') && !scene.anims.exists('boss_vote_buying-march')) {
+    scene.anims.create({
+      key: 'boss_vote_buying-march',
+      frames: scene.anims.generateFrameNumbers('boss_vote_buying', { start: 0, end: 25 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'boss_vote_buying-attack',
+      frames: scene.anims.generateFrameNumbers('boss_vote_buying', { start: 26, end: 55 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'boss_vote_buying-cast',
+      frames: scene.anims.generateFrameNumbers('boss_vote_buying', { start: 26, end: 55 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'boss_vote_buying-death',
+      frames: scene.anims.generateFrameNumbers('boss_vote_buying', { start: 59, end: 73 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
 }
 
 /** Manually generate animations for sprite sheets without a JSON atlas. */

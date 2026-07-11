@@ -144,6 +144,10 @@ export class GameScene extends Phaser.Scene {
       frameWidth: 256,
       frameHeight: 256,
     });
+    this.load.spritesheet('boss_vote_buying', '/assets/enemies/vote_buying_sprite.png', {
+      frameWidth: 256,
+      frameHeight: 256,
+    });
     this.load.image('kamote_rider', '/assets/fx/kamote_rider.svg');
     this.load.image('water_wave', '/assets/fx/water_wave.svg');
     this.load.image('tornado', '/assets/fx/tornado.svg');
