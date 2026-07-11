@@ -641,7 +641,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     // Check if in range of any summon
     let targetSummon: Summon | null = null;
     for (const summon of summons) {
-      if (!summon.isDead && Math.abs(this.x - summon.x) < 30 && Math.abs(this.y - summon.y) < 20) {
+      if (!summon.isEnemyTeam && !summon.isDead && Math.abs(this.x - summon.x) < 30 && Math.abs(this.y - summon.y) < 20) {
         targetSummon = summon;
         break;
       }

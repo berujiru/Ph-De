@@ -362,14 +362,11 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
               <option value="brute">Brute</option>
               <option value="ghost_employee">Ghost Employee (Stealth)</option>
               <option value="epal">Epal (Morale Aura)</option>
-              <option value="the_overpriced">The Overpriced (Fake HP)</option>
-              <option value="kickback_courier">Kickback Courier (Thief)</option>
-              <option value="shell_company">Shell Company (Splitter)</option>
               <option value="crony_bodyguard">Crony (Taunt)</option>
               <option value="hoarder">Hoarder (Obstacle Drop)</option>
               <option value="bribery">Bribery (Budget Cut)</option>
               <option value="land_grabber">Land Grabber (Knockback)</option>
-              <option value="tender_rigger">Tender Rigger (Immunity)</option>
+              <option value="red_tape">Red Tape (Taunt)</option>
               <option value="boss_flood_control">Ghost Flood Control</option>
               <option value="boss_pork_barrel">Pork Barrel</option>
               <option value="boss_troll_farm">Troll Farm</option>

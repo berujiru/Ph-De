@@ -244,6 +244,7 @@ export function setupInternalEvents(scene: GameScene) {
     }
     const barricadeDef = { name: 'Hoarder Junk', hp: 150, color: 0xca8a04 };
     const summon = new Summon(scene, source.x, source.y, barricadeDef.hp, barricadeDef.color, art);
+    summon.isEnemyTeam = true;
     scene.summons.push(summon);
   });
 

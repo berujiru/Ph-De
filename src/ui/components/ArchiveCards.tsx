@@ -66,7 +66,7 @@ export function SkinPortrait({
 
 const MINI_BOSS_IDS = new Set<EnemyId>([
   'ghost_employee', 'bribery', 'epal', 'the_overpriced', 'kickback_courier',
-  'shell_company', 'crony_bodyguard', 'hoarder', 'land_grabber', 'tender_rigger',
+  'shell_company', 'crony_bodyguard', 'hoarder', 'land_grabber', 'tender_rigger', 'red_tape',
 ]);
 
 export type EnemyTier = 'Minion' | 'Mini-Boss' | 'Boss';

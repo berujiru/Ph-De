@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 
 export class Summon extends Phaser.GameObjects.Container {
   public isDead = false;
+  public isEnemyTeam = false;
   public maxHp: number;
   public hp: number;
   private shape: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image | Phaser.GameObjects.Sprite;

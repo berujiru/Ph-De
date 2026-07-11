@@ -31,7 +31,9 @@ const CODEX_ENEMIES = Object.values(ENEMY_DEFINITIONS).filter((def) => def.id !=
 
 // Mock: which anomalies the player has actually faced (unlock-on-encounter).
 const FACED_ENEMY_IDS = new Set<EnemyId>([
-  'grunt', 'runner', 'brute', 'ghost_employee', 'epal', 'the_overpriced', 'kickback_courier',
+  'grunt', 'runner', 'brute', 'ghost_employee', 'bribery', 'epal', 'crony_bodyguard', 'hoarder', 'land_grabber', 'red_tape',
+  'boss_flood_control', 'boss_pork_barrel', 'boss_troll_farm', 'boss_vote_buying', 'boss_nepotism', 'boss_wang_wang',
+  'boss_budget_insertion', 'boss_smuggling', 'boss_dynasty_1', 'boss_dynasty_2', 'boss_dynasty_3', 'boss_ang_sistema'
 ]);
 
 export function InventoryScreen({ onBack }: InventoryScreenProps) {

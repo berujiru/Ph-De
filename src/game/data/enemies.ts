@@ -1,4 +1,4 @@
-export type EnemyId = 'grunt' | 'runner' | 'brute' | 'sandbox_target' | 'ghost_employee' | 'bribery' | 'epal' | 'the_overpriced' | 'kickback_courier' | 'shell_company' | 'crony_bodyguard' | 'hoarder' | 'land_grabber' | 'tender_rigger' | 'boss_flood_control' | 'boss_pork_barrel' | 'boss_troll_farm' | 'boss_vote_buying' | 'boss_nepotism' | 'boss_wang_wang' | 'boss_budget_insertion' | 'boss_smuggling' | 'boss_dynasty_1' | 'boss_dynasty_2' | 'boss_dynasty_3' | 'boss_ang_sistema' | 'minion_nepotism';
+export type EnemyId = 'grunt' | 'runner' | 'brute' | 'sandbox_target' | 'ghost_employee' | 'bribery' | 'epal' | 'the_overpriced' | 'kickback_courier' | 'shell_company' | 'crony_bodyguard' | 'hoarder' | 'land_grabber' | 'tender_rigger' | 'red_tape' | 'boss_flood_control' | 'boss_pork_barrel' | 'boss_troll_farm' | 'boss_vote_buying' | 'boss_nepotism' | 'boss_wang_wang' | 'boss_budget_insertion' | 'boss_smuggling' | 'boss_dynasty_1' | 'boss_dynasty_2' | 'boss_dynasty_3' | 'boss_ang_sistema' | 'minion_nepotism';
 
 /**
  * Per-enemy stats — every enemy type has its own value for each of these.
@@ -267,6 +267,18 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     attackRateMs: 2000,
     color: 0xd946ef,
     hitImmunityCount: 20,
+  },
+  red_tape: {
+    id: 'red_tape',
+    name: 'Red Tape',
+    speed: 30,
+    maxHp: 300,
+    reward: 20,
+    damage: 10,
+    attackRateMs: 3000,
+    color: 0xef4444,
+    sizeClass: 'miniboss',
+    tauntAura: true,
   },
   boss_flood_control: {
     id: 'boss_flood_control',

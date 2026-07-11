@@ -120,6 +120,26 @@ export class ProjectileAttack extends Attack {
     this.visual.pointAlong(this.vx, this.vy);
     this.trail.update(this.visual.x, this.visual.y, this.vx, this.vy);
 
+    const summons = (this.scene as any).summons as any[];
+    if (summons) {
+      for (const summon of summons) {
+        if (summon.isEnemyTeam && !summon.isDead && !this.hitEnemies.has(summon)) {
+          const dx = summon.x - this.visual.x;
+          const dy = summon.y - this.visual.y;
+          const collisionRadius = 50 + this.modifiers.bonusRadius;
+          if (dx * dx + dy * dy < collisionRadius * collisionRadius) {
+            summon.takeDamage(this.totalDamage);
+            this.hitEnemies.add(summon);
+            this.hitCount++;
+            if (this.hitCount >= this.maxHits) {
+              this.die();
+              return;
+            }
+          }
+        }
+      }
+    }
+
     const enemies = (this.scene as any).enemies as Enemy[];
     if (enemies) {
       for (const enemy of enemies) {
@@ -166,7 +186,7 @@ export class PierceAttack extends Attack {
   private visual: AttackSprite;
   private hitCount = 0;
   private maxHits: number;
-  private hitEnemies = new Set<Enemy>();
+  private hitEnemies = new Set<any>();
 
   constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy | { x: number, y: number }, damage: number, visual: AttackVisual, speed: number, basePierce: number, modifiers?: Partial<AttackModifiers>, damageType: string = 'Physical') {
     super(scene, 'PierceAttack', damage, modifiers, damageType);
@@ -197,6 +217,26 @@ export class PierceAttack extends Attack {
     const nx = -this.vy;
     const ny = this.vx;
     const len = Math.sqrt(nx * nx + ny * ny) || 1;
+
+    const summons = (this.scene as any).summons as any[];
+    if (summons) {
+      for (const summon of summons) {
+        if (summon.isEnemyTeam && !summon.isDead && !this.hitEnemies.has(summon)) {
+          const dx = summon.x - this.visual.x;
+          const dy = summon.y - this.visual.y;
+          const cross = Math.abs(dx * (ny / len) - dy * (nx / len));
+          if (cross < 40 + this.modifiers.bonusRadius) {
+            summon.takeDamage(this.totalDamage);
+            this.hitEnemies.add(summon);
+            this.hitCount++;
+            if (this.hitCount >= this.maxHits) {
+              this.die();
+              return;
+            }
+          }
+        }
+      }
+    }
 
     const enemies = (this.scene as any).enemies as Enemy[];
     if (enemies) {
