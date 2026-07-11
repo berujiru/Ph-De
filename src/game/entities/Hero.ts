@@ -8,7 +8,6 @@ import { RALLY } from '../data/level';
 import { formationTargetY, stepTowardFormation } from '../core/RallyMarch';
 import { applyHeroPassive, type ISkillHero } from '../core/Skills';
 import { HeroModel } from './models/HeroModel';
-import { SkillAura } from './fx/SkillAura';
 import { SpriteAura } from './fx/SpriteAura';
 
 export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
@@ -50,7 +49,6 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   private passiveTimer = 0;
 
   private model: HeroModel;
-  private skillAura: SkillAura;
   private spriteAura: SpriteAura;
   private buffIcons: Record<string, Phaser.GameObjects.Text> = {};
   private rangeIndicator: Phaser.GameObjects.Arc;
@@ -94,12 +92,6 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
       this.showRange();
     });
 
-    // Skill Aura (below the hero)
-    this.skillAura = new SkillAura(scene, def.color);
-    this.skillAura.setPosition(0, 35); // Approx foot position for 64px tier
-    // Put aura below the model (index 1, as range indicator is 0)
-    this.addAt(this.skillAura, 1);
-
     // Buff Sprite Aura (reverse tear drops)
     this.spriteAura = new SpriteAura(scene, 0xfacc15); // Default yellow
     // Add above the model
@@ -118,8 +110,6 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.evictionSign.add([signRect, signText]);
     this.evictionSign.setVisible(false);
     this.add(this.evictionSign);
-
-    this.updateSkillButtonVisuals();
 
     scene.add.existing(this);
   }
@@ -332,8 +322,6 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
       if (this.currentSkillCooldown <= 0) {
         this.currentSkillCooldown = 0;
         this.isSkillReady = true;
-
-        this.updateSkillButtonVisuals();
       }
     }
 
@@ -396,16 +384,10 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
 
   pauseVisuals(): void {
     this.model.pause();
-    if (this.isSkillReady && this.skillAura) {
-      this.skillAura.pause();
-    }
   }
 
   resumeVisuals(): void {
     this.model.resume();
-    if (this.isSkillReady && this.skillAura) {
-      this.skillAura.resume();
-    }
   }
 
   public setEvicted(evicted: boolean) {
@@ -428,8 +410,6 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     if (!this.isSkillReady) return;
     this.isSkillReady = false;
     this.currentSkillCooldown = this.skillCooldownMs;
-
-    this.updateSkillButtonVisuals();
 
     // Cast animation plays through the model.
     this.model.setState('cast');
@@ -456,14 +436,6 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
         this.rangeIndicator.setVisible(false);
       }
     });
-  }
-
-  private updateSkillButtonVisuals() {
-    if (this.isSkillReady) {
-      this.skillAura.play();
-    } else {
-      this.skillAura.stop();
-    }
   }
 
   stun(durationMs: number) {

@@ -232,16 +232,19 @@ export class GameScene extends Phaser.Scene {
     setupGameAnimations(this);
     this.buildGame();
 
+    this.cleanupUIEvents = setupUIEvents(this);
+    const cleanupInternalEvents = setupInternalEvents(this);
+
     const cleanup = () => {
-      if (this.cleanupUIEvents) this.cleanupUIEvents();
-      this.events.removeAllListeners();
+      if (this.cleanupUIEvents) {
+        this.cleanupUIEvents();
+        this.cleanupUIEvents = undefined;
+      }
+      cleanupInternalEvents();
     };
 
-    this.cleanupUIEvents = setupUIEvents(this);
-    setupInternalEvents(this);
-
-    this.events.on('shutdown', cleanup);
-    this.events.on('destroy', cleanup);
+    this.events.once('shutdown', cleanup);
+    this.events.once('destroy', cleanup);
   }
 
   public resetGame(): void {

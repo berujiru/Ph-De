@@ -25,10 +25,12 @@ export const ENEMY_SPAWN_Y_OFFSET = 50;
  */
 export const RALLY = {
   /**
-   * Where the shield front starts the battle. Decrease the number (e.g., 300) 
+   * Where the shield front starts the battle. Decrease the number (e.g., 300)
    * to move heroes LOWER on screen, or increase it (e.g., 600) to move them HIGHER.
+   * Matches shieldMaxY so the shield sits at its final position immediately —
+   * no opening march.
    */
-  shieldStartY: WORLD_HEIGHT - 200,
+  shieldStartY: WORLD_HEIGHT - 350,
   /**
    * The shield never advances past this point. Keep this matching shieldStartY
    * to freeze the march.

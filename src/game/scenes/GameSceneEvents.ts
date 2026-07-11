@@ -204,7 +204,7 @@ export function setupUIEvents(scene: GameScene): () => void {
   };
 }
 
-export function setupInternalEvents(scene: GameScene) {
+export function setupInternalEvents(scene: GameScene): () => void {
   scene.events.on('enemyFlood', () => {
     for (const enemy of scene.enemies) {
       enemy.definition.speed *= 2; 
@@ -397,6 +397,31 @@ export function setupInternalEvents(scene: GameScene) {
       },
     });
   });
+
+  // Remove only the listeners registered above. Never call
+  // scene.events.removeAllListeners() — Phaser's own plugins (CameraManager,
+  // tweens, etc.) listen on the same emitter and would break on restart.
+  const internalEventNames = [
+    'enemyFlood',
+    'enemyDeathSplit',
+    'enemyDeathDropObstacle',
+    'stealVoices',
+    'heroKnockback',
+    'moraleAura',
+    'enemySummonSwarm',
+    'enemySummonShieldbearer',
+    'enemyScatterFakeGold',
+    'enemySmuggleHp',
+    'enemyEconomyHeist',
+    'bossPhaseShift',
+    'resurrectAll',
+    'heroSkillTriggered',
+  ];
+  return () => {
+    for (const name of internalEventNames) {
+      scene.events.removeAllListeners(name);
+    }
+  };
 }
 
 export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent) {
