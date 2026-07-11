@@ -309,6 +309,34 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
       repeat: 0,
     });
   }
+
+  // Custom manual sprite sheet configuration for Nepotism
+  if (scene.textures.exists('boss_nepotism') && !scene.anims.exists('boss_nepotism-march')) {
+    scene.anims.create({
+      key: 'boss_nepotism-march',
+      frames: scene.anims.generateFrameNumbers('boss_nepotism', { start: 0, end: 26 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'boss_nepotism-attack',
+      frames: scene.anims.generateFrameNumbers('boss_nepotism', { start: 26, end: 52 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'boss_nepotism-cast',
+      frames: scene.anims.generateFrameNumbers('boss_nepotism', { start: 26, end: 52 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'boss_nepotism-death',
+      frames: scene.anims.generateFrameNumbers('boss_nepotism', { start: 53, end: 71 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
 }
 
 /** Manually generate animations for sprite sheets without a JSON atlas. */
