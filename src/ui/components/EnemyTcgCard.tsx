@@ -2,8 +2,33 @@ import type { CSSProperties, ReactNode } from 'react';
 import { theme } from '../theme';
 import { SkullIcon } from '../icons';
 import { ENEMY_DEFINITIONS, type EnemyDefinition, type EnemyId } from '../../game/data/enemies';
-import { enemyTier, TIER_COLOR, enemyMechanic, hexColor } from './ArchiveCards';
+import { enemyTier, TIER_COLOR, hexColor } from './ArchiveCards';
 import { metersPerSecondLabel } from '../../game/data/constants';
+
+function getPassivesText(def: EnemyDefinition): string[] {
+  const passives: string[] = [];
+  if (def.stealth) passives.push('Untargetable until revealed or splashed.');
+  if (def.moraleAura) passives.push('Buffs nearby anomalies with a morale aura.');
+  if (def.fakeHpPadding) passives.push('Padded with fake HP — popped by an Audit.');
+  if (def.splitOnDeathCount) passives.push(`Shatters into ${def.splitOnDeathCount} on death.`);
+  if (def.tauntAura) passives.push('Redirects your projectiles onto itself.');
+  if (def.dropObstacleOnDeath) passives.push('Drops a barricade blocking your shots on death.');
+  if (def.barrierDamageMultiplier) passives.push(`Tears through barricades ${def.barrierDamageMultiplier}× faster.`);
+  if (def.knockbackPulseCooldown) passives.push('Shoves your frontline back down the path.');
+  if (def.hitImmunityCount) passives.push(`Shrugs off its first ${def.hitImmunityCount} hits.`);
+  if (def.stealVoicesPerSecond) passives.push('Drains your Voices while it lives.');
+  if (def.budgetCut) passives.push('Slashes your budget on death.');
+  if (def.privatePropertyStun) passives.push('Stuns towers on death.');
+  if (def.evasionChance) passives.push(`Has a ${(def.evasionChance * 100).toFixed(0)}% chance to evade attacks.`);
+  if (def.selfDestructOnBarrier) passives.push('Self-destructs on the barrier for massive damage.');
+  
+  if (passives.length === 0) {
+    if (def.maxHp >= 140 && def.speed <= 45) passives.push('A slow, bloated tank of a lie.');
+    else if (def.speed >= 100) passives.push('Fast — rushes the Barrier before you can react.');
+    else passives.push('Swarms in raw numbers to drown out the rally.');
+  }
+  return passives;
+}
 
 interface EnemyTcgCardProps {
   enemyId: EnemyId;
@@ -20,6 +45,8 @@ export function EnemyTcgCard({ enemyId, style, rotation = 0, isFacedUp = true }:
   const tier = enemyTier(def);
   const color = hexColor(def.color);
   const tierColor = TIER_COLOR[tier];
+  
+  const rank = tier === 'Boss' ? 'S' : tier === 'Mini-Boss' ? 'A' : (def.maxHp >= 60 ? 'B' : 'C');
 
   // In the future, this might point to a generated portrait image like `/assets/enemies/${enemyId}_portrait.png`
   const portraitUrl = `/assets/enemies/${enemyId}_portrait.png`;
@@ -82,20 +109,20 @@ export function EnemyTcgCard({ enemyId, style, rotation = 0, isFacedUp = true }:
         {/* Tier Badge / Element */}
         <div style={{
           backgroundColor: tierColor,
-          width: 28,
-          height: 28,
+          width: 32,
+          height: 32,
           borderRadius: '50%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           border: '2px solid #cbd5e1',
           boxShadow: '0 2px 8px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.5)',
-          fontSize: 12,
+          fontSize: 16,
           fontWeight: 900,
           color: '#fff',
           textShadow: '0 1px 2px rgba(0,0,0,0.8)'
         }}>
-          {tier.charAt(0)}
+          {rank}
         </div>
       </div>
 
@@ -176,32 +203,20 @@ export function EnemyTcgCard({ enemyId, style, rotation = 0, isFacedUp = true }:
       }}>
         {/* Classification */}
         <div style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: '#64748b', borderBottom: '1px solid #cbd5e1', paddingBottom: 4, marginBottom: 6 }}>
-          [ Anomaly / {tier} ]
+          [ Rank {rank} Anomaly / {tier} ]
         </div>
-        <div style={{ fontStyle: 'italic', lineHeight: 1.4 }}>
-          {enemyMechanic(def)}
+        <div style={{ fontStyle: 'italic', lineHeight: 1.4, flexGrow: 1 }}>
+          {getPassivesText(def).map((text, i) => <div key={i} style={{ marginBottom: 4 }}>• {text}</div>)}
         </div>
+        
+        {/* Active Skill */}
+        {def.activeSkill && (
+          <div style={{ marginTop: 8, borderTop: '1px solid #cbd5e1', paddingTop: 6, fontSize: 12 }}>
+            <span style={{ fontWeight: 900, color: '#b91c1c' }}>ACTV: </span>
+            <span style={{ fontWeight: 800 }}>{def.activeSkill.name}</span>
+          </div>
+        )}
       </div>
-
-      {/* Footer / Active Skill (ATK / DEF box style) */}
-      {def.activeSkill && (
-        <div style={{
-          marginTop: 10,
-          padding: '6px 10px',
-          backgroundColor: '#0f172a',
-          color: '#facc15',
-          fontSize: 12,
-          fontWeight: 900,
-          textAlign: 'right',
-          letterSpacing: 1,
-          border: '1px solid #475569',
-          borderRadius: 4,
-          boxShadow: 'inset 0 0 10px rgba(0,0,0,0.8)',
-          zIndex: 10
-        }}>
-          ACTV // <span style={{color: '#fff'}}>{def.activeSkill.name.toUpperCase()}</span>
-        </div>
-      )}
     </div>
   );
 }

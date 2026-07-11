@@ -283,6 +283,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 <EnemyCaseCard
                   key={def.id}
                   name={def.name}
+                  enemyId={def.id}
                   colorHex={hexColor(def.color)}
                   tag={{ label: tier, color: TIER_COLOR[tier] }}
                   faced={faced}

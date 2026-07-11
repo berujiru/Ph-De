@@ -270,6 +270,8 @@ export function HeroPolaroidCard({
 
 export interface EnemyCaseCardProps {
   name: string;
+  /** Enemy ID to load portrait from `/assets/enemies/{id}_portrait.png` */
+  enemyId?: string;
   /** Mugshot tint — a `#rrggbb` string (use hexColor() for numeric colors). */
   colorHex?: string;
   /** Small tag above the name (tier, headcount…). */
@@ -286,6 +288,7 @@ export interface EnemyCaseCardProps {
 /** The pinned manila case-file card from the Truth Codex. */
 export function EnemyCaseCard({
   name,
+  enemyId,
   colorHex,
   tag,
   faced = true,
@@ -348,10 +351,29 @@ export function EnemyCaseCard({
             ? `radial-gradient(circle at 50% 40%, ${colorHex} 0%, #1e293b 78%)`
             : 'radial-gradient(circle at 50% 40%, #334155 0%, #1e293b 80%)',
           border: '2px solid rgba(0,0,0,0.35)',
+          overflow: 'hidden',
+          position: 'relative',
         }}
       >
         {faced ? (
-          <span style={{ color: '#e2e8f0', display: 'flex' }}><SkullIcon size={22} /></span>
+          <>
+            {enemyId && (
+              <img
+                src={`/assets/enemies/${enemyId}_portrait.png`}
+                alt={name}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  if (e.currentTarget.nextSibling) {
+                    (e.currentTarget.nextSibling as HTMLElement).style.display = 'flex';
+                  }
+                }}
+              />
+            )}
+            <span style={{ color: '#e2e8f0', display: enemyId ? 'none' : 'flex' }}>
+              <SkullIcon size={22} />
+            </span>
+          </>
         ) : (
           <span style={{ fontFamily: TYPEWRITER_FONT, fontSize: 24, fontWeight: 900, color: '#94a3b8' }}>?</span>
         )}
