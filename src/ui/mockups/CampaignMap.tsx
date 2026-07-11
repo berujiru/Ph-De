@@ -7,7 +7,6 @@ import {
   PlayIcon,
   RallyPermitIcon,
   SettingsIcon,
-  SkullIcon,
   StarIcon,
   StarOutlineIcon,
 } from '../icons';
@@ -15,6 +14,7 @@ import { BackButton } from '../components/BackButton';
 import { bossForStage, buildWaveTable, isBossStage } from '../../game/data/waves';
 import { ENEMY_DEFINITIONS, enemySizeClass } from '../../game/data/enemies';
 import { ENEMY_INTRO_STAGE, type GatedEnemyId } from '../../game/data/enemyUnlocks';
+import { EnemyTcgCard } from '../components/EnemyTcgCard';
 
 interface CampaignMapProps {
   onBack: () => void;
@@ -54,11 +54,11 @@ const AUTHORED_ENEMY_IDS = new Set(
     wave.events.flatMap((evt) => (evt.type === 'spawn' ? [evt.enemyId] : [])),
   ),
 );
-const MINIBOSS_DEBUTS = new Map<number, string[]>();
+const MINIBOSS_DEBUTS = new Map<number, GatedEnemyId[]>();
 for (const [id, debutStage] of Object.entries(ENEMY_INTRO_STAGE) as [GatedEnemyId, number][]) {
   if (!AUTHORED_ENEMY_IDS.has(id)) continue;
   if (enemySizeClass(ENEMY_DEFINITIONS[id]) !== 'miniboss') continue;
-  MINIBOSS_DEBUTS.set(debutStage, [...(MINIBOSS_DEBUTS.get(debutStage) ?? []), ENEMY_DEFINITIONS[id].name]);
+  MINIBOSS_DEBUTS.set(debutStage, [...(MINIBOSS_DEBUTS.get(debutStage) ?? []), id]);
 }
 
 // Nested Data Structure for 4 Acts x 10 Stages + Finale
@@ -458,7 +458,6 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                       // BOSS_STAGE_INTERVAL-th stage), and any anomaly that
                       // debuts here (wave script + enemyUnlocks schedule).
                       const hasBoss = isBossStage(act.id, stageIdx);
-                      const bossName = ENEMY_DEFINITIONS[bossForStage(act.id, stageIdx)].name;
                       const minibossDebuts = MINIBOSS_DEBUTS.get(stageEntry.id) ?? [];
 
                       const nodeColor: string = isCleared
@@ -526,6 +525,26 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                                 <span style={{ fontSize: 11, color: nodeColor, fontWeight: 700, letterSpacing: 1 }}>
                                   STAGE {stageEntry.id}
                                 </span>
+                                {hasBoss && (
+                                  <div style={{ position: 'relative', width: 30, height: 42, flexShrink: 0, marginLeft: 4 }}>
+                                    <div style={{ transform: 'scale(0.1)', transformOrigin: 'top left', position: 'absolute', pointerEvents: 'none' }}>
+                                      <EnemyTcgCard enemyId={bossForStage(act.id, stageIdx)} />
+                                    </div>
+                                    <div style={{ position: 'absolute', bottom: -4, left: '50%', transform: 'translateX(-50%)', backgroundColor: '#ef4444', color: '#fff', fontSize: 7, fontWeight: 900, padding: '1px 4px', borderRadius: 2, boxShadow: '0 1px 2px rgba(0,0,0,0.5)', zIndex: 10, letterSpacing: 0.5 }}>
+                                      BOSS
+                                    </div>
+                                  </div>
+                                )}
+                                {minibossDebuts.map((id) => (
+                                  <div key={id} style={{ position: 'relative', width: 30, height: 42, flexShrink: 0, marginLeft: 4 }}>
+                                    <div style={{ transform: 'scale(0.1)', transformOrigin: 'top left', position: 'absolute', pointerEvents: 'none' }}>
+                                      <EnemyTcgCard enemyId={id} />
+                                    </div>
+                                    <div style={{ position: 'absolute', bottom: -4, left: '50%', transform: 'translateX(-50%)', backgroundColor: '#f59e0b', color: '#fff', fontSize: 7, fontWeight: 900, padding: '1px 4px', borderRadius: 2, boxShadow: '0 1px 2px rgba(0,0,0,0.5)', zIndex: 10, letterSpacing: 0.5 }}>
+                                      NEW
+                                    </div>
+                                  </div>
+                                ))}
                                 <StageStars stars={stars} />
                               </div>
                               <div
@@ -536,48 +555,6 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                                 }}
                               >
                                 {stageEntry.name}
-                              </div>
-                              {/* Threat telegraph: boss stages + mini-boss debuts */}
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginTop: 5 }}>
-                                {hasBoss && (
-                                  <span
-                                    style={{
-                                      display: 'inline-flex',
-                                      alignItems: 'center',
-                                      gap: 4,
-                                      fontSize: 10,
-                                      fontWeight: 800,
-                                      letterSpacing: 0.5,
-                                      color: '#fca5a5',
-                                      backgroundColor: 'rgba(239, 68, 68, 0.12)',
-                                      border: '1px solid rgba(239, 68, 68, 0.45)',
-                                      borderRadius: 999,
-                                      padding: '2px 8px',
-                                    }}
-                                  >
-                                    <SkullIcon size={10} /> BOSS: {bossName.toUpperCase()}
-                                  </span>
-                                )}
-                                {minibossDebuts.map((name) => (
-                                  <span
-                                    key={name}
-                                    style={{
-                                      display: 'inline-flex',
-                                      alignItems: 'center',
-                                      gap: 4,
-                                      fontSize: 10,
-                                      fontWeight: 800,
-                                      letterSpacing: 0.5,
-                                      color: '#fcd34d',
-                                      backgroundColor: 'rgba(245, 158, 11, 0.12)',
-                                      border: '1px solid rgba(245, 158, 11, 0.45)',
-                                      borderRadius: 999,
-                                      padding: '2px 8px',
-                                    }}
-                                  >
-                                    ⚠ NEW MINI-BOSS: {name.toUpperCase()}
-                                  </span>
-                                ))}
                               </div>
                             </div>
 
