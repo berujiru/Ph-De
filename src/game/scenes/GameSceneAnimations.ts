@@ -113,6 +113,34 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
       repeat: 0,
     });
   }
+
+  // Custom manual sprite sheet configuration for Smuggling
+  if (scene.textures.exists('boss_smuggling') && !scene.anims.exists('boss_smuggling-march')) {
+    scene.anims.create({
+      key: 'boss_smuggling-march',
+      frames: scene.anims.generateFrameNumbers('boss_smuggling', { start: 0, end: 26 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'boss_smuggling-attack',
+      frames: scene.anims.generateFrameNumbers('boss_smuggling', { start: 27, end: 51 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'boss_smuggling-cast',
+      frames: scene.anims.generateFrameNumbers('boss_smuggling', { start: 27, end: 51 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'boss_smuggling-death',
+      frames: scene.anims.generateFrameNumbers('boss_smuggling', { start: 52, end: 65 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
 }
 
 /** Manually generate animations for sprite sheets without a JSON atlas. */
