@@ -124,6 +124,28 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
     });
   }
 
+  // Custom manual sprite sheet configuration for Crony
+  if (scene.textures.exists('crony_bodyguard') && !scene.anims.exists('crony_bodyguard-march')) {
+    scene.anims.create({
+      key: 'crony_bodyguard-march',
+      frames: scene.anims.generateFrameNumbers('crony_bodyguard', { start: 0, end: 23 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'crony_bodyguard-attack',
+      frames: scene.anims.generateFrameNumbers('crony_bodyguard', { start: 24, end: 31 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'crony_bodyguard-death',
+      frames: scene.anims.generateFrameNumbers('crony_bodyguard', { start: 57, end: 69 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
+
   // Custom manual sprite sheet configuration for Ghost Flood Control
   if (scene.textures.exists('boss_flood_control') && !scene.anims.exists('boss_flood_control-march')) {
     scene.anims.create({
