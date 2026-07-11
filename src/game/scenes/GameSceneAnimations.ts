@@ -40,19 +40,63 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
   if (scene.textures.exists('grunt') && !scene.anims.exists('grunt-march')) {
     scene.anims.create({
       key: 'grunt-march',
-      frames: scene.anims.generateFrameNumbers('grunt', { start: 0, end: 23 }),
+      frames: scene.anims.generateFrameNumbers('grunt', { start: 0, end: 17 }),
       frameRate: 10,
       repeat: -1,
     });
     scene.anims.create({
       key: 'grunt-attack',
-      frames: scene.anims.generateFrameNumbers('grunt', { start: 24, end: 36 }),
+      frames: scene.anims.generateFrameNumbers('grunt', { start: 26, end: 34 }),
       frameRate: 10,
       repeat: 0,
     });
     scene.anims.create({
       key: 'grunt-death',
-      frames: scene.anims.generateFrameNumbers('grunt', { start: 54, end: 71 }),
+      frames: scene.anims.generateFrameNumbers('grunt', { start: 57, end: 70 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
+
+  // Custom manual sprite sheet configuration for Runner
+  if (scene.textures.exists('runner') && !scene.anims.exists('runner-march')) {
+    scene.anims.create({
+      key: 'runner-march',
+      frames: scene.anims.generateFrameNumbers('runner', { start: 0, end: 22 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'runner-attack',
+      frames: scene.anims.generateFrameNumbers('runner', { start: 24, end: 31 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'runner-death',
+      frames: scene.anims.generateFrameNumbers('runner', { start: 45, end: 66 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
+
+  // Custom manual sprite sheet configuration for Brute
+  if (scene.textures.exists('brute') && !scene.anims.exists('brute-march')) {
+    scene.anims.create({
+      key: 'brute-march',
+      frames: scene.anims.generateFrameNumbers('brute', { start: 0, end: 18 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'brute-attack',
+      frames: scene.anims.generateFrameNumbers('brute', { start: 24, end: 37 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'brute-death',
+      frames: scene.anims.generateFrameNumbers('brute', { start: 40, end: 57 }),
       frameRate: 10,
       repeat: 0,
     });

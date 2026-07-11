@@ -108,7 +108,15 @@ export class GameScene extends Phaser.Scene {
     }
     this.load.image('hero-base', '/assets/heroes/hero-base.svg');
     this.load.image('enemy-base', '/assets/enemies/enemy-base.svg');
-    this.load.spritesheet('grunt', '/assets/enemies/minion_grunt.png', {
+    this.load.spritesheet('grunt', '/assets/enemies/minion_grunt_sprite.png', {
+      frameWidth: 256,
+      frameHeight: 256,
+    });
+    this.load.spritesheet('runner', '/assets/enemies/minion_runner_sprite.png', {
+      frameWidth: 256,
+      frameHeight: 256,
+    });
+    this.load.spritesheet('brute', '/assets/enemies/brute_sheet.png', {
       frameWidth: 256,
       frameHeight: 256,
     });
