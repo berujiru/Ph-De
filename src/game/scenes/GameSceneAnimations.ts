@@ -70,13 +70,13 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
       key: 'boss_flood_control-attack',
       frames: scene.anims.generateFrameNumbers('boss_flood_control', { start: 31, end: 41 }),
       frameRate: 10,
-      repeat: 0,
+      repeat: -1,
     });
     scene.anims.create({
       key: 'boss_flood_control-cast',
       frames: scene.anims.generateFrameNumbers('boss_flood_control', { start: 31, end: 41 }),
       frameRate: 10,
-      repeat: 0,
+      repeat: -1,
     });
     scene.anims.create({
       key: 'boss_flood_control-death',
@@ -98,13 +98,13 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
       key: 'boss_budget_insertion-attack',
       frames: scene.anims.generateFrameNumbers('boss_budget_insertion', { start: 24, end: 49 }),
       frameRate: 10,
-      repeat: 0,
+      repeat: -1,
     });
     scene.anims.create({
       key: 'boss_budget_insertion-cast',
       frames: scene.anims.generateFrameNumbers('boss_budget_insertion', { start: 24, end: 49 }),
       frameRate: 10,
-      repeat: 0,
+      repeat: -1,
     });
     scene.anims.create({
       key: 'boss_budget_insertion-death',
@@ -126,13 +126,13 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
       key: 'boss_smuggling-attack',
       frames: scene.anims.generateFrameNumbers('boss_smuggling', { start: 27, end: 51 }),
       frameRate: 10,
-      repeat: 0,
+      repeat: -1,
     });
     scene.anims.create({
       key: 'boss_smuggling-cast',
       frames: scene.anims.generateFrameNumbers('boss_smuggling', { start: 27, end: 51 }),
       frameRate: 10,
-      repeat: 0,
+      repeat: -1,
     });
     scene.anims.create({
       key: 'boss_smuggling-death',
@@ -182,13 +182,13 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
       key: 'boss_troll_farm-attack',
       frames: scene.anims.generateFrameNumbers('boss_troll_farm', { start: 27, end: 51 }),
       frameRate: 10,
-      repeat: 0,
+      repeat: -1,
     });
     scene.anims.create({
       key: 'boss_troll_farm-cast',
       frames: scene.anims.generateFrameNumbers('boss_troll_farm', { start: 27, end: 51 }),
       frameRate: 10,
-      repeat: 0,
+      repeat: -1,
     });
     scene.anims.create({
       key: 'boss_troll_farm-death',
@@ -210,13 +210,13 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
       key: 'boss_wang_wang-attack',
       frames: scene.anims.generateFrameNumbers('boss_wang_wang', { start: 27, end: 51 }),
       frameRate: 10,
-      repeat: 0,
+      repeat: -1,
     });
     scene.anims.create({
       key: 'boss_wang_wang-cast',
       frames: scene.anims.generateFrameNumbers('boss_wang_wang', { start: 27, end: 51 }),
       frameRate: 10,
-      repeat: 0,
+      repeat: -1,
     });
     scene.anims.create({
       key: 'boss_wang_wang-death',
@@ -238,17 +238,45 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
       key: 'boss_dynasty-attack',
       frames: scene.anims.generateFrameNumbers('boss_dynasty', { start: 27, end: 52 }),
       frameRate: 10,
-      repeat: 0,
+      repeat: -1,
     });
     scene.anims.create({
       key: 'boss_dynasty-cast',
       frames: scene.anims.generateFrameNumbers('boss_dynasty', { start: 27, end: 52 }),
       frameRate: 10,
-      repeat: 0,
+      repeat: -1,
     });
     scene.anims.create({
       key: 'boss_dynasty-death',
       frames: scene.anims.generateFrameNumbers('boss_dynasty', { start: 53, end: 64 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
+
+  // Custom manual sprite sheet configuration for Pork Barrel
+  if (scene.textures.exists('boss_pork_barrel') && !scene.anims.exists('boss_pork_barrel-march')) {
+    scene.anims.create({
+      key: 'boss_pork_barrel-march',
+      frames: scene.anims.generateFrameNumbers('boss_pork_barrel', { start: 0, end: 27 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'boss_pork_barrel-attack',
+      frames: scene.anims.generateFrameNumbers('boss_pork_barrel', { start: 32, end: 40 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'boss_pork_barrel-cast',
+      frames: scene.anims.generateFrameNumbers('boss_pork_barrel', { start: 32, end: 40 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'boss_pork_barrel-death',
+      frames: scene.anims.generateFrameNumbers('boss_pork_barrel', { start: 56, end: 79 }),
       frameRate: 10,
       repeat: 0,
     });

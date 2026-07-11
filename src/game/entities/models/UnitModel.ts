@@ -128,7 +128,7 @@ export abstract class UnitModel extends Phaser.GameObjects.Container {
     
     // An explicit duration overrides the sheet's frameRate so the clip fits the
     // requested time window (e.g. the attack cadence).
-    sprite.play({ key, repeat, ...(durationMs !== undefined ? { duration: durationMs } : {}) });
+    sprite.play({ key, repeat, ignoreIfPlaying: true, ...(durationMs !== undefined ? { duration: durationMs } : {}) });
     return true;
   }
 
