@@ -102,6 +102,28 @@ export function createEnemyAnimations(scene: Phaser.Scene): void {
     });
   }
 
+  // Custom manual sprite sheet configuration for Bribery
+  if (scene.textures.exists('bribery') && !scene.anims.exists('bribery-march')) {
+    scene.anims.create({
+      key: 'bribery-march',
+      frames: scene.anims.generateFrameNumbers('bribery', { start: 1, end: 18 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    scene.anims.create({
+      key: 'bribery-attack',
+      frames: scene.anims.generateFrameNumbers('bribery', { start: 24, end: 46 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: 'bribery-death',
+      frames: scene.anims.generateFrameNumbers('bribery', { start: 58, end: 74 }),
+      frameRate: 10,
+      repeat: 0,
+    });
+  }
+
   // Custom manual sprite sheet configuration for Ghost Flood Control
   if (scene.textures.exists('boss_flood_control') && !scene.anims.exists('boss_flood_control-march')) {
     scene.anims.create({
