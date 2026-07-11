@@ -74,33 +74,33 @@ function ySlots(r, count, jitter = 40, pad = 60) {
 }
 
 // ---------------------------------------------------------------------------
-// Act palettes (docs/ART_AND_AUDIO_GUIDELINES.md slate base + accent golds).
+// Act palettes — bright daylight variants (sunlit slate base + warm accents).
 // ---------------------------------------------------------------------------
 
 const ACT_PALETTES = {
-  1: { // Barangay — night
-    skyTop: '#0a0f1e', skyMid: '#0f172a', skyBot: '#16233d',
-    glow: '#facc15', glowOp: 0.10,
-    ground: '#0c1526', road: '#131c31', curb: '#1e293b', dash: '#94a3b8',
-    near: '#22304f', far: '#141e36', lit: '#facc15', accent: '#38bdf8', accent2: '#ef4444',
+  1: { // Barangay — bright morning
+    skyTop: '#4da5e8', skyMid: '#86c5f0', skyBot: '#d6edfb',
+    glow: '#fff3c4', glowOp: 0.35,
+    ground: '#aab6c6', road: '#98a6b8', curb: '#6b7c92', dash: '#f8fafc',
+    near: '#7d90ad', far: '#7387a3', lit: '#facc15', accent: '#38bdf8', accent2: '#ef4444',
   },
-  2: { // Bayan — pre-dawn
-    skyTop: '#0b0a22', skyMid: '#1e1b4b', skyBot: '#4a3369',
-    glow: '#fb923c', glowOp: 0.20,
-    ground: '#141731', road: '#1b2140', curb: '#2d3160', dash: '#a5b4fc',
-    near: '#2e3363', far: '#1e2148', lit: '#fb923c', accent: '#f472b6', accent2: '#38bdf8',
+  2: { // Bayan — mid-morning
+    skyTop: '#3d9be2', skyMid: '#7fc4ef', skyBot: '#d2f0fb',
+    glow: '#e8fbf0', glowOp: 0.40,
+    ground: '#7c8bb0', road: '#8697b8', curb: '#a5b0d4', dash: '#f8fafc',
+    near: '#97a5d8', far: '#8c9cc4', lit: '#fb923c', accent: '#f472b6', accent2: '#38bdf8',
   },
-  3: { // Province — golden hour
-    skyTop: '#3b2f63', skyMid: '#7c2d12', skyBot: '#b45309',
-    glow: '#fbbf24', glowOp: 0.32,
-    ground: '#221a22', road: '#2b2029', curb: '#4a3345', dash: '#fcd34d',
-    near: '#443040', far: '#31212e', lit: '#fbbf24', accent: '#fb7185', accent2: '#f97316',
+  3: { // Province — golden afternoon
+    skyTop: '#5fa9e4', skyMid: '#a9d3ef', skyBot: '#ffe3a3',
+    glow: '#ffd166', glowOp: 0.45,
+    ground: '#6f5563', road: '#7d5f6b', curb: '#ad7889', dash: '#fcd34d',
+    near: '#a5707f', far: '#8f6274', lit: '#fbbf24', accent: '#fb7185', accent2: '#f97316',
   },
-  4: { // National — midnight city
-    skyTop: '#010409', skyMid: '#020617', skyBot: '#101736',
-    glow: '#22d3ee', glowOp: 0.14,
-    ground: '#090d1a', road: '#0e1424', curb: '#1c2740', dash: '#64748b',
-    near: '#202c46', far: '#111a2e', lit: '#22d3ee', accent: '#a78bfa', accent2: '#f43f5e',
+  4: { // National — clear high noon
+    skyTop: '#2f8ad8', skyMid: '#6ebcee', skyBot: '#c6e7fa',
+    glow: '#eaf7ff', glowOp: 0.40,
+    ground: '#93a2b6', road: '#9cabbf', curb: '#7f93b0', dash: '#475569',
+    near: '#8ba0bf', far: '#9db0c4', lit: '#7cc8ea', accent: '#a78bfa', accent2: '#f43f5e',
   },
 };
 
@@ -338,35 +338,28 @@ function svg(body, { opaque = false } = {}) {
 
 function skySvg(act, r) {
   const p = ACT_PALETTES[act];
-  let detail = '';
-  if (act === 1 || act === 2 || act === 4) {
-    const n = act === 1 ? 26 : act === 2 ? 14 : 18;
-    let stars = '';
-    for (let i = 0; i < n; i++) {
-      stars += `<circle cx="${f(r() * W)}" cy="${f(r() * H * 0.7)}" r="${f(0.8 + r() * 1.4)}"/>`;
-    }
-    detail += `<g fill="#f8fafc" opacity="${act === 4 ? 0.25 : 0.4}">${stars}</g>`;
-  }
-  if (act === 1) {
-    const mx = f(90 + r() * 360), my = f(90 + r() * 180);
-    detail += `<circle cx="${mx}" cy="${my}" r="34" fill="#e2e8f0" opacity="0.85"/>` +
-      `<circle cx="${f(mx - 12)}" cy="${f(my - 6)}" r="30" fill="${p.skyTop}" opacity="0.9"/>` +
-      `<circle cx="${mx}" cy="${my}" r="52" fill="#e2e8f0" opacity="0.06"/>`;
-  }
-  if (act === 2) {
-    detail += `<ellipse cx="${W / 2}" cy="${H}" rx="${W * 0.9}" ry="200" fill="${p.glow}" opacity="0.18"/>`;
-  }
-  if (act === 3) {
-    detail += `<circle cx="${W / 2}" cy="${f(H * 0.86)}" r="70" fill="#fde68a" opacity="0.85"/>` +
-      `<circle cx="${W / 2}" cy="${f(H * 0.86)}" r="130" fill="${p.glow}" opacity="0.25"/>`;
-    for (let i = 0; i < 3; i++) {
-      detail += `<ellipse cx="${f(r() * W)}" cy="${f(H * (0.3 + i * 0.16))}" rx="${f(90 + r() * 70)}" ry="10" fill="#1c1219" opacity="0.5"/>`;
-    }
-  }
-  if (act === 4) {
-    detail += `<ellipse cx="${W / 2}" cy="${H}" rx="${W}" ry="160" fill="${p.glow}" opacity="0.10"/>` +
-      `<ellipse cx="${f(W * 0.2)}" cy="${f(H * 0.92)}" rx="140" ry="60" fill="${p.accent}" opacity="0.06"/>` +
-      `<ellipse cx="${f(W * 0.8)}" cy="${f(H * 0.94)}" rx="140" ry="60" fill="${p.accent2}" opacity="0.05"/>`;
+  // Daylight skies: a sun + soft cumulus per act mood. Act 3 rides low
+  // (golden afternoon); the others sit high in a clear blue sky.
+  const sun = {
+    1: { cx: 300, cy: 150, r: 34, core: '#fff7cd', halo: '#ffe9a3' },
+    2: { cx: 380, cy: 130, r: 30, core: '#fffbe6', halo: '#ffedad' },
+    3: { cx: 270, cy: 680, r: 52, core: '#fff1b8', halo: '#ffd766' },
+    4: { cx: 160, cy: 110, r: 26, core: '#ffffff', halo: '#fff3b8' },
+  }[act];
+  let detail =
+    `<circle cx="${sun.cx}" cy="${sun.cy}" r="${f(sun.r * 2.2)}" fill="${sun.halo}" opacity="0.25"/>` +
+    `<circle cx="${sun.cx}" cy="${sun.cy}" r="${f(sun.r * 1.45)}" fill="${sun.halo}" opacity="0.4"/>` +
+    `<circle cx="${sun.cx}" cy="${sun.cy}" r="${sun.r}" fill="${sun.core}"/>`;
+  const cloudCount = { 1: 5, 2: 4, 3: 4, 4: 3 }[act];
+  const cloudTint = act === 3 ? '#fff6e0' : '#ffffff';
+  for (let i = 0; i < cloudCount; i++) {
+    const cx = f(40 + r() * (W - 80));
+    const cy = f(80 + r() * H * 0.58);
+    const rx = f(55 + r() * 60), ry = f(14 + r() * 10);
+    detail += `<g fill="${cloudTint}" opacity="${f(0.6 + r() * 0.3)}">` +
+      `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}"/>` +
+      `<ellipse cx="${f(cx - rx * 0.45)}" cy="${f(cy + ry * 0.45)}" rx="${f(rx * 0.55)}" ry="${f(ry * 0.8)}"/>` +
+      `<ellipse cx="${f(cx + rx * 0.4)}" cy="${f(cy + ry * 0.35)}" rx="${f(rx * 0.6)}" ry="${f(ry * 0.85)}"/></g>`;
   }
   const body =
     `  <defs>\n` +
@@ -443,7 +436,7 @@ function groundDetail(style, r, p) {
       // Bay markings on both shoulders.
       for (const x of [SLAB_X + 14, ROAD_X + ROAD_W + 14]) {
         for (let y = 100; y <= 800; y += 190) {
-          d += `<rect x="${x}" y="${y}" width="92" height="130" rx="4" stroke="${p.dash}" stroke-width="2.5" fill="none" ${acc(0.15)}/>`;
+          d += `<rect x="${x}" y="${y}" width="92" height="130" rx="4" stroke="${p.dash}" stroke-width="2.5" fill="none" ${acc(0.4)}/>`;
         }
       }
       break;
@@ -471,7 +464,7 @@ function groundDetail(style, r, p) {
       // Extra lane dashes on the shoulders (period divides 960 → seamless).
       for (const x of [f((SLAB_X + ROAD_X) / 2), f(ROAD_X + ROAD_W + (SLAB_X + SLAB_W - ROAD_X - ROAD_W) / 2)]) {
         for (let i = 0; i < 8; i++) {
-          d += `<rect x="${x - 3}" y="${i * 120 + 46}" width="6" height="34" fill="${p.dash}" ${acc(0.12)}/>`;
+          d += `<rect x="${x - 3}" y="${i * 120 + 46}" width="6" height="34" fill="${p.dash}" ${acc(0.35)}/>`;
         }
       }
       d += crosswalk(p);
@@ -490,7 +483,7 @@ function groundDetail(style, r, p) {
 function crosswalk(p) {
   let d = '';
   for (let i = 0; i < 8; i++) {
-    d += `<rect x="${ROAD_X + 12 + i * 23}" y="452" width="14" height="56" fill="${p.dash}" opacity="0.15"/>`;
+    d += `<rect x="${ROAD_X + 12 + i * 23}" y="452" width="14" height="56" fill="${p.dash}" opacity="0.4"/>`;
   }
   return d;
 }
@@ -507,7 +500,8 @@ function streetSvg(cfg, r) {
     `  <rect x="${ROAD_X}" y="0" width="6" height="${H}" fill="${p.curb}"/>\n` +
     `  <rect x="${ROAD_X + ROAD_W - 6}" y="0" width="6" height="${H}" fill="${p.curb}"/>\n`;
   // Dashed centerline, period 120 divides 960 → seamless across the wrap.
-  body += `  <g fill="${p.dash}" opacity="0.12">\n`;
+  // Daylight: markings read clearly (night builds kept these faint).
+  body += `  <g fill="${p.dash}" opacity="0.5">\n`;
   for (let i = 0; i < 8; i++) {
     body += `    <rect x="${W / 2 - 4}" y="${i * 120 + 40}" width="8" height="40"/>\n`;
   }

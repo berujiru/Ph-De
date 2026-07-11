@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="540" height="960" viewBox="0 0 540 960">
   <!-- causeway slab: continuous full-height, uniform -> wraps seamlessly -->
-  <rect x="50" y="0" width="440" height="960" fill="#0c1526"/>
-  <rect x="50" y="0" width="6" height="960" fill="#22304f"/>
-  <rect x="484" y="0" width="6" height="960" fill="#22304f"/>
+  <rect x="50" y="0" width="440" height="960" fill="#aab6c6"/>
+  <rect x="50" y="0" width="6" height="960" fill="#7d90ad"/>
+  <rect x="484" y="0" width="6" height="960" fill="#7d90ad"/>
   <!-- center road (the marching lane stays clear of props) -->
-  <rect x="170" y="0" width="200" height="960" fill="#131c31"/>
-  <rect x="170" y="0" width="6" height="960" fill="#1e293b"/>
-  <rect x="364" y="0" width="6" height="960" fill="#1e293b"/>
-  <g fill="#94a3b8" opacity="0.12">
+  <rect x="170" y="0" width="200" height="960" fill="#98a6b8"/>
+  <rect x="170" y="0" width="6" height="960" fill="#6b7c92"/>
+  <rect x="364" y="0" width="6" height="960" fill="#6b7c92"/>
+  <g fill="#f8fafc" opacity="0.5">
     <rect x="266" y="40" width="8" height="40"/>
     <rect x="266" y="160" width="8" height="40"/>
     <rect x="266" y="280" width="8" height="40"/>
@@ -17,15 +17,15 @@
     <rect x="266" y="760" width="8" height="40"/>
     <rect x="266" y="880" width="8" height="40"/>
   </g>
-  <rect x="50" y="120" width="120" height="2" fill="#1e293b" opacity="0.35"/><rect x="370" y="120" width="120" height="2" fill="#1e293b" opacity="0.35"/><rect x="50" y="240" width="120" height="2" fill="#1e293b" opacity="0.35"/><rect x="370" y="240" width="120" height="2" fill="#1e293b" opacity="0.35"/><rect x="50" y="360" width="120" height="2" fill="#1e293b" opacity="0.35"/><rect x="370" y="360" width="120" height="2" fill="#1e293b" opacity="0.35"/><rect x="50" y="480" width="120" height="2" fill="#1e293b" opacity="0.35"/><rect x="370" y="480" width="120" height="2" fill="#1e293b" opacity="0.35"/><rect x="50" y="600" width="120" height="2" fill="#1e293b" opacity="0.35"/><rect x="370" y="600" width="120" height="2" fill="#1e293b" opacity="0.35"/><rect x="50" y="720" width="120" height="2" fill="#1e293b" opacity="0.35"/><rect x="370" y="720" width="120" height="2" fill="#1e293b" opacity="0.35"/><rect x="50" y="840" width="120" height="2" fill="#1e293b" opacity="0.35"/><rect x="370" y="840" width="120" height="2" fill="#1e293b" opacity="0.35"/>
-  <g fill="#22304f"><rect x="64" y="155.2" width="68" height="8"/><rect x="70" y="111.2" width="6" height="44"/><rect x="120" y="111.2" width="6" height="44"/><polygon points="58,111.2 98,87.2 138,111.2"/></g>
-  <rect x="96" y="206.6" width="4" height="110" fill="#22304f"/><polygon points="100,206.6 132,214.6 100,222.6" fill="#ef4444" opacity="0.8"/>
-  <g fill="#22304f"><rect x="77.3" y="489.5" width="52" height="7" rx="2"/><rect x="81.3" y="496.5" width="5" height="11"/><rect x="120.3" y="496.5" width="5" height="11"/></g>
+  <rect x="50" y="120" width="120" height="2" fill="#6b7c92" opacity="0.35"/><rect x="370" y="120" width="120" height="2" fill="#6b7c92" opacity="0.35"/><rect x="50" y="240" width="120" height="2" fill="#6b7c92" opacity="0.35"/><rect x="370" y="240" width="120" height="2" fill="#6b7c92" opacity="0.35"/><rect x="50" y="360" width="120" height="2" fill="#6b7c92" opacity="0.35"/><rect x="370" y="360" width="120" height="2" fill="#6b7c92" opacity="0.35"/><rect x="50" y="480" width="120" height="2" fill="#6b7c92" opacity="0.35"/><rect x="370" y="480" width="120" height="2" fill="#6b7c92" opacity="0.35"/><rect x="50" y="600" width="120" height="2" fill="#6b7c92" opacity="0.35"/><rect x="370" y="600" width="120" height="2" fill="#6b7c92" opacity="0.35"/><rect x="50" y="720" width="120" height="2" fill="#6b7c92" opacity="0.35"/><rect x="370" y="720" width="120" height="2" fill="#6b7c92" opacity="0.35"/><rect x="50" y="840" width="120" height="2" fill="#6b7c92" opacity="0.35"/><rect x="370" y="840" width="120" height="2" fill="#6b7c92" opacity="0.35"/>
+  <g fill="#7d90ad"><rect x="64" y="155.2" width="68" height="8"/><rect x="70" y="111.2" width="6" height="44"/><rect x="120" y="111.2" width="6" height="44"/><polygon points="58,111.2 98,87.2 138,111.2"/></g>
+  <rect x="96" y="206.6" width="4" height="110" fill="#7d90ad"/><polygon points="100,206.6 132,214.6 100,222.6" fill="#ef4444" opacity="0.8"/>
+  <g fill="#7d90ad"><rect x="77.3" y="489.5" width="52" height="7" rx="2"/><rect x="81.3" y="496.5" width="5" height="11"/><rect x="120.3" y="496.5" width="5" height="11"/></g>
   <path d="M118.5 563.2 Q 73.5 605.2 28.5 599.2" stroke="#e2e8f0" stroke-width="1.5" fill="none" opacity="0.5"/><polygon points="103.5,566.2 111.5,566.2 107.5,576.2" fill="#e2e8f0" opacity="0.75"/><polygon points="88.5,570 96.5,570 92.5,580" fill="#facc15" opacity="0.75"/><polygon points="73.5,575.2 81.5,575.2 77.5,585.2" fill="#ef4444" opacity="0.75"/><polygon points="58.5,582 66.5,582 62.5,592" fill="#e2e8f0" opacity="0.75"/><polygon points="43.5,590.2 51.5,590.2 47.5,600.2" fill="#facc15" opacity="0.75"/>
-  <rect x="92" y="790.3" width="32" height="20" rx="4" fill="#22304f"/><circle cx="101" cy="784.3" r="10" fill="#22304f" opacity="0.85"/><circle cx="116" cy="782.3" r="12" fill="#22304f" opacity="0.85"/>
-  <g fill="#22304f"><rect x="385.8" y="134.8" width="68" height="8"/><rect x="391.8" y="90.8" width="6" height="44"/><rect x="441.8" y="90.8" width="6" height="44"/><polygon points="379.8,90.8 419.8,66.8 459.8,90.8"/></g>
-  <rect x="432.5" y="178.9" width="4" height="110" fill="#22304f"/><polygon points="436.5,178.9 468.5,186.9 436.5,194.9" fill="#ef4444" opacity="0.8"/>
-  <g fill="#22304f"><rect x="414.3" y="447.1" width="52" height="7" rx="2"/><rect x="418.3" y="454.1" width="5" height="11"/><rect x="457.3" y="454.1" width="5" height="11"/></g>
+  <rect x="92" y="790.3" width="32" height="20" rx="4" fill="#7d90ad"/><circle cx="101" cy="784.3" r="10" fill="#7d90ad" opacity="0.85"/><circle cx="116" cy="782.3" r="12" fill="#7d90ad" opacity="0.85"/>
+  <g fill="#7d90ad"><rect x="385.8" y="134.8" width="68" height="8"/><rect x="391.8" y="90.8" width="6" height="44"/><rect x="441.8" y="90.8" width="6" height="44"/><polygon points="379.8,90.8 419.8,66.8 459.8,90.8"/></g>
+  <rect x="432.5" y="178.9" width="4" height="110" fill="#7d90ad"/><polygon points="436.5,178.9 468.5,186.9 436.5,194.9" fill="#ef4444" opacity="0.8"/>
+  <g fill="#7d90ad"><rect x="414.3" y="447.1" width="52" height="7" rx="2"/><rect x="418.3" y="454.1" width="5" height="11"/><rect x="457.3" y="454.1" width="5" height="11"/></g>
   <path d="M434.4 605.3 Q 479.4 647.3 524.4 641.3" stroke="#e2e8f0" stroke-width="1.5" fill="none" opacity="0.5"/><polygon points="449.4,608.3 457.4,608.3 453.4,618.3" fill="#e2e8f0" opacity="0.75"/><polygon points="464.4,612.1 472.4,612.1 468.4,622.1" fill="#facc15" opacity="0.75"/><polygon points="479.4,617.3 487.4,617.3 483.4,627.3" fill="#ef4444" opacity="0.75"/><polygon points="494.4,624.1 502.4,624.1 498.4,634.1" fill="#e2e8f0" opacity="0.75"/><polygon points="509.4,632.3 517.4,632.3 513.4,642.3" fill="#facc15" opacity="0.75"/>
-  <rect x="420.9" y="773.9" width="32" height="20" rx="4" fill="#22304f"/><circle cx="429.9" cy="767.9" r="10" fill="#22304f" opacity="0.85"/><circle cx="444.9" cy="765.9" r="12" fill="#22304f" opacity="0.85"/>
+  <rect x="420.9" y="773.9" width="32" height="20" rx="4" fill="#7d90ad"/><circle cx="429.9" cy="767.9" r="10" fill="#7d90ad" opacity="0.85"/><circle cx="444.9" cy="765.9" r="12" fill="#7d90ad" opacity="0.85"/>
 </svg>

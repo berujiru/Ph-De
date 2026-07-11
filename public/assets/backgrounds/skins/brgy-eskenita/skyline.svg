@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="540" height="960" viewBox="0 0 540 960">
-  <g fill="#22304f"><rect x="-18.1" y="183.8" width="82.6" height="62.2"/><polygon points="-26.1,183.8 23.2,157.8 72.5,183.8"/></g><rect x="15.2" y="195.8" width="14" height="16" fill="#facc15" opacity="0.25"/>
-  <g fill="#22304f"><rect x="-21.1" y="413.4" width="76.1" height="64.9"/><polygon points="-29.1,413.4 16.9,387.4 63,413.4"/></g><rect x="8.9" y="425.4" width="14" height="16" fill="#facc15" opacity="0.25"/>
-  <g fill="#141e36"><rect x="-1.7" y="593.1" width="32" height="149.1"/><polygon points="-7.7,593.1 14.3,563.1 36.3,593.1"/></g><rect x="8.3" y="605.1" width="12" height="16" rx="6" fill="#facc15" opacity="0.2"/>
-  <g fill="#22304f"><rect x="484.4" y="171.2" width="79.5" height="69.7"/><polygon points="476.4,171.2 524.2,145.2 571.9,171.2"/></g><rect x="516.1" y="183.2" width="14" height="16" fill="#facc15" opacity="0.25"/>
-  <g fill="#22304f"><rect x="472.2" y="386.6" width="94.2" height="54.7"/><polygon points="464.2,386.6 519.3,360.6 574.4,386.6"/></g><rect x="511.3" y="398.6" width="14" height="16" fill="#facc15" opacity="0.25"/>
-  <g fill="#141e36"><rect x="499.6" y="590.8" width="32" height="121.7"/><polygon points="493.6,590.8 515.6,560.8 537.6,590.8"/></g><rect x="509.6" y="602.8" width="12" height="16" rx="6" fill="#facc15" opacity="0.2"/>
+  <g fill="#7d90ad"><rect x="-18.1" y="183.8" width="82.6" height="62.2"/><polygon points="-26.1,183.8 23.2,157.8 72.5,183.8"/></g><rect x="15.2" y="195.8" width="14" height="16" fill="#facc15" opacity="0.25"/>
+  <g fill="#7d90ad"><rect x="-21.1" y="413.4" width="76.1" height="64.9"/><polygon points="-29.1,413.4 16.9,387.4 63,413.4"/></g><rect x="8.9" y="425.4" width="14" height="16" fill="#facc15" opacity="0.25"/>
+  <g fill="#7387a3"><rect x="-1.7" y="593.1" width="32" height="149.1"/><polygon points="-7.7,593.1 14.3,563.1 36.3,593.1"/></g><rect x="8.3" y="605.1" width="12" height="16" rx="6" fill="#facc15" opacity="0.2"/>
+  <g fill="#7d90ad"><rect x="484.4" y="171.2" width="79.5" height="69.7"/><polygon points="476.4,171.2 524.2,145.2 571.9,171.2"/></g><rect x="516.1" y="183.2" width="14" height="16" fill="#facc15" opacity="0.25"/>
+  <g fill="#7d90ad"><rect x="472.2" y="386.6" width="94.2" height="54.7"/><polygon points="464.2,386.6 519.3,360.6 574.4,386.6"/></g><rect x="511.3" y="398.6" width="14" height="16" fill="#facc15" opacity="0.25"/>
+  <g fill="#7387a3"><rect x="499.6" y="590.8" width="32" height="121.7"/><polygon points="493.6,590.8 515.6,560.8 537.6,590.8"/></g><rect x="509.6" y="602.8" width="12" height="16" rx="6" fill="#facc15" opacity="0.2"/>
 </svg>

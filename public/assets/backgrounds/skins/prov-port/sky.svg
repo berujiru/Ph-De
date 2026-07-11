@@ -1,16 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="540" height="960" viewBox="0 0 540 960" preserveAspectRatio="none">
   <defs>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#3b2f63"/>
-      <stop offset="0.55" stop-color="#7c2d12"/>
-      <stop offset="1" stop-color="#b45309"/>
+      <stop offset="0" stop-color="#5fa9e4"/>
+      <stop offset="0.55" stop-color="#a9d3ef"/>
+      <stop offset="1" stop-color="#ffe3a3"/>
     </linearGradient>
     <linearGradient id="horizon" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#fbbf24" stop-opacity="0"/>
-      <stop offset="1" stop-color="#fbbf24" stop-opacity="0.32"/>
+      <stop offset="0" stop-color="#ffd166" stop-opacity="0"/>
+      <stop offset="1" stop-color="#ffd166" stop-opacity="0.45"/>
     </linearGradient>
   </defs>
   <rect width="540" height="960" fill="url(#sky)"/>
   <rect y="480" width="540" height="480" fill="url(#horizon)"/>
-  <circle cx="270" cy="825.6" r="70" fill="#fde68a" opacity="0.85"/><circle cx="270" cy="825.6" r="130" fill="#fbbf24" opacity="0.25"/><ellipse cx="230.1" cy="288" rx="113.9" ry="10" fill="#1c1219" opacity="0.5"/><ellipse cx="364.9" cy="441.6" rx="113" ry="10" fill="#1c1219" opacity="0.5"/><ellipse cx="430.3" cy="595.2" rx="149.9" ry="10" fill="#1c1219" opacity="0.5"/>
+  <circle cx="270" cy="680" r="114.4" fill="#ffd766" opacity="0.25"/><circle cx="270" cy="680" r="75.4" fill="#ffd766" opacity="0.4"/><circle cx="270" cy="680" r="52" fill="#fff1b8"/><g fill="#fff6e0" opacity="0.8"><ellipse cx="236" cy="269.9" rx="95.5" ry="17.3"/><ellipse cx="193" cy="277.7" rx="52.5" ry="13.8"/><ellipse cx="274.2" cy="276" rx="57.3" ry="14.7"/></g><g fill="#fff6e0" opacity="0.8"><ellipse cx="433.5" cy="88.3" rx="93.4" ry="21"/><ellipse cx="391.5" cy="97.8" rx="51.4" ry="16.8"/><ellipse cx="470.9" cy="95.6" rx="56" ry="17.8"/></g><g fill="#fff6e0" opacity="0.7"><ellipse cx="246.7" cy="542" rx="57.7" ry="19.4"/><ellipse cx="220.7" cy="550.7" rx="31.7" ry="15.5"/><ellipse cx="269.8" cy="548.8" rx="34.6" ry="16.5"/></g><g fill="#fff6e0" opacity="0.9"><ellipse cx="476.7" cy="527.5" rx="66.5" ry="19.2"/><ellipse cx="446.8" cy="536.1" rx="36.6" ry="15.4"/><ellipse cx="503.3" cy="534.2" rx="39.9" ry="16.3"/></g>
 </svg>

@@ -1,16 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="540" height="960" viewBox="0 0 540 960" preserveAspectRatio="none">
   <defs>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#0a0f1e"/>
-      <stop offset="0.55" stop-color="#0f172a"/>
-      <stop offset="1" stop-color="#16233d"/>
+      <stop offset="0" stop-color="#4da5e8"/>
+      <stop offset="0.55" stop-color="#86c5f0"/>
+      <stop offset="1" stop-color="#d6edfb"/>
     </linearGradient>
     <linearGradient id="horizon" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#facc15" stop-opacity="0"/>
-      <stop offset="1" stop-color="#facc15" stop-opacity="0.1"/>
+      <stop offset="0" stop-color="#fff3c4" stop-opacity="0"/>
+      <stop offset="1" stop-color="#fff3c4" stop-opacity="0.35"/>
     </linearGradient>
   </defs>
   <rect width="540" height="960" fill="url(#sky)"/>
   <rect y="480" width="540" height="480" fill="url(#horizon)"/>
-  <g fill="#f8fafc" opacity="0.4"><circle cx="491.5" cy="126.2" r="1.3"/><circle cx="15.7" cy="117.7" r="0.9"/><circle cx="333.4" cy="599.1" r="2.2"/><circle cx="157.2" cy="196.4" r="1"/><circle cx="112.8" cy="230.1" r="1.5"/><circle cx="195.2" cy="229.8" r="1.2"/><circle cx="249.4" cy="666.3" r="1.3"/><circle cx="414.7" cy="306.7" r="1.1"/><circle cx="377.4" cy="636.4" r="0.8"/><circle cx="104" cy="390.3" r="1.7"/><circle cx="153.3" cy="508.2" r="1.6"/><circle cx="449.1" cy="126.7" r="1.2"/><circle cx="498.6" cy="356.3" r="1.4"/><circle cx="389.6" cy="414.2" r="1.1"/><circle cx="75.4" cy="309.6" r="1.5"/><circle cx="291.7" cy="609.3" r="0.9"/><circle cx="25.8" cy="253.2" r="1.8"/><circle cx="89.6" cy="570.8" r="1.1"/><circle cx="496.6" cy="650.7" r="0.8"/><circle cx="236.5" cy="151.8" r="0.9"/><circle cx="455" cy="578.7" r="2.1"/><circle cx="74.4" cy="580.7" r="1.2"/><circle cx="288.7" cy="65.8" r="1.5"/><circle cx="89.4" cy="664.3" r="1.6"/><circle cx="516.1" cy="464.8" r="0.9"/><circle cx="315.8" cy="272.1" r="1.2"/></g><circle cx="306.4" cy="123.2" r="34" fill="#e2e8f0" opacity="0.85"/><circle cx="294.4" cy="117.2" r="30" fill="#0a0f1e" opacity="0.9"/><circle cx="306.4" cy="123.2" r="52" fill="#e2e8f0" opacity="0.06"/>
+  <circle cx="300" cy="150" r="74.8" fill="#ffe9a3" opacity="0.25"/><circle cx="300" cy="150" r="49.3" fill="#ffe9a3" opacity="0.4"/><circle cx="300" cy="150" r="34" fill="#fff7cd"/><g fill="#ffffff" opacity="0.7"><ellipse cx="458.7" cy="184.6" rx="75.2" ry="14.3"/><ellipse cx="424.9" cy="191" rx="41.4" ry="11.4"/><ellipse cx="488.8" cy="189.6" rx="45.1" ry="12.2"/></g><g fill="#ffffff" opacity="0.7"><ellipse cx="76.2" cy="423.8" rx="108.5" ry="23.7"/><ellipse cx="27.4" cy="434.5" rx="59.7" ry="19"/><ellipse cx="119.6" cy="432.1" rx="65.1" ry="20.1"/></g><g fill="#ffffff" opacity="0.7"><ellipse cx="174.5" cy="163.2" rx="67.5" ry="17.4"/><ellipse cx="144.1" cy="171" rx="37.1" ry="13.9"/><ellipse cx="201.5" cy="169.3" rx="40.5" ry="14.8"/></g><g fill="#ffffff" opacity="0.9"><ellipse cx="206.3" cy="270.4" rx="72.6" ry="18.6"/><ellipse cx="173.6" cy="278.8" rx="39.9" ry="14.9"/><ellipse cx="235.3" cy="276.9" rx="43.6" ry="15.8"/></g><g fill="#ffffff" opacity="0.8"><ellipse cx="211" cy="507.6" rx="82.4" ry="16.3"/><ellipse cx="173.9" cy="514.9" rx="45.3" ry="13"/><ellipse cx="244" cy="513.3" rx="49.4" ry="13.9"/></g>
 </svg>

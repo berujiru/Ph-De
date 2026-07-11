@@ -8,7 +8,9 @@ export function createPhaserGame(parent: HTMLElement): Phaser.Game {
     parent,
     width: GAME_WIDTH,
     height: GAME_HEIGHT,
-    backgroundColor: '#0f172a',
+    // Daylight sky tone — matches the bright parallax backdrop so any exposed
+    // canvas edge doesn't flash dark.
+    backgroundColor: '#86c5f0',
     scale: {
       mode: Phaser.Scale.ENVELOP,
       autoCenter: Phaser.Scale.CENTER_BOTH,

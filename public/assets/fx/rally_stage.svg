@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="300" viewBox="0 0 1000 300">
+  <!--
+    Rally stage the heroes stand on, placed just behind (below) the morale
+    shield. Top-behind oblique camera: the deck top fills most of the art, the
+    skirt (front face toward the crowd/camera) shows along the bottom edge.
+    Center stays clear so the hero formation always reads; speakers and
+    banner poles dress only the left/right sides. Peaceful-rally festive
+    dressing: banderitas bunting strung along the crowd-facing skirt.
+  -->
+  <!-- soft ground shadow under the platform -->
+  <ellipse cx="500" cy="286" rx="478" ry="14" fill="#334155" opacity="0.22"/>
+
+  <!-- skirt: the platform's front face, seen by the crowd -->
+  <rect x="34" y="220" width="932" height="60" rx="6" fill="#8a5a36"/>
+  <rect x="34" y="220" width="932" height="8" fill="#6f4527" opacity="0.9"/>
+  <g fill="#6f4527">
+    <rect x="70" y="228" width="14" height="52"/>
+    <rect x="260" y="228" width="14" height="52"/>
+    <rect x="493" y="228" width="14" height="52"/>
+    <rect x="726" y="228" width="14" height="52"/>
+    <rect x="916" y="228" width="14" height="52"/>
+  </g>
+
+  <!-- banderitas bunting swagged across the skirt -->
+  <path d="M50 236 Q 275 262 500 240 Q 725 262 950 236" stroke="#f8fafc" stroke-width="3" fill="none" opacity="0.8"/>
+  <g opacity="0.95">
+    <polygon points="120,242 140,242 130,262" fill="#ef4444"/>
+    <polygon points="190,248 210,248 200,268" fill="#facc15"/>
+    <polygon points="300,252 320,252 310,272" fill="#38bdf8"/>
+    <polygon points="380,248 400,248 390,268" fill="#f8fafc"/>
+    <polygon points="440,244 460,244 450,264" fill="#ef4444"/>
+    <polygon points="540,244 560,244 550,264" fill="#facc15"/>
+    <polygon points="610,248 630,248 620,268" fill="#38bdf8"/>
+    <polygon points="690,252 710,252 700,272" fill="#ef4444"/>
+    <polygon points="790,248 810,248 800,268" fill="#f8fafc"/>
+    <polygon points="870,242 890,242 880,262" fill="#facc15"/>
+  </g>
+
+  <!-- deck top the heroes stand on -->
+  <rect x="14" y="10" width="972" height="218" rx="12" fill="#cf9663"/>
+  <!-- plank seams -->
+  <g stroke="#b97f4e" stroke-width="3" opacity="0.65">
+    <line x1="22" y1="44" x2="978" y2="44"/>
+    <line x1="22" y1="78" x2="978" y2="78"/>
+    <line x1="22" y1="112" x2="978" y2="112"/>
+    <line x1="22" y1="146" x2="978" y2="146"/>
+    <line x1="22" y1="180" x2="978" y2="180"/>
+    <line x1="22" y1="212" x2="978" y2="212"/>
+  </g>
+  <!-- side rails -->
+  <rect x="14" y="10" width="10" height="218" rx="5" fill="#b97f4e"/>
+  <rect x="976" y="10" width="10" height="218" rx="5" fill="#b97f4e"/>
+  <!-- front (enemy-facing) edge trim, sunlit -->
+  <rect x="14" y="10" width="972" height="10" rx="5" fill="#eec296"/>
+
+  <!-- speaker stacks: sides only, center lane stays clear -->
+  <g>
+    <rect x="38" y="56" width="70" height="94" rx="6" fill="#334155"/>
+    <circle cx="73" cy="86" r="20" fill="#1e293b"/>
+    <circle cx="73" cy="86" r="9" fill="#475569"/>
+    <circle cx="73" cy="128" r="13" fill="#1e293b"/>
+    <rect x="892" y="56" width="70" height="94" rx="6" fill="#334155"/>
+    <circle cx="927" cy="86" r="20" fill="#1e293b"/>
+    <circle cx="927" cy="86" r="9" fill="#475569"/>
+    <circle cx="927" cy="128" r="13" fill="#1e293b"/>
+  </g>
+
+  <!-- banner poles with pennant flags at the back corners -->
+  <g>
+    <rect x="52" y="160" width="6" height="56" fill="#64748b"/>
+    <polygon points="58,162 96,170 58,178" fill="#facc15"/>
+    <rect x="942" y="160" width="6" height="56" fill="#64748b"/>
+    <polygon points="942,162 904,170 942,178" fill="#38bdf8"/>
+  </g>
+</svg>

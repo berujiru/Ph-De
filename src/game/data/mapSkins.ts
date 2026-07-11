@@ -19,19 +19,19 @@
 // ---------------------------------------------------------------------------
 
 export type MapSkinId =
-  // Act 1 — Barangay (night)
+  // Act 1 — Barangay (morning)
   | 'brgy-eskenita'
   | 'brgy-court'
   | 'brgy-plaza'
-  // Act 2 — Bayan (pre-dawn)
+  // Act 2 — Bayan (mid-morning)
   | 'bayan-palengke'
   | 'bayan-terminal'
   | 'bayan-cityhall'
-  // Act 3 — Province (golden hour / dusk)
+  // Act 3 — Province (golden afternoon)
   | 'prov-highway'
   | 'prov-port'
   | 'prov-capitol'
-  // Act 4 — National (midnight city)
+  // Act 4 — National (high noon)
   | 'natl-avenue'
   | 'natl-govt'
   | 'natl-palace';
@@ -50,8 +50,8 @@ export interface MapSkin {
   name: string;
   /** Which act this skin belongs to (1-4). */
   act: number;
-  /** Time-of-day mood applied via the sky layer. */
-  timeOfDay: 'night' | 'pre-dawn' | 'golden-hour' | 'midnight-city';
+  /** Time-of-day mood applied via the sky layer (all daylight variants). */
+  timeOfDay: 'morning' | 'mid-morning' | 'afternoon' | 'noon';
   /** Festival/event season. Defaults to 'default' (always active). */
   season: MapSeason;
   /**
@@ -99,25 +99,25 @@ function skin(
 // ---------------------------------------------------------------------------
 
 export const MAP_SKINS: MapSkin[] = [
-  // Act 1 — Barangay (night)
-  skin('brgy-eskenita', 'Narrow Alley (Eskenita)',    1, 'night'),
-  skin('brgy-court',    'Basketball Court',            1, 'night'),
-  skin('brgy-plaza',    'Barangay Plaza',              1, 'night'),
+  // Act 1 — Barangay (bright morning)
+  skin('brgy-eskenita', 'Narrow Alley (Eskenita)',    1, 'morning'),
+  skin('brgy-court',    'Basketball Court',            1, 'morning'),
+  skin('brgy-plaza',    'Barangay Plaza',              1, 'morning'),
 
-  // Act 2 — Bayan / LGU (pre-dawn)
-  skin('bayan-palengke',  'Public Market (Palengke)',  2, 'pre-dawn'),
-  skin('bayan-terminal',  'Jeepney Terminal',          2, 'pre-dawn'),
-  skin('bayan-cityhall',  'City Hall Road',            2, 'pre-dawn'),
+  // Act 2 — Bayan / LGU (mid-morning)
+  skin('bayan-palengke',  'Public Market (Palengke)',  2, 'mid-morning'),
+  skin('bayan-terminal',  'Jeepney Terminal',          2, 'mid-morning'),
+  skin('bayan-cityhall',  'City Hall Road',            2, 'mid-morning'),
 
-  // Act 3 — Province (golden hour / dusk)
-  skin('prov-highway', 'Provincial Highway',           3, 'golden-hour'),
-  skin('prov-port',    'Coastal Port',                 3, 'golden-hour'),
-  skin('prov-capitol', 'Capitol Grounds',              3, 'golden-hour'),
+  // Act 3 — Province (golden afternoon)
+  skin('prov-highway', 'Provincial Highway',           3, 'afternoon'),
+  skin('prov-port',    'Coastal Port',                 3, 'afternoon'),
+  skin('prov-capitol', 'Capitol Grounds',              3, 'afternoon'),
 
-  // Act 4 — National (midnight city lights)
-  skin('natl-avenue', 'National Avenue',               4, 'midnight-city'),
-  skin('natl-govt',   'Government District',           4, 'midnight-city'),
-  skin('natl-palace', 'Palace Gates',                  4, 'midnight-city'),
+  // Act 4 — National (clear high noon)
+  skin('natl-avenue', 'National Avenue',               4, 'noon'),
+  skin('natl-govt',   'Government District',           4, 'noon'),
+  skin('natl-palace', 'Palace Gates',                  4, 'noon'),
 ];
 
 /** All skins for a given act. */

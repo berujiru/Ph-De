@@ -28,6 +28,7 @@ import { getSelectedSkin } from '../data/skinSelection';
 export class GameScene extends Phaser.Scene {
   public shield!: MoraleShield;
   public parallax!: ParallaxBackground;
+  private rallyStage?: Phaser.GameObjects.Image;
   public activeMapSkin: MapSkin | null = null;
   public currentAct: number | null = null;
   public currentStageIdx: number | null = null;
@@ -188,6 +189,7 @@ export class GameScene extends Phaser.Scene {
       frameWidth: 256,
       frameHeight: 256,
     });
+    this.load.image('rally-stage', '/assets/fx/rally_stage.svg');
     this.load.image('kamote_rider', '/assets/fx/kamote_rider.svg');
     this.load.image('water_wave', '/assets/fx/water_wave.svg');
     this.load.image('tornado', '/assets/fx/tornado.svg');
@@ -256,6 +258,7 @@ export class GameScene extends Phaser.Scene {
     for (const t of this.traps) t.destroy();
     for (const aoe of this.persistentAoe) aoe.destroy();
     if (this.parallax) this.parallax.destroy();
+    if (this.rallyStage) this.rallyStage.destroy();
     if (this.shield) this.shield.destroy();
     if (this.rouletteHighlighter) this.rouletteHighlighter.destroy();
 
@@ -306,6 +309,11 @@ export class GameScene extends Phaser.Scene {
 
     this.cameras.main.setBounds(0, 0, GAME_WIDTH, WORLD_HEIGHT);
     this.cameras.main.scrollX = 0;
+
+    // Rally stage the heroes stand on — spans the formation band just behind
+    // (below) the shield front. Above the parallax, below every unit.
+    this.rallyStage = this.add.image(GAME_WIDTH / 2, RALLY.shieldStartY + 150, 'rally-stage');
+    this.rallyStage.setDepth(-5);
 
     this.shield = new MoraleShield(this, GAME_WIDTH / 2, RALLY.shieldStartY, GAME_WIDTH, BARRICADE_DEFAULTS.height, BARRICADE_DEFAULTS.maxHp);
 

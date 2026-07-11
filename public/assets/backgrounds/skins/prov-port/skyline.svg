@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="540" height="960" viewBox="0 0 540 960">
-  <g fill="#31212e"><rect x="16.5" y="53.5" width="10" height="182.7"/><rect x="21.5" y="53.5" width="90" height="8"/><rect x="-40.5" y="61.5" width="4" height="30"/></g>
-  <g fill="#31212e"><path d="M-25.9 460.1 h80 l-12 14 h-56 z"/><rect x="12.1" y="420.1" width="4" height="40"/></g><circle cx="14.1" cy="420.1" r="2.5" fill="#fbbf24" opacity="0.7"/>
-  <rect x="-4.4" y="727.3" width="60" height="26" fill="#443040"/><rect x="-4.4" y="727.3" width="60" height="5" fill="#fb7185" opacity="0.5"/><rect x="3.6" y="705.3" width="44" height="22" fill="#443040" opacity="0.9"/>
-  <g fill="#31212e"><rect x="522.1" y="57.7" width="10" height="207.4"/><rect x="437.1" y="57.7" width="90" height="8"/><rect x="585.1" y="65.7" width="4" height="30"/></g>
-  <g fill="#31212e"><path d="M488.8 461 h80 l-12 14 h-56 z"/><rect x="526.8" y="421" width="4" height="40"/></g><circle cx="528.8" cy="421" r="2.5" fill="#fbbf24" opacity="0.7"/>
-  <rect x="495.9" y="729.8" width="60" height="26" fill="#443040"/><rect x="495.9" y="729.8" width="60" height="5" fill="#fb7185" opacity="0.5"/><rect x="503.9" y="707.8" width="44" height="22" fill="#443040" opacity="0.9"/>
+  <g fill="#8f6274"><rect x="16.5" y="53.5" width="10" height="182.7"/><rect x="21.5" y="53.5" width="90" height="8"/><rect x="-40.5" y="61.5" width="4" height="30"/></g>
+  <g fill="#8f6274"><path d="M-25.9 460.1 h80 l-12 14 h-56 z"/><rect x="12.1" y="420.1" width="4" height="40"/></g><circle cx="14.1" cy="420.1" r="2.5" fill="#fbbf24" opacity="0.7"/>
+  <rect x="-4.4" y="727.3" width="60" height="26" fill="#a5707f"/><rect x="-4.4" y="727.3" width="60" height="5" fill="#fb7185" opacity="0.5"/><rect x="3.6" y="705.3" width="44" height="22" fill="#a5707f" opacity="0.9"/>
+  <g fill="#8f6274"><rect x="522.1" y="57.7" width="10" height="207.4"/><rect x="437.1" y="57.7" width="90" height="8"/><rect x="585.1" y="65.7" width="4" height="30"/></g>
+  <g fill="#8f6274"><path d="M488.8 461 h80 l-12 14 h-56 z"/><rect x="526.8" y="421" width="4" height="40"/></g><circle cx="528.8" cy="421" r="2.5" fill="#fbbf24" opacity="0.7"/>
+  <rect x="495.9" y="729.8" width="60" height="26" fill="#a5707f"/><rect x="495.9" y="729.8" width="60" height="5" fill="#fb7185" opacity="0.5"/><rect x="503.9" y="707.8" width="44" height="22" fill="#a5707f" opacity="0.9"/>
 </svg>

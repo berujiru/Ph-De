@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="540" height="960" viewBox="0 0 540 960">
-  <polygon points="-113.2,206 13.1,61.6 139.4,206" fill="#31212e" opacity="0.8"/>
-  <polygon points="-81.4,491.4 23.6,351.9 128.6,491.4" fill="#31212e" opacity="0.8"/>
-  <rect x="19.2" y="676.5" width="6" height="26" fill="#443040"/><circle cx="22.2" cy="660.8" r="22.4" fill="#443040" opacity="0.9"/>
-  <polygon points="389,281.7 521.9,145.1 654.8,281.7" fill="#31212e" opacity="0.8"/>
-  <polygon points="427.5,436.3 517.7,334.3 608,436.3" fill="#31212e" opacity="0.8"/>
-  <rect x="522.4" y="679.6" width="6" height="26" fill="#443040"/><circle cx="525.4" cy="662.9" r="23.9" fill="#443040" opacity="0.9"/>
+  <polygon points="-113.2,206 13.1,61.6 139.4,206" fill="#8f6274" opacity="0.8"/>
+  <polygon points="-81.4,491.4 23.6,351.9 128.6,491.4" fill="#8f6274" opacity="0.8"/>
+  <rect x="19.2" y="676.5" width="6" height="26" fill="#a5707f"/><circle cx="22.2" cy="660.8" r="22.4" fill="#a5707f" opacity="0.9"/>
+  <polygon points="389,281.7 521.9,145.1 654.8,281.7" fill="#8f6274" opacity="0.8"/>
+  <polygon points="427.5,436.3 517.7,334.3 608,436.3" fill="#8f6274" opacity="0.8"/>
+  <rect x="522.4" y="679.6" width="6" height="26" fill="#a5707f"/><circle cx="525.4" cy="662.9" r="23.9" fill="#a5707f" opacity="0.9"/>
 </svg>

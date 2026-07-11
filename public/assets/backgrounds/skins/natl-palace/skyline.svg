@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="540" height="960" viewBox="0 0 540 960">
-  <g fill="#111a2e"><rect x="-35.5" y="177.6" width="120" height="80"/><ellipse cx="24.5" cy="177.6" rx="34" ry="30"/><rect x="22.5" y="133.6" width="4" height="16"/></g><g fill="#22d3ee" opacity="0.2"><rect x="-19.5" y="207.6" width="10" height="24"/><rect x="58.5" y="207.6" width="10" height="24"/></g>
-  <rect x="3.5" y="206.7" width="28" height="273.7" fill="#111a2e"/><rect x="16" y="182.7" width="3" height="24" fill="#111a2e"/><circle cx="17.5" cy="182.7" r="3" fill="#f43f5e" opacity="0.8"/>
-  <rect x="23" y="671.1" width="6" height="26" fill="#202c46"/><circle cx="26" cy="656.6" r="20.7" fill="#202c46" opacity="0.9"/>
-  <g fill="#111a2e"><rect x="458.6" y="149.6" width="120" height="80"/><ellipse cx="518.6" cy="149.6" rx="34" ry="30"/><rect x="516.6" y="105.6" width="4" height="16"/></g><g fill="#22d3ee" opacity="0.2"><rect x="474.6" y="179.6" width="10" height="24"/><rect x="552.6" y="179.6" width="10" height="24"/></g>
-  <rect x="511.9" y="215.5" width="28" height="227.7" fill="#111a2e"/><rect x="524.4" y="191.5" width="3" height="24" fill="#111a2e"/><circle cx="525.9" cy="191.5" r="3" fill="#f43f5e" opacity="0.8"/>
-  <rect x="514.7" y="721" width="6" height="26" fill="#202c46"/><circle cx="517.7" cy="704.3" r="23.8" fill="#202c46" opacity="0.9"/>
+  <g fill="#9db0c4"><rect x="-35.5" y="177.6" width="120" height="80"/><ellipse cx="24.5" cy="177.6" rx="34" ry="30"/><rect x="22.5" y="133.6" width="4" height="16"/></g><g fill="#7cc8ea" opacity="0.2"><rect x="-19.5" y="207.6" width="10" height="24"/><rect x="58.5" y="207.6" width="10" height="24"/></g>
+  <rect x="3.5" y="206.7" width="28" height="273.7" fill="#9db0c4"/><rect x="16" y="182.7" width="3" height="24" fill="#9db0c4"/><circle cx="17.5" cy="182.7" r="3" fill="#f43f5e" opacity="0.8"/>
+  <rect x="23" y="671.1" width="6" height="26" fill="#8ba0bf"/><circle cx="26" cy="656.6" r="20.7" fill="#8ba0bf" opacity="0.9"/>
+  <g fill="#9db0c4"><rect x="458.6" y="149.6" width="120" height="80"/><ellipse cx="518.6" cy="149.6" rx="34" ry="30"/><rect x="516.6" y="105.6" width="4" height="16"/></g><g fill="#7cc8ea" opacity="0.2"><rect x="474.6" y="179.6" width="10" height="24"/><rect x="552.6" y="179.6" width="10" height="24"/></g>
+  <rect x="511.9" y="215.5" width="28" height="227.7" fill="#9db0c4"/><rect x="524.4" y="191.5" width="3" height="24" fill="#9db0c4"/><circle cx="525.9" cy="191.5" r="3" fill="#f43f5e" opacity="0.8"/>
+  <rect x="514.7" y="721" width="6" height="26" fill="#8ba0bf"/><circle cx="517.7" cy="704.3" r="23.8" fill="#8ba0bf" opacity="0.9"/>
 </svg>
