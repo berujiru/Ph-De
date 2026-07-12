@@ -407,7 +407,8 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
               <option value="none">No Skill</option>
               <option value="flood">Flood</option>
               <option value="devour">Devour</option>
-              <option value="summonSwarm">Deploy Trolls</option>
+              <option value="fakeNewsBroadcast">Fake News Broadcast</option>
+              <option value="summonSwarm">Deploy Trolls (Legacy)</option>
               <option value="summonShieldbearer">Appoint Shieldbearer</option>
               <option value="scatterFakeGold">Bribe (Fake Gold)</option>
               <option value="smuggleHp">Smuggle Funds (HP)</option>

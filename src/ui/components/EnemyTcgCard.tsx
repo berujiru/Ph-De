@@ -1,5 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
-import { theme } from '../theme';
+import type { CSSProperties } from 'react';
 import { SkullIcon } from '../icons';
 import { ENEMY_DEFINITIONS, type EnemyDefinition, type EnemyId } from '../../game/data/enemies';
 import { enemyTier, TIER_COLOR, hexColor } from './ArchiveCards';
@@ -38,7 +37,7 @@ interface EnemyTcgCardProps {
   isFacedUp?: boolean;
 }
 
-export function EnemyTcgCard({ enemyId, style, rotation = 0, isFacedUp = true }: EnemyTcgCardProps) {
+export function EnemyTcgCard({ enemyId, style, rotation = 0 }: EnemyTcgCardProps) {
   const def = ENEMY_DEFINITIONS[enemyId];
   if (!def) return null;
 
@@ -201,11 +200,19 @@ export function EnemyTcgCard({ enemyId, style, rotation = 0, isFacedUp = true }:
         display: 'flex',
         flexDirection: 'column'
       }}>
-        {/* Classification */}
         <div style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: '#64748b', borderBottom: '1px solid #cbd5e1', paddingBottom: 4, marginBottom: 6 }}>
           [ Rank {rank} Anomaly / {tier} ]
         </div>
-        <div style={{ fontStyle: 'italic', lineHeight: 1.4, flexGrow: 1 }}>
+        
+        {/* Lore / Flavor Text */}
+        {def.lore && (
+          <div style={{ fontStyle: 'italic', fontSize: 11, color: '#475569', marginBottom: 8, paddingBottom: 6, borderBottom: '1px dashed #cbd5e1' }}>
+            "{def.lore}"
+          </div>
+        )}
+
+        {/* Passives */}
+        <div style={{ lineHeight: 1.4, flexGrow: 1, fontWeight: 600 }}>
           {getPassivesText(def).map((text, i) => <div key={i} style={{ marginBottom: 4 }}>• {text}</div>)}
         </div>
         

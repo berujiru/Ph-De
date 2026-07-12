@@ -146,7 +146,9 @@ export function setupUIEvents(scene: GameScene): () => void {
     } else if (skill === 'devour') {
       def.activeSkill = { name: 'Sandbox Devour', effect: 'devour' };
     } else if (skill === 'summonSwarm') {
-      def.activeSkill = { name: 'Sandbox Trolls', effect: 'summonSwarm' };
+      def.activeSkill = { name: 'Sandbox Trolls (Old)', effect: 'summonSwarm' };
+    } else if (skill === 'fakeNewsBroadcast') {
+      def.activeSkill = { name: 'Sandbox Fake News', effect: 'fakeNewsBroadcast' };
     } else if (skill === 'summonShieldbearer') {
       def.activeSkill = { name: 'Sandbox Shieldbearer', effect: 'summonShieldbearer' };
     } else if (skill === 'scatterFakeGold') {

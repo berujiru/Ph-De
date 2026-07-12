@@ -64,7 +64,7 @@ export interface EnemyDefinition {
   
   activeSkill?: {
     name: string;
-    effect: 'flood' | 'devour' | 'summonSwarm' | 'summonShieldbearer' | 'sirenBurst' | 'smuggleHp' | 'economyHeist' | 'scatterFakeGold' | 'resurrectAll';
+    effect: 'flood' | 'devour' | 'summonSwarm' | 'summonShieldbearer' | 'sirenBurst' | 'smuggleHp' | 'economyHeist' | 'scatterFakeGold' | 'resurrectAll' | 'fakeNewsBroadcast';
   };
   ai?: {
     skillCooldownMs?: number;
@@ -320,11 +320,10 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     color: 0x3f3f46,
     selfDestructOnBarrier: true,
     selfDestructDamage: 200,
-    auraRange: 200,
-    moraleAura: true,
+    evasionChance: 0.3,
     isRanged: true,
     attackRangePx: 250,
-    activeSkill: { name: 'Deploy Trolls', effect: 'summonSwarm' },
+    activeSkill: { name: 'Fake News Broadcast', effect: 'fakeNewsBroadcast' },
     ai: {
       skillCooldownMs: 8000,
       initialSkillDelayMs: 4000,

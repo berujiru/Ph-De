@@ -457,6 +457,14 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       this.scene.events.emit('enemyEconomyHeist', { source: this });
     } else if (skill.effect === 'resurrectAll') {
       this.scene.events.emit('resurrectAll', { source: this });
+    } else if (skill.effect === 'fakeNewsBroadcast') {
+      // Blind all heroes for 3 seconds
+      const heroes = (this.scene as any).heroes;
+      if (heroes) {
+        for (const hero of heroes) {
+          hero.blindTimer = 3000;
+        }
+      }
     } else if (skill.effect === 'sirenBurst') {
       // Clear ailments
       this.activeAilments['slow'] = 0;

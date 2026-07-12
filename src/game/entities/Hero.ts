@@ -47,6 +47,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   private formationJitterY: number;
 
   private passiveTimer = 0;
+  public blindTimer = 0;
 
   private model: HeroModel;
   private spriteAura: SpriteAura;
@@ -104,7 +105,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
       fontFamily: 'Inter, sans-serif',
       fontSize: '9px',
       color: '#ffffff',
-      fontWeight: 'bold',
+      fontStyle: 'bold',
       align: 'center'
     }).setOrigin(0.5);
     this.evictionSign.add([signRect, signText]);
@@ -251,7 +252,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     if (this.stunTimer > 0) {
       this.stunTimer -= delta;
       if (this.stunTimer > 0) {
-        if (this.model.getState() !== 'idle') {
+        if (this.model.modelState !== 'idle') {
           this.model.setState('idle');
         }
         return;
@@ -265,6 +266,11 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
       if (this.activeBuffs[type] <= 0) {
         this.removeBuff(type);
       }
+    }
+
+    if (this.blindTimer > 0) {
+      this.blindTimer -= delta;
+      if (this.blindTimer < 0) this.blindTimer = 0;
     }
 
     // Process Continuous Passives (e.g. Nurse healing)
@@ -359,22 +365,45 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
         }
 
         if (finalTarget && finalTarget.active && !finalTarget.isDead) {
-          this.onAttack(this, finalTarget);
+          // Fake News Blindness check
+          if (this.blindTimer > 0 && Math.random() < 0.5) {
+            // Miss! Show visual text
+            const missText = this.scene.add.text(this.x, this.y - 30, 'MISS', {
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '12px',
+              color: '#d1d5db',
+              fontStyle: 'bold',
+              stroke: '#000',
+              strokeThickness: 3
+            }).setOrigin(0.5);
+            
+            this.scene.tweens.add({
+              targets: missText,
+              y: missText.y - 20,
+              alpha: 0,
+              duration: 800,
+              onComplete: () => missText.destroy()
+            });
+            
+            // Skip the actual attack
+          } else {
+            this.onAttack(this, finalTarget);
 
-          // Passives applied on attack
-          const activePassive = this.passiveOverride || this.id;
-          applyHeroPassive(activePassive, this, finalTarget, {
-            GAME_WIDTH: Number(this.scene.game.config.width),
-            GAME_HEIGHT: Number(this.scene.game.config.height),
-            heroes: [],
-            enemies: [],
-            onVisual: (evt) => {
-              if (evt.type === 'text') {
-                const txt = this.scene.add.text(evt.x || 0, evt.y || 0, evt.text || '', { color: evt.color || '#fff', fontStyle: 'bold' }).setOrigin(0.5);
-                this.scene.tweens.add({ targets: txt, y: (evt.y || 0) - 30, alpha: 0, duration: 1000, onComplete: () => txt.destroy() });
+            // Passives applied on attack
+            const activePassive = this.passiveOverride || this.id;
+            applyHeroPassive(activePassive, this, finalTarget, {
+              GAME_WIDTH: Number(this.scene.game.config.width),
+              GAME_HEIGHT: Number(this.scene.game.config.height),
+              heroes: [],
+              enemies: [],
+              onVisual: (evt) => {
+                if (evt.type === 'text') {
+                  const txt = this.scene.add.text(evt.x || 0, evt.y || 0, evt.text || '', { color: evt.color || '#fff', fontStyle: 'bold' }).setOrigin(0.5);
+                  this.scene.tweens.add({ targets: txt, y: (evt.y || 0) - 30, alpha: 0, duration: 1000, onComplete: () => txt.destroy() });
+                }
               }
-            }
-          });
+            });
+          }
         }
         
         this.pendingAttacks.splice(i, 1);

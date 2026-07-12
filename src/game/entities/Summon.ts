@@ -71,7 +71,7 @@ export class Summon extends Phaser.GameObjects.Container {
       // Flash reads as a solid fill, not a multiply, on the white flash frame.
       if (color === 0xffffff) this.shape.setTintFill();
     } else {
-      this.shape.setFillStyle(color);
+      (this.shape as Phaser.GameObjects.Rectangle).setFillStyle(color);
     }
   }
 
