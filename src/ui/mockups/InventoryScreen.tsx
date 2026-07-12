@@ -29,7 +29,16 @@ interface InventoryScreenProps {
 type ArchiveTab = 'heroes' | 'codex';
 
 // Real anomalies only (drop the sandbox punching bag).
-const CODEX_ENEMIES = Object.values(ENEMY_DEFINITIONS).filter((def) => def.id !== 'sandbox_target');
+const CODEX_ENEMIES = Object.values(ENEMY_DEFINITIONS)
+  .filter((def) => def.id !== 'sandbox_target')
+  .sort((a, b) => {
+    const tierA = enemyTier(a);
+    const tierB = enemyTier(b);
+    const weightA = tierA === 'Minion' ? 1 : tierA === 'Mini-Boss' ? 2 : 3;
+    const weightB = tierB === 'Minion' ? 1 : tierB === 'Mini-Boss' ? 2 : 3;
+    if (weightA !== weightB) return weightA - weightB;
+    return a.name.localeCompare(b.name);
+  });
 
 // Mock campaign progress (mirrors CampaignMap.tsx): heroes whose unlock stage
 // (data/heroUnlocks.ts) has been reached count as recruited into the movement.
