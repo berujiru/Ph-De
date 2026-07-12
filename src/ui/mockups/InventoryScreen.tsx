@@ -16,6 +16,7 @@ import {
   EnemyCaseCard,
 } from '../components/ArchiveCards';
 import { EnemyTcgCard } from '../components/EnemyTcgCard';
+import { HeroTcgCard } from '../components/HeroTcgCard';
 import { getSelectedSkin, setSelectedSkin, subscribeSkins } from '../../game/data/skinSelection';
 import { heroSkins } from '../../game/data/skins';
 import { heroUnlockStage } from '../../game/data/heroUnlocks';
@@ -387,100 +388,16 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 justifyContent: 'center',
                 alignItems: 'center',
                 boxShadow: '2px 2px 0 #000',
-                lineHeight: 1
+                lineHeight: 1,
+                zIndex: 100
               }}
             >
               ×
             </button>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '18px', flexWrap: 'wrap' }}>
-              {/* Paper-clipped photo */}
-              <div style={{
-                position: 'relative',
-                width: '80px',
-                height: '80px',
-                background: PORTRAIT_BG,
-                border: `4px solid ${hexColor(selectedHero.color)}`,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'flex-end',
-                overflow: 'hidden',
-                boxShadow: '2px 2px 10px rgba(0,0,0,0.2)',
-                transform: 'rotate(-2deg)'
-              }}>
-                {/* Paperclip */}
-                <div style={{
-                  position: 'absolute',
-                  top: '-15px',
-                  left: '20px',
-                  width: '12px',
-                  height: '40px',
-                  border: '3px solid #94a3b8',
-                  borderRadius: '10px',
-                  borderBottom: 'none',
-                  zIndex: 2
-                }} />
-                <SkinPortrait skin={getSelectedSkin(selectedHero.id)} alt={selectedHero.name} />
-              </div>
-
-              <div style={{ flex: 1, minWidth: 140, color: '#000' }}>
-                <h2 style={{ margin: 0, fontSize: 'clamp(16px, 4.5vw, 24px)', fontFamily: TYPEWRITER_FONT, textTransform: 'uppercase', borderBottom: '2px solid #000', paddingBottom: '4px' }}>
-                  {selectedHero.name}
-                </h2>
-                <div style={{ fontSize: '13px', fontWeight: 'bold', marginTop: '4px', color: '#334155' }}>
-                  ROLE: {selectedHero.profession.toUpperCase()}
-                </div>
-                <div style={{ fontSize: '11px', fontWeight: 'bold', marginTop: '2px', color: '#64748b', fontFamily: TYPEWRITER_FONT }}>
-                  JOINS THE MOVEMENT: ACT {actForStage(heroUnlockStage(selectedHero.id))} · STAGE {heroUnlockStage(selectedHero.id)}
-                </div>
-                <div style={{ marginTop: '10px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '12px', padding: '2px 8px', border: '1px solid #000', fontWeight: 'bold' }}>
-                    {selectedHero.damageType.toUpperCase()}
-                  </span>
-                  <span style={{ fontSize: '12px', padding: '2px 8px', border: '1px solid #000', fontWeight: 'bold' }}>
-                    {selectedHero.attackKind === 'melee' ? 'MELEE' : 'RANGED'}
-                  </span>
-                </div>
-              </div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+              <HeroTcgCard heroId={selectedHero.id} />
             </div>
-
-            {/* Typewritten Stats */}
-            <div style={{
-              backgroundColor: 'rgba(255,255,255,0.5)',
-              border: '1px dashed #000',
-              padding: '15px',
-              marginBottom: '14px',
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr',
-              textAlign: 'center',
-              fontFamily: TYPEWRITER_FONT,
-              color: '#000'
-            }}>
-              <div>
-                <div style={{ fontSize: '10px', fontWeight: 'bold' }}>DMG OUTPUT</div>
-                <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{selectedHero.damage}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '10px', fontWeight: 'bold' }}>ATK SPD</div>
-                <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{(selectedHero.attackRateMs / 1000).toFixed(1)}s</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '10px', fontWeight: 'bold' }}>RANGE</div>
-                <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{metersLabel(selectedHero.range)}</div>
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '20px', color: '#000' }}>
-              <h3 style={{ margin: '0 0 4px 0', fontSize: '13px', borderBottom: '1px solid #000', display: 'inline-block' }}>SIGNATURE SKILL: {selectedHero.signatureSkill.name}</h3>
-              <p style={{ margin: '4px 0 0 0', fontSize: '11px', fontFamily: TYPEWRITER_FONT }}>{selectedHero.signatureSkill.description}</p>
-            </div>
-
-            {selectedHero.passive && (
-              <div style={{ marginBottom: '18px', color: '#000' }}>
-                <h3 style={{ margin: '0 0 4px 0', fontSize: '13px', borderBottom: '1px solid #000', display: 'inline-block' }}>PASSIVE: {selectedHero.passive.name}</h3>
-                <p style={{ margin: '4px 0 0 0', fontSize: '11px', fontFamily: TYPEWRITER_FONT }}>{selectedHero.passive.description}</p>
-              </div>
-            )}
 
             {/* Skins — pick which sheet this worker wears into battle */}
             {heroSkins(selectedHero.id).length > 0 && (

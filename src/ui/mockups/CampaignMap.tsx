@@ -66,7 +66,7 @@ const CAMPAIGN_DATA: ActEntry[] = [
   {
     id: 1,
     title: 'Act 1: The Grassroots',
-    description: 'Protecting local communities from immediate threats like Troll Bots and Fixers.',
+    description: 'Protecting local communities from immediate threats like Troll Bots and Fixers. Bosses: Ghost Flood Control, Wang-Wang, Vote Buying.',
     map: skinsForAct(1)[0]?.layers.street ?? '/assets/maps/map-barangay.svg',
     mapSkins: skinsForAct(1).map((s) => s.id),
     stages: [
@@ -85,7 +85,7 @@ const CAMPAIGN_DATA: ActEntry[] = [
   {
     id: 2,
     title: 'Act 2: The Town Core',
-    description: 'Taking back public utilities and spaces from entrenched local corruption.',
+    description: 'Taking back public utilities and spaces from entrenched local corruption. Bosses: Troll Farm, Nepotism, Smuggling.',
     map: skinsForAct(2)[0]?.layers.street ?? '/assets/maps/map-bayan.svg',
     mapSkins: skinsForAct(2).map((s) => s.id),
     stages: [
@@ -104,7 +104,7 @@ const CAMPAIGN_DATA: ActEntry[] = [
   {
     id: 3,
     title: 'Act 3: The Regional Hub',
-    description: 'Dismantling provincial syndicates and ghost projects across the region.',
+    description: 'Dismantling provincial syndicates and ghost projects across the region. Bosses: Pork Barrel, Budget Insertion, Ghost Flood Control.',
     map: skinsForAct(3)[0]?.layers.street ?? '/assets/maps/map-province.svg',
     mapSkins: skinsForAct(3).map((s) => s.id),
     stages: [
@@ -123,7 +123,7 @@ const CAMPAIGN_DATA: ActEntry[] = [
   {
     id: 4,
     title: 'Act 4: The National Gauntlet',
-    description: 'Facing the systemic root of the anomalies across national government agencies.',
+    description: 'Facing the systemic root of the anomalies across national government agencies. Bosses: Political Dynasty, Budget Insertion, Pork Barrel.',
     map: skinsForAct(4)[0]?.layers.street ?? '/assets/maps/map-national.svg',
     mapSkins: skinsForAct(4).map((s) => s.id),
     stages: [
@@ -142,7 +142,7 @@ const CAMPAIGN_DATA: ActEntry[] = [
   {
     id: 5,
     title: 'Finale: Ang Sistema',
-    description: 'Every defeated anomaly returns at once. The full alliance holds the line.',
+    description: 'Every defeated anomaly returns at once. The full alliance holds the line. Boss: Ang Sistema.',
     map: skinsForAct(4)[2]?.layers.street ?? '/assets/maps/map-finale.svg',
     mapSkins: ['natl-palace'],
     stages: [stage(41, 'Ang Sistema (Finale)', 3)],
