@@ -335,3 +335,40 @@ interface BossDefinition {
 The existing prototype's three towers serve as hero stand-ins for
 testing until real hero kits land; its waves/economy/targeting code
 carries forward unchanged.
+
+
+## Enemy Lore (Origins)
+
+### Minions
+*   **Troll Bot:** Born from discarded burner phones and the malice of a thousand fake accounts. They manifest wherever truth is too fragile to defend itself.
+*   **Fixer:** A scuttling amalgamation of stamped folders and bypassed queues. Brought to life by the desperation of citizens trying to cut through broken systems.
+*   **Red Tape:** Mummified in endless ribbons of bureaucracy. It was formed by the collective groans of people waiting for permits that never come.
+*   **Fake News Blimp:** Inflated by hot air and manufactured outrage. It floats above the consequences of the lies it broadcasts.
+*   **Flying Voter:** A restless swarm of fake IDs and ghost ballots, animated by the sheer will to manipulate the margins of victory.
+*   **Colorum:** A rogue, unregistered chassis fueled by unregulated greed. It materializes on the roads whenever the system looks the other way.
+*   **Crony Bodyguard (Goon):** Thugs sculpted from the arrogance of untouchable politicians. They exist only to shield the corrupt from the consequences of their actions.
+*   **Ghost Employee (15-30 Worker):** A bloated, translucent specter sustained entirely by payroll anomalies. Brought to reality by the greed of officials claiming salaries for people who don't exist.
+*   **Tongpats Collector:** A lean, fast scavenger born from the 'standard cut' expected in every government transaction.
+*   **Bribe Courier:** A slippery imp carrying leaking duffels of grease money. It thrives in the shadows of under-the-table handshakes.
+
+### Mini-Bosses
+*   **Epal:** A hulking monstrosity wearing a politician's tarpaulin face. It draws power from credit-grabbing during calamities and public works.
+*   **The Overpriced:** A bloated parade-balloon entity padded with fake receipts and inflated costs. It looks imposing until pierced by a hard audit.
+*   **Kickback Courier:** Born from the 'change' that never makes it back to the public treasury. It steals what little hope the people have left.
+*   **Shell Company:** A corporate blob of empty promises. Strike it down, and it simply shatters into a dozen smaller dummy corporations to hide the money trail.
+*   **Hoarder:** A massive cartel beast sitting on mountains of artificial scarcity. It starves the supply chain just to watch prices rise.
+*   **Bribery:** A slimy creature tossing dirty money to silence opposition. Its very presence corrupts the budget, locking down the heroes' abilities to fight back.
+*   **Land Grabber:** An earth-moving abomination forged from fake land titles and forced evictions. It bulldozes anything standing in the way of 'development'.
+*   **Tender Rigger:** Wrapped tightly in pre-sealed bidding envelopes. It is completely immune to attacks until its rigged contracts are forcefully unsealed.
+
+### Bosses
+*   **Troll Farm:** A digital sweatshop of paid disinformation made flesh. It constantly broadcasts fake news to blind the heroes and hides behind thousands of manufactured identities.
+*   **Ghost Flood Control:** Manifested from billions of pesos washed away in non-existent dredging projects. It floods the path, letting corruption surge forward unchallenged.
+*   **Pork Barrel:** A bloated hog of discretionary funds. It devours whatever resources it can find on the field, growing endlessly at the expense of the people.
+*   **Vote Buying:** The physical embodiment of election season. It scatters fake, tainted gold to buy the loyalty—or at least the distraction—of those trying to defend the nation.
+*   **Nepotism:** A monstrous matriarch/patriarch that bypasses all meritocracy. It endlessly appoints unqualified, shielded relatives into the lane to do its fighting.
+*   **Wang-Wang:** An entity forged from VIP entitlement and blaring sirens. It ignores the rules of the road, surging forward with absolute impunity.
+*   **Budget Insertion:** A master of midnight maneuvers. It smuggles massive amounts of stolen health and resources down the path while everyone else is distracted.
+*   **Smuggling:** The gaping hole in the nation's borders. As long as it remains alive, it actively drains the economy and hope generation of the defenders.
+*   **The Dynasty:** The apex predator of regional politics. A multi-headed beast where striking down one head merely allows a seemingly identical heir to take its place.
+*   **Ang Sistema:** The dark, beating heart of it all. It is the systemic, institutional rot that ensures that even if one anomaly is defeated, the system will resurrect them to fight again.

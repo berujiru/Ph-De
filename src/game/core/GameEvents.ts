@@ -24,6 +24,7 @@ export interface ActiveHeroInfo {
   id: string;
   passiveOverride?: string;
   isSkillReady: boolean;
+  isSkillLocked?: boolean;
 }
 
 export interface ActiveEnemyInfo {
@@ -44,7 +45,6 @@ export interface GameStateSnapshot {
   status: 'playing' | 'won' | 'lost';
   activeHeroes: ActiveHeroInfo[];
   activeEnemies: ActiveEnemyInfo[];
-  skillsLocked?: boolean;
   doughBarrierActive?: boolean;
   shieldScreenYRatio?: number;
 }

@@ -35,9 +35,7 @@ export class GameScene extends Phaser.Scene {
   public enemies: Enemy[] = [];
   public seenEnemies: Set<string> = new Set();
   
-  public get isBudgetCutActive(): boolean {
-    return this.enemies.some(e => !e.isDead && e.definition.budgetCut);
-  }
+  public budgetCutTargetHero: Hero | null = null;
   public heroes: Hero[] = [];
   public attacks: Attack[] = [];
   public summons: Summon[] = [];
@@ -337,6 +335,22 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(_time: number, delta: number): void {
+    if (this.isPaused) return;
+
+    const hasBudgetCut = this.enemies.some(e => !e.isDead && e.definition.budgetCut);
+    if (hasBudgetCut) {
+      if (!this.budgetCutTargetHero || !this.heroes.includes(this.budgetCutTargetHero)) {
+        if (this.heroes.length > 0) {
+          const randomIndex = Math.floor(Math.random() * this.heroes.length);
+          this.budgetCutTargetHero = this.heroes[randomIndex];
+        } else {
+          this.budgetCutTargetHero = null;
+        }
+      }
+    } else {
+      this.budgetCutTargetHero = null;
+    }
+
     if (this.status !== 'playing' || this.isPaused || this.gameSpeed === 0) return;
 
     delta *= this.gameSpeed;
@@ -554,10 +568,10 @@ export class GameScene extends Phaser.Scene {
       activeHeroes: this.heroes.map(h => ({ 
         id: h.id, 
         passiveOverride: h.passiveOverride,
-        isSkillReady: h.isSkillReady && !this.comboQueue.includes(h)
+        isSkillReady: h.isSkillReady && !this.comboQueue.includes(h),
+        isSkillLocked: this.budgetCutTargetHero === h
       })),
       activeEnemies: activeEnemies,
-      skillsLocked: this.isBudgetCutActive,
       shieldScreenYRatio: (this.shield.y - this.cameras.main.scrollY) / this.cameras.main.height
     };
     const serialized = JSON.stringify(snapshot);

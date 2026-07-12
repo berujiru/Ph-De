@@ -16,8 +16,8 @@ function getPassivesText(def: EnemyDefinition): string[] {
   if (def.knockbackPulseCooldown) passives.push('Shoves your frontline back down the path.');
   if (def.hitImmunityCount) passives.push(`Shrugs off its first ${def.hitImmunityCount} hits.`);
   if (def.stealVoicesPerSecond) passives.push('Drains your Voices while it lives.');
-  if (def.budgetCut) passives.push('Slashes your budget on death.');
-  if (def.privatePropertyStun) passives.push('Stuns towers on death.');
+  if (def.budgetCut) passives.push('Completely disables all Hero active skills while alive.');
+  if (def.privatePropertyStun) passives.push('Evicts a random hero and replaces them with a Private Property sign.');
   if (def.evasionChance) passives.push(`Has a ${(def.evasionChance * 100).toFixed(0)}% chance to evade attacks.`);
   if (def.selfDestructOnBarrier) passives.push('Self-destructs on the barrier for massive damage.');
   
@@ -28,6 +28,19 @@ function getPassivesText(def: EnemyDefinition): string[] {
   }
   return passives;
 }
+
+const ACTIVE_SKILL_DESCRIPTIONS: Record<string, string> = {
+  flood: 'Floods the path, causing all anomalies to surge forward with massive speed boosts.',
+  devour: 'Devours uncollected gold on the field to permanently increase its own max HP.',
+  summonSwarm: 'Continuously summons swarms of Troll Bots to overwhelm your defenses.',
+  summonShieldbearer: 'Continuously summons Unqualified Relatives into the lane as meat shields.',
+  sirenBurst: 'Emits siren bursts granting massive speed surges, ignoring slow effects.',
+  smuggleHp: 'Smuggles massive amounts of stolen HP down the path while diverting attention.',
+  economyHeist: 'Actively drains your ongoing Hope generation and economy.',
+  scatterFakeGold: 'Scatters fake gold pickups that subtract from your actual economy if tapped.',
+  resurrectAll: 'Resurrects lesser versions of defeated anomalies to fight alongside it.',
+  fakeNewsBroadcast: 'Instantly blinds all heroes, causing their next attacks to miss 50% of the time.'
+};
 
 interface EnemyTcgCardProps {
   enemyId: EnemyId;
@@ -221,6 +234,9 @@ export function EnemyTcgCard({ enemyId, style, rotation = 0 }: EnemyTcgCardProps
           <div style={{ marginTop: 8, borderTop: '1px solid #cbd5e1', paddingTop: 6, fontSize: 12 }}>
             <span style={{ fontWeight: 900, color: '#b91c1c' }}>ACTV: </span>
             <span style={{ fontWeight: 800 }}>{def.activeSkill.name}</span>
+            <div style={{ marginTop: 2, fontSize: 11, color: '#475569', lineHeight: 1.3 }}>
+              {def.activeSkill.description || ACTIVE_SKILL_DESCRIPTIONS[def.activeSkill.effect]}
+            </div>
           </div>
         )}
       </div>

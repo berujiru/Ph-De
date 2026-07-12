@@ -7,6 +7,8 @@ export type EnemyId = 'grunt' | 'runner' | 'brute' | 'sandbox_target' | 'ghost_e
 export interface EnemyDefinition {
   id: EnemyId;
   name: string;
+  /** Narrative flavor text for the Codex. */
+  lore?: string;
   /** Movement speed along the path, in px/sec. */
   speed: number;
   maxHp: number;
@@ -64,6 +66,7 @@ export interface EnemyDefinition {
   
   activeSkill?: {
     name: string;
+    description?: string;
     effect: 'flood' | 'devour' | 'summonSwarm' | 'summonShieldbearer' | 'sirenBurst' | 'smuggleHp' | 'economyHeist' | 'scatterFakeGold' | 'resurrectAll' | 'fakeNewsBroadcast';
   };
   ai?: {
@@ -114,7 +117,8 @@ export function enemySizeClass(def: EnemyDefinition): UnitSizeClass {
 export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   grunt: {
     id: 'grunt',
-    name: 'Grunt',
+    name: 'Petty Corruptor',
+    lore: 'A mindless drone of the systemic rot. Formed from the countless tiny, everyday compromises that erode a nation.',
     speed: 70,
     maxHp: 45,
     reward: 5,
@@ -124,7 +128,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   runner: {
     id: 'runner',
-    name: 'Runner',
+    name: 'Bribe Runner',
+    lore: 'A fast-moving anomaly that exists only to pass envelopes under the table before anyone can catch it.',
     speed: 130,
     maxHp: 25,
     reward: 4,
@@ -134,7 +139,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   brute: {
     id: 'brute',
-    name: 'Brute',
+    name: 'Bureaucratic Thug',
+    lore: 'A heavy-handed enforcer of arbitrary rules. It exists to physically stonewall progress and drain energy.',
     speed: 45,
     maxHp: 180,
     reward: 15,
@@ -156,6 +162,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   ghost_employee: {
     id: 'ghost_employee',
     name: 'Ghost Employee',
+    lore: 'Translucent office specter',
     speed: 60,
     maxHp: 70,
     reward: 8,
@@ -167,6 +174,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   bribery: {
     id: 'bribery',
     name: 'Bribery',
+    lore: 'Slimy suited creature tossing dirty money',
     speed: 100,
     maxHp: 80,
     reward: 15,
@@ -179,6 +187,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   epal: {
     id: 'epal',
     name: 'Epal',
+    lore: 'Hulking mobster with candidate tarp face',
     speed: 55,
     maxHp: 160,
     reward: 15,
@@ -191,6 +200,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   the_overpriced: {
     id: 'the_overpriced',
     name: 'The Overpriced',
+    lore: 'Parade-balloon creature',
     speed: 40,
     maxHp: 60,
     reward: 10,
@@ -202,6 +212,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   kickback_courier: {
     id: 'kickback_courier',
     name: 'Kickback Courier',
+    lore: 'Imp lugging leaking duffel',
     speed: 110,
     maxHp: 90,
     reward: 5, // drops extra on death in code
@@ -213,6 +224,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   shell_company: {
     id: 'shell_company',
     name: 'Shell Company',
+    lore: 'Inflated suit/shield',
     speed: 45,
     maxHp: 130,
     reward: 12,
@@ -236,6 +248,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   hoarder: {
     id: 'hoarder',
     name: 'Hoarder',
+    lore: 'Bloated merchant sitting on sacks',
     speed: 35,
     maxHp: 340,
     reward: 25,
@@ -248,6 +261,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   land_grabber: {
     id: 'land_grabber',
     name: 'Land Grabber',
+    lore: 'Earth-moving machine monster',
     speed: 40,
     maxHp: 220,
     reward: 18,
@@ -260,6 +274,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   tender_rigger: {
     id: 'tender_rigger',
     name: 'Tender Rigger',
+    lore: 'Monster wrapped in sealed envelopes',
     speed: 50,
     maxHp: 110,
     reward: 15,
@@ -271,6 +286,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   red_tape: {
     id: 'red_tape',
     name: 'Red Tape',
+    lore: 'Mummified in endless ribbons of bureaucracy. It was formed by the collective groans of people waiting for permits that never come.',
     speed: 30,
     maxHp: 300,
     reward: 20,
