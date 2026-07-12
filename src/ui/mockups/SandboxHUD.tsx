@@ -487,7 +487,7 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
                type="button"
                className="hud-btn"
                onClick={() => {
-                 if (gameState?.skillsLocked) return;
+                 if (hero.isSkillLocked) return;
                  playBtnSound();
                  uiToGameEvents.emit('queueHeroSkill', { heroId: hero.id });
                }}
@@ -496,19 +496,19 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
                  height: 64,
                  borderRadius: '50%',
                  backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                 boxShadow: gameState?.skillsLocked ? 'none' : '0 4px 6px rgba(0,0,0,0.3)',
-                 border: gameState?.skillsLocked ? '2px solid rgba(255,255,255,0.8)' : `3px solid #ef4444`,
+                 boxShadow: hero.isSkillLocked ? 'none' : '0 4px 6px rgba(0,0,0,0.3)',
+                 border: hero.isSkillLocked ? '2px solid rgba(255,255,255,0.8)' : `3px solid #ef4444`,
                  color: '#facc15',
                  display: 'flex',
                  flexDirection: 'column',
                  alignItems: 'center',
                  justifyContent: 'center',
-                 animation: gameState?.skillsLocked ? 'none' : 'pulse-glow 1.5s infinite',
-                 cursor: gameState?.skillsLocked ? 'default' : 'pointer',
+                 animation: hero.isSkillLocked ? 'none' : 'pulse-glow 1.5s infinite',
+                 cursor: hero.isSkillLocked ? 'default' : 'pointer',
+                 position: 'relative',
                  overflow: 'hidden',
-                 padding: 4,
-                 opacity: gameState?.skillsLocked ? 0.4 : 1,
-                 filter: gameState?.skillsLocked ? 'grayscale(100%)' : 'none'
+                 opacity: hero.isSkillLocked ? 0.4 : 1,
+                 filter: hero.isSkillLocked ? 'grayscale(100%)' : 'none'
                }}
              >
                 <span style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase', textAlign: 'center', lineHeight: 1.1, textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>

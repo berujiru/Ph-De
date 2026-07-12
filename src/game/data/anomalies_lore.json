@@ -1,0 +1,114 @@
+{
+  "grunt": {
+    "name": "Petty Corruptor",
+    "lore": "Manifested from the countless tiny, everyday compromises that erode the nation's integrity. When millions of people look the other way, this drone is pulled from the ether into reality to enforce the rot."
+  },
+  "runner": {
+    "name": "Bribe Runner",
+    "lore": "Willed into physical existence by the sheer desperation of citizens forced to cut through intentionally broken systems. The collective sigh of the frustrated public gave it form and speed."
+  },
+  "brute": {
+    "name": "Bureaucratic Thug",
+    "lore": "Mummified in ribbons of red tape. It was physically materialized by the agonizing, collective groans of people waiting months for permits that never come, feeding off their drained energy."
+  },
+  "sandbox_target": {
+    "name": "Punching Bag",
+    "lore": "A harmless training dummy manifested from the desire to test one's strength."
+  },
+  "ghost_employee": {
+    "name": "Ghost Employee",
+    "lore": "A translucent specter pulled into reality by the greed of officials claiming salaries for people who don't exist. It is literally sustained by payroll anomalies and stolen wages."
+  },
+  "bribery": {
+    "name": "Bribery",
+    "lore": "Born from the thick envelopes of 'padulas' quietly slipped under tables. The sheer volume of bought silence reached critical mass, manifesting this creature to physically paralyze anyone trying to fix the system."
+  },
+  "epal": {
+    "name": "Epal",
+    "lore": "Birthed from the shameless vanity of politicians plastering their faces on taxpayer-funded projects. The sheer audacity of credit-grabbing during calamities gave this monstrosity its physical, hulking form."
+  },
+  "the_overpriced": {
+    "name": "The Overpriced",
+    "lore": "Manifested from billions stolen through rigged procurement and fake receipts. The sheer magnitude of the inflated costs caused reality itself to bloat, creating this parade-balloon entity."
+  },
+  "kickback_courier": {
+    "name": "Kickback Courier",
+    "lore": "Summoned into existence by the 'change' that never makes it back to the public treasury after a project is finished. It was formed to steal what little hope the people have left."
+  },
+  "shell_company": {
+    "name": "Shell Company",
+    "lore": "A corporate blob formed by the necessity to launder money and hide the true masterminds. The legal fictions of dummy directors became so dense they materialized into a physical shield."
+  },
+  "crony_bodyguard": {
+    "name": "Crony Bodyguard",
+    "lore": "Sculpted from the arrogance and impunity of untouchable politicians. The collective belief that the elite are above the law gave these thugs physical form to shield their masters."
+  },
+  "hoarder": {
+    "name": "Hoarder",
+    "lore": "Summoned by the greed of syndicates who starve the supply chain just to watch commodity prices soar. The artificial scarcity became so heavy it birthed this massive cartel beast."
+  },
+  "land_grabber": {
+    "name": "Land Grabber",
+    "lore": "Forged from fake land titles, violent harassment, and the tears of forced evictions. The collective trauma of communities paved over for 'development' willed this earth-moving abomination into being."
+  },
+  "tender_rigger": {
+    "name": "Tender Rigger",
+    "lore": "Manifested from the dark rooms where procurement processes are rigged to shut out honest competition. The secrecy of pre-sealed bidding envelopes wraps it tightly in physical immunity."
+  },
+  "red_tape": {
+    "name": "Red Tape",
+    "lore": "Mummified in endless ribbons of bureaucracy. It was formed by the agonizing, collective groans of people waiting for permits that never come, feeding off their drained energy."
+  },
+  "boss_flood_control": {
+    "name": "Ghost Flood Control",
+    "lore": "Manifested from the billions of pesos completely washed away in non-existent dredging projects. The sheer volume of stolen infrastructure funds materialized as a devastating flood entity."
+  },
+  "boss_pork_barrel": {
+    "name": "Pork Barrel",
+    "lore": "Born from the insatiable appetite of politicians demanding unmonitored discretionary budgets. The sheer greed for untraceable funds coalesced into this bloated, devouring hog."
+  },
+  "boss_troll_farm": {
+    "name": "Troll Farm",
+    "lore": "A sprawling digital sweatshop of paid disinformation made flesh. It manifested when the weaponization of the internet by political elites finally breached the physical realm, creating a hive mind of lies."
+  },
+  "boss_vote_buying": {
+    "name": "Vote Buying",
+    "lore": "The physical embodiment of election season desperation. It manifested from the systematic exploitation of poverty, proving that in a broken system, everything—even reality—has a price."
+  },
+  "boss_nepotism": {
+    "name": "Nepotism",
+    "lore": "Spawned by the endless political dynasties ensuring power never leaves the family. The sheer weight of bypassed meritocracy birthed this monstrous entity to endlessly appoint unqualified relatives."
+  },
+  "boss_wang_wang": {
+    "name": "Wang-Wang",
+    "lore": "Forged from VIP entitlement, blaring sirens, and the belief that the law only applies to the poor. The audacity of ignoring the rules of the road willed this entity into unstoppable physical form."
+  },
+  "boss_budget_insertion": {
+    "name": "Budget Insertion",
+    "lore": "Born in the dark hours of legislative sessions where funds are quietly reallocated. The secrecy of midnight maneuvers gave it the power to bypass all defenses."
+  },
+  "boss_smuggling": {
+    "name": "Smuggling",
+    "lore": "Manifested from the blind eyes turned at the customs gates. The gaping, unchecked holes in the nation's borders became so large they spawned an entity that actively drains the economy."
+  },
+  "boss_dynasty_1": {
+    "name": "The Dynasty",
+    "lore": "A multi-headed beast formed by decades of unchallenged, inherited political rule. The systemic hoarding of power across generations allowed this apex predator to manifest, ensuring the cycle of corruption never ends."
+  },
+  "boss_dynasty_2": {
+    "name": "The Dynasty",
+    "lore": "A multi-headed beast formed by decades of unchallenged, inherited political rule. The systemic hoarding of power across generations allowed this apex predator to manifest, ensuring the cycle of corruption never ends."
+  },
+  "boss_dynasty_3": {
+    "name": "The Dynasty",
+    "lore": "A multi-headed beast formed by decades of unchallenged, inherited political rule. The systemic hoarding of power across generations allowed this apex predator to manifest, ensuring the cycle of corruption never ends."
+  },
+  "boss_ang_sistema": {
+    "name": "Ang Sistema",
+    "lore": "The dark, beating heart of it all. It is the systemic, institutional rot that birthed every other anomaly. It is not just a monster; it is the environment itself, ensuring that even if one corrupt official falls, the system will resurrect them to fight again."
+  },
+  "minion_nepotism": {
+    "name": "Shielded Relative",
+    "lore": "Brought into existence entirely by the Nepotism boss. It has no merit or reason to exist other than being summoned by a powerful patron to absorb damage meant for them."
+  }
+}

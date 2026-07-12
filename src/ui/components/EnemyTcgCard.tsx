@@ -16,7 +16,7 @@ function getPassivesText(def: EnemyDefinition): string[] {
   if (def.knockbackPulseCooldown) passives.push('Shoves your frontline back down the path.');
   if (def.hitImmunityCount) passives.push(`Shrugs off its first ${def.hitImmunityCount} hits.`);
   if (def.stealVoicesPerSecond) passives.push('Drains your Voices while it lives.');
-  if (def.budgetCut) passives.push('Completely disables all Hero active skills while alive.');
+  if (def.budgetCut) passives.push('Disables the active skill of a random Hero while alive.');
   if (def.privatePropertyStun) passives.push('Evicts a random hero and replaces them with a Private Property sign.');
   if (def.evasionChance) passives.push(`Has a ${(def.evasionChance * 100).toFixed(0)}% chance to evade attacks.`);
   if (def.selfDestructOnBarrier) passives.push('Self-destructs on the barrier for massive damage.');

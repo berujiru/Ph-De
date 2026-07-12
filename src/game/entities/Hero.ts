@@ -322,7 +322,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
 
     // Skill cooldown logic
     const gameScene = this.scene as import('../scenes/GameScene').GameScene;
-    const isBudgetCutActive = gameScene && gameScene.isBudgetCutActive;
+    const isBudgetCutActive = gameScene && gameScene.budgetCutTargetHero === this;
     if (!this.isSkillReady && !isBudgetCutActive) {
       this.currentSkillCooldown -= delta;
       if (this.currentSkillCooldown <= 0) {

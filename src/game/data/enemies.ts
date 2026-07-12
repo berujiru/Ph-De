@@ -118,7 +118,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   grunt: {
     id: 'grunt',
     name: 'Petty Corruptor',
-    lore: 'A mindless drone of the systemic rot. Formed from the countless tiny, everyday compromises that erode a nation.',
+    lore: 'Brought to life by the thousands of discarded burner phones and the collective malice of coordinated troll farms. It manifests wherever the truth is too fragile to defend itself. Its sole purpose is to flood the streets with sheer volume, overwhelming defenses and eroding the public\'s ability to discern fact from fiction.',
+    lore: 'Brought to life by the thousands of discarded burner phones and the collective malice of coordinated troll farms. It manifests wherever the truth is too fragile to defend itself. Its sole purpose is to flood the streets with sheer volume, overwhelming defenses and eroding the public\'s ability to discern fact from fiction.',
+    
     speed: 70,
     maxHp: 45,
     reward: 5,
@@ -129,7 +131,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   runner: {
     id: 'runner',
     name: 'Bribe Runner',
-    lore: 'A fast-moving anomaly that exists only to pass envelopes under the table before anyone can catch it.',
+    lore: 'A scuttling amalgamation of stamped folders, bypassed queues, and forged signatures. It was willed into existence by the desperation of citizens forced to cut through intentionally broken systems. It moves with unnatural speed, bypassing the rules to deliver corruption directly to the frontline before anyone can stop it.',
+    
+    
     speed: 130,
     maxHp: 25,
     reward: 4,
@@ -140,7 +144,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   brute: {
     id: 'brute',
     name: 'Bureaucratic Thug',
-    lore: 'A heavy-handed enforcer of arbitrary rules. It exists to physically stonewall progress and drain energy.',
+    lore: 'Mummified in endless ribbons of bureaucratic red tape. It was formed by the agonizing, collective groans of people waiting months for permits that never come. Its heavy, lumbering presence physically stonewalls progress, forcing society to grind to a halt while it absorbs blows meant to dismantle the system.',
+    
+    
     speed: 45,
     maxHp: 180,
     reward: 15,
@@ -162,7 +168,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   ghost_employee: {
     id: 'ghost_employee',
     name: 'Ghost Employee',
-    lore: 'Translucent office specter',
+    lore: 'A bloated, translucent specter sustained entirely by payroll anomalies. Brought to reality by the greed of officials claiming salaries for people who don\'t exist. It drains resources without contributing any labor, serving only to siphon public funds and quietly bloat the ranks of the corrupt.',
+    lore: 'A bloated, translucent specter sustained entirely by payroll anomalies. Brought to reality by the greed of officials claiming salaries for people who don\'t exist. It drains resources without contributing any labor, serving only to siphon public funds and quietly bloat the ranks of the corrupt.',
+    
     speed: 60,
     maxHp: 70,
     reward: 8,
@@ -187,7 +195,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   epal: {
     id: 'epal',
     name: 'Epal',
-    lore: 'Hulking mobster with candidate tarp face',
+    lore: 'A hulking monstrosity wearing a politician\'s giant tarpaulin face. It draws power from shameless credit-grabbing during national calamities and taxpayer-funded public works. Its sheer arrogance and plastered smile boost the morale of the corrupt anomalies around it, making them fight harder for the false idol.',
+    lore: 'A hulking monstrosity wearing a politician\'s giant tarpaulin face. It draws power from shameless credit-grabbing during national calamities and taxpayer-funded public works. Its sheer arrogance and plastered smile boost the morale of the corrupt anomalies around it, making them fight harder for the false idol.',
+    
     speed: 55,
     maxHp: 160,
     reward: 15,
@@ -200,7 +210,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   the_overpriced: {
     id: 'the_overpriced',
     name: 'The Overpriced',
-    lore: 'Parade-balloon creature',
+    lore: 'A bloated parade-balloon entity padded with fake receipts, rigged biddings, and vastly inflated costs. It manifested from the billions stolen through overpriced procurement. It looks massive and imposing, but its "health" is entirely fake padding that deflates rapidly when pierced by a hard audit.',
+    
+    
     speed: 40,
     maxHp: 60,
     reward: 10,
@@ -212,7 +224,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   kickback_courier: {
     id: 'kickback_courier',
     name: 'Kickback Courier',
-    lore: 'Imp lugging leaking duffel',
+    lore: 'Born from the \'change\' that never makes it back to the public treasury after a project is finished. It is a slippery imp lugging leaking duffel bags of stolen funds. As it scurries across the nation, it steals what little hope the people have left, demanding a cut of their hard-earned progress.',
+    lore: 'Born from the \'change\' that never makes it back to the public treasury after a project is finished. It is a slippery imp lugging leaking duffel bags of stolen funds. As it scurries across the nation, it steals what little hope the people have left, demanding a cut of their hard-earned progress.',
+    
     speed: 110,
     maxHp: 90,
     reward: 5, // drops extra on death in code
@@ -224,7 +238,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   shell_company: {
     id: 'shell_company',
     name: 'Shell Company',
-    lore: 'Inflated suit/shield',
+    lore: 'A corporate blob of empty promises and dummy directors. It was formed to launder money and hide the identities of the true masterminds. Strike it down, and its bad effect is realized: it simply shatters into a dozen smaller dummy corporations, making the money trail nearly impossible to destroy.',
+    
+    
     speed: 45,
     maxHp: 130,
     reward: 12,
@@ -235,7 +251,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   crony_bodyguard: {
     id: 'crony_bodyguard',
-    name: 'Crony',
+    name: 'Crony Bodyguard',
+    lore: 'Thugs sculpted from the arrogance and impunity of untouchable politicians. They exist only to shield the corrupt from the consequences of their actions. It taunts anyone who tries to attack the masterminds, forcing justice to go through them first.',
+    
     speed: 45,
     maxHp: 280,
     reward: 20,
@@ -248,7 +266,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   hoarder: {
     id: 'hoarder',
     name: 'Hoarder',
-    lore: 'Bloated merchant sitting on sacks',
+    lore: 'A massive cartel beast sitting comfortably on mountains of artificial scarcity. It was summoned by the greed of syndicates who starve the supply chain just to watch commodity prices soar. Upon death, its immense weight crashes down, dropping a massive barricade that physically blocks the people from reaching the truth.',
+    
+    
     speed: 35,
     maxHp: 340,
     reward: 25,
@@ -261,7 +281,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   land_grabber: {
     id: 'land_grabber',
     name: 'Land Grabber',
-    lore: 'Earth-moving machine monster',
+    lore: 'An earth-moving abomination forged from fake land titles, violent harassment, and forced evictions. It was willed into being by those who pave over communities for \'development\'. It violently evicts heroes from the field, replacing them with cold "Private Property" signs.',
+    lore: 'An earth-moving abomination forged from fake land titles, violent harassment, and forced evictions. It was willed into being by those who pave over communities for \'development\'. It violently evicts heroes from the field, replacing them with cold "Private Property" signs.',
+    
     speed: 40,
     maxHp: 220,
     reward: 18,
@@ -274,7 +296,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   tender_rigger: {
     id: 'tender_rigger',
     name: 'Tender Rigger',
-    lore: 'Monster wrapped in sealed envelopes',
+    lore: 'Wrapped tightly in pre-sealed bidding envelopes and insider information. It manifested from the rigged procurement processes that shut out honest competition. Because its victory is pre-decided, it is completely immune to all attacks until its rigged contracts are forcefully unsealed by sustained resistance.',
+    
+    
     speed: 50,
     maxHp: 110,
     reward: 15,
@@ -299,6 +323,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_flood_control: {
     id: 'boss_flood_control',
     name: 'Ghost Flood Control',
+    lore: 'Manifested from the billions of pesos completely washed away in non-existent dredging projects and substandard infrastructure. Every typhoon season feeds its power. It floods the entire path with its massive area-of-effect presence, letting corruption surge forward unchallenged while the defenders drown in the aftermath.',
+    
     visualScale: 1.3,
     speed: 30,
     maxHp: 800,
@@ -314,6 +340,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_pork_barrel: {
     id: 'boss_pork_barrel',
     name: 'Pork Barrel',
+    lore: 'A bloated, grotesque hog of discretionary funds. It was born from the insatiable appetite of politicians demanding unmonitored budgets. It is a black hole of public funds; it devours whatever resources it can find on the field, growing endlessly at the direct expense of the people\'s welfare.',
+    lore: 'A bloated, grotesque hog of discretionary funds. It was born from the insatiable appetite of politicians demanding unmonitored budgets. It is a black hole of public funds; it devours whatever resources it can find on the field, growing endlessly at the direct expense of the people\'s welfare.',
     speed: 30,
     maxHp: 1200,
     reward: 100,
@@ -328,6 +356,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_troll_farm: {
     id: 'boss_troll_farm',
     name: 'Troll Farm',
+    lore: 'A sprawling digital sweatshop of paid disinformation made flesh. It manifested from the weaponization of the internet by political elites. It constantly broadcasts a blinding barrage of fake news, shutting down the heroes\' vision and making it impossible to strike back, while hiding safely behind thousands of manufactured identities.',
+    lore: 'A sprawling digital sweatshop of paid disinformation made flesh. It manifested from the weaponization of the internet by political elites. It constantly broadcasts a blinding barrage of fake news, shutting down the heroes\' vision and making it impossible to strike back, while hiding safely behind thousands of manufactured identities.',
     speed: 30,
     maxHp: 700,
     reward: 50,
@@ -349,6 +379,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_vote_buying: {
     id: 'boss_vote_buying',
     name: 'Vote Buying',
+    lore: 'The physical embodiment of election season desperation. It manifested from the systematic exploitation of poverty. It scatters fake, tainted gold to buy the loyalty—or at least the distraction—of those trying to defend the nation, proving that in a broken system, everything has a price.',
+    
     speed: 35,
     maxHp: 600,
     reward: 75,
@@ -363,6 +395,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_nepotism: {
     id: 'boss_nepotism',
     name: 'Nepotism',
+    lore: 'A monstrous matriarch or patriarch that bypasses all meritocracy. It was spawned by the endless political dynasties ensuring power never leaves the family. Its devastating effect is endless: it continuously bypasses the rules to appoint unqualified, shielded relatives into the lane to do its fighting.',
+    
     speed: 30,
     maxHp: 900,
     reward: 80,
@@ -378,6 +412,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_wang_wang: {
     id: 'boss_wang_wang',
     name: 'Wang-Wang',
+    lore: 'An entity forged from VIP entitlement, blaring sirens, and the belief that the law only applies to the poor. It ignores the rules of the road entirely. Its bad effect is simple and terrifying: it surges forward with absolute impunity, shoving aside anyone who dares stand in its way.',
+    
     speed: 35,
     maxHp: 500,
     reward: 60,
@@ -391,6 +427,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_budget_insertion: {
     id: 'boss_budget_insertion',
     name: 'Budget Insertion',
+    lore: 'A master of midnight maneuvers and hidden clauses. It was born in the dark hours of legislative sessions where funds are quietly reallocated. It bypasses all front-line defenses, smuggling massive amounts of stolen health and resources past the heroes while everyone else is distracted.',
+    
     speed: 30,
     maxHp: 1000,
     reward: 100,
@@ -406,6 +444,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_smuggling: {
     id: 'boss_smuggling',
     name: 'Smuggling',
+    lore: 'The gaping, unchecked hole in the nation\'s borders. It manifested from the blind eyes turned at the customs gates. As long as it remains alive, it actively drains the economy, stealing the \'Hope\' currency generated by the defenders and starving the resistance of their ability to fight back.',
+    lore: 'The gaping, unchecked hole in the nation\'s borders. It manifested from the blind eyes turned at the customs gates. As long as it remains alive, it actively drains the economy, stealing the \'Hope\' currency generated by the defenders and starving the resistance of their ability to fight back.',
     speed: 35,
     maxHp: 750,
     reward: 80,
@@ -420,6 +460,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_dynasty_3: {
     id: 'boss_dynasty_3',
     name: 'The Dynasty (Heir)',
+    lore: 'The apex predator of regional politics. A multi-headed beast formed by decades of unchallenged, inherited political rule. Its effect is absolute despair: striking down one head merely allows a seemingly identical, pre-groomed heir to take its place, ensuring the cycle of corruption never actually ends.',
+    lore: 'The apex predator of regional politics. A multi-headed beast formed by decades of unchallenged, inherited political rule. Its effect is absolute despair: striking down one head merely allows a seemingly identical, pre-groomed heir to take its place, ensuring the cycle of corruption never actually ends.',
     speed: 40,
     maxHp: 400,
     reward: 200,
@@ -434,6 +476,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_dynasty_2: {
     id: 'boss_dynasty_2',
     name: 'The Dynasty (Schemer)',
+    lore: 'The apex predator of regional politics. A multi-headed beast formed by decades of unchallenged, inherited political rule. Its effect is absolute despair: striking down one head merely allows a seemingly identical, pre-groomed heir to take its place, ensuring the cycle of corruption never actually ends.',
+    lore: 'The apex predator of regional politics. A multi-headed beast formed by decades of unchallenged, inherited political rule. Its effect is absolute despair: striking down one head merely allows a seemingly identical, pre-groomed heir to take its place, ensuring the cycle of corruption never actually ends.',
     speed: 35,
     maxHp: 600,
     reward: 0,
@@ -449,6 +493,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_dynasty_1: {
     id: 'boss_dynasty_1',
     name: 'The Dynasty (Bruiser)',
+    lore: 'The apex predator of regional politics. A multi-headed beast formed by decades of unchallenged, inherited political rule. Its effect is absolute despair: striking down one head merely allows a seemingly identical, pre-groomed heir to take its place, ensuring the cycle of corruption never actually ends.',
+    lore: 'The apex predator of regional politics. A multi-headed beast formed by decades of unchallenged, inherited political rule. Its effect is absolute despair: striking down one head merely allows a seemingly identical, pre-groomed heir to take its place, ensuring the cycle of corruption never actually ends.',
     speed: 30,
     maxHp: 800,
     reward: 0,
@@ -464,6 +510,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   boss_ang_sistema: {
     id: 'boss_ang_sistema',
     name: 'Ang Sistema',
+    lore: 'The dark, beating heart of it all. It is the systemic, institutional rot that birthed every other anomaly. It is not just a monster; it is the environment itself. Its most devastating effect is that it ensures even if one corrupt official or anomaly is defeated, the system will simply resurrect them to fight again.',
+    
     speed: 30,
     maxHp: 2500,
     reward: 500,
