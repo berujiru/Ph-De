@@ -219,7 +219,15 @@ export function EnemyTcgCard({ enemyId, style, rotation = 0 }: EnemyTcgCardProps
         
         {/* Lore / Flavor Text */}
         {def.lore && (
-          <div style={{ fontStyle: 'italic', fontSize: 11, color: '#475569', marginBottom: 8, paddingBottom: 6, borderBottom: '1px dashed #cbd5e1' }}>
+          <div style={{ 
+            fontStyle: 'italic', 
+            fontSize: def.lore.length > 150 ? 9 : 11,
+            lineHeight: 1.2,
+            color: '#475569', 
+            marginBottom: 8, 
+            paddingBottom: 6, 
+            borderBottom: '1px dashed #cbd5e1' 
+          }}>
             "{def.lore}"
           </div>
         )}
