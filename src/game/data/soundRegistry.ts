@@ -38,7 +38,7 @@ export const MUSIC = {
   battle: 'music-battle',
   victory: 'music-victory',
   defeat: 'music-defeat',
-  /** Per-act boss themes; bossThemeForAct() falls back to a shared default. */
+  /** Per-act boss themes; bossThemeForAct() falls back to bossDefault. */
   bossThemes: {
     1: 'music-boss-act1',
     2: 'music-boss-act2',
@@ -46,7 +46,8 @@ export const MUSIC = {
     4: 'music-boss-act4',
     5: 'music-boss-finale', // boss_ang_sistema — the signature track
   } as Record<number, string>,
-  bossDefault: 'music-boss-act1',
+  /** Plays for any boss whose act has no dedicated theme yet. */
+  bossDefault: 'music-boss-default',
 } as const;
 
 export function bossThemeForAct(act: number | null): string {
@@ -155,11 +156,20 @@ export const AUDIO_MANIFEST: Record<string, string> = {
   [SFX.barrierBreak]: '/assets/sounds/barrier-break.mp3',
   [SFX.victory]: '/assets/sounds/victory.mp3',
   [SFX.defeat]: '/assets/sounds/defeat.mp3',
-  // Pending real files — uncomment as they are produced:
+  // --- Pending real files: drop the .mp3 in the path shown, then uncomment. ---
   // [SFX.heal]: '/assets/sounds/heal.mp3',
-  // [MUSIC.battle]: '/assets/music/battle.mp3',
+  //
+  // Music (put files in public/assets/music/):
   // [MUSIC.prep]: '/assets/music/prep.mp3',
+  // [MUSIC.battle]: '/assets/music/battle.mp3',
+  // [MUSIC.victory]: '/assets/music/victory.mp3',
+  // [MUSIC.defeat]: '/assets/music/defeat.mp3',
+  // [MUSIC.bossDefault]: '/assets/music/boss-default.mp3',   // default boss theme
   // [MUSIC.bossThemes[1]]: '/assets/music/boss-act1.mp3',
+  // [MUSIC.bossThemes[2]]: '/assets/music/boss-act2.mp3',
+  // [MUSIC.bossThemes[3]]: '/assets/music/boss-act3.mp3',
+  // [MUSIC.bossThemes[4]]: '/assets/music/boss-act4.mp3',
+  // [MUSIC.bossThemes[5]]: '/assets/music/boss-finale.mp3',  // boss_ang_sistema
 };
 
 /**

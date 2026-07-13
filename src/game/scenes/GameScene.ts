@@ -10,7 +10,7 @@ import { enemySizeClass } from '../data/enemies';
 import { computeKillPool, voiceDropCost } from '../data/drops';
 import { type HeroId, HERO_DEFINITIONS } from '../data/heroes';
 import { allAttackArtStems, attackArtKey, attackArtPath } from '../data/attackArt';
-import { preloadAudio, SFX } from '../data/soundRegistry';
+import { preloadAudio, SFX, bossThemeForAct } from '../data/soundRegistry';
 import { AudioManager } from '../core/AudioManager';
 import { GAME_HEIGHT, GAME_WIDTH, WORLD_HEIGHT, RALLY, PARALLAX } from '../data/level';
 import { getMapSkinForStage, type MapSkin } from '../data/mapSkins';
@@ -69,6 +69,9 @@ export class GameScene extends Phaser.Scene {
   public comboQueue: Hero[] = [];
   public isProcessingCombo = false;
   public comboCount = 0;
+
+  /** True while a boss theme is playing — flips the boss-only BGM on/off. */
+  private bossMusicActive = false;
 
   private cleanupUIEvents?: () => void;
 
@@ -271,6 +274,10 @@ export class GameScene extends Phaser.Scene {
     if (this.shield) this.shield.destroy();
     if (this.rouletteHighlighter) this.rouletteHighlighter.destroy();
 
+    // Silence any lingering boss theme before the next battle builds.
+    this.bossMusicActive = false;
+    AudioManager.stopMusic(0);
+
     this.buildGame();
   }
 
@@ -472,6 +479,10 @@ export class GameScene extends Phaser.Scene {
 
     this.enemies = this.enemies.filter(e => !e.isDead);
 
+    // Boss-only BGM: fade the boss theme in while any boss is alive, out when
+    // the last one falls. (Only bosses get background music by design.)
+    this.updateBossMusic();
+
     for (const hero of this.heroes) {
       hero.update(delta, this.enemies, this.shield.y);
     }
@@ -491,9 +502,28 @@ export class GameScene extends Phaser.Scene {
     this.emitState();
   }
 
+  /**
+   * Starts the boss theme when a boss enters and stops it when none remain
+   * alive. `this.enemies` holds only living enemies here (dead ones are already
+   * filtered out), so a simple presence check drives the fade both ways.
+   */
+  private updateBossMusic(): void {
+    const hasBoss = this.enemies.some((e) => e.definition.id.startsWith('boss_'));
+    if (hasBoss && !this.bossMusicActive) {
+      this.bossMusicActive = true;
+      AudioManager.playMusic(bossThemeForAct(this.currentAct), { loop: true, fadeMs: 1200 });
+    } else if (!hasBoss && this.bossMusicActive) {
+      this.bossMusicActive = false;
+      AudioManager.stopMusic(1500);
+    }
+  }
+
   public endBattle(status: 'won' | 'lost'): void {
     if (this.status !== 'playing') return;
     this.status = status;
+    // No more fight — let any boss theme fade out.
+    this.bossMusicActive = false;
+    AudioManager.stopMusic(1000);
     for (const hero of this.heroes) hero.playOutcome(status === 'won' ? 'celebrate' : 'defeat');
     if (status === 'lost') {
       for (const enemy of this.enemies) enemy.playOutcome('celebrate');

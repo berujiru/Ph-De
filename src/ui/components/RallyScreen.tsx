@@ -39,7 +39,7 @@ import {
   stampLabel,
   withAlpha,
 } from '../mockups/battleStyles';
-import { SkinPortrait } from './ArchiveCards';
+import { SkinPortrait, hexColor } from './ArchiveCards';
 import { getSelectedSkin } from '../../game/data/skinSelection';
 import { HERO_DEFINITIONS, type HeroId } from '../../game/data/heroes';
 import { IntelModal } from './IntelModal';
@@ -776,7 +776,7 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
                 borderRadius: 8,
                 backgroundColor: '#0f172a',
                 border: `2px solid ${colorHex}`,
-                boxShadow: `0 8px 16px rgba(0,0,0,0.5), inset 0 0 12px ${withAlpha(def.color, 0.4)}`,
+                boxShadow: `0 8px 16px rgba(0,0,0,0.5), inset 0 0 12px ${withAlpha(colorHex, 0.4)}`,
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'hidden',

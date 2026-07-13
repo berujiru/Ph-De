@@ -39,10 +39,14 @@ Status legend: ✅ done · 🟡 wired, placeholder/needs real asset · ⬜ not s
 - [ ] Add a `heal.mp3` and uncomment `SFX.heal` in the manifest
 
 ### Milestone 2 — Boss soundtrack (Souls-like, theatrical)
-- [ ] Start `music-battle` on wave start, `music-prep` on the prep screen
-- [ ] Boss trigger in `spawnEnemy` (`id.startsWith('boss_')` → `playMusic(bossThemeForAct(act))`)
-- [ ] Return to battle bed / `music-victory` on clear; `music-defeat` on loss
-- [ ] Generate per-act boss themes via MusicFX/Lyria (prompts below); add to manifest
+**Design decision: only bosses have background music** (no battle/prep beds).
+- [x] Boss trigger wired in `GameScene.updateBossMusic()` — fades `bossThemeForAct(act)`
+      in while any `boss_` enemy is alive, out when the last one dies; also stops on
+      `endBattle` / `resetGame`. Plays silence until the file is added.
+- [ ] **Add `public/assets/music/boss-default.mp3`** and uncomment `[MUSIC.bossDefault]`
+      in `AUDIO_MANIFEST` — that's all that's needed for a default boss theme.
+- [ ] (Optional) Per-act themes: add `boss-act1..4.mp3` / `boss-finale.mp3` + uncomment.
+- [ ] Generate themes via MusicFX/Lyria (prompts below).
 
 ### Milestone 3 — Voice lines (later)
 - [ ] Fill `HERO_SFX[*].voice` files; trigger on skill cut-in
@@ -118,13 +122,14 @@ reserved for their channel/wind-up.
 
 ## Music
 
-| Key | Used for | Status |
-|---|---|---|
-| `music-prep` | Preparation screen bed | ⬜ |
-| `music-battle` | Standard wave bed | ⬜ |
-| `music-boss-act1..4` | Per-act boss themes | ⬜ |
-| `music-boss-finale` | `boss_ang_sistema` signature theme | ⬜ |
-| `music-victory` / `music-defeat` | End-of-battle stingers | ⬜ |
+| Key | File | Used for | Status |
+|---|---|---|---|
+| `music-boss-default` | `music/boss-default.mp3` | **Default boss theme** (trigger wired) | 🟡 needs file |
+| `music-boss-act1..4` | `music/boss-act1..4.mp3` | Per-act boss themes (optional) | ⬜ |
+| `music-boss-finale` | `music/boss-finale.mp3` | `boss_ang_sistema` signature theme | ⬜ |
+
+> Battle/prep beds and victory/defeat music tracks are **out of scope** — only bosses
+> get background music per the design decision.
 
 ---
 
