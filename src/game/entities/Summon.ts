@@ -66,12 +66,14 @@ export class Summon extends Phaser.GameObjects.Container {
   }
 
   private flashShape(color: number) {
-    if (this.shape instanceof Phaser.GameObjects.Image) {
+    // Narrow on Rectangle: Sprite is NOT an instanceof Image in Phaser, so
+    // checking for Image here sent sprite-art summons into setFillStyle().
+    if (this.shape instanceof Phaser.GameObjects.Rectangle) {
+      this.shape.setFillStyle(color);
+    } else {
       this.shape.setTint(color);
       // Flash reads as a solid fill, not a multiply, on the white flash frame.
       if (color === 0xffffff) this.shape.setTintFill();
-    } else {
-      (this.shape as Phaser.GameObjects.Rectangle).setFillStyle(color);
     }
   }
 
