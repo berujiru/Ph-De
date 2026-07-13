@@ -89,7 +89,7 @@ export const HERO_SKINS: Partial<Record<HeroId, HeroSkin[]>> = {
       states: {
         idle: { from: 40, frames: 68 },
         march: { from: 112, frames: 16 },
-        attack: { from: 0, frames: 38, frameRate: 30 },
+        attack: { from: 0, frames: 38, frameRate: 20 },
         cast: { from: 128, frames: 22, frameRate: 20 },
       },
     },

@@ -338,11 +338,26 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       damage: hero.damage * 0.2
     });
   } else if (skillId === 'fishball_vendor') {
-    // Spicy Sauce: Ignite in front — a narrow column directly ahead (above) the hero.
-    for (const e of enemies) {
-      if (!e.isDead && Math.abs(e.x - hero.x) < 50 && e.y < hero.y) {
-        e.activeAilments['burn'] = 100;
-      }
+    // Spicy Sauce: Ignite in front — multiple AOE circles ahead of the hero.
+    const bonusRadius = hero.modifiers?.bonusRadius || 0;
+    const bonusDamage = hero.modifiers?.bonusDamage || 0;
+    const numPatches = 8;
+    const spacing = 360; // 2x radius to prevent overlapping
+    const radius = 180 + (bonusRadius * 25);
+    const damage = (hero.damage + bonusDamage * 2) * 0.5;
+
+    for (let i = 1; i <= numPatches; i++) {
+      const patchY = hero.y - (i * spacing);
+      if (patchY < -100) break;
+
+      onVisual({
+        type: 'spawnFirePatch',
+        x: hero.x,
+        y: patchY,
+        radius,
+        duration: 15000,
+        damage
+      });
     }
   } else if (skillId === 'sales_lady') {
     // Closing Sale: Execute < 15% HP

@@ -618,6 +618,9 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
   } else if (evt.type === 'aoeRoot') {
     const attack = new AoeRootFieldAttack(scene, evt.x, evt.y, evt.radius, evt.duration, evt.damage);
     scene.attacks.push(attack);
+  } else if (evt.type === 'spawnFirePatch') {
+    const attack = new AoeFirePatchAttack(scene, evt.x, evt.y, evt.radius, evt.duration, evt.damage);
+    scene.attacks.push(attack);
   } else if (evt.type === 'spawnMolotovPatch') {
     // 1. Arc animation
     const molotov = scene.add.image(evt.startX, evt.startY, 'molotov');
