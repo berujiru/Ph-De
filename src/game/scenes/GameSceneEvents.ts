@@ -442,7 +442,7 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
     // marching shield, inside the zone enemies must cross to engage it.
     const width = evt.widthPx || 480;
     const height = width * (160 / 512); // barrier_wall.svg native aspect
-    const y = scene.shield.y - scene.shield.height / 2 - RALLY.engageRangePx;
+    const y = evt.y !== undefined ? evt.y : (scene.shield.y - scene.shield.height / 2 - RALLY.engageRangePx);
     // tint 0xffffff = keep the art's baked colors (Summon skips the multiply).
     const barrier = new Summon(scene, evt.x, y, evt.maxHp || 450, 0xd97706, {
       artKey: 'barrier_wall', tint: 0xffffff,

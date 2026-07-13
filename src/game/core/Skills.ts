@@ -288,9 +288,28 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     const widthPx = 480 + bonusRadius * 60;
     // Base 450 at damage 18 (vs the morale shield's 750); damage drops harden it.
     const maxHp = (hero.damage + bonusDamage * 2) * 25;
-    // Follow the builder's lane position, clamped so the wall stays in-lane.
-    const x = Math.max(widthPx / 2, Math.min(GAME_WIDTH - widthPx / 2, hero.x));
-    onVisual({ type: 'spawnBarrier', x, widthPx, maxHp });
+    let target = null;
+    let closestDist = Infinity;
+    for (const e of enemies) {
+      if (!e.isDead) {
+        const d = dist(hero.x, hero.y, e.x, e.y);
+        if (d < closestDist) {
+          closestDist = d;
+          target = e;
+        }
+      }
+    }
+
+    let targetX = hero.x;
+    let targetY: number | undefined = undefined;
+    if (target) {
+      targetX = target.x;
+      targetY = target.y + 50;
+    }
+
+    // Follow the target's position (or builder's if no enemies), clamped so the wall stays in-lane.
+    const x = Math.max(widthPx / 2, Math.min(GAME_WIDTH - widthPx / 2, targetX));
+    onVisual({ type: 'spawnBarrier', x, y: targetY, widthPx, maxHp });
   } else if (skillId === 'farmer') {
     // Tree of Life: Summon an AoE golden tree that periodically roots and damages
     let target = null;

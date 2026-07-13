@@ -68,9 +68,9 @@ export class Summon extends Phaser.GameObjects.Container {
     this.hp -= amount;
 
     // Flash white on hit, then restore the summon's own color
-    this.flashShape(0xffffff);
+    this.flashShape(0xffffff, true);
     this.scene.time.delayedCall(100, () => {
-      if (!this.isDead) this.flashShape(this.color);
+      if (!this.isDead) this.flashShape(this.color, false);
     });
 
     if (this.hp <= 0) {
@@ -85,17 +85,19 @@ export class Summon extends Phaser.GameObjects.Container {
     }
   }
 
-  private flashShape(color: number) {
+  private flashShape(color: number, isFlash: boolean = false) {
     // Narrow on Rectangle: Sprite is NOT an instanceof Image in Phaser, so
     // checking for Image here sent sprite-art summons into setFillStyle().
     if (this.shape instanceof Phaser.GameObjects.Rectangle) {
       this.shape.setFillStyle(color);
     } else {
-      this.shape.setTint(color);
-      // Flash reads as a solid fill, not a multiply, on the white flash frame.
-      // (setTintFill was removed in Phaser 4 — tint mode is set explicitly,
-      // and must be reset to MULTIPLY on restore or the art stays a flat fill.)
-      this.shape.setTintMode(color === 0xffffff ? Phaser.TintModes.FILL : Phaser.TintModes.MULTIPLY);
+      if (color === 0xffffff && !isFlash) {
+        this.shape.clearTint();
+      } else {
+        this.shape.setTint(color);
+        // Flash reads as a solid fill, not a multiply, on the white flash frame.
+        this.shape.setTintMode(isFlash ? Phaser.TintModes.FILL : Phaser.TintModes.MULTIPLY);
+      }
     }
   }
 
