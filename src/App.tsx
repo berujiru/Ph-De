@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GameCanvas } from './ui/GameCanvas';
 import { MainMenu } from './ui/mockups/MainMenu';
 import { RallyScreen } from './ui/components/RallyScreen';
@@ -11,12 +11,20 @@ import { SandboxHUD } from './ui/mockups/SandboxHUD';
 import { AudioSettings } from './ui/components/AudioSettings';
 import { theme } from './ui/theme';
 import { uiToGameEvents } from './game/core/GameEvents';
+import { AudioManager } from './game/core/AudioManager';
+import { MUSIC } from './game/data/soundRegistry';
 import './App.css';
 
 function App() {
   const [currentView, setCurrentView] = useState<'loading' | 'main' | 'campaign' | 'prep' | 'battle' | 'sandbox' | 'store' | 'inventory'>('loading');
   const [selectedStage, setSelectedStage] = useState<{ act: number; stageIdx: number } | null>(null);
   const [audioOpen, setAudioOpen] = useState(false);
+
+  useEffect(() => {
+    if (currentView !== 'loading' && currentView !== 'battle' && currentView !== 'sandbox') {
+      AudioManager.playMusic(MUSIC.ambience, { loop: true, fadeMs: 1000 });
+    }
+  }, [currentView]);
 
   const handlePlay = () => {
     setCurrentView('campaign');

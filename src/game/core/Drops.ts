@@ -65,21 +65,26 @@ export function buildCandidatePool(ctx: DropContext, rng: () => number): Candida
   // --- Global drops ---------------------------------------------------------
   // newHero: only while a slot is open AND the roster has someone to recruit.
   if (ctx.hasOpenSlot && ctx.availableRecruits.length > 0) {
-    // Pre-resolve which recruit this drop offers so the card can name them and
-    // show their purpose ("display the purpose of the summon").
-    const pick = ctx.availableRecruits[Math.floor(rng() * ctx.availableRecruits.length)];
-    const spec = GLOBAL_DROP_DEFS.newHero;
-    candidates.push({
-      weight: weights[spec.rarity],
-      option: {
-        id: `hero:${pick.id}`,
-        title: pick.name,
-        description: pick.purpose ?? `Deploy ${pick.name} to the barricade.`,
-        type: 'spawn',
-        rarity: spec.rarity,
-        kind: 'hero',
-      },
-    });
+    // Pre-resolve which recruits this drop offers so the card can name them.
+    // Pick up to 2 unique recruits so multiple heroes can appear in one drop.
+    const recruitCount = Math.min(2, ctx.availableRecruits.length);
+    const available = [...ctx.availableRecruits];
+    for (let i = 0; i < recruitCount; i++) {
+      const idx = Math.floor(rng() * available.length);
+      const pick = available.splice(idx, 1)[0];
+      const spec = GLOBAL_DROP_DEFS.newHero;
+      candidates.push({
+        weight: weights[spec.rarity],
+        option: {
+          id: `hero:${pick.id}`,
+          title: pick.name,
+          description: pick.purpose ?? `Deploy ${pick.name} to the barricade.`,
+          type: 'spawn',
+          rarity: spec.rarity,
+          kind: 'hero',
+        },
+      });
+    }
   }
 
   // moraleHeal: only when the barrier is actually damaged.
@@ -143,11 +148,31 @@ export function rollDrops(ctx: DropContext, rng: () => number, count = 3): DropO
   const remaining = buildCandidatePool(ctx, rng);
   const chosen: DropOption[] = [];
 
+  // Prioritize hero drop: if there's an open slot, guarantee at least 1 hero option (if available)
+  if (ctx.hasOpenSlot) {
+    const heroCandidates = remaining.filter(c => c.option.kind === 'hero');
+    if (heroCandidates.length > 0) {
+      const pick = pickWeighted(heroCandidates, rng);
+      if (pick) {
+        chosen.push(pick.option);
+        remaining.splice(remaining.indexOf(pick), 1);
+      }
+    }
+  }
+
   while (chosen.length < count && remaining.length > 0) {
     const pick = pickWeighted(remaining, rng);
     if (!pick) break;
     chosen.push(pick.option);
     remaining.splice(remaining.indexOf(pick), 1);
+  }
+
+  // Shuffle chosen so the guaranteed hero isn't always the first card
+  for (let i = chosen.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    const temp = chosen[i];
+    chosen[i] = chosen[j];
+    chosen[j] = temp;
   }
 
   return chosen;

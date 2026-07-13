@@ -128,70 +128,19 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
   const kind: DropKind = option.kind ?? (option.type === 'spawn' ? 'hero' : 'generalUpgrade');
   const kindMeta = KIND_META[kind];
   const isBuhis = kind === 'buhisBuhay';
+  const isHero = kind === 'hero';
   const DamageIcon = option.damageType ? damageTypeIcons[option.damageType] : undefined;
   // Hero drops carry the hero id as `hero:<id>` — the equipped skin's portrait
   // cell renders as the recruit photo.
   const heroId = kind === 'hero' && option.id.startsWith('hero:') ? option.id.slice('hero:'.length) : undefined;
   const heroSkin = heroId ? getSelectedSkin(heroId as HeroId) : undefined;
 
-  /* The emblem art differs per kind so the three drop types are unmistakable
-     at a glance: a portrait for a recruit, a damage chip for a hero upgrade,
-     a solidarity fist for a global boon, a hazard mark for a Buhis-Buhay pact. */
-  let visual: ReactNode;
-  if (kind === 'hero') {
-    // Polaroid / lanyard-ID framing (ART guidelines §2A).
-    visual = (
-      <div
-        style={{
-          position: 'relative',
-          width: 62,
-          height: 68,
-          padding: 4,
-          paddingBottom: 10,
-          backgroundColor: theme.materials.paper,
-          borderRadius: 3,
-          boxShadow: `0 6px 14px ${withAlpha(theme.colors.background, 0.6)}`,
-          transform: 'rotate(-2deg)',
-        }}
-      >
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-            borderRadius: 2,
-            backgroundColor: withAlpha(theme.colors.background, 0.9),
-            overflow: 'hidden',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <SkinPortrait skin={heroSkin} />
-        </div>
-        <span
-          style={{
-            position: 'absolute',
-            right: -8,
-            bottom: 2,
-            width: 28,
-            height: 28,
-            borderRadius: '50%',
-            backgroundColor: glass.surface,
-            backdropFilter: 'blur(6px)',
-            WebkitBackdropFilter: 'blur(6px)',
-            border: `1px solid ${withAlpha(theme.colors.accent, 0.6)}`,
-            boxShadow: `0 0 10px ${withAlpha(theme.colors.accent, 0.4)}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: theme.colors.accent,
-          }}
-        >
-          {DamageIcon ? <DamageIcon size={15} /> : <RaisedFistIcon size={15} />}
-        </span>
-      </div>
-    );
-  } else {
+  /* Hero recruits render as a full-bleed portrait card (see the JSX below), so
+     only the non-hero kinds build a centered emblem `visual`: a damage chip for
+     a hero upgrade, a solidarity fist for a global boon, a hazard mark for a
+     Buhis-Buhay pact. */
+  let visual: ReactNode = null;
+  if (!isHero) {
     const Icon =
       isBuhis
         ? SkullIcon
@@ -259,6 +208,7 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
         onClick={() => onSelect(option.id)}
         style={{
           ...glassPanel,
+          position: 'relative',
           overflow: 'hidden',
           backgroundColor: 'rgba(15, 23, 42, 0.88)',
           border: `${rarity === 'epic' ? 2 : 1}px solid ${isBuhis ? withAlpha(theme.colors.danger, 0.7) : meta.border}`,
@@ -278,9 +228,30 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
           animationDelay: `${index * 80}ms`,
         }}
       >
+        {/* Hero recruits: the portrait fills the whole card (full-bleed), with a
+            bottom gradient so the overlaid name stays legible. */}
+        {isHero && (
+          <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+            <SkinPortrait
+              skin={heroSkin}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background:
+                  'linear-gradient(to bottom, rgba(2,6,23,0.5) 0%, rgba(2,6,23,0) 30%, rgba(2,6,23,0) 48%, rgba(2,6,23,0.92) 100%)',
+              }}
+            />
+          </div>
+        )}
+
         {/* Kind ribbon — the loud "what is this?" banner across the top. */}
         <span
           style={{
+            position: 'relative',
+            zIndex: 1,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -297,50 +268,80 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
           {kindMeta.ribbon}
         </span>
 
-        {/* Rarity — stars only (no label text). */}
-        <span
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginTop: 8,
-            color: rarity === 'common' ? theme.colors.textMuted : theme.colors.accent,
-          }}
-        >
-          <RarityStars rarity={rarity} />
-        </span>
-
-        <div style={{ display: 'flex', justifyContent: 'center', margin: '8px 0 6px' }}>{visual}</div>
-
-        <div style={{ padding: '0 clamp(6px, 2.5vw, 12px) 12px', display: 'flex', flexDirection: 'column', gap: 5, flex: 1 }}>
-          <span style={{ fontSize: 'clamp(13px, 3.6vw, 16px)', fontWeight: 900, lineHeight: 1.15, letterSpacing: 0.2 }}>
-            {option.title}
-          </span>
-          {/* Purpose copy — hidden for hero recruits (the portrait + name say it). */}
-          {kind !== 'hero' && (
-            <span style={{ fontSize: 'clamp(10px, 2.8vw, 12px)', color: theme.colors.textPrimary, opacity: 0.9, lineHeight: 1.4 }}>
-              {option.description}
-            </span>
-          )}
-
-          {isBuhis && (
-            <span
+        {isHero ? (
+          /* Portrait carries the card; rarity + name overlay the bottom. */
+          <>
+            <div style={{ flex: 1 }} />
+            <div
               style={{
-                marginTop: 'auto',
-                paddingTop: 6,
-                fontSize: 9,
-                fontWeight: 800,
-                letterSpacing: 0.3,
-                textTransform: 'uppercase',
-                color: theme.colors.danger,
-                lineHeight: 1.35,
-                borderTop: `1px dashed ${withAlpha(theme.colors.danger, 0.4)}`,
+                position: 'relative',
+                zIndex: 1,
+                padding: '0 10px 12px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 4,
               }}
             >
-              Buhis-Buhay — high risk: {option.risk ?? 'a heavy toll follows'}
+              <RarityStars rarity={rarity} />
+              <span
+                style={{
+                  fontSize: 'clamp(15px, 4vw, 18px)',
+                  fontWeight: 900,
+                  lineHeight: 1.15,
+                  letterSpacing: 0.3,
+                  textShadow: '0 2px 8px rgba(0,0,0,0.95)',
+                }}
+              >
+                {option.title}
+              </span>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Rarity — stars only (no label text). */}
+            <span
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 8,
+                color: rarity === 'common' ? theme.colors.textMuted : theme.colors.accent,
+              }}
+            >
+              <RarityStars rarity={rarity} />
             </span>
-          )}
-        </div>
+
+            <div style={{ display: 'flex', justifyContent: 'center', margin: '8px 0 6px' }}>{visual}</div>
+
+            <div style={{ padding: '0 clamp(6px, 2.5vw, 12px) 12px', display: 'flex', flexDirection: 'column', gap: 5, flex: 1 }}>
+              <span style={{ fontSize: 'clamp(13px, 3.6vw, 16px)', fontWeight: 900, lineHeight: 1.15, letterSpacing: 0.2 }}>
+                {option.title}
+              </span>
+              <span style={{ fontSize: 'clamp(10px, 2.8vw, 12px)', color: theme.colors.textPrimary, opacity: 0.9, lineHeight: 1.4 }}>
+                {option.description}
+              </span>
+
+              {isBuhis && (
+                <span
+                  style={{
+                    marginTop: 'auto',
+                    paddingTop: 6,
+                    fontSize: 9,
+                    fontWeight: 800,
+                    letterSpacing: 0.3,
+                    textTransform: 'uppercase',
+                    color: theme.colors.danger,
+                    lineHeight: 1.35,
+                    borderTop: `1px dashed ${withAlpha(theme.colors.danger, 0.4)}`,
+                  }}
+                >
+                  Buhis-Buhay — high risk: {option.risk ?? 'a heavy toll follows'}
+                </span>
+              )}
+            </div>
+          </>
+        )}
       </button>
     </div>
   );

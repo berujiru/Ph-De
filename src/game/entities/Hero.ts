@@ -152,7 +152,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     // camera) so its base/stick and the card sit low behind the hero's feet.
     // This offsets only the standee child — the hero's battle position (the Hero
     // container's x/y) is unchanged.
-    const dropOffset = Math.round(sizePx * 0.2);
+    const dropOffset = Math.round(sizePx * 0.38);
     const container = new Phaser.GameObjects.Container(scene, 0, dropOffset);
 
     // Scaled-down portrait card (3:4-ish). Kept narrower than the hero row
@@ -165,8 +165,9 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     const cardTop = cardBottom - cardH;
     const left = -cardW / 2;
 
-    // Ready-glow halo (behind everything) — a soft yellow slab, hidden by default.
-    const glow = scene.add.rectangle(0, cardBottom - cardH / 2, cardW + pad * 2, cardH + pad * 2, 0xfacc15, 0.5);
+    // Ready-glow halo (behind everything) — red so it stands out against the
+    // yellow rally stage (which the old yellow glow blended into). Hidden by default.
+    const glow = scene.add.rectangle(0, cardBottom - cardH / 2, cardW + pad * 2, cardH + pad * 2, 0xef4444, 1);
     glow.setVisible(false);
     glow.setAlpha(0);
     this.standeeGlow = glow;
@@ -194,8 +195,9 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
 
     const portraitKey = `${this.id}_ui_portrait`;
     if (scene.textures.exists(portraitKey)) {
-      const img = scene.add.image(0, boxCY + boxH / 2 - 2, portraitKey).setOrigin(0.5, 1);
-      // Contain within the window, bottom-aligned so it never overflows the frame.
+      const img = scene.add.image(0, boxCY - boxH / 2 + 2, portraitKey).setOrigin(0.5, 0);
+      // Contain within the window, TOP-anchored so the hero's face is always
+      // visible (portraits are full-body — bottom-anchoring showed only feet).
       const fit = Math.min((boxW - 2) / (img.width || boxW), (boxH - 2) / (img.height || boxH));
       img.setScale(fit);
       container.add(img);
@@ -212,9 +214,9 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
       this.standeeGlow.setVisible(true);
       this.standeeGlowTween = this.scene.tweens.add({
         targets: this.standeeGlow,
-        alpha: { from: 0.18, to: 0.5 },
-        scaleX: { from: 1, to: 1.08 },
-        scaleY: { from: 1, to: 1.05 },
+        alpha: { from: 0.45, to: 0.9 },
+        scaleX: { from: 1, to: 1.12 },
+        scaleY: { from: 1, to: 1.08 },
         yoyo: true,
         repeat: -1,
         duration: 650,

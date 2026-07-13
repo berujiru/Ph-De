@@ -114,9 +114,8 @@ export interface HeroPolaroidCardProps {
   /** Stable tilt in degrees. */
   rotation?: number;
   /**
-   * The hero's equipped skin — its portrait cell renders as the photo when the
-   * hero is unlocked; locked heroes always keep the silhouette placeholder so
-   * art isn't spoiled.
+   * The hero's equipped skin — its portrait renders as the photo. Locked heroes
+   * still show the portrait, just desaturated (grayscale) with a lock badge.
    */
   skin?: HeroSkin;
   onClick?: () => void;
@@ -142,8 +141,10 @@ export function HeroPolaroidCard({
   lockedHint,
 }: HeroPolaroidCardProps) {
   const interactive = unlocked && !!onClick;
-  // Real portrait only when unlocked; otherwise the silhouette placeholder.
-  const showPortrait = unlocked && !!skin;
+  // Show the real portrait whenever the hero has art — even when locked. Locked
+  // cards are desaturated by the card-level grayscale filter below (plus a lock
+  // badge), rather than hidden behind a black silhouette.
+  const showPortrait = !!skin;
   return (
     <div
       onClick={() => interactive && onClick!()}

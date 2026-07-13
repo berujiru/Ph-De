@@ -82,7 +82,7 @@ export function HeroTcgCard({ heroId, style, rotation = 0 }: HeroTcgCardProps) {
         </div>
       </div>
 
-      {/* Portrait Box */}
+      {/* Portrait Box — top-anchored so the hero's face is always in frame. */}
       <div style={{
         width: '100%',
         height: 220,
@@ -91,23 +91,12 @@ export function HeroTcgCard({ heroId, style, rotation = 0 }: HeroTcgCardProps) {
         borderRadius: 4,
         boxShadow: `0 8px 16px rgba(0,0,0,0.2), inset 0 0 20px ${color}40`,
         marginBottom: 12,
-        display: 'flex',
-        alignItems: 'flex-end',
-        justifyContent: 'center',
         position: 'relative',
         overflow: 'hidden',
-        background: `radial-gradient(circle at 50% 100%, ${color} 0%, #cbd5e1 80%)`,
+        background: `radial-gradient(circle at 50% 30%, ${color} 0%, #cbd5e1 80%)`,
         zIndex: 10
       }}>
-        <div style={{ 
-          transform: 'scale(1.5) translateY(10px)', 
-          transformOrigin: 'bottom center', 
-          height: '100%',
-          display: 'flex',
-          alignItems: 'flex-end'
-        }}>
-           <SkinPortrait skin={skin} alt={def.name} />
-        </div>
+        <SkinPortrait skin={skin} alt={def.name} style={{ objectFit: 'cover', objectPosition: 'center top' }} />
       </div>
 
       {/* Basic Stats row */}

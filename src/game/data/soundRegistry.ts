@@ -38,6 +38,8 @@ export const MUSIC = {
   battle: 'music-battle',
   victory: 'music-victory',
   defeat: 'music-defeat',
+  /** Out-of-combat in-game bed — loops under gameplay, ducks out for boss themes. */
+  ambience: 'music-ambience',
   /** Per-act boss themes; bossThemeForAct() falls back to bossDefault. */
   bossThemes: {
     1: 'music-boss-act1',
@@ -160,11 +162,13 @@ export const AUDIO_MANIFEST: Record<string, string> = {
   // [SFX.heal]: '/assets/sounds/heal.mp3',
   //
   // Music (put files in public/assets/music/):
+  // The out-of-combat ambience bed (filename has a space → %20-encoded URL).
+  [MUSIC.ambience]: '/assets/music/default%20ambience.mp3',
+  [MUSIC.bossDefault]: '/assets/music/boss-default.mp3',   // default boss theme
   // [MUSIC.prep]: '/assets/music/prep.mp3',
   // [MUSIC.battle]: '/assets/music/battle.mp3',
   // [MUSIC.victory]: '/assets/music/victory.mp3',
   // [MUSIC.defeat]: '/assets/music/defeat.mp3',
-  // [MUSIC.bossDefault]: '/assets/music/boss-default.mp3',   // default boss theme
   // [MUSIC.bossThemes[1]]: '/assets/music/boss-act1.mp3',
   // [MUSIC.bossThemes[2]]: '/assets/music/boss-act2.mp3',
   // [MUSIC.bossThemes[3]]: '/assets/music/boss-act3.mp3',
