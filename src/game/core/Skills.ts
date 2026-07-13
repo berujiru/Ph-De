@@ -361,10 +361,18 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     }
   } else if (skillId === 'sales_lady') {
     // Closing Sale: Execute < 15% HP
+    onVisual({ type: 'expandingCircle', x: hero.x, y: hero.y, color: '#ec4899', maxRadius: GAME_HEIGHT, duration: 800 });
+
+    let executedCount = 0;
     for (const e of enemies) {
       if (!e.isDead && e.hp < e.definition.maxHp * 0.15) {
         e.takeDamage(99999);
+        onVisual({ type: 'closingSaleExecute', x: e.x, y: e.y });
+        executedCount++;
       }
+    }
+    if (executedCount > 0) {
+      onVisual({ type: 'screenFlash', color: '#ec4899', alpha: 0.3, duration: 400 });
     }
   } else if (skillId === 'sorbetes_vendor') {
     // Dirty Ice Cream: drop traps spread across the lane, just above the bottom front line.

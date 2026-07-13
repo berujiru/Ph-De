@@ -618,6 +618,29 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
   } else if (evt.type === 'aoeRoot') {
     const attack = new AoeRootFieldAttack(scene, evt.x, evt.y, evt.radius, evt.duration, evt.damage);
     scene.attacks.push(attack);
+  } else if (evt.type === 'closingSaleExecute') {
+    // 1. Text pop "SOLD!"
+    const txt = scene.add.text(evt.x, evt.y - 30, 'SOLD!', { color: '#ec4899', fontStyle: 'bold', fontSize: '24px' })
+      .setOrigin(0.5)
+      .setDepth(evt.y + 100);
+    scene.tweens.add({ targets: txt, y: evt.y - 80, alpha: 0, duration: 1500, onComplete: () => txt.destroy() });
+
+    // 2. Shockwave ring
+    spawnShockwaveRing(scene, {
+      x: evt.x, y: evt.y,
+      color: 0xec4899,
+      startRadius: 10,
+      endRadius: 150,
+      rings: 2,
+      ringDelayMs: 100,
+      fillAlpha: 0.2,
+      strokeWidth: 6,
+      strokeAlpha: 0.8,
+      durationMs: 700,
+      ease: 'Sine.easeOut',
+      blendMode: Phaser.BlendModes.ADD,
+      depth: evt.y + 50
+    });
   } else if (evt.type === 'spawnFirePatch') {
     const attack = new AoeFirePatchAttack(scene, evt.x, evt.y, evt.radius, evt.duration, evt.damage);
     scene.attacks.push(attack);
