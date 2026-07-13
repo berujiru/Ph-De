@@ -273,7 +273,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 5000,
     color: 0xd97706,
     purpose: 'Builds Yero barricades that body-block the path (wall HP scales with his damage). Buys time, not damage.',
-    signatureSkill: { name: 'Yero Barricade', description: 'Summons an indestructible wall blocking enemies for 5 seconds.' },
+    signatureSkill: { name: 'Barrier', description: 'Builds a wide destructible wall ahead of the shield that blocks enemies until it breaks. Voice Drop enhancements make it longer and tougher.' },
     passive: { name: 'Heavy Stance', description: 'Completely immune to knockback effects.' },
     attackArt: 'yero-panel',
   },

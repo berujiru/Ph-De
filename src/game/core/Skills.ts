@@ -279,10 +279,17 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     onVisual({ type: 'healShield', amount: 150 });
     onVisual({ type: 'text', x: hero.x, y: hero.y - 20, text: 'HEAL!', color: '#10b981' });
   } else if (skillId === 'construction_worker') {
-    // Yero Barricade: Fake Obstacle — a horizontal wall across the lane, just
-    // above the visible bottom front line.
-    onVisual({ type: 'spawnObstacle', x: GAME_WIDTH / 2, y: GAME_HEIGHT - 150, width: 200, height: 20, color: '#d97706', duration: 5000 });
-
+    // Barrier: a real destructible wall (a Summon that body-blocks) built
+    // across the lane ahead of the shield front. No duration — it stands
+    // until enemies break it; the skill cooldown gates spam.
+    const bonusRadius = hero.modifiers?.bonusRadius || 0;
+    const bonusDamage = hero.modifiers?.bonusDamage || 0;
+    const widthPx = 360 + bonusRadius * 60; // radius drops lengthen the wall
+    // Base 450 at damage 18 (vs the morale shield's 750); damage drops harden it.
+    const maxHp = (hero.damage + bonusDamage * 2) * 25;
+    // Follow the builder's lane position, clamped so the wall stays in-lane.
+    const x = Math.max(widthPx / 2, Math.min(GAME_WIDTH - widthPx / 2, hero.x));
+    onVisual({ type: 'spawnBarrier', x, widthPx, maxHp });
   } else if (skillId === 'farmer') {
     // Tree of Life: Summon an AoE golden tree that periodically roots and damages
     let target = null;

@@ -436,9 +436,19 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
     const tweenProps: any = { targets: evt.target, x: evt.x, duration: evt.duration || 500, delay: evt.delay || 0 };
     if (evt.y !== undefined) tweenProps.y = evt.y;
     scene.tweens.add(tweenProps);
-  } else if (evt.type === 'spawnObstacle') {
-    const block = scene.add.rectangle(evt.x, evt.y, evt.width, evt.height, parseInt((evt.color || '#000').replace('#', '0x')));
-    scene.time.delayedCall(evt.duration || 5000, () => block.destroy());
+  } else if (evt.type === 'spawnBarrier') {
+    // Construction Worker's Barrier: a destructible wall Summon spanning the
+    // lane just ahead of (above) the shield front — world-anchored to the
+    // marching shield, inside the zone enemies must cross to engage it.
+    const width = evt.widthPx || 360;
+    const height = width * (160 / 512); // barrier_wall.svg native aspect
+    const y = scene.shield.y - scene.shield.height / 2 - RALLY.engageRangePx;
+    // tint 0xffffff = keep the art's baked colors (Summon skips the multiply).
+    const barrier = new Summon(scene, evt.x, y, evt.maxHp || 450, 0xd97706, {
+      artKey: 'barrier_wall', tint: 0xffffff,
+      displayWidth: width, displayHeight: height,
+    });
+    scene.summons.push(barrier);
   } else if (evt.type === 'spawnTrap') {
     const trap = scene.add.circle(evt.x, evt.y, evt.radius, parseInt((evt.color || '#000').replace('#', '0x')));
     scene.time.delayedCall(evt.duration || 3000, () => trap.destroy());

@@ -758,8 +758,10 @@ export class SummonAttack extends Attack {
   private land() {
     this.trail.destroy();
     this.flight.destroy();
-    // Total damage stat is repurposed as maxHP for summons
-    const summonHp = this.totalDamage * 10;
+    // Total damage stat is repurposed as maxHP for summons. Voice-drop damage
+    // enhancements still harden the wall via bonusDamage -> totalDamage —
+    // that's the intended improvement path for the ×5 base.
+    const summonHp = this.totalDamage * 5;
     const summon = new Summon(this.scene, this.destX, this.destY, summonHp, this.visualCfg.tint, { artKey: this.visualCfg.artKey, tint: this.visualCfg.tint });
     if ((this.scene as any).summons) {
       (this.scene as any).summons.push(summon);

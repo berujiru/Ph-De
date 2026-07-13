@@ -142,6 +142,33 @@ describe('Hero Skills', () => {
     expect(ctx.visualEvents.some((evt: any) => evt.type === 'dragTo' && evt.target === e1)).toBe(true);
   });
 
+  it('construction_worker (Barrier) spawns a destructible wall scaled by voice-drop mods', () => {
+    const h1 = createDummyHero('construction_worker', 540, 0);
+    h1.damage = 18;
+    const ctx = createDummyContext([h1]);
+
+    applyHeroSkill('construction_worker', h1, ctx);
+
+    // Base: width 360, HP (18 + 0*2) * 25 = 450, centered on the builder.
+    expect(ctx.onVisual).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'spawnBarrier', x: 540, widthPx: 360, maxHp: 450 }),
+    );
+  });
+
+  it('construction_worker (Barrier) grows with radius/damage drops and clamps to the lane', () => {
+    const h1 = createDummyHero('construction_worker', 0, 0); // hugging the lane edge
+    h1.damage = 18;
+    h1.modifiers = { bonusDamage: 6, bonusPierce: 0, bonusRadius: 2, bonusChain: 0 };
+    const ctx = createDummyContext([h1]);
+
+    applyHeroSkill('construction_worker', h1, ctx);
+
+    // Width 360 + 2*60 = 480; HP (18 + 6*2) * 25 = 750; x clamped to widthPx/2.
+    expect(ctx.onVisual).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'spawnBarrier', x: 240, widthPx: 480, maxHp: 750 }),
+    );
+  });
+
   it('sales_lady (Closing Sale) executes low HP enemies', () => {
     const h1 = createDummyHero('sales_lady');
     const e1 = createDummyEnemy('e1', 0, 0, 100);

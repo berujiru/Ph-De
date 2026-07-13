@@ -5,13 +5,20 @@ export class Summon extends Phaser.GameObjects.Container {
   public isEnemyTeam = false;
   public maxHp: number;
   public hp: number;
+  /**
+   * Body-block half-extents for Enemy's summon AABB check — derived from the
+   * body's display size, floored at the historical 30×20 half-box so small
+   * summons behave exactly as before while wide walls block their full span.
+   */
+  public blockHalfWidth: number;
+  public blockHalfHeight: number;
   private shape: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image | Phaser.GameObjects.Sprite;
   private color: number;
   private hpBarBg: Phaser.GameObjects.Rectangle;
   private hpBarFill: Phaser.GameObjects.Rectangle;
   private barWidth: number;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, maxHp: number, color: number, art?: { artKey: string; tint: number; frame?: number; size?: number }) {
+  constructor(scene: Phaser.Scene, x: number, y: number, maxHp: number, color: number, art?: { artKey: string; tint: number; frame?: number; size?: number; displayWidth?: number; displayHeight?: number }) {
     super(scene, x, y);
     this.maxHp = maxHp;
     this.hp = maxHp;
@@ -20,7 +27,11 @@ export class Summon extends Phaser.GameObjects.Container {
     // The barricade shape (wider than tall, blocking the vertical lane)
     if (art && scene.textures.exists(art.artKey)) {
       const img = scene.add.sprite(0, 0, art.artKey, art.frame);
-      if (art.frame !== undefined) {
+      if (art.displayWidth !== undefined) {
+        // Explicit footprint (skill barrier): height defaults to the art's
+        // native aspect when not given.
+        img.setDisplaySize(art.displayWidth, art.displayHeight ?? art.displayWidth * (img.height / img.width));
+      } else if (art.frame !== undefined) {
         const renderSize = art.size ?? 96;
         img.setDisplaySize(renderSize, renderSize);
       } else {
@@ -35,6 +46,9 @@ export class Summon extends Phaser.GameObjects.Container {
       this.shape = scene.add.rectangle(0, 0, 40, 16, color);
     }
     this.add(this.shape);
+
+    this.blockHalfWidth = Math.max(30, this.shape.displayWidth / 2);
+    this.blockHalfHeight = Math.max(20, this.shape.displayHeight / 2);
 
     // HP Bar — sized to the body so a wide wall doesn't wear a toothpick bar.
     this.barWidth = Math.max(30, Math.round(this.shape.displayWidth * 0.625));

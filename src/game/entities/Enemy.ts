@@ -646,10 +646,11 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       return;
     }
 
-    // Check if in range of any summon
+    // Check if in range of any summon. Block box comes from the summon's own
+    // half-extents (display-size derived) so wide walls block their full span.
     let targetSummon: Summon | null = null;
     for (const summon of summons) {
-      if (!summon.isEnemyTeam && !summon.isDead && Math.abs(this.x - summon.x) < 30 && Math.abs(this.y - summon.y) < 20) {
+      if (!summon.isEnemyTeam && !summon.isDead && Math.abs(this.x - summon.x) < summon.blockHalfWidth && Math.abs(this.y - summon.y) < summon.blockHalfHeight) {
         targetSummon = summon;
         break;
       }
