@@ -233,7 +233,7 @@ export const HERO_SKINS: Partial<Record<HeroId, HeroSkin[]>> = {
       portraitFrame: 0,
       states: {
         march: { from: 0, frames: 1 },
-        attack: { from: 0, frames: 21, frameRate: 30 },
+        attack: { from: 0, frames: 21, frameRate: 15 },
         cast: { from: 0, frames: 1 },
       },
     },

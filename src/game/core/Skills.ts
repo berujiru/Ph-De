@@ -377,7 +377,14 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
   } else if (skillId === 'sorbetes_vendor') {
     // Dirty Ice Cream: drop traps spread across the lane, just above the bottom front line.
     for(let i=0; i<3; i++) {
-      onVisual({ type: 'spawnTrap', x: GAME_WIDTH / 2 + (i-1)*120 + (Math.random()-0.5)*40, y: GAME_HEIGHT - 200, radius: 10, color: '#f472b6', duration: 3000 });
+      onVisual({ 
+        type: 'spawnTrap', 
+        x: GAME_WIDTH / 2 + (i-1)*150 + (Math.random()-0.5)*40, 
+        y: hero.y - 350 - (Math.random() * 80), // Spawn up the lane in the path of incoming enemies
+        color: '#f472b6', 
+        damage: hero.damage * 3,
+        modifiers: hero.modifiers
+      });
     }
   } else if (skillId === 'electrician') {
     // Rolling Blackout: AoE electric surge wave moving from bottom to top
@@ -408,12 +415,12 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     const bonusDamage = hero.modifiers?.bonusDamage || 0;
     const bonusPierce = hero.modifiers?.bonusPierce || 0;
 
-    const hitRadius = 80 + bonusRadius * 10;
+    const hitRadius = 150 + bonusRadius * 20;
     const knockback = 200 + bonusPierce * 50;
     const damage = (hero.damage + bonusDamage) * 4;
 
     for(let i=0; i<3; i++) {
-      onVisual({ type: 'spawnRider', x: hero.x + (i-1)*40, y: hero.y, targetY: hero.y - 1500, duration: 1000, damage, delay: 500, knockback, hitRadius });
+      onVisual({ type: 'spawnRider', x: hero.x + (i-1)*200, y: hero.y, targetY: hero.y - 1500, duration: 1000, damage, delay: 500, knockback, hitRadius });
     }
   }
 }

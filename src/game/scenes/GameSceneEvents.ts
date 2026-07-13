@@ -23,7 +23,8 @@ import {
   AoeRootFieldAttack,
   AoeFirePatchAttack,
   TornadoAttack,
-  TreeOfLifeFieldAttack
+  TreeOfLifeFieldAttack,
+  TrapAttack
 } from '../entities/Attacks';
 import { TrafficLight } from '../entities/fx/TrafficLight';
 import { spawnShockwaveRing } from '../entities/fx/ShockwaveRing';
@@ -450,8 +451,17 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
     });
     scene.summons.push(barrier);
   } else if (evt.type === 'spawnTrap') {
-    const trap = scene.add.circle(evt.x, evt.y, evt.radius, parseInt((evt.color || '#000').replace('#', '0x')));
-    scene.time.delayedCall(evt.duration || 3000, () => trap.destroy());
+    const visual = {
+      artKey: attackArtKey('ice-trap'),
+      tint: parseInt((evt.color || '#f472b6').replace('#', '0x')),
+      sizePx: 80,
+    };
+    
+    // We pass a dummy target since TrapAttack offset applies a +80 y position.
+    const dummyTarget = { x: evt.x, y: evt.y - 80 } as any;
+    
+    const attack = new TrapAttack(scene, evt.x, evt.y, dummyTarget, evt.damage || 12, visual, evt.modifiers || {}, 'Frost');
+    scene.attacks.push(attack);
   } else if (evt.type === 'screenFlash') {
     const blackout = scene.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, parseInt((evt.color || '#000').replace('#', '0x')), evt.alpha || 0.5).setScrollFactor(0);
     scene.time.delayedCall(evt.duration || 3000, () => blackout.destroy());

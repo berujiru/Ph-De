@@ -989,8 +989,9 @@ export class TrapAttack extends Attack {
 
   constructor(scene: Phaser.Scene, _x: number, _y: number, target: Enemy, damage: number, visual: AttackVisual, modifiers?: Partial<AttackModifiers>, damageType: string = 'Physical') {
     super(scene, 'TrapAttack', damage, modifiers, damageType);
-    const trapX = target.x - 50;
-    const trapY = target.y;
+    const trapX = target.x;
+    // Place trap ahead of the enemy's downward path
+    const trapY = target.y + 80;
     // Small static armed-trap marker in the hero's art.
     this.visual = new AttackSprite(scene, { x: trapX, y: trapY, artKey: visual.artKey, tint: visual.tint, lengthPx: visual.sizePx });
     // A pulsing hazard ring telegraphs the armed trap's footprint.
@@ -1038,6 +1039,10 @@ export class TrapAttack extends Attack {
           const dy = enemy.y - this.visual.y;
           if (dx * dx + dy * dy <= radius * radius) {
             enemy.takeDamage(this.totalDamage, this.damageType);
+            if (this.damageType === 'Frost') {
+              // Standard freeze: 34 stack per hit
+              if (enemy.applyAilment) enemy.applyAilment('freeze', 34, 15000);
+            }
           }
         }
       }
