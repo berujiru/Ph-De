@@ -51,7 +51,7 @@ export function spawnEnemy(scene: GameScene, enemyId: EnemyId = 'grunt', wave: n
   const enemy = new Enemy(scene, x, y, def);
   scene.enemies.push(enemy);
 
-  if (!scene.isSandbox && !scene.seenEnemies.has(enemyId)) {
+  if (!scene.seenEnemies.has(enemyId)) {
     scene.seenEnemies.add(enemyId);
     gameToUiEvents.emit('enemyEncountered', { enemyId });
   }

@@ -108,7 +108,7 @@ export const UNIT_RENDER_SIZES: Record<UnitSizeClass, number> = {
   minion: 128,
   miniboss: 180,
   hero: 200,
-  boss: 333,
+  boss: 800,
 };
 
 /** Resolve an enemy's size tier: explicit sizeClass, else boss ids, else minion. */
@@ -119,7 +119,8 @@ export function enemySizeClass(def: EnemyDefinition): UnitSizeClass {
 export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   grunt: {
     id: 'grunt',
-    name: 'Petty Corruptor',    
+    name: 'Petty Corruptor',
+    
     speed: 70,
     maxHp: 45,
     reward: 5,
@@ -129,7 +130,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   runner: {
     id: 'runner',
-    name: 'Bribe Runner',    
+    name: 'Bribe Runner',
+    
     
     speed: 130,
     maxHp: 25,
@@ -140,7 +142,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   brute: {
     id: 'brute',
-    name: 'Bureaucratic Thug',    
+    name: 'Bureaucratic Thug',
+    
     
     speed: 45,
     maxHp: 180,
@@ -162,7 +165,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   ghost_employee: {
     id: 'ghost_employee',
-    name: 'Ghost Employee',    
+    name: 'Ghost Employee',
+    
     speed: 60,
     maxHp: 70,
     reward: 8,
@@ -173,7 +177,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   bribery: {
     id: 'bribery',
-    name: 'Bribery',    speed: 100,
+    name: 'Bribery',
+    speed: 100,
     maxHp: 80,
     reward: 15,
     damage: 4,
@@ -184,7 +189,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   epal: {
     id: 'epal',
-    name: 'Epal',    
+    name: 'Epal',
+    
     speed: 55,
     maxHp: 160,
     reward: 15,
@@ -196,7 +202,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   the_overpriced: {
     id: 'the_overpriced',
-    name: 'The Overpriced',    
+    name: 'The Overpriced',
+    
     
     speed: 40,
     maxHp: 60,
@@ -208,7 +215,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   kickback_courier: {
     id: 'kickback_courier',
-    name: 'Kickback Courier',    
+    name: 'Kickback Courier',
+    
     speed: 110,
     maxHp: 90,
     reward: 5, // drops extra on death in code
@@ -219,7 +227,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   shell_company: {
     id: 'shell_company',
-    name: 'Shell Company',    
+    name: 'Shell Company',
+    
     
     speed: 45,
     maxHp: 130,
@@ -231,7 +240,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   crony_bodyguard: {
     id: 'crony_bodyguard',
-    name: 'Crony Bodyguard',    
+    name: 'Crony Bodyguard',
+    
     speed: 45,
     maxHp: 280,
     reward: 20,
@@ -243,7 +253,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   hoarder: {
     id: 'hoarder',
-    name: 'Hoarder',    
+    name: 'Hoarder',
+    
     
     speed: 35,
     maxHp: 340,
@@ -256,7 +267,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   land_grabber: {
     id: 'land_grabber',
-    name: 'Land Grabber',    
+    name: 'Land Grabber',
+    
     speed: 40,
     maxHp: 220,
     reward: 18,
@@ -268,7 +280,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   tender_rigger: {
     id: 'tender_rigger',
-    name: 'Tender Rigger',    
+    name: 'Tender Rigger',
+    
     
     speed: 50,
     maxHp: 110,
@@ -280,7 +293,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   red_tape: {
     id: 'red_tape',
-    name: 'Red Tape',    speed: 30,
+    name: 'Red Tape',
+    speed: 30,
     maxHp: 300,
     reward: 20,
     damage: 10,
@@ -291,7 +305,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   boss_flood_control: {
     id: 'boss_flood_control',
-    name: 'Ghost Flood Control',    
+    name: 'Ghost Flood Control',
+    
     visualScale: 1.3,
     speed: 30,
     maxHp: 800,
@@ -306,7 +321,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   boss_pork_barrel: {
     id: 'boss_pork_barrel',
-    name: 'Pork Barrel',    speed: 30,
+    name: 'Pork Barrel',
+    speed: 30,
     maxHp: 1200,
     reward: 100,
     damage: 50,
@@ -319,7 +335,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   boss_troll_farm: {
     id: 'boss_troll_farm',
-    name: 'Troll Farm',    speed: 30,
+    name: 'Troll Farm',
+    speed: 30,
     maxHp: 700,
     reward: 50,
     damage: 15,
@@ -339,7 +356,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   boss_vote_buying: {
     id: 'boss_vote_buying',
-    name: 'Vote Buying',    
+    name: 'Vote Buying',
+    
     speed: 35,
     maxHp: 600,
     reward: 75,
@@ -353,7 +371,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   boss_nepotism: {
     id: 'boss_nepotism',
-    name: 'Nepotism',    
+    name: 'Nepotism',
+    
     speed: 30,
     maxHp: 900,
     reward: 80,
@@ -368,7 +387,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   boss_wang_wang: {
     id: 'boss_wang_wang',
-    name: 'Wang-Wang',    
+    name: 'Wang-Wang',
+    
     speed: 35,
     maxHp: 500,
     reward: 60,
@@ -381,7 +401,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   boss_budget_insertion: {
     id: 'boss_budget_insertion',
-    name: 'Budget Insertion',    
+    name: 'Budget Insertion',
+    
     speed: 30,
     maxHp: 1000,
     reward: 100,
@@ -396,7 +417,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   boss_smuggling: {
     id: 'boss_smuggling',
-    name: 'Smuggling',    speed: 35,
+    name: 'Smuggling',
+    speed: 35,
     maxHp: 750,
     reward: 80,
     damage: 25,
@@ -409,7 +431,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   boss_dynasty_3: {
     id: 'boss_dynasty_3',
-    name: 'The Dynasty (Heir)',    speed: 40,
+    name: 'The Dynasty (Heir)',
+    speed: 40,
     maxHp: 400,
     reward: 200,
     damage: 20,
@@ -422,7 +445,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   boss_dynasty_2: {
     id: 'boss_dynasty_2',
-    name: 'The Dynasty (Schemer)',    speed: 35,
+    name: 'The Dynasty (Schemer)',
+    speed: 35,
     maxHp: 600,
     reward: 0,
     damage: 30,
@@ -436,7 +460,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   boss_dynasty_1: {
     id: 'boss_dynasty_1',
-    name: 'The Dynasty (Bruiser)',    speed: 30,
+    name: 'The Dynasty (Bruiser)',
+    speed: 30,
     maxHp: 800,
     reward: 0,
     damage: 50,
@@ -450,7 +475,8 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   },
   boss_ang_sistema: {
     id: 'boss_ang_sistema',
-    name: 'Ang Sistema',    
+    name: 'Ang Sistema',
+    
     speed: 30,
     maxHp: 2500,
     reward: 500,

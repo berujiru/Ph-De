@@ -17,6 +17,7 @@ import {
 } from '../icons';
 import { battleCss, fab, glass, glassPanel, glassSelect, withAlpha } from './battleStyles';
 import { IntelModal } from '../components/IntelModal';
+import { EnemyTcgCard } from '../components/EnemyTcgCard';
 
 interface SandboxHUDProps {
   onReturnToMenu: () => void;
@@ -94,12 +95,20 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
   const [intelOpen, setIntelOpen] = useState(false);
   const [rigOpen, setRigOpen] = useState(false);
   const [gameState, setGameState] = useState<GameStateSnapshot | null>(null);
+  const [introducedEnemy, setIntroducedEnemy] = useState<string | null>(null);
 
   useEffect(() => {
     const unsub = gameToUiEvents.on('stateChanged', (snapshot) => {
       setGameState(snapshot);
     });
-    return () => unsub();
+    const unsubEncounter = gameToUiEvents.on('enemyEncountered', ({ enemyId }) => {
+      uiToGameEvents.emit('setSpeed', { speed: 0 });
+      setIntroducedEnemy(enemyId);
+    });
+    return () => {
+      unsub();
+      unsubEncounter();
+    };
   }, []);
 
   const playBtnSound = () => uiToGameEvents.emit('playSound', { key: 'sfx-btn-press' });
@@ -572,6 +581,78 @@ export function SandboxHUD({ onReturnToMenu }: SandboxHUDProps) {
           enemies={gameState.activeEnemies || []}
           onClose={() => setIntelOpen(false)}
         />
+      )}
+
+      {/* Enemy Introduction Modal (copied from RallyScreen) */}
+      {introducedEnemy && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 300,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 16,
+            pointerEvents: 'auto',
+            background: `radial-gradient(circle at 50% 50%, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.95) 100%)`,
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            animation: 'overlay-fade 0.3s ease both',
+          }}
+        >
+          <div style={{ marginBottom: 24, textAlign: 'center' }}>
+            <h1 style={{
+              margin: 0,
+              fontSize: 'clamp(24px, 5vw, 36px)',
+              fontWeight: 900,
+              textTransform: 'uppercase',
+              letterSpacing: 2,
+              color: theme.colors.accent,
+              textShadow: '0 2px 10px rgba(0,0,0,0.8)'
+            }}>
+              New Anomaly Detected
+            </h1>
+          </div>
+          
+          <EnemyTcgCard 
+            enemyId={introducedEnemy as any} 
+            rotation={-2} 
+            style={{ 
+              transformOrigin: 'center',
+              animation: 'placard-drop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both' 
+            }} 
+          />
+
+          <button
+            type="button"
+            className="hud-btn"
+            onClick={() => {
+              playBtnSound();
+              setIntroducedEnemy(null);
+              // Restore speed to 1 in sandbox
+              handleSetSpeed(1);
+            }}
+            style={{
+              marginTop: 32,
+              padding: '12px 32px',
+              borderRadius: 8,
+              border: `2px solid ${theme.colors.accent}`,
+              backgroundColor: 'rgba(0,0,0,0.6)',
+              color: theme.colors.textPrimary,
+              fontSize: 16,
+              fontWeight: 800,
+              letterSpacing: 1.5,
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              boxShadow: `0 4px 12px rgba(0,0,0,0.5)`,
+              animation: 'overlay-fade 0.3s ease 0.4s both'
+            }}
+          >
+            Acknowledge
+          </button>
+        </div>
       )}
     </div>
   );
