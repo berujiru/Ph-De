@@ -52,11 +52,6 @@ export const MUSIC = {
   bossDefault: 'music-boss-default',
 } as const;
 
-export function bossThemeForAct(act: number | null): string {
-  if (act && MUSIC.bossThemes[act]) return MUSIC.bossThemes[act];
-  return MUSIC.bossDefault;
-}
-
 // --- Per-hero / per-enemy catalog ---------------------------------------------
 
 interface HeroSound {
@@ -187,4 +182,12 @@ export function preloadAudio(scene: Phaser.Scene): void {
       scene.load.audio(key, path);
     }
   }
+}
+
+export function bossThemeForAct(act: number | null): string {
+  if (act && MUSIC.bossThemes[act]) {
+    const key = MUSIC.bossThemes[act];
+    if (AUDIO_MANIFEST[key]) return key;
+  }
+  return MUSIC.bossDefault;
 }

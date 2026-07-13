@@ -188,7 +188,7 @@ class AudioManagerImpl {
       this.pendingMusic = { key, opts };
       return;
     }
-    if (this.currentMusicKey === key && this.currentMusic) return;
+    if (this.currentMusicKey === key && this.currentMusic && this.currentMusic.isPlaying) return;
 
     const fadeMs = opts.fadeMs ?? 800;
     const clipVol = opts.volume ?? 1;
@@ -197,7 +197,10 @@ class AudioManagerImpl {
     let next: Phaser.Sound.BaseSound;
     try {
       next = this.sound.add(key);
-      next.play({ loop: opts.loop ?? true, volume: fadeMs > 0 ? 0 : target });
+      if ('setLoop' in next) {
+        (next as any).setLoop(opts.loop ?? true);
+      }
+      next.play({ volume: fadeMs > 0 ? 0 : target });
     } catch {
       return; // Track not loaded — keep whatever is playing.
     }
