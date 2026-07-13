@@ -703,21 +703,70 @@ export class ChainAttack extends Attack {
 }
 
 export class SummonAttack extends Attack {
-  constructor(scene: Phaser.Scene, _x: number, _y: number, target: Enemy, damage: number, visual: AttackVisual, modifiers?: Partial<AttackModifiers>) {
-    super(scene, 'SummonAttack', damage, modifiers);
+  // Two phases, mirroring VortexAttack: the hero hurls the panel (tumbling
+  // flight sprite homing on the target, last-known spot if it dies), and the
+  // barricade is built where it LANDS instead of materializing instantly.
+  private flight: AttackSprite;
+  private trail: MotionTrail;
+  private target: Enemy | null;
+  private speed: number;
+  private destX: number;
+  private destY: number;
+  private visualCfg: AttackVisual;
+  // Summoner-style sizePx is 0 (the barricade sizes by gameplay), so the
+  // thrown panel gets its own in-flight length — it's a big sheet.
+  private static readonly FLIGHT_LENGTH_PX = 72;
 
+  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy, damage: number, visual: AttackVisual, speed: number, modifiers?: Partial<AttackModifiers>) {
+    super(scene, 'SummonAttack', damage, modifiers);
+    this.speed = speed;
+    this.target = target;
+    this.destX = target.x;
+    this.destY = target.y;
+    this.visualCfg = visual;
+    this.trail = new MotionTrail(scene, visual.tint);
+    // A flat sheet tumbles end-over-end as it flies (cf. the vortex net).
+    this.flight = new AttackSprite(scene, {
+      x, y, artKey: visual.artKey, tint: visual.tint,
+      lengthPx: SummonAttack.FLIGHT_LENGTH_PX,
+      spinDegPerSec: 400,
+    });
+  }
+
+  update(_time: number, delta: number) {
+    if (this.isDead) return;
+    if (this.target && this.target.isDead) this.target = null;
+    if (this.target) {
+      this.destX = this.target.x;
+      this.destY = this.target.y;
+    }
+    const dx = this.destX - this.flight.x;
+    const dy = this.destY - this.flight.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const step = this.speed * (delta / 1000);
+    // Same overshoot-guarded touchdown as VortexAttack.
+    if (dist <= Math.max(12, step)) {
+      this.land();
+      return;
+    }
+    this.flight.setPosition(this.flight.x + (dx / dist) * step, this.flight.y + (dy / dist) * step);
+    this.flight.update(delta); // advance the tumble
+    this.trail.update(this.flight.x, this.flight.y, (dx / dist) * this.speed, (dy / dist) * this.speed);
+  }
+
+  /** Touchdown: swap the flight sprite for the built barricade at the landing point. */
+  private land() {
+    this.trail.destroy();
+    this.flight.destroy();
     // Total damage stat is repurposed as maxHP for summons
     const summonHp = this.totalDamage * 10;
-    const summon = new Summon(scene, target.x, target.y, summonHp, visual.tint, { artKey: visual.artKey, tint: visual.tint });
-    
-    if ((scene as any).summons) {
-      (scene as any).summons.push(summon);
+    const summon = new Summon(this.scene, this.destX, this.destY, summonHp, this.visualCfg.tint, { artKey: this.visualCfg.artKey, tint: this.visualCfg.tint });
+    if ((this.scene as any).summons) {
+      (this.scene as any).summons.push(summon);
     }
-    
     this.isDead = true;
+    this.destroy();
   }
-  
-  update() {}
 }
 
 export class BeamAttack extends Attack {

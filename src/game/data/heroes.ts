@@ -268,7 +268,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damageType: 'Physical',
     attackKind: 'ranged',
     attackStyle: 'summoner',
-    range: 400,
+    range: GLOBAL_RANGE_PX * 0.75, // 75% of Eden's global reach — throws panels far up the lane
     damage: 18, // summoner damage = wall HP knob, not DPS
     attackRateMs: 5000,
     color: 0xd97706,

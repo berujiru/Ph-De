@@ -9,6 +9,7 @@ export class Summon extends Phaser.GameObjects.Container {
   private color: number;
   private hpBarBg: Phaser.GameObjects.Rectangle;
   private hpBarFill: Phaser.GameObjects.Rectangle;
+  private barWidth: number;
 
   constructor(scene: Phaser.Scene, x: number, y: number, maxHp: number, color: number, art?: { artKey: string; tint: number; frame?: number; size?: number }) {
     super(scene, x, y);
@@ -23,7 +24,8 @@ export class Summon extends Phaser.GameObjects.Container {
         const renderSize = art.size ?? 96;
         img.setDisplaySize(renderSize, renderSize);
       } else {
-        img.setDisplaySize(48, 20);
+        // Hero-built barricade (yero panel): wall-sized, spanning the lane.
+        img.setDisplaySize(96, 40);
       }
       if (art.tint !== 0xffffff) {
         img.setTint(art.tint);
@@ -34,9 +36,11 @@ export class Summon extends Phaser.GameObjects.Container {
     }
     this.add(this.shape);
 
-    // HP Bar
-    this.hpBarBg = scene.add.rectangle(0, -30, 30, 4, 0x000000, 0.5);
-    this.hpBarFill = scene.add.rectangle(-15, -30, 30, 4, 0x22c55e).setOrigin(0, 0.5);
+    // HP Bar — sized to the body so a wide wall doesn't wear a toothpick bar.
+    this.barWidth = Math.max(30, Math.round(this.shape.displayWidth * 0.625));
+    const barY = -(this.shape.displayHeight / 2 + 20);
+    this.hpBarBg = scene.add.rectangle(0, barY, this.barWidth, 4, 0x000000, 0.5);
+    this.hpBarFill = scene.add.rectangle(-this.barWidth / 2, barY, this.barWidth, 4, 0x22c55e).setOrigin(0, 0.5);
     this.add(this.hpBarBg);
     this.add(this.hpBarFill);
 
@@ -56,7 +60,7 @@ export class Summon extends Phaser.GameObjects.Container {
     if (this.hp <= 0) {
       this.die();
     } else {
-      this.hpBarFill.width = 30 * (this.hp / this.maxHp);
+      this.hpBarFill.width = this.barWidth * (this.hp / this.maxHp);
       if (this.hp < this.maxHp * 0.3) {
         this.hpBarFill.setFillStyle(0xef4444); // Red
       } else if (this.hp < this.maxHp * 0.6) {
@@ -73,7 +77,9 @@ export class Summon extends Phaser.GameObjects.Container {
     } else {
       this.shape.setTint(color);
       // Flash reads as a solid fill, not a multiply, on the white flash frame.
-      if (color === 0xffffff) this.shape.setTintFill();
+      // (setTintFill was removed in Phaser 4 — tint mode is set explicitly,
+      // and must be reset to MULTIPLY on restore or the art stays a flat fill.)
+      this.shape.setTintMode(color === 0xffffff ? Phaser.TintModes.FILL : Phaser.TintModes.MULTIPLY);
     }
   }
 

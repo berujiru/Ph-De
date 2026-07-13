@@ -103,7 +103,9 @@ export function spawnHero(scene: GameScene, id: HeroId, passiveOverride?: string
     } else if (h.definition.attackStyle === 'chain') {
       attack = new ChainAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, h.definition.baseChain ?? 1, mods, damageType);
     } else if (h.definition.attackStyle === 'summoner') {
-      attack = new SummonAttack(scene, h.x, h.y, target, h.damage, visual, mods);
+      // Thrown panel: flies from the muzzle, barricade builds where it lands.
+      attack = new SummonAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, speed, mods);
+      h.playProjectileLaunch();
     } else if (h.definition.attackStyle === 'beam') {
       attack = new BeamAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, h.range, mods, damageType);
     } else if (h.definition.attackStyle === 'lobbed') {

@@ -5,7 +5,7 @@ import type { AttackStyle } from './attackArt';
  * Flight speed for basic-attack projectiles, in px/s (mirrors the attackArt
  * registry pattern). Heroes override via `HeroDefinition.projectileSpeed`;
  * omitted heroes use their style default. Styles with no traveling body
- * (instant, field, or summon attacks) are 0 and never read the value.
+ * (instant or field attacks) are 0 and never read the value.
  *
  * Feel guide: heavy/chunky projectiles fly slow (pandesal ~400), light sharp
  * ones fly fast (pencil ~850). Keep values within [250, 900] — enforced by
@@ -22,7 +22,7 @@ export const STYLE_DEFAULT_SPEED: Record<AttackStyle, number> = {
   beam: 0,
   vortex: 420, // heavy lobbed net — slower than a plain projectile
   trap: 0,
-  summoner: 0,
+  summoner: 400, // heavy thrown sheet — slower still than the vortex net
 };
 
 /** The flight speed (px/s) a hero's basic attack travels at. */
