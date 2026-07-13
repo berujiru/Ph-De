@@ -148,7 +148,12 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     sizePx: number,
   ): Phaser.GameObjects.Container {
     const color = this.definition.color;
-    const container = new Phaser.GameObjects.Container(scene, 0, 0);
+    // Drop the whole standee toward the bottom (down the field, nearer the
+    // camera) so its base/stick and the card sit low behind the hero's feet.
+    // This offsets only the standee child — the hero's battle position (the Hero
+    // container's x/y) is unchanged.
+    const dropOffset = Math.round(sizePx * 0.2);
+    const container = new Phaser.GameObjects.Container(scene, 0, dropOffset);
 
     // Scaled-down portrait card (3:4-ish). Kept narrower than the hero row
     // spacing so adjacent standees don't overlap. Base sits near the feet; the
