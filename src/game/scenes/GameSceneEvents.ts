@@ -440,7 +440,7 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
     // Construction Worker's Barrier: a destructible wall Summon spanning the
     // lane just ahead of (above) the shield front — world-anchored to the
     // marching shield, inside the zone enemies must cross to engage it.
-    const width = evt.widthPx || 360;
+    const width = evt.widthPx || 480;
     const height = width * (160 / 512); // barrier_wall.svg native aspect
     const y = scene.shield.y - scene.shield.height / 2 - RALLY.engageRangePx;
     // tint 0xffffff = keep the art's baked colors (Summon skips the multiply).

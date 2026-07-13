@@ -284,7 +284,8 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     // until enemies break it; the skill cooldown gates spam.
     const bonusRadius = hero.modifiers?.bonusRadius || 0;
     const bonusDamage = hero.modifiers?.bonusDamage || 0;
-    const widthPx = 360 + bonusRadius * 60; // radius drops lengthen the wall
+    // Base width = 5× the attack-built 96px wall; radius drops lengthen it.
+    const widthPx = 480 + bonusRadius * 60;
     // Base 450 at damage 18 (vs the morale shield's 750); damage drops harden it.
     const maxHp = (hero.damage + bonusDamage * 2) * 25;
     // Follow the builder's lane position, clamped so the wall stays in-lane.

@@ -149,9 +149,10 @@ describe('Hero Skills', () => {
 
     applyHeroSkill('construction_worker', h1, ctx);
 
-    // Base: width 360, HP (18 + 0*2) * 25 = 450, centered on the builder.
+    // Base: width 480 (5x the 96px attack wall), HP (18 + 0*2) * 25 = 450,
+    // centered on the builder.
     expect(ctx.onVisual).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'spawnBarrier', x: 540, widthPx: 360, maxHp: 450 }),
+      expect.objectContaining({ type: 'spawnBarrier', x: 540, widthPx: 480, maxHp: 450 }),
     );
   });
 
@@ -163,9 +164,9 @@ describe('Hero Skills', () => {
 
     applyHeroSkill('construction_worker', h1, ctx);
 
-    // Width 360 + 2*60 = 480; HP (18 + 6*2) * 25 = 750; x clamped to widthPx/2.
+    // Width 480 + 2*60 = 600; HP (18 + 6*2) * 25 = 750; x clamped to widthPx/2.
     expect(ctx.onVisual).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'spawnBarrier', x: 240, widthPx: 480, maxHp: 750 }),
+      expect.objectContaining({ type: 'spawnBarrier', x: 300, widthPx: 600, maxHp: 750 }),
     );
   });
 

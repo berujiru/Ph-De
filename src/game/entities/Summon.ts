@@ -43,7 +43,9 @@ export class Summon extends Phaser.GameObjects.Container {
       }
       this.shape = img;
     } else {
-      this.shape = scene.add.rectangle(0, 0, 40, 16, color);
+      // No texture: still honor an explicit footprint so a wide wall doesn't
+      // collapse into the tiny default block while its art is missing.
+      this.shape = scene.add.rectangle(0, 0, art?.displayWidth ?? 40, art?.displayHeight ?? 16, color);
     }
     this.add(this.shape);
 
