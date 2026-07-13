@@ -279,37 +279,10 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     onVisual({ type: 'healShield', amount: 150 });
     onVisual({ type: 'text', x: hero.x, y: hero.y - 20, text: 'HEAL!', color: '#10b981' });
   } else if (skillId === 'construction_worker') {
-    // Barrier: a real destructible wall (a Summon that body-blocks) built
-    // across the lane ahead of the shield front. No duration — it stands
-    // until enemies break it; the skill cooldown gates spam.
-    const bonusRadius = hero.modifiers?.bonusRadius || 0;
-    const bonusDamage = hero.modifiers?.bonusDamage || 0;
-    // Base width = 5× the attack-built 96px wall; radius drops lengthen it.
-    const widthPx = 480 + bonusRadius * 60;
-    // Base 450 at damage 18 (vs the morale shield's 750); damage drops harden it.
-    const maxHp = (hero.damage + bonusDamage * 2) * 25;
-    let target = null;
-    let closestDist = Infinity;
-    for (const e of enemies) {
-      if (!e.isDead) {
-        const d = dist(hero.x, hero.y, e.x, e.y);
-        if (d < closestDist) {
-          closestDist = d;
-          target = e;
-        }
-      }
-    }
-
-    let targetX = hero.x;
-    let targetY: number | undefined = undefined;
-    if (target) {
-      targetX = target.x;
-      targetY = target.y + 50;
-    }
-
-    // Follow the target's position (or builder's if no enemies), clamped so the wall stays in-lane.
-    const x = Math.max(widthPx / 2, Math.min(GAME_WIDTH - widthPx / 2, targetX));
-    onVisual({ type: 'spawnBarrier', x, y: targetY, widthPx, maxHp });
+    // Barrier skill temporarily DISABLED — the Construction Worker stays
+    // deployable but its wall no longer spawns. The spawnBarrier visual handler
+    // in GameSceneEvents is left intact so this is a one-line re-enable later.
+    onVisual({ type: 'text', x: hero.x, y: hero.y - 20, text: '…', color: '#d97706' });
   } else if (skillId === 'farmer') {
     // Tree of Life: Summon an AoE golden tree that periodically roots and damages
     let target = null;

@@ -7,6 +7,7 @@ import { type UpgradeKind } from '../data/drops';
 import { RALLY } from '../data/level';
 import { formationTargetY, stepTowardFormation } from '../core/RallyMarch';
 import { applyHeroPassive, type ISkillHero } from '../core/Skills';
+import { uiToGameEvents } from '../core/GameEvents';
 import { HeroModel } from './models/HeroModel';
 import { SpriteAura } from './fx/SpriteAura';
 
@@ -54,6 +55,13 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   private buffIcons: Record<string, Phaser.GameObjects.Text> = {};
   private rangeIndicator: Phaser.GameObjects.Arc;
 
+  /** Mini TCG-card standee behind the hero; the sprite stands in front of it. */
+  private standee: Phaser.GameObjects.Container;
+  /** Glow halo behind the standee that pulses while the signature skill is ready. */
+  private standeeGlow?: Phaser.GameObjects.Rectangle;
+  private standeeGlowTween?: Phaser.Tweens.Tween;
+  private skillGlowActive = false;
+
   constructor(
     scene: Phaser.Scene,
     x: number,
@@ -82,6 +90,11 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     // Heroes render at the 'hero' size tier; labels/bars hang off its half-height.
     const sizePx = UNIT_RENDER_SIZES.hero;
     this.model = new HeroModel(scene, 0, 0, def.color, spriteKey ?? def.spriteKey ?? def.id, sizePx);
+
+    // TCG-card standee — added BEFORE the model so the hero sprite draws in
+    // front of it (visually standing before their own card).
+    this.standee = this.createStandee(scene, this.model.footOffset, sizePx);
+    this.add(this.standee);
     this.add(this.model);
 
     // Make interactive — hit area tracks the size tier.
@@ -90,7 +103,13 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.on('pointerdown', () => {
       const gs = this.scene as any;
       if (gs.isPaused || gs.gameSpeed === 0) return;
-      this.showRange();
+      // A lit portrait (skill ready) casts via the combo queue — same path the
+      // old HUD skill button used; otherwise a tap just shows the range ring.
+      if (this.isSkillReady && !this.isEvicted) {
+        uiToGameEvents.emit('queueHeroSkill', { heroId: this.id });
+      } else {
+        this.showRange();
+      }
     });
 
     // Buff Sprite Aura (reverse tear drops)
@@ -113,6 +132,95 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.add(this.evictionSign);
 
     scene.add.existing(this);
+  }
+
+  /**
+   * Builds a small "TCG-card preview" standee behind the hero: the card FRAME
+   * (rounded light panel + hero-colored border) with only the portrait art
+   * inside. Card text is dropped — at in-battle scale it's illegible, so the
+   * portrait alone carries the card. The sprite draws in front of it, so it
+   * reads as the character standing before their own card. A hidden yellow halo
+   * behind it pulses when the skill is ready. Reuses `${id}_ui_portrait`.
+   */
+  private createStandee(
+    scene: Phaser.Scene,
+    footOffset: number,
+    sizePx: number,
+  ): Phaser.GameObjects.Container {
+    const color = this.definition.color;
+    const container = new Phaser.GameObjects.Container(scene, 0, 0);
+
+    // Scaled-down portrait card (3:4-ish). Kept narrower than the hero row
+    // spacing so adjacent standees don't overlap. Base sits near the feet; the
+    // top clears the head so the sprite overlaps the card's lower half.
+    const cardW = Math.round(sizePx * 0.72);
+    const cardH = Math.round(sizePx * 0.96);
+    const pad = Math.round(cardW * 0.08);
+    const cardBottom = Math.round(footOffset * 0.9);
+    const cardTop = cardBottom - cardH;
+    const left = -cardW / 2;
+
+    // Ready-glow halo (behind everything) — a soft yellow slab, hidden by default.
+    const glow = scene.add.rectangle(0, cardBottom - cardH / 2, cardW + pad * 2, cardH + pad * 2, 0xfacc15, 0.5);
+    glow.setVisible(false);
+    glow.setAlpha(0);
+    this.standeeGlow = glow;
+    container.add(glow);
+
+    // Ground shadow so the standee reads as planted, not floating.
+    container.add(scene.add.ellipse(0, cardBottom + pad * 0.4, cardW * 0.9, pad * 1.6, 0x000000, 0.35));
+
+    // Card frame — light metallic panel with a hero-colored border.
+    const body = scene.add.graphics();
+    body.fillStyle(0xf1f5f9, 1);
+    body.fillRoundedRect(left, cardTop, cardW, cardH, 12);
+    body.lineStyle(3, color, 1);
+    body.strokeRoundedRect(left, cardTop, cardW, cardH, 12);
+    container.add(body);
+
+    // Portrait window — hero-color wash filling the frame (minus a thin border);
+    // the portrait art is contained bottom-aligned inside it (no Y-squash).
+    const boxW = cardW - pad;
+    const boxH = cardH - pad;
+    const boxCY = cardTop + cardH / 2;
+    const box = scene.add.rectangle(0, boxCY, boxW, boxH, color, 0.18);
+    box.setStrokeStyle(2, 0x94a3b8, 1);
+    container.add(box);
+
+    const portraitKey = `${this.id}_ui_portrait`;
+    if (scene.textures.exists(portraitKey)) {
+      const img = scene.add.image(0, boxCY + boxH / 2 - 2, portraitKey).setOrigin(0.5, 1);
+      // Contain within the window, bottom-aligned so it never overflows the frame.
+      const fit = Math.min((boxW - 2) / (img.width || boxW), (boxH - 2) / (img.height || boxH));
+      img.setScale(fit);
+      container.add(img);
+    }
+
+    return container;
+  }
+
+  /** Pulse (or stop pulsing) the standee glow to signal skill readiness. */
+  private setSkillGlow(on: boolean): void {
+    if (on === this.skillGlowActive || !this.standeeGlow) return;
+    this.skillGlowActive = on;
+    if (on) {
+      this.standeeGlow.setVisible(true);
+      this.standeeGlowTween = this.scene.tweens.add({
+        targets: this.standeeGlow,
+        alpha: { from: 0.18, to: 0.5 },
+        scaleX: { from: 1, to: 1.08 },
+        scaleY: { from: 1, to: 1.05 },
+        yoyo: true,
+        repeat: -1,
+        duration: 650,
+        ease: 'Sine.easeInOut',
+      });
+    } else {
+      this.standeeGlowTween?.remove();
+      this.standeeGlowTween = undefined;
+      this.standeeGlow.setVisible(false);
+      this.standeeGlow.setAlpha(0).setScale(1);
+    }
   }
 
   /** World-space point projectiles visually launch from (the model's muzzle). */
@@ -330,6 +438,8 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
         this.isSkillReady = true;
       }
     }
+    // Light up the ground portrait while the skill is castable (not mid-lock).
+    this.setSkillGlow(this.isSkillReady && !isBudgetCutActive);
 
     // Auto-attack — fire when the cadence is ready and a target is in range.
     if (target && this.attackCooldown === 0) {
@@ -424,12 +534,15 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.isEvicted = evicted;
     if (evicted) {
       this.model.setVisible(false);
+      this.standee.setVisible(false);
+      this.setSkillGlow(false);
       this.evictionSign.setVisible(true);
       // interrupt any current attack
       this.attackCooldown = 0;
       this.pendingAttacks = [];
     } else {
       this.model.setVisible(true);
+      this.standee.setVisible(true);
       this.evictionSign.setVisible(false);
       this.model.setState('idle');
     }
@@ -439,6 +552,7 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     if (!this.isSkillReady) return;
     this.isSkillReady = false;
     this.currentSkillCooldown = this.skillCooldownMs;
+    this.setSkillGlow(false);
 
     // Cast animation plays through the model.
     this.model.setState('cast');

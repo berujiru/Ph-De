@@ -142,31 +142,17 @@ describe('Hero Skills', () => {
     expect(ctx.visualEvents.some((evt: any) => evt.type === 'dragTo' && evt.target === e1)).toBe(true);
   });
 
-  it('construction_worker (Barrier) spawns a destructible wall scaled by voice-drop mods', () => {
+  it('construction_worker (Barrier) is temporarily disabled — spawns no wall', () => {
+    // The barrier skill is shelved for now (see Skills.ts). The hero stays
+    // deployable and the skill is a safe no-op: it must not emit a spawnBarrier.
     const h1 = createDummyHero('construction_worker', 540, 0);
     h1.damage = 18;
     const ctx = createDummyContext([h1]);
 
     applyHeroSkill('construction_worker', h1, ctx);
 
-    // Base: width 480 (5x the 96px attack wall), HP (18 + 0*2) * 25 = 450,
-    // centered on the builder.
-    expect(ctx.onVisual).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'spawnBarrier', x: 540, widthPx: 480, maxHp: 450 }),
-    );
-  });
-
-  it('construction_worker (Barrier) grows with radius/damage drops and clamps to the lane', () => {
-    const h1 = createDummyHero('construction_worker', 0, 0); // hugging the lane edge
-    h1.damage = 18;
-    h1.modifiers = { bonusDamage: 6, bonusPierce: 0, bonusRadius: 2, bonusChain: 0 };
-    const ctx = createDummyContext([h1]);
-
-    applyHeroSkill('construction_worker', h1, ctx);
-
-    // Width 480 + 2*60 = 600; HP (18 + 6*2) * 25 = 750; x clamped to widthPx/2.
-    expect(ctx.onVisual).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'spawnBarrier', x: 300, widthPx: 600, maxHp: 750 }),
+    expect(ctx.onVisual).not.toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'spawnBarrier' }),
     );
   });
 

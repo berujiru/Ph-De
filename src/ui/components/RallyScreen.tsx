@@ -39,9 +39,9 @@ import {
   stampLabel,
   withAlpha,
 } from '../mockups/battleStyles';
-import { SkinPortrait, hexColor } from './ArchiveCards';
+import { SkinPortrait } from './ArchiveCards';
 import { getSelectedSkin } from '../../game/data/skinSelection';
-import { HERO_DEFINITIONS, type HeroId } from '../../game/data/heroes';
+import { type HeroId } from '../../game/data/heroes';
 import { IntelModal } from './IntelModal';
 import { EnemyTcgCard } from './EnemyTcgCard';
 
@@ -675,145 +675,6 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
             <span style={{ ...stampLabel, fontSize: 8 }}>Act</span>
           </button>
         </div>
-      </div>
-
-      {/* ---------- Right Side: Skill Queue ---------- */}
-      <div
-        style={{
-          position: 'absolute',
-          right: 12,
-          top: '50%',
-          transform: 'translateY(-50%)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 16,
-          pointerEvents: 'auto',
-          zIndex: 50,
-        }}
-      >
-        {state.activeHeroes.filter(h => h.isSkillReady).map(hero => {
-           const def = HERO_DEFINITIONS[hero.id as HeroId];
-           if (!def) return null;
-           const shortName = def.signatureSkill.shortName || def.signatureSkill.name.split(' ')[0];
-           return (
-             <button
-               key={hero.id}
-               type="button"
-               className="hud-btn"
-               onClick={() => {
-                 if (hero.isSkillLocked) return;
-                 playBtnSound();
-                 uiToGameEvents.emit('queueHeroSkill', { heroId: hero.id });
-               }}
-               style={{
-                 width: 64,
-                 height: 64,
-                 borderRadius: '50%',
-                 backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                 border: hero.isSkillLocked ? '2px solid rgba(255,255,255,0.8)' : `3px solid #ef4444`,
-                 boxShadow: hero.isSkillLocked ? 'none' : `0 0 18px #ef4444, inset 0 0 10px #ef4444`,
-                 color: '#facc15',
-                 display: 'flex',
-                 flexDirection: 'column',
-                 alignItems: 'center',
-                 justifyContent: 'center',
-                 animation: hero.isSkillLocked ? 'none' : 'pulse-glow 1.5s infinite',
-                 cursor: hero.isSkillLocked ? 'default' : 'pointer',
-                 overflow: 'hidden',
-                 padding: 4
-               }}
-             >
-                <span style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase', textAlign: 'center', lineHeight: 1.1, textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
-                  {shortName}
-                </span>
-             </button>
-           );
-        })}
-      </div>
-
-      {/* ---------- Bottom Tray: Hero Lineup ---------- */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 16,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          gap: 12,
-          pointerEvents: 'auto',
-          zIndex: 40,
-        }}
-      >
-        {/* Render exactly 5 slots */}
-        {Array.from({ length: 5 }).map((_, i) => {
-          const hero = state.activeHeroes?.[i];
-          if (!hero) {
-            // Empty slot
-            return (
-              <div
-                key={`empty-${i}`}
-                style={{
-                  width: 72,
-                  height: 96,
-                  borderRadius: 8,
-                  backgroundColor: 'rgba(15, 23, 42, 0.4)',
-                  border: '2px dashed rgba(148, 163, 184, 0.3)',
-                }}
-              />
-            );
-          }
-
-          const def = HERO_DEFINITIONS[hero.id as HeroId];
-          const skin = getSelectedSkin(def.id);
-          const colorHex = hexColor(def.color);
-
-          return (
-            <div
-              key={hero.id}
-              style={{
-                width: 72,
-                height: 96,
-                borderRadius: 8,
-                backgroundColor: '#0f172a',
-                border: `2px solid ${colorHex}`,
-                boxShadow: `0 8px 16px rgba(0,0,0,0.5), inset 0 0 12px ${withAlpha(colorHex, 0.4)}`,
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: 'hidden',
-                position: 'relative',
-              }}
-            >
-              <div style={{ flex: 1, position: 'relative', overflow: 'hidden', background: 'radial-gradient(circle at 50% 100%, #334155 0%, #0f172a 100%)' }}>
-                <SkinPortrait skin={skin} style={{ objectPosition: 'top center' }} />
-              </div>
-              <div
-                style={{
-                  height: 24,
-                  backgroundColor: colorHex,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '0 4px',
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    fontSize: 9,
-                    fontWeight: 900,
-                    color: '#ffffff',
-                    textTransform: 'uppercase',
-                    textAlign: 'center',
-                    lineHeight: 1.1,
-                    textShadow: '0 2px 4px rgba(0,0,0,0.8)',
-                  }}
-                >
-                  {def.name}
-                </span>
-              </div>
-            </div>
-          );
-        })}
       </div>
 
       {/* ---------- Abandon Rally Confirmation ---------- */}

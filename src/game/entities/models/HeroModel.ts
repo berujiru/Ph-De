@@ -66,6 +66,11 @@ export class HeroModel extends UnitModel {
     return { x: 0, y: -this.baseH * 0.5 };
   }
 
+  /** Local-space y of the sprite's feet (bottom edge) — where ground decals sit. */
+  get footOffset(): number {
+    return this.baseH * 0.5;
+  }
+
   protected bodyTarget(): Phaser.GameObjects.GameObject {
     return this.bodySprite;
   }

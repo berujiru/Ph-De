@@ -57,9 +57,14 @@ export const RALLY = {
      * whenever its attack range demands it — see enemyContactAheadPx /
      * rangeSlackPx below. Positive = behind the shield (below, toward the crowd).
      */
-    /** Melee heroes hold just behind (below) the shield front. */
-    meleeOffsetY: 45,
-    /** Ranged heroes hold further back in the crowd (further below). */
+    /**
+     * Melee and ranged now hold the SAME line so the squad forms one row on the
+     * rally stage (the stage art sits at shieldStartY + 150). formationTargetY
+     * still pulls a short-range hero forward if its range can't reach the shield
+     * front from here, so melee stay functional; otherwise everyone lines up.
+     */
+    meleeOffsetY: 150,
+    /** Ranged heroes hold on the stage line (kept equal to meleeOffsetY). */
     rangedOffsetY: 150,
     /**
      * Enemies halt and attack this far ahead of (above) the shield's center y
@@ -68,8 +73,8 @@ export const RALLY = {
     enemyContactAheadPx: BARRICADE_DEFAULTS.height / 2,
     /** Safety margin kept between a hero's slot and the edge of its range. */
     rangeSlackPx: 20,
-    /** Ranged heroes scatter up to ±half this (along the march axis) so they don't stack on one pixel. */
-    rangedJitterPx: 24,
+    /** Kept at 0 so the squad lines up on one crisp row (no march-axis scatter). */
+    rangedJitterPx: 0,
     /** Horizontal spacing between heroes across the lane. */
     rowSpacingPx: 180,
     /** Heroes out of position catch up faster than the march itself. */
