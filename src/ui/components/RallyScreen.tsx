@@ -731,6 +731,91 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
         })}
       </div>
 
+      {/* ---------- Bottom Tray: Hero Lineup ---------- */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 16,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          gap: 12,
+          pointerEvents: 'auto',
+          zIndex: 40,
+        }}
+      >
+        {/* Render exactly 5 slots */}
+        {Array.from({ length: 5 }).map((_, i) => {
+          const hero = state.activeHeroes?.[i];
+          if (!hero) {
+            // Empty slot
+            return (
+              <div
+                key={`empty-${i}`}
+                style={{
+                  width: 72,
+                  height: 96,
+                  borderRadius: 8,
+                  backgroundColor: 'rgba(15, 23, 42, 0.4)',
+                  border: '2px dashed rgba(148, 163, 184, 0.3)',
+                }}
+              />
+            );
+          }
+
+          const def = HERO_DEFINITIONS[hero.id as HeroId];
+          const skin = getSelectedSkin(def.id);
+          const colorHex = hexColor(def.color);
+
+          return (
+            <div
+              key={hero.id}
+              style={{
+                width: 72,
+                height: 96,
+                borderRadius: 8,
+                backgroundColor: '#0f172a',
+                border: `2px solid ${colorHex}`,
+                boxShadow: `0 8px 16px rgba(0,0,0,0.5), inset 0 0 12px ${withAlpha(def.color, 0.4)}`,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                position: 'relative',
+              }}
+            >
+              <div style={{ flex: 1, position: 'relative', overflow: 'hidden', background: 'radial-gradient(circle at 50% 100%, #334155 0%, #0f172a 100%)' }}>
+                <SkinPortrait skin={skin} style={{ objectPosition: 'top center' }} />
+              </div>
+              <div
+                style={{
+                  height: 24,
+                  backgroundColor: colorHex,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '0 4px',
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: 9,
+                    fontWeight: 900,
+                    color: '#ffffff',
+                    textTransform: 'uppercase',
+                    textAlign: 'center',
+                    lineHeight: 1.1,
+                    textShadow: '0 2px 4px rgba(0,0,0,0.8)',
+                  }}
+                >
+                  {def.name}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
       {/* ---------- Abandon Rally Confirmation ---------- */}
       {surrenderConfirmOpen && !gameOver && (
         <div

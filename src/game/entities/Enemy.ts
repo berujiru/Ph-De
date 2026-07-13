@@ -12,6 +12,8 @@ import { cameraPunch } from './fx/CameraPunch';
 import { SpriteAura } from './fx/SpriteAura';
 import { FX } from '../data/level';
 import { EnemyAI } from '../core/EnemyAI';
+import { AudioManager } from '../core/AudioManager';
+import { enemyHitSfx, enemyDeathSfx } from '../data/soundRegistry';
 
 export type AilmentType = 'burn' | 'slow' | 'wet' | 'freeze' | 'stun' | 'poison' | 'bleed' | 'rot' | 'sleep' | 'curse' | 'knockback' | 'armorShred' | 'muted' | 'root' | 'dragged';
 
@@ -308,7 +310,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
 
     if (amount > 0) {
       this.hp -= amount;
-      try { this.scene.sound.play('sfx-enemy-hit'); } catch (e) {}
+      AudioManager.playSfx(enemyHitSfx(this.definition.id));
       // Combat juice: floating damage number + spark burst at the impact point.
       spawnDamageNumber(this.scene, this.x, this.y - 18, amount);
       spawnHitSpark(this.scene, this.x, this.y, 0xffffff);
@@ -319,7 +321,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
 
     if (this.hp <= 0) {
       this.isDead = true;
-      try { this.scene.sound.play('sfx-enemy-die'); } catch (e) {}
+      AudioManager.playSfx(enemyDeathSfx(this.definition.id));
       // Death pop on top of the model collapse + a subtle camera punch.
       spawnDeathBurst(this.scene, this.x, this.y, this.definition.color);
       cameraPunch(this.scene, FX.cameraShake.enemyDeath);

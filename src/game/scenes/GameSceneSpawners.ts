@@ -26,6 +26,8 @@ import { DAMAGE_TYPE_COLORS, type DamageType } from '../core/Damage';
 import { attackArtKey, resolveAttackArt, resolveAttackSize } from '../data/attackArt';
 import { resolveAttackSpeed } from '../data/attackSpeed';
 import { gameToUiEvents } from '../core/GameEvents';
+import { AudioManager } from '../core/AudioManager';
+import { heroAttackSfx } from '../data/soundRegistry';
 
 export function spawnEnemy(scene: GameScene, enemyId: EnemyId = 'grunt', wave: number = 1) {
   // Scatter across the lane (X); spawn just above the visible top of the
@@ -90,6 +92,9 @@ export function spawnHero(scene: GameScene, id: HeroId, passiveOverride?: string
     const speed = resolveAttackSpeed(h.definition);
     // Persisted per-hero upgrade mods land on every Attack this hero spawns.
     const mods = h.modifiers;
+
+    // Per-hero basic-attack SFX (falls back to the generic shoot cue).
+    AudioManager.playSfx(heroAttackSfx(h.definition.id));
 
     if (h.definition.attackStyle === 'melee-cleave') {
       attack = new MeleeCleaveAttack(scene, h.x, h.y, target, h.damage, h.range, visual, mods, damageType);

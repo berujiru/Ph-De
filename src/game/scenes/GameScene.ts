@@ -10,6 +10,8 @@ import { enemySizeClass } from '../data/enemies';
 import { computeKillPool, voiceDropCost } from '../data/drops';
 import { type HeroId, HERO_DEFINITIONS } from '../data/heroes';
 import { allAttackArtStems, attackArtKey, attackArtPath } from '../data/attackArt';
+import { preloadAudio, SFX } from '../data/soundRegistry';
+import { AudioManager } from '../core/AudioManager';
 import { GAME_HEIGHT, GAME_WIDTH, WORLD_HEIGHT, RALLY, PARALLAX } from '../data/level';
 import { getMapSkinForStage, type MapSkin } from '../data/mapSkins';
 import { WaveManager } from '../core/WaveManager';
@@ -87,6 +89,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   preload() {
+    // Audio: register every available sound file (data-driven, same pattern as
+    // the art loops below). Keys not yet backed by a real file are simply skipped.
+    preloadAudio(this);
+
     for (const layer of PARALLAX.layers) {
       this.load.image(layer.key, `/assets/backgrounds/${layer.key}.svg`);
     }
@@ -212,6 +218,10 @@ export class GameScene extends Phaser.Scene {
           frameHeight: skin.frameHeight,
         });
       }
+      
+      // Load UI portrait for mini-card (fallback handled if missing)
+      const uiPortraitKey = `${heroId}_ui_portrait`;
+      this.load.image(uiPortraitKey, `/assets/heroes/${heroId}_portrait.png`);
     }
 
     Object.values(HERO_DEFINITIONS).forEach((hero) => {
@@ -426,7 +436,7 @@ export class GameScene extends Phaser.Scene {
 
       if (this.waveManager.allSpawnsDone && livingEnemiesCount === 0) {
         if (this.status === 'playing') {
-          try { this.sound.play('sfx-victory'); } catch (e) {}
+          AudioManager.playSfx(SFX.victory);
           this.endBattle('won');
         }
       }
@@ -474,7 +484,7 @@ export class GameScene extends Phaser.Scene {
     this.summons = this.summons.filter(s => !s.isDead);
 
     if (this.shield.isDead && !this.isSandbox) {
-      try { this.sound.play('sfx-defeat'); } catch (e) {}
+      AudioManager.playSfx(SFX.defeat);
       this.endBattle('lost');
     }
 

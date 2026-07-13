@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import { cameraPunch } from './fx/CameraPunch';
 import { FX } from '../data/level';
 import { SpriteAura } from './fx/SpriteAura';
+import { AudioManager } from '../core/AudioManager';
+import { SFX } from '../data/soundRegistry';
 
 const MORALE_TIERS = [
   { min: 0.6, core: 0x38bdf8, bright: 0x7dd3fc },
@@ -138,7 +140,7 @@ export class MoraleShield extends Phaser.GameObjects.Container {
     this.hp = Math.min(this.maxHp, this.hp + amount);
     this.refreshMoraleVisual();
     this.playHealVisual();
-    try { this.scene.sound.play('sfx-heal'); } catch (e) {}
+    AudioManager.playSfx(SFX.heal);
   }
 
   takeDamage(amount: number) {
@@ -146,9 +148,9 @@ export class MoraleShield extends Phaser.GameObjects.Container {
     this.hp = Math.max(0, this.hp - amount);
 
     if (this.hp <= 0) {
-      try { this.scene.sound.play('sfx-barrier-break'); } catch (e) {}
+      AudioManager.playSfx(SFX.barrierBreak);
     } else {
-      try { this.scene.sound.play('sfx-barrier-hit'); } catch (e) {}
+      AudioManager.playSfx(SFX.barrierHit);
     }
 
     this.refreshMoraleVisual();

@@ -48,7 +48,8 @@ export abstract class Attack extends Phaser.GameObjects.GameObject {
       bonusChain: modifiers?.bonusChain || 0,
     };
     scene.add.existing(this);
-    try { scene.sound.play('sfx-shoot'); } catch(e) {}
+    // Basic-attack SFX is fired per-hero from GameSceneSpawners (so each hero can
+    // have its own attack sound); skill-spawned attacks get their own skill cues.
   }
 
   public upgrade(newMods: Partial<AttackModifiers>) {

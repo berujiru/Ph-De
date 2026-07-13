@@ -8,12 +8,15 @@ import { LoadingScreen } from './ui/mockups/LoadingScreen';
 import { InventoryScreen } from './ui/mockups/InventoryScreen';
 import { PreparationScreen } from './ui/mockups/PreparationScreen';
 import { SandboxHUD } from './ui/mockups/SandboxHUD';
+import { AudioSettings } from './ui/components/AudioSettings';
+import { theme } from './ui/theme';
 import { uiToGameEvents } from './game/core/GameEvents';
 import './App.css';
 
 function App() {
   const [currentView, setCurrentView] = useState<'loading' | 'main' | 'campaign' | 'prep' | 'battle' | 'sandbox' | 'store' | 'inventory'>('loading');
   const [selectedStage, setSelectedStage] = useState<{ act: number; stageIdx: number } | null>(null);
+  const [audioOpen, setAudioOpen] = useState(false);
 
   const handlePlay = () => {
     setCurrentView('campaign');
@@ -90,6 +93,35 @@ function App() {
       {currentView === 'inventory' && (
         <InventoryScreen onBack={() => setCurrentView('main')} />
       )}
+
+      {/* Global audio settings — reachable from any screen (loading excepted). */}
+      {currentView !== 'loading' && (
+        <button
+          onClick={() => setAudioOpen(true)}
+          aria-label="Audio settings"
+          style={{
+            position: 'absolute',
+            top: 12,
+            left: 12,
+            zIndex: 150,
+            width: 40,
+            height: 40,
+            borderRadius: 999,
+            border: `1px solid ${theme.colors.borderGlass}`,
+            background: theme.colors.surfaceGlass,
+            backdropFilter: 'blur(12px)',
+            color: theme.colors.textPrimary,
+            cursor: 'pointer',
+            fontSize: 18,
+            lineHeight: 1,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+          }}
+        >
+          🔊
+        </button>
+      )}
+
+      {audioOpen && <AudioSettings onClose={() => setAudioOpen(false)} />}
       </div>
     </div>
   );

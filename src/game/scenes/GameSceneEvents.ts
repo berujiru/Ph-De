@@ -14,6 +14,7 @@ import { applyHeroSkill, type SkillVisualEvent } from '../core/Skills';
 import { DAMAGE_TYPE_COLORS, type DamageType } from '../core/Damage';
 import { attackArtKey, resolveAttackArt, resolveAttackSize } from '../data/attackArt';
 import { resolveAttackSpeed } from '../data/attackSpeed';
+import { AudioManager } from '../core/AudioManager';
 import {
   Attack,
   ProjectileAttack,
@@ -182,8 +183,8 @@ export function setupUIEvents(scene: GameScene): () => void {
   });
 
   const unsubPlaySound = uiToGameEvents.on('playSound', ({ key }) => {
-    if (!scene.sys) return;
-    try { scene.sound.play(key); } catch(e) {}
+    // Route UI-emitted sounds through the shared mixer (bus volume + mute).
+    AudioManager.playSfx(key);
   });
 
   const unsubApplyAilment = uiToGameEvents.on('applySandboxAilment', ({ ailment, amount }) => {

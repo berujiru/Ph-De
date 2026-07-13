@@ -1,0 +1,176 @@
+import type Phaser from 'phaser';
+import type { HeroId } from './heroes';
+import type { EnemyId } from './enemies';
+
+/**
+ * The single source of truth for every sound in the game — the "tracking spine"
+ * called out in docs/AUDIO_PROGRESS.md. It maps semantic keys to asset files and
+ * keys each hero / enemy to its clips, so adding audio is a data edit (new file
+ * + manifest line) rather than a code change.
+ *
+ * Two layers:
+ *   1. AUDIO_MANIFEST — files that physically exist and get preloaded. Only add
+ *      a line here once the real asset is in public/assets. This keeps the
+ *      console free of 404s while sounds are still being produced.
+ *   2. HERO_SFX / ENEMY_SFX / MUSIC — the intended catalog keyed per entity.
+ *      Resolvers fall back to a generic, always-loaded key so the game is never
+ *      silent for an entity whose bespoke clip hasn't been made yet.
+ */
+
+// --- Core SFX keys (bespoke files land in public/assets/sounds/) ---------------
+
+export const SFX = {
+  btnPress: 'sfx-btn-press',
+  shoot: 'sfx-shoot',
+  enemyHit: 'sfx-enemy-hit',
+  enemyDie: 'sfx-enemy-die',
+  barrierHit: 'sfx-barrier-hit',
+  barrierBreak: 'sfx-barrier-break',
+  heal: 'sfx-heal',
+  victory: 'sfx-victory',
+  defeat: 'sfx-defeat',
+} as const;
+
+// --- Music keys (files land in public/assets/music/, wired up in Milestone 2) --
+
+export const MUSIC = {
+  prep: 'music-prep',
+  battle: 'music-battle',
+  victory: 'music-victory',
+  defeat: 'music-defeat',
+  /** Per-act boss themes; bossThemeForAct() falls back to a shared default. */
+  bossThemes: {
+    1: 'music-boss-act1',
+    2: 'music-boss-act2',
+    3: 'music-boss-act3',
+    4: 'music-boss-act4',
+    5: 'music-boss-finale', // boss_ang_sistema — the signature track
+  } as Record<number, string>,
+  bossDefault: 'music-boss-act1',
+} as const;
+
+export function bossThemeForAct(act: number | null): string {
+  if (act && MUSIC.bossThemes[act]) return MUSIC.bossThemes[act];
+  return MUSIC.bossDefault;
+}
+
+// --- Per-hero / per-enemy catalog ---------------------------------------------
+
+interface HeroSound {
+  /** Basic-attack SFX; falls back to SFX.shoot. */
+  attack?: string;
+  /** Signature-skill SFX (foley), distinct from the Tagalog voice line. */
+  skill?: string;
+  /** Tagalog voice line played on the skill cut-in (Milestone 3). */
+  voice?: string;
+}
+
+interface EnemySound {
+  attack?: string;
+  death?: string;
+  /** Boss channel/skill SFX (devour, siren, resurrect, …). */
+  skill?: string;
+}
+
+/**
+ * Intended per-hero clips. Keys map into AUDIO_MANIFEST once the file exists.
+ * Only the 20 recruitable heroes are listed; sandbox testers use the generic
+ * fallback. Voice lines are authored in docs/ART_AND_AUDIO_GUIDELINES.md §5.
+ */
+export const HERO_SFX: Partial<Record<HeroId, HeroSound>> = {
+  eden: { voice: 'voice-eden-rally' },
+  teacher: { voice: 'voice-teacher-recess' },
+  student: { voice: 'voice-student-cramming' },
+  jeepney_driver: { voice: 'voice-jeepney-barya' },
+  fisherfolk: { voice: 'voice-fisherfolk-lambat' },
+  street_sweeper: { voice: 'voice-sweeper-duststorm' },
+  taho_vendor: { voice: 'voice-taho-hotsyrup' },
+  nurse: { voice: 'voice-nurse-vaccine' },
+  construction_worker: { voice: 'voice-construction-barricade' },
+  call_center_agent: { voice: 'voice-callcenter-escalate' },
+  security_guard: { voice: 'voice-security-flashlight' },
+  farmer: { voice: 'voice-farmer-harvest' },
+  fishball_vendor: { voice: 'voice-fishball-spicy' },
+  sales_lady: { voice: 'voice-saleslady-closing' },
+  sorbetes_vendor: { voice: 'voice-sorbetes-dirty' },
+  electrician: { voice: 'voice-electrician-blackout' },
+  baker: { voice: 'voice-baker-dough' },
+  traffic_enforcer: { voice: 'voice-traffic-stop' },
+  plumber: { voice: 'voice-plumber-flush' },
+  delivery_rider: { voice: 'voice-rider-deliver' },
+};
+
+/** Intended per-enemy clips. Bosses add a `skill` channel cue. */
+export const ENEMY_SFX: Partial<Record<EnemyId, EnemySound>> = {
+  // Minions & mid-tier lean on the generic hit/death fallbacks for now.
+  boss_pork_barrel: { skill: 'sfx-boss-devour' },
+  boss_wang_wang: { skill: 'sfx-boss-siren' },
+  boss_ang_sistema: { skill: 'sfx-boss-resurrect' },
+  boss_troll_farm: { skill: 'sfx-boss-fakenews' },
+  boss_vote_buying: { skill: 'sfx-boss-scattergold' },
+};
+
+// --- Resolvers (always return a key; callers get a sensible fallback) ----------
+
+export function heroAttackSfx(id: HeroId): string {
+  return HERO_SFX[id]?.attack ?? SFX.shoot;
+}
+
+export function heroSkillSfx(id: HeroId): string | undefined {
+  return HERO_SFX[id]?.skill;
+}
+
+export function heroVoice(id: HeroId): string | undefined {
+  return HERO_SFX[id]?.voice;
+}
+
+export function enemyHitSfx(id: EnemyId): string {
+  return ENEMY_SFX[id]?.attack ?? SFX.enemyHit;
+}
+
+export function enemyDeathSfx(id: EnemyId): string {
+  return ENEMY_SFX[id]?.death ?? SFX.enemyDie;
+}
+
+export function enemySkillSfx(id: EnemyId): string | undefined {
+  return ENEMY_SFX[id]?.skill;
+}
+
+// --- Preload manifest ----------------------------------------------------------
+
+/**
+ * Files that currently exist on disk and should be preloaded. Add a line here
+ * the moment a real asset lands so the key "lights up"; keys not listed here
+ * simply no-op at play time (AudioManager swallows undecoded keys).
+ *
+ * NOTE: the .mp3s below start as silent placeholders — replacing the file with a
+ * real recording needs no code change (Milestone 1, step 5).
+ */
+export const AUDIO_MANIFEST: Record<string, string> = {
+  [SFX.btnPress]: '/assets/sounds/btn-press.mp3',
+  [SFX.shoot]: '/assets/sounds/shoot.mp3',
+  [SFX.enemyHit]: '/assets/sounds/enemy-hit.mp3',
+  [SFX.enemyDie]: '/assets/sounds/enemy-die.mp3',
+  [SFX.barrierHit]: '/assets/sounds/barrier-hit.mp3',
+  [SFX.barrierBreak]: '/assets/sounds/barrier-break.mp3',
+  [SFX.victory]: '/assets/sounds/victory.mp3',
+  [SFX.defeat]: '/assets/sounds/defeat.mp3',
+  // Pending real files — uncomment as they are produced:
+  // [SFX.heal]: '/assets/sounds/heal.mp3',
+  // [MUSIC.battle]: '/assets/music/battle.mp3',
+  // [MUSIC.prep]: '/assets/music/prep.mp3',
+  // [MUSIC.bossThemes[1]]: '/assets/music/boss-act1.mp3',
+};
+
+/**
+ * Register every available audio file with the scene loader. Called from
+ * GameScene.preload(), mirroring the data-driven load loops already there
+ * (allAttackArtStems, HERO_DEFINITIONS).
+ */
+export function preloadAudio(scene: Phaser.Scene): void {
+  for (const [key, path] of Object.entries(AUDIO_MANIFEST)) {
+    if (!scene.cache.audio.exists(key)) {
+      scene.load.audio(key, path);
+    }
+  }
+}
