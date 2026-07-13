@@ -20,7 +20,7 @@ export const STYLE_DEFAULT_SPEED: Record<AttackStyle, number> = {
   'melee-cleave': 0,
   chain: 0,
   beam: 0,
-  vortex: 0,
+  vortex: 420, // heavy lobbed net — slower than a plain projectile
   trap: 0,
   summoner: 0,
 };

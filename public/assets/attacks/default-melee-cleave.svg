@@ -1,7 +1,38 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
-  <!-- Crescent slash spanning the full canvas: pivot at the left edge, blade tip
-       at the right edge so sprite length == cleave range when swept. -->
-  <path d="M8 4 A78 78 0 0 1 8 124 A118 118 0 0 0 8 4 Z"
-        fill="#ffffff" stroke="#0f172a" stroke-width="5" stroke-linejoin="round"/>
-  <path d="M14 22 A58 58 0 0 1 14 106" fill="none" stroke="#cccccc" stroke-width="6" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Generic melee cleave (sandbox/fallback): pure anime slash arc, no weapon. Pivot at
+       the left edge, crescent bulges to the right edge so sprite length == cleave range.
+       Layered crescent with a bright leading-edge core, feathered trailing edge, and
+       speed lines — light/glow only, no dark outline, reads dramatic under any tint. -->
+  <defs>
+    <radialGradient id="cleave-slash" gradientUnits="userSpaceOnUse" cx="40" cy="256" r="470">
+      <stop offset="0.45" stop-color="#999999" stop-opacity="0"/>
+      <stop offset="0.72" stop-color="#cccccc" stop-opacity="0.4"/>
+      <stop offset="0.9" stop-color="#e6e6e6" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.95"/>
+    </radialGradient>
+    <radialGradient id="cleave-core" gradientUnits="userSpaceOnUse" cx="40" cy="256" r="470">
+      <stop offset="0.82" stop-color="#ffffff" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="1"/>
+    </radialGradient>
+  </defs>
+
+  <!-- broad crescent sweep: feathered trailing edge fading toward the pivot -->
+  <path d="M 36 20 C 320 60, 496 150, 496 256 C 496 362, 320 452, 36 492
+           C 230 424, 364 336, 364 256 C 364 176, 230 88, 36 20 Z"
+        fill="url(#cleave-slash)"/>
+  <!-- bright core hugging the leading edge -->
+  <path d="M 36 20 C 320 60, 496 150, 496 256 C 496 362, 320 452, 36 492
+           C 274 448, 452 350, 452 256 C 452 162, 274 64, 36 20 Z"
+        fill="url(#cleave-core)"/>
+
+  <!-- concentric speed lines, hand-drawn anime feel -->
+  <path d="M 64 96 Q 830 256 64 416" fill="none" stroke="#ffffff" stroke-width="8"
+        stroke-opacity="0.9" stroke-linecap="round"/>
+  <path d="M 86 152 Q 660 256 86 360" fill="none" stroke="#e6e6e6" stroke-width="5"
+        stroke-opacity="0.65" stroke-linecap="round" stroke-dasharray="46 30"/>
+  <path d="M 108 202 Q 510 256 108 310" fill="none" stroke="#cccccc" stroke-width="4"
+        stroke-opacity="0.5" stroke-linecap="round" stroke-dasharray="24 36"/>
+  <!-- faint trailing wisp near the inner edge -->
+  <path d="M 96 190 Q 420 256 96 322" fill="none" stroke="#999999" stroke-width="18"
+        stroke-opacity="0.25" stroke-linecap="round"/>
 </svg>

@@ -1,12 +1,76 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
-  <!-- Jeepney Driver: big lug wrench swung from the pivot at x=0; open jaw at the
-       far edge so sprite length == cleave range. Faint arc sells the sweep. -->
-  <path d="M10 12 A76 76 0 0 1 10 116 A110 110 0 0 0 10 12 Z" fill="#e6e6e6" fill-opacity="0.3"/>
-  <circle cx="12" cy="64" r="11" fill="#cccccc" stroke="#0f172a" stroke-width="4"/>
-  <circle cx="12" cy="64" r="4" fill="#0f172a"/>
-  <rect x="18" y="56" width="82" height="16" rx="6" fill="#ffffff" stroke="#0f172a" stroke-width="5"/>
-  <rect x="26" y="60" width="62" height="4" rx="2" fill="#cccccc"/>
-  <path d="M96 42 Q126 42 126 56 L108 60 L108 68 L126 72 Q126 86 96 86 Q88 74 88 64 Q88 54 96 42 Z"
-        fill="#ffffff" stroke="#0f172a" stroke-width="5" stroke-linejoin="round"/>
-  <path d="M98 50 Q112 48 118 52" fill="none" stroke="#cccccc" stroke-width="4" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Jeepney Driver: detailed lug wrench swung from the pivot at x=0; open jaw at the
+       far edge so sprite length == cleave range. Anime crescent slash + speed lines
+       layered behind the weapon (light/glow only, no dark outline on the slash). -->
+  <defs>
+    <radialGradient id="wrench-slash" gradientUnits="userSpaceOnUse" cx="40" cy="256" r="470">
+      <stop offset="0.55" stop-color="#999999" stop-opacity="0"/>
+      <stop offset="0.8" stop-color="#cccccc" stop-opacity="0.35"/>
+      <stop offset="0.93" stop-color="#ffffff" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.95"/>
+    </radialGradient>
+    <linearGradient id="wrench-shaft" gradientUnits="userSpaceOnUse" x1="0" y1="230" x2="0" y2="282">
+      <stop offset="0" stop-color="#f2f2f2"/>
+      <stop offset="0.45" stop-color="#cccccc"/>
+      <stop offset="1" stop-color="#666666"/>
+    </linearGradient>
+    <linearGradient id="wrench-jaw" gradientUnits="userSpaceOnUse" x1="0" y1="168" x2="0" y2="344">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.5" stop-color="#d9d9d9"/>
+      <stop offset="1" stop-color="#8c8c8c"/>
+    </linearGradient>
+    <linearGradient id="wrench-nut" gradientUnits="userSpaceOnUse" x1="0" y1="220" x2="0" y2="292">
+      <stop offset="0" stop-color="#e6e6e6"/>
+      <stop offset="1" stop-color="#808080"/>
+    </linearGradient>
+    <radialGradient id="wrench-pivot" cx="0.35" cy="0.35" r="0.85">
+      <stop offset="0" stop-color="#f2f2f2"/>
+      <stop offset="1" stop-color="#8c8c8c"/>
+    </radialGradient>
+  </defs>
+
+  <!-- anime slash crescent: bright leading edge, feathered trailing edge -->
+  <path d="M 36 20 C 320 60, 496 150, 496 256 C 496 362, 320 452, 36 492
+           C 240 430, 380 340, 380 256 C 380 172, 240 82, 36 20 Z"
+        fill="url(#wrench-slash)"/>
+  <!-- concentric speed lines, hand-drawn anime feel -->
+  <path d="M 70 110 Q 800 256 70 402" fill="none" stroke="#ffffff" stroke-width="7"
+        stroke-opacity="0.85" stroke-linecap="round"/>
+  <path d="M 90 160 Q 640 256 90 352" fill="none" stroke="#e6e6e6" stroke-width="5"
+        stroke-opacity="0.6" stroke-linecap="round" stroke-dasharray="42 28"/>
+  <path d="M 110 205 Q 500 256 110 307" fill="none" stroke="#cccccc" stroke-width="4"
+        stroke-opacity="0.5" stroke-linecap="round" stroke-dasharray="24 34"/>
+
+  <!-- shaft: cylindrical shading, light top edge to dark underside -->
+  <rect x="66" y="230" width="316" height="52" rx="20" fill="url(#wrench-shaft)"
+        stroke="#0f172a" stroke-width="12"/>
+  <!-- long specular streak along the shaft -->
+  <rect x="92" y="240" width="266" height="9" rx="4.5" fill="#ffffff" fill-opacity="0.9"/>
+  <!-- worn-metal nicks -->
+  <path d="M 148 270 l 26 -6" fill="none" stroke="#999999" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 236 246 l 22 8" fill="none" stroke="#8c8c8c" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 306 268 l 18 -5" fill="none" stroke="#999999" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- knurled adjuster nut near the head -->
+  <rect x="348" y="220" width="56" height="72" rx="10" fill="url(#wrench-nut)"
+        stroke="#0f172a" stroke-width="12"/>
+  <rect x="358" y="230" width="7" height="52" rx="3.5" fill="#666666"/>
+  <rect x="373" y="230" width="7" height="52" rx="3.5" fill="#666666"/>
+  <rect x="388" y="230" width="7" height="52" rx="3.5" fill="#666666"/>
+
+  <!-- beveled open jaw at the far edge -->
+  <path d="M 388 168 Q 504 168 504 224 L 432 240 L 432 272 L 504 288 Q 504 344 388 344
+           Q 354 296 354 256 Q 354 216 388 168 Z"
+        fill="url(#wrench-jaw)" stroke="#0f172a" stroke-width="14" stroke-linejoin="round"/>
+  <!-- inner-edge shading inside the jaw mouth -->
+  <path d="M 432 240 L 504 224 L 504 238 L 446 251 Z" fill="#999999" fill-opacity="0.9"/>
+  <path d="M 432 272 L 504 288 L 504 274 L 446 261 Z" fill="#737373" fill-opacity="0.9"/>
+  <!-- bevel highlight on the upper jaw face -->
+  <path d="M 398 192 Q 452 184 476 200" fill="none" stroke="#ffffff" stroke-width="8"
+        stroke-opacity="0.85" stroke-linecap="round"/>
+
+  <!-- pivot pin / screw head at the grip end -->
+  <circle cx="46" cy="256" r="40" fill="url(#wrench-pivot)" stroke="#0f172a" stroke-width="12"/>
+  <circle cx="46" cy="256" r="15" fill="#0f172a"/>
+  <path d="M 34 256 h 24" fill="none" stroke="#8c8c8c" stroke-width="5" stroke-linecap="round"/>
 </svg>

@@ -49,7 +49,8 @@ describe('balance data invariants', () => {
   });
 
   it('every flight-style hero resolves a projectile speed within [250, 900] px/s', () => {
-    const flightStyles = new Set(['projectile', 'pierce', 'boomerang', 'lobbed', 'linear-wave']);
+    // vortex counts: the net flies as a homing projectile before the vortex opens.
+    const flightStyles = new Set(['projectile', 'pierce', 'boomerang', 'lobbed', 'linear-wave', 'vortex']);
     for (const definition of Object.values(HERO_DEFINITIONS)) {
       if (definition.id.startsWith('sandbox_') || !flightStyles.has(definition.attackStyle)) continue;
       const speed = resolveAttackSpeed(definition);

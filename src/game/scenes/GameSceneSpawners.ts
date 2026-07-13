@@ -94,7 +94,9 @@ export function spawnHero(scene: GameScene, id: HeroId, passiveOverride?: string
     if (h.definition.attackStyle === 'melee-cleave') {
       attack = new MeleeCleaveAttack(scene, h.x, h.y, target, h.damage, h.range, visual, mods, damageType);
     } else if (h.definition.attackStyle === 'vortex') {
-      attack = new VortexAttack(scene, h.x, h.y, target, h.damage, visual, mods, damageType);
+      // Thrown net: flies from the muzzle, vortex opens where it lands.
+      attack = new VortexAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, speed, mods, damageType);
+      h.playProjectileLaunch();
     } else if (h.definition.attackStyle === 'boomerang') {
       attack = new BoomerangAttack(scene, h, target, h.damage, visual, speed, mods, damageType);
       h.playProjectileLaunch();

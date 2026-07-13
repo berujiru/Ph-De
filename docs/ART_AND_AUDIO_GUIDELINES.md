@@ -76,8 +76,11 @@ Registry and per-style fallbacks live in `src/game/data/attackArt.ts`; wiring
 steps are in `docs/ADDING_HEROES.md` → *Step A2*.
 
 Authoring rules (mechanically enforced by `tests/unit/attackArt.test.ts`):
-- `viewBox="0 0 128 128"` with matching `width`/`height` attributes (Phaser
-  rasterizes `load.image` SVGs at intrinsic size).
+- `viewBox="0 0 128 128"` with matching `width`/`height` attributes is the
+  **default** (Phaser rasterizes `load.image` SVGs at intrinsic size).
+  **Exception:** melee-cleave art is authored at `512×512` (matching
+  `width`/`height`/`viewBox`) because it displays stretched to the full cleave
+  range (420–550px) and a 128px raster reads blurry at that size.
 - Art centered, "nose" pointing **+X** — the engine rotates the sprite along
   the flight vector. Elongated shapes (pierce lances, slashes, wave bands) use
   the full width.

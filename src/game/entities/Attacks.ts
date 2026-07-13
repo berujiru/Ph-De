@@ -277,6 +277,14 @@ export class MeleeCleaveAttack extends Attack {
   private lifeTimeMs = 320;
   private ageMs = 0;
   private maxRadius: number;
+  // Afterimage trail: fading snapshots of the swipe left behind as it sweeps.
+  // Spawned on a fixed cadence (not per-frame — see MotionTrail's perf notes),
+  // ~8 ghosts over the 280ms sweep. Each ghost's fade tween self-destroys, so
+  // early attack death needs no cleanup pass.
+  private swipe: AttackSprite;
+  private swipeTint: number;
+  private ghostTimerMs = 0;
+  private static readonly GHOST_INTERVAL_MS = 35;
 
   constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy, damage: number, range: number, visual: AttackVisual, modifiers?: Partial<AttackModifiers>, damageType: string = 'Physical') {
     super(scene, 'MeleeCleaveAttack', damage, modifiers, damageType);
@@ -291,6 +299,8 @@ export class MeleeCleaveAttack extends Attack {
     cleaveSwingFlip = !cleaveSwingFlip;
     const dir = cleaveSwingFlip ? 1 : -1;
     const swipe = new AttackSprite(scene, { x, y, artKey: visual.artKey, tint: visual.tint, lengthPx: this.maxRadius, alpha: 0.9 });
+    this.swipe = swipe;
+    this.swipeTint = visual.tint;
     swipe.image.setOrigin(0, 0.5); // pivot at the hero's hands
     const fullScale = swipe.image.scale;
     swipe.image.setScale(fullScale * 0.85);
@@ -334,41 +344,88 @@ export class MeleeCleaveAttack extends Attack {
   update(_time: number, delta: number) {
     if (this.isDead) return;
     this.ageMs += delta;
+
+    // Trail: drop a ghost of the swipe at its current pose every ~35ms while
+    // the swipe is still alive (its alpha tween destroys it before we do).
+    if (this.swipe.image.active) {
+      this.ghostTimerMs += delta;
+      while (this.ghostTimerMs >= MeleeCleaveAttack.GHOST_INTERVAL_MS) {
+        this.ghostTimerMs -= MeleeCleaveAttack.GHOST_INTERVAL_MS;
+        this.spawnGhost();
+      }
+    }
+
     if (this.ageMs >= this.lifeTimeMs) {
       this.isDead = true;
       this.destroy();
     }
   }
+
+  /** Fading copy of the swipe frozen at its current rotation/scale. */
+  private spawnGhost() {
+    const src = this.swipe.image;
+    const ghost = this.scene.add.image(src.x, src.y, src.texture.key);
+    ghost.setOrigin(0, 0.5);
+    ghost.setRotation(src.rotation);
+    ghost.setScale(src.scaleX, src.scaleY);
+    ghost.setTint(this.swipeTint);
+    ghost.setAlpha(0.3);
+    ghost.setDepth(src.depth - 1); // read behind the live swipe
+    this.scene.tweens.add({
+      targets: ghost,
+      alpha: 0,
+      duration: 180,
+      ease: 'Quad.easeOut',
+      onComplete: () => ghost.destroy(),
+    });
+  }
 }
 
 export class VortexAttack extends Attack {
-  private overlay: AreaOverlay;
-  private xPos: number;
-  private yPos: number;
+  // Two phases: the hero throws the net (tumbling flight sprite homing on the
+  // target, cf. ProjectileAttack), then the vortex opens where it LANDS — so a
+  // dodging enemy drags the trap with it. The 3000ms lifetime starts at landing.
+  private phase: 'flight' | 'vortex' = 'flight';
+  private flight: AttackSprite;
+  private trail: MotionTrail;
+  private target: Enemy | null;
+  private speed: number;
+  private destX: number;
+  private destY: number;
+  private visualCfg: AttackVisual;
+  private overlay: AreaOverlay | null = null;
+  private xPos = 0;
+  private yPos = 0;
   private lifeTimeMs = 3000;
   private ageMs = 0;
   private tickRateMs = 500;
   private timeSinceLastTick = 0;
+  // Vortex-style sizePx is 0 (the overlay sizes by gameplay radius), so the
+  // thrown net gets its own in-flight length.
+  private static readonly FLIGHT_LENGTH_PX = 64;
 
-  constructor(scene: Phaser.Scene, _x: number, _y: number, target: Enemy, damage: number, visual: AttackVisual, modifiers?: Partial<AttackModifiers>, damageType: string = 'Physical') {
+  constructor(scene: Phaser.Scene, x: number, y: number, target: Enemy, damage: number, visual: AttackVisual, speed: number, modifiers?: Partial<AttackModifiers>, damageType: string = 'Physical') {
     super(scene, 'VortexAttack', damage, modifiers, damageType);
-    const radius = 100 + this.modifiers.bonusRadius;
-    // Spawn at target location so it traps enemies there
-    this.xPos = target.x;
-    this.yPos = target.y;
-    this.overlay = new AreaOverlay(scene, {
-      x: target.x, y: target.y, radius,
-      fillColor: visual.tint, fillAlpha: 0.25,
-      strokeColor: visual.tint, strokeWidth: 3, strokeAlpha: 0.9,
-      svgKey: visual.artKey, svgTint: visual.tint,
-      svgScale: (radius * 2) / 128, // art is authored at 128px, cover the disc
-      svgSpin: 90,
-      enter: { durationMs: 200 },
+    this.speed = speed;
+    this.target = target;
+    this.destX = target.x;
+    this.destY = target.y;
+    this.visualCfg = visual;
+    this.trail = new MotionTrail(scene, visual.tint);
+    // Thrown net tumbles as it flies (gentler than BoomerangAttack's whirl).
+    this.flight = new AttackSprite(scene, {
+      x, y, artKey: visual.artKey, tint: visual.tint,
+      lengthPx: VortexAttack.FLIGHT_LENGTH_PX,
+      spinDegPerSec: 450,
     });
   }
 
   update(_time: number, delta: number) {
     if (this.isDead) return;
+    if (this.phase === 'flight') {
+      this.updateFlight(delta);
+      return;
+    }
     this.ageMs += delta;
     this.timeSinceLastTick += delta;
 
@@ -406,9 +463,50 @@ export class VortexAttack extends Attack {
 
     if (this.ageMs >= this.lifeTimeMs) {
       this.isDead = true;
-      this.overlay.fadeOutAndDestroy(200);
+      this.overlay?.fadeOutAndDestroy(200);
       this.destroy();
     }
+  }
+
+  /** Home on the live target; if it dies mid-flight, finish at its last-known spot. */
+  private updateFlight(delta: number) {
+    if (this.target && this.target.isDead) this.target = null;
+    if (this.target) {
+      this.destX = this.target.x;
+      this.destY = this.target.y;
+    }
+    const dx = this.destX - this.flight.x;
+    const dy = this.destY - this.flight.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const step = this.speed * (delta / 1000);
+    // Arrive when within touchdown range — or when this frame's step would
+    // overshoot it (large delta), so the net never orbits its landing point.
+    if (dist <= Math.max(12, step)) {
+      this.land();
+      return;
+    }
+    this.flight.setPosition(this.flight.x + (dx / dist) * step, this.flight.y + (dy / dist) * step);
+    this.flight.update(delta); // advance the tumble
+    this.trail.update(this.flight.x, this.flight.y, (dx / dist) * this.speed, (dy / dist) * this.speed);
+  }
+
+  /** Touchdown: swap the flight sprite for the vortex overlay at the landing point. */
+  private land() {
+    this.phase = 'vortex';
+    this.trail.destroy();
+    this.flight.destroy();
+    this.xPos = this.destX;
+    this.yPos = this.destY;
+    const radius = 100 + this.modifiers.bonusRadius;
+    this.overlay = new AreaOverlay(this.scene, {
+      x: this.xPos, y: this.yPos, radius,
+      fillColor: this.visualCfg.tint, fillAlpha: 0.25,
+      strokeColor: this.visualCfg.tint, strokeWidth: 3, strokeAlpha: 0.9,
+      svgKey: this.visualCfg.artKey, svgTint: this.visualCfg.tint,
+      svgScale: (radius * 2) / 128, // art is authored at 128px, cover the disc
+      svgSpin: 90,
+      enter: { durationMs: 200 },
+    });
   }
 }
 
