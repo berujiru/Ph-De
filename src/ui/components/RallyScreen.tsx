@@ -12,7 +12,6 @@ import {
 import {
   BarricadeIcon,
   ChestIcon,
-  HeroCardIcon,
   HopeCoinIcon,
   MegaphoneIcon,
   PauseIcon,
@@ -42,10 +41,15 @@ import {
 import { SkinPortrait } from './ArchiveCards';
 import { getSelectedSkin } from '../../game/data/skinSelection';
 import { HERO_DEFINITIONS, type HeroId } from '../../game/data/heroes';
+import { getHighestClearedStage, getStoreUnlockedHeroes } from '../../game/data/metaState';
+import { availableHeroIds } from '../../game/data/heroUnlocks';
+import { computeBattleRewards, applyBattleRewards, type BattleRewards } from '../../game/data/battleRewards';
 import { IntelModal } from './IntelModal';
 import { EnemyTcgCard } from './EnemyTcgCard';
 
 interface RallyScreenProps {
+  /** Campaign stage being played (null for non-campaign runs); drives stage-clear recording. */
+  stage: { act: number; stageIdx: number } | null;
   onReturnToMenu: () => void;
 }
 
@@ -394,7 +398,7 @@ function SpoilRow({ icon, iconColor, label, value, valueColor, prefix = '+', suf
 /* RallyScreen                                                           */
 /* ------------------------------------------------------------------ */
 
-export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
+export function RallyScreen({ stage, onReturnToMenu }: RallyScreenProps) {
   const [state, setState] = useState<GameStateSnapshot>({
     barrierHp: 100,
     maxBarrierHp: 100,
@@ -413,9 +417,12 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
   const [surrenderConfirmOpen, setSurrenderConfirmOpen] = useState(false);
   const [intelOpen, setIntelOpen] = useState(false);
   const [introducedEnemy, setIntroducedEnemy] = useState<string | null>(null);
+  const [spoils, setSpoils] = useState<BattleRewards | null>(null);
   const lastSpeedRef = useRef(1);
   /** True only when the Intel modal itself paused the game (vs. the user's pause button). */
   const intelPausedGameRef = useRef(false);
+  /** Guards battle rewards to a single application per rally. */
+  const rewardsAppliedRef = useRef(false);
 
   useEffect(() => {
     const unsubState = gameToUiEvents.on('stateChanged', setState);
@@ -486,15 +493,28 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
   const voicesRatio = state.maxVoicesCount > 0 ? state.voicesCount / state.maxVoicesCount : 0;
   const voicesNearFull = voicesRatio >= 0.75;
 
-  // Mock spoils — real values arrive with the run-summary contract later.
   const wavesCleared = won ? state.totalWaves : Math.max(0, state.currentWave - 1);
-  const hopeEarned = won ? 150 + wavesCleared * 25 : 40 + wavesCleared * 10;
-  const heroCardDrops = won ? 2 : 1;
   const stars = [
     { label: 'No breach', earned: state.barrierHp >= state.maxBarrierHp },
     { label: 'No Act used', earned: true },
     { label: 'Swift defense', earned: won },
   ];
+
+  // Award + persist battle spoils exactly once when the rally ends. The ref
+  // survives stateChanged re-emissions; StrictMode's remount happens while the
+  // game is still 'playing' (gameOver false), so it never double-applies.
+  useEffect(() => {
+    if (!gameOver || rewardsAppliedRef.current) return;
+    rewardsAppliedRef.current = true;
+    const starsEarned = won ? stars.filter((s) => s.earned).length : 0;
+    // Read the owned roster BEFORE applyBattleRewards' recordStageClear bumps
+    // highestClearedStage — otherwise a freshly unlocked hero could be dropped.
+    const roster = availableHeroIds(getHighestClearedStage(), getStoreUnlockedHeroes());
+    const rewards = computeBattleRewards({ won, wavesCleared }, roster, Math.random);
+    applyBattleRewards(rewards, { won, starsEarned, stage });
+    setSpoils(rewards);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- state is frozen once gameOver flips true
+  }, [gameOver]);
 
   return (
     <div className="rally-screen" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
@@ -832,7 +852,7 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
       )}
 
       {/* ---------- Spoils of War (Victory / Defeat) ---------- */}
-      {gameOver && (
+      {gameOver && spoils && (
         <div
           style={{
             position: 'fixed',
@@ -951,32 +971,50 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
                   iconColor={theme.colors.gold}
                   label="Hope Points"
                   note={won ? undefined : 'A failed defense still wakes people up'}
-                  value={hopeEarned}
+                  value={spoils.hope}
                   valueColor={theme.colors.gold}
                 />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%', marginTop: 4 }}>
                   <div style={{ ...stampLabel, fontSize: 11, color: theme.colors.textMuted }}>
                     Hero Card Drops
                   </div>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    {heroCardDrops > 0 ? Array.from({ length: heroCardDrops }).map((_, i) => (
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {spoils.cardDrops.length > 0 ? spoils.cardDrops.map((heroId, i) => (
                       <div
                         key={i}
                         style={{
                           width: 46,
-                          height: 62,
-                          borderRadius: 8,
-                          border: `1px solid ${withAlpha(theme.colors.accent, 0.7)}`,
-                          background: `linear-gradient(160deg, ${withAlpha(theme.colors.accent, 0.22)}, ${withAlpha(theme.colors.background, 0.5)})`,
-                          boxShadow: `0 4px 12px ${withAlpha(theme.colors.background, 0.6)}, inset 0 0 8px ${withAlpha(theme.colors.accent, 0.2)}`,
                           display: 'flex',
+                          flexDirection: 'column',
                           alignItems: 'center',
-                          justifyContent: 'center',
-                          color: theme.colors.accent,
+                          gap: 3,
                           animation: `star-pop 0.3s ease ${0.35 + i * 0.12}s both`,
                         }}
                       >
-                        <HeroCardIcon size={26} />
+                        <div
+                          style={{
+                            width: 46,
+                            height: 62,
+                            borderRadius: 8,
+                            overflow: 'hidden',
+                            border: `1px solid ${withAlpha(theme.colors.accent, 0.7)}`,
+                            background: `linear-gradient(160deg, ${withAlpha(theme.colors.accent, 0.22)}, ${withAlpha(theme.colors.background, 0.5)})`,
+                            boxShadow: `0 4px 12px ${withAlpha(theme.colors.background, 0.6)}, inset 0 0 8px ${withAlpha(theme.colors.accent, 0.2)}`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: theme.colors.accent,
+                          }}
+                        >
+                          <SkinPortrait
+                            skin={getSelectedSkin(heroId)}
+                            alt={HERO_DEFINITIONS[heroId]?.name ?? heroId}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }}
+                          />
+                        </div>
+                        <span style={{ fontSize: 7.5, fontWeight: 800, letterSpacing: 0.2, textAlign: 'center', lineHeight: 1.1, color: theme.colors.textSecondary }}>
+                          {HERO_DEFINITIONS[heroId]?.name ?? heroId}
+                        </span>
                       </div>
                     )) : (
                       <div style={{ fontSize: 13, color: theme.colors.textMuted }}>None</div>

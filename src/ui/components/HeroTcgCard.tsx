@@ -8,11 +8,14 @@ interface HeroTcgCardProps {
   heroId: HeroId;
   style?: CSSProperties;
   rotation?: number;
+  /** Level-scaled damage to show instead of the base (metaState hero level). */
+  damageOverride?: number;
 }
 
-export function HeroTcgCard({ heroId, style, rotation = 0 }: HeroTcgCardProps) {
+export function HeroTcgCard({ heroId, style, rotation = 0, damageOverride }: HeroTcgCardProps) {
   const def = HERO_DEFINITIONS[heroId];
   if (!def) return null;
+  const shownDamage = damageOverride ?? def.damage;
 
   const color = hexColor(def.color);
   const skin = getSelectedSkin(def.id);
@@ -113,7 +116,7 @@ export function HeroTcgCard({ heroId, style, rotation = 0 }: HeroTcgCardProps) {
         marginBottom: 10,
         zIndex: 10
       }}>
-        <span>DMG: <span style={{color: '#facc15'}}>{def.damage}</span></span>
+        <span>DMG: <span style={{color: '#facc15'}}>{shownDamage}</span></span>
         <span>SPD: <span style={{color: '#38bdf8'}}>{(def.attackRateMs / 1000).toFixed(1)}s</span></span>
         <span>RNG: <span style={{color: '#ef4444'}}>{metersLabel(def.range)}</span></span>
       </div>

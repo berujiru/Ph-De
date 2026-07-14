@@ -1,8 +1,10 @@
 import type { HeroId } from './heroes';
+import { cardsForNextLevel, HERO_LEVEL_CAP } from './heroProgression';
 
 /**
  * Meta-progression state, backed by localStorage.
- * Manages Hope points, Rally Permits, Store Unlocks, and Campaign Progress.
+ * Manages Hope points, Rally Permits, Store Unlocks, Campaign Progress, and
+ * the permanent Hero Card inventory + hero levels.
  */
 
 const STORAGE_KEY = 'firstripple.meta';
@@ -13,6 +15,10 @@ export interface MetaStateData {
   highestClearedStage: number;
   stageStars: Record<number, number>;
   storeUnlockedHeroes: HeroId[];
+  /** Owned Hero Cards per hero (absent key = 0). Spent to level heroes up. */
+  heroCards: Partial<Record<HeroId, number>>;
+  /** Permanent hero level per hero (absent key = level 1). */
+  heroLevels: Partial<Record<HeroId, number>>;
 }
 
 const DEFAULT_STATE: MetaStateData = {
@@ -21,6 +27,8 @@ const DEFAULT_STATE: MetaStateData = {
   highestClearedStage: 0,
   stageStars: {},
   storeUnlockedHeroes: [],
+  heroCards: {},
+  heroLevels: {},
 };
 
 function readStorage(): MetaStateData {
@@ -34,6 +42,10 @@ function readStorage(): MetaStateData {
       highestClearedStage: typeof parsed.highestClearedStage === 'number' ? parsed.highestClearedStage : DEFAULT_STATE.highestClearedStage,
       stageStars: parsed.stageStars && typeof parsed.stageStars === 'object' ? parsed.stageStars : DEFAULT_STATE.stageStars,
       storeUnlockedHeroes: Array.isArray(parsed.storeUnlockedHeroes) ? parsed.storeUnlockedHeroes : DEFAULT_STATE.storeUnlockedHeroes,
+      // Migration: saves written before Hero Cards existed lack these keys and
+      // silently default (new keys are additive; old code ignores them too).
+      heroCards: parsed.heroCards && typeof parsed.heroCards === 'object' ? parsed.heroCards : { ...DEFAULT_STATE.heroCards },
+      heroLevels: parsed.heroLevels && typeof parsed.heroLevels === 'object' ? parsed.heroLevels : { ...DEFAULT_STATE.heroLevels },
     };
   } catch {
     return { ...DEFAULT_STATE };
@@ -87,6 +99,22 @@ export function getStoreUnlockedHeroes(): HeroId[] {
   return state.storeUnlockedHeroes;
 }
 
+export function getHeroCards(): Partial<Record<HeroId, number>> {
+  return state.heroCards;
+}
+
+export function getHeroCardCount(heroId: HeroId): number {
+  return state.heroCards[heroId] ?? 0;
+}
+
+export function getHeroLevels(): Partial<Record<HeroId, number>> {
+  return state.heroLevels;
+}
+
+export function getHeroLevel(heroId: HeroId): number {
+  return state.heroLevels[heroId] ?? 1;
+}
+
 // Setters / Actions
 export function addHope(amount: number) {
   if (amount <= 0) return;
@@ -118,6 +146,30 @@ export function unlockHeroInStore(heroId: HeroId) {
   if (state.storeUnlockedHeroes.includes(heroId)) return;
   state = { ...state, storeUnlockedHeroes: [...state.storeUnlockedHeroes, heroId] };
   notify();
+}
+
+export function addHeroCards(heroId: HeroId, amount: number) {
+  if (amount <= 0) return;
+  state = {
+    ...state,
+    heroCards: { ...state.heroCards, [heroId]: (state.heroCards[heroId] ?? 0) + amount },
+  };
+  notify();
+}
+
+/** Spend cards to raise a hero one level. Returns false if at cap or short on cards. */
+export function levelUpHero(heroId: HeroId): boolean {
+  const level = state.heroLevels[heroId] ?? 1;
+  if (level >= HERO_LEVEL_CAP) return false;
+  const cost = cardsForNextLevel(level);
+  if ((state.heroCards[heroId] ?? 0) < cost) return false;
+  state = {
+    ...state,
+    heroCards: { ...state.heroCards, [heroId]: (state.heroCards[heroId] ?? 0) - cost },
+    heroLevels: { ...state.heroLevels, [heroId]: level + 1 },
+  };
+  notify();
+  return true;
 }
 
 export function setHighestClearedStage(stageId: number) {

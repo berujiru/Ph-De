@@ -65,6 +65,21 @@ export function heroUnlockStage(id: HeroId): number {
 }
 
 /**
+ * Every hero the player currently owns for meta purposes (card drops, store
+ * grants): Eden plus any recruitable worker whose unlock stage has been cleared
+ * or who was bought early in the store. Mirrors PreparationScreen's inline
+ * roster filter.
+ */
+export function availableHeroIds(highestClearedStage: number, storeUnlocked: HeroId[]): HeroId[] {
+  return [
+    'eden' as HeroId,
+    ...RECRUITABLE_HERO_IDS.filter(
+      (id) => HERO_UNLOCK_STAGE[id] <= highestClearedStage || storeUnlocked.includes(id),
+    ),
+  ];
+}
+
+/**
  * Heroes the Voices RNG may offer in the given campaign battle. Non-campaign
  * battles (sandbox quick-start passes null coordinates) get the full roster.
  */

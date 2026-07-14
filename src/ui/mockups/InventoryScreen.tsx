@@ -26,8 +26,12 @@ import {
   getPermits,
   getHighestClearedStage,
   getStoreUnlockedHeroes,
+  getHeroCardCount,
+  getHeroLevel,
+  levelUpHero,
   subscribeMetaState,
 } from '../../game/data/metaState';
+import { cardsForNextLevel, HERO_LEVEL_CAP, leveledDamage } from '../../game/data/heroProgression';
 
 interface InventoryScreenProps {
   onBack: () => void;
@@ -230,13 +234,15 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(68px, 1fr))', gap: '8px 6px', padding: '6px 2px' }}>
           {roster.map((hero, idx) => {
             // Unlock path comes from the campaign schedule (data/heroUnlocks.ts);
-            // cleared-stage progress and leveling are still mock.
+            // level + card counts are real, from metaState.
             const unlockStage = heroUnlockStage(hero.id);
             const unlockAct = actForStage(unlockStage);
             const isUnlocked = unlockStage <= highestStage || storeUnlocked.includes(hero.id as HeroId);
-            const mockLevel = hero.id === 'eden' ? 3 : 1;
-            const mockCards = hero.id === 'eden' ? 4 : 8;
-            const mockCardsNeeded = mockLevel * 5;
+            const level = getHeroLevel(hero.id);
+            const cards = getHeroCardCount(hero.id);
+            const atCap = level >= HERO_LEVEL_CAP;
+            const cardsNeeded = cardsForNextLevel(level);
+            const canPromote = !atCap && cards >= cardsNeeded;
             const rotation = (idx % 2 === 0 ? 1 : -1) * (2 + (idx % 3)); // slight, stable rotation
 
             return (
@@ -245,7 +251,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 name={hero.name}
                 subtitle={isUnlocked ? hero.profession : `A ${hero.profession.toLowerCase()} waits for the movement to reach them…`}
                 unlocked={isUnlocked}
-                level={mockLevel}
+                level={level}
                 rotation={rotation}
                 skin={getSelectedSkin(hero.id)}
                 onClick={() => setSelectedHero(hero)}
@@ -269,13 +275,13 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 <div style={{
                   fontSize: '7.5px',
                   fontWeight: 'bold',
-                  color: mockCards >= mockCardsNeeded ? theme.colors.accent : theme.colors.textMuted,
-                  backgroundColor: mockCards >= mockCardsNeeded ? 'rgba(234, 88, 12, 0.15)' : 'rgba(0,0,0,0.6)',
-                  border: mockCards >= mockCardsNeeded ? `1px solid ${theme.colors.accent}` : `1px solid ${theme.colors.border}`,
+                  color: canPromote ? theme.colors.accent : theme.colors.textMuted,
+                  backgroundColor: canPromote ? 'rgba(234, 88, 12, 0.15)' : 'rgba(0,0,0,0.6)',
+                  border: canPromote ? `1px solid ${theme.colors.accent}` : `1px solid ${theme.colors.border}`,
                   padding: '1px 5px',
                   borderRadius: '10px'
                 }}>
-                  CARDS: {mockCards} / {mockCardsNeeded}
+                  {atCap ? `CARDS: ${cards} · MAX` : `CARDS: ${cards} / ${cardsNeeded}`}
                 </div>
               </HeroPolaroidCard>
             );
@@ -408,7 +414,10 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
             </button>
 
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
-              <HeroTcgCard heroId={selectedHero.id} />
+              <HeroTcgCard
+                heroId={selectedHero.id}
+                damageOverride={leveledDamage(selectedHero.damage, getHeroLevel(selectedHero.id))}
+              />
             </div>
 
             {/* Skins — pick which sheet this worker wears into battle */}
@@ -461,41 +470,55 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
               flexWrap: 'wrap'
             }}>
 
-              {/* Red Approved Stamp if enough cards */}
-              {((selectedHero.id === 'eden' ? 4 : 8) >= (selectedHero.id === 'eden' ? 15 : 5)) && (
-                <div style={{
-                  position: 'absolute',
-                  top: '10px',
-                  left: '40%',
-                  transform: 'rotate(-15deg)',
-                  color: theme.colors.accent, // Ember-orange stamp
-                  border: `4px solid ${theme.colors.accent}`,
-                  padding: '5px 15px',
-                  fontSize: '24px',
-                  fontWeight: '900',
-                  fontFamily: TYPEWRITER_FONT,
-                  opacity: 0.85,
-                  textShadow: '0 0 10px rgba(234,88,12,0.5)',
-                  boxShadow: '0 0 15px rgba(234,88,12,0.3), inset 0 0 10px rgba(234,88,12,0.3)',
-                  pointerEvents: 'none'
-                }}>
-                  READY FOR PROMOTION
-                </div>
-              )}
+              {/* Red Approved Stamp when enough cards to promote */}
+              {(() => {
+                const level = getHeroLevel(selectedHero.id);
+                const atCap = level >= HERO_LEVEL_CAP;
+                const cards = getHeroCardCount(selectedHero.id);
+                const cost = cardsForNextLevel(level);
+                const canPromote = !atCap && cards >= cost;
+                return (
+                  <>
+                    {canPromote && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '10px',
+                        left: '40%',
+                        transform: 'rotate(-15deg)',
+                        color: theme.colors.accent, // Ember-orange stamp
+                        border: `4px solid ${theme.colors.accent}`,
+                        padding: '5px 15px',
+                        fontSize: '24px',
+                        fontWeight: '900',
+                        fontFamily: TYPEWRITER_FONT,
+                        opacity: 0.85,
+                        textShadow: '0 0 10px rgba(234,88,12,0.5)',
+                        boxShadow: '0 0 15px rgba(234,88,12,0.3), inset 0 0 10px rgba(234,88,12,0.3)',
+                        pointerEvents: 'none'
+                      }}>
+                        READY FOR PROMOTION
+                      </div>
+                    )}
 
-              <div style={{ display: 'flex', flexDirection: 'column', color: theme.colors.textPrimary }}>
-                <span style={{ fontSize: '14px', fontWeight: 'bold', fontFamily: TYPEWRITER_FONT }}>CARDS GATHERED:</span>
-                <span style={{ fontSize: '24px', fontWeight: '900' }}>
-                  {selectedHero.id === 'eden' ? '4 / 15' : '8 / 5'}
-                </span>
-              </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', color: theme.colors.textPrimary }}>
+                      <span style={{ fontSize: '14px', fontWeight: 'bold', fontFamily: TYPEWRITER_FONT }}>
+                        LV {level}{atCap ? ' · MAX' : ''} — CARDS:
+                      </span>
+                      <span style={{ fontSize: '24px', fontWeight: '900' }}>
+                        {atCap ? `${cards}` : `${cards} / ${cost}`}
+                      </span>
+                    </div>
 
-              <SoulsButton
-                variant="primary"
-                disabled={selectedHero.id === 'eden'}
-              >
-                Promote Worker
-              </SoulsButton>
+                    <SoulsButton
+                      variant="primary"
+                      disabled={!canPromote}
+                      onClick={() => { levelUpHero(selectedHero.id); }}
+                    >
+                      {atCap ? 'Max Level' : 'Promote Worker'}
+                    </SoulsButton>
+                  </>
+                );
+              })()}
             </div>
 
           </div>

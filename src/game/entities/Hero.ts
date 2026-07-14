@@ -7,6 +7,8 @@ import { type UpgradeKind } from '../data/drops';
 import { RALLY } from '../data/level';
 import { formationTargetY, stepTowardFormation } from '../core/RallyMarch';
 import { applyHeroPassive, type ISkillHero } from '../core/Skills';
+import { leveledDamage } from '../data/heroProgression';
+import { getHeroLevel } from '../data/metaState';
 import { uiToGameEvents } from '../core/GameEvents';
 import { HeroModel } from './models/HeroModel';
 import { SpriteAura } from './fx/SpriteAura';
@@ -75,7 +77,10 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.id = def.id;
     this.definition = def;
 
-    this.damage = def.damage;
+    // Permanent Hero-Card level scales base damage (and thus every skill, which
+    // derives from hero.damage). Voice-drop bonuses stack on top downstream.
+    // Sandbox testers have no saved level → getHeroLevel returns 1 → ×1.0.
+    this.damage = leveledDamage(def.damage, getHeroLevel(def.id));
     this.attackRateMs = def.attackRateMs;
     this.range = def.range;
     this.onAttack = onAttack;

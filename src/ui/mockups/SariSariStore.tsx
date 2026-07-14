@@ -13,11 +13,13 @@ import { Embers } from '../components/ApocalypseScenery';
 import { RewardReveal, type RevealReward } from '../components/RewardReveal';
 import type { DropRarity } from '../../game/core/GameEvents';
 import { HERO_DEFINITIONS, type HeroId } from '../../game/data/heroes';
-import { HERO_UNLOCK_STAGE, type RecruitableHeroId } from '../../game/data/heroUnlocks';
+import { HERO_UNLOCK_STAGE, type RecruitableHeroId, availableHeroIds } from '../../game/data/heroUnlocks';
+import { rollCardDrops } from '../../game/data/battleRewards';
 import {
   getHope,
   spendHope,
   addPermits,
+  addHeroCards,
   getStoreUnlockedHeroes,
   unlockHeroInStore,
   getHighestClearedStage,
@@ -333,8 +335,9 @@ const HERO_PLACEHOLDER_SRC = '/assets/heroes/hero-placeholder.svg';
 const CARD_RARITIES: DropRarity[] = ['common', 'common', 'rare', 'common', 'epic', 'rare'];
 
 /** Build the reveal payload for a purchase — hero unlocks and card packs
- *  share the same card-flip reveal (per owner request). */
-function rewardsFor(item: CatalogItem): { heading: string; rewards: RevealReward[] } {
+ *  share the same card-flip reveal (per owner request). `grantedCards` is the
+ *  actual heroes the pack rolled, so the reveal names who leveled up. */
+function rewardsFor(item: CatalogItem, grantedCards: HeroId[] = []): { heading: string; rewards: RevealReward[] } {
   switch (item.category) {
     case 'Hero Unlocks':
       return {
@@ -348,13 +351,11 @@ function rewardsFor(item: CatalogItem): { heading: string; rewards: RevealReward
         }],
       };
     case 'Hero Cards': {
-      const count = item.id === 'eden_bundle' ? 5 : 3;
-      const fixedName = item.id === 'eden_bundle' ? 'Eden' : null;
-      const rewards: RevealReward[] = Array.from({ length: count }, (_, i) => ({
+      const rewards: RevealReward[] = grantedCards.map((heroId, i) => ({
         id: `${item.id}-${i}`,
-        title: `${fixedName ?? 'Hero'} Card`,
+        title: `${HERO_DEFINITIONS[heroId]?.name ?? heroId} Card`,
         subtitle: 'Level up the roster.',
-        rarity: fixedName ? 'rare' : CARD_RARITIES[i % CARD_RARITIES.length],
+        rarity: item.id === 'eden_bundle' ? 'rare' : CARD_RARITIES[i % CARD_RARITIES.length],
         icon: <HeroCardIcon size={44} />,
       }));
       return { heading: 'Cards Drawn!', rewards };
@@ -412,6 +413,7 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
 
   const handleBuy = (item: CatalogItem) => {
     if (spendHope(item.cost)) {
+      let grantedCards: HeroId[] = [];
       if (item.category === 'Hero Unlocks') {
         const heroId = item.id.replace('unlock_', '') as HeroId;
         unlockHeroInStore(heroId);
@@ -419,8 +421,15 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
         addPermits(1);
       } else if (item.id === 'permit_bundle') {
         addPermits(5);
+      } else if (item.id === 'card_pack') {
+        // 3 random cards from the heroes the player actually owns.
+        grantedCards = rollCardDrops(3, availableHeroIds(highestStage, storeUnlocked), Math.random);
+        for (const heroId of grantedCards) addHeroCards(heroId, 1);
+      } else if (item.id === 'eden_bundle') {
+        grantedCards = ['eden', 'eden', 'eden', 'eden', 'eden'];
+        addHeroCards('eden', 5);
       }
-      setReveal(rewardsFor(item));
+      setReveal(rewardsFor(item, grantedCards));
     }
   };
 

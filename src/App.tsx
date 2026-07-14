@@ -11,6 +11,7 @@ import { SandboxHUD } from './ui/mockups/SandboxHUD';
 import { AudioSettings } from './ui/components/AudioSettings';
 import { theme } from './ui/theme';
 import { uiToGameEvents } from './game/core/GameEvents';
+import { spendPermit } from './game/data/metaState';
 import { AudioManager } from './game/core/AudioManager';
 import { MUSIC } from './game/data/soundRegistry';
 import './App.css';
@@ -31,6 +32,9 @@ function App() {
   };
 
   const handleStartBattle = () => {
+    // Each rally costs 1 Rally Permit. The prep screen already disables Deploy at
+    // 0 permits; this is the actual enforcement + deduction.
+    if (!spendPermit()) return;
     setCurrentView('battle');
     // Start game systems
     uiToGameEvents.emit('restart', selectedStage ? { act: selectedStage.act, stageIdx: selectedStage.stageIdx } : undefined);
@@ -87,7 +91,7 @@ function App() {
       )}
 
       {currentView === 'battle' && (
-        <RallyScreen onReturnToMenu={() => setCurrentView('main')} />
+        <RallyScreen stage={selectedStage} onReturnToMenu={() => setCurrentView('main')} />
       )}
       
       {currentView === 'sandbox' && (
