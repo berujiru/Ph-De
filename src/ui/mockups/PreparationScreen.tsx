@@ -1,9 +1,7 @@
 import { useEffect, useReducer, useState } from 'react';
 import { theme } from '../theme';
 import {
-  CheckIcon,
   InfoIcon,
-  LockIcon,
   MegaphoneIcon,
   RallyPermitIcon,
   VoicesIcon,
@@ -11,7 +9,8 @@ import {
 } from '../icons';
 import { BackButton } from '../components/BackButton';
 import { Embers, SoulsButton } from '../components/ApocalypseScenery';
-import { EnemyCaseCard, HeroPolaroidCard, SkinPortrait } from '../components/ArchiveCards';
+import { EnemyCaseCard, HeroPolaroidCard, SkinPortrait, hexColor } from '../components/ArchiveCards';
+import { EnemyTcgCard } from '../components/EnemyTcgCard';
 import { getSelectedSkin } from '../../game/data/skinSelection';
 import { HERO_DEFINITIONS, type HeroDefinition, type HeroId } from '../../game/data/heroes';
 import { buildWaveTable, bossForStage } from '../../game/data/waves';
@@ -35,6 +34,8 @@ const TYPEWRITER_FONT = '"Courier New", Courier, monospace';
 
 /** Telegraphed enemy intel for the stage (reuses enemy-card data shape). */
 interface EnemyIntel {
+  id: string;
+  color: number;
   name: string;
   form: string;
   note: string;
@@ -60,22 +61,6 @@ const MOCK_WEAKNESSES: Record<string, HeroDefinition['damageType']> = {
 };
 
 // No hardcoded UNLOCKED_HERO_IDS here anymore
-
-interface BayanihanAct {
-  id: string;
-  name: string;
-  effect: string;
-  unlocked: boolean;
-}
-
-const BAYANIHAN_ACTS: BayanihanAct[] = [
-  { id: 'people_power', name: 'People Power', effect: 'Crowd surge — mass knockback down the path.', unlocked: true },
-  { id: 'batingaw', name: 'Batingaw', effect: 'Church bell tolls — mass stun (bosses resist).', unlocked: true },
-  { id: 'baha_ng_tulong', name: 'Baha ng Tulong', effect: 'Flood of aid — large Barrier heal.', unlocked: false },
-  { id: 'boses_ng_bayan', name: 'Boses ng Bayan', effect: 'All heroes gain attack speed.', unlocked: false },
-  { id: 'salu_salo', name: 'Salu-Salo', effect: 'Community feast — gold windfall.', unlocked: false },
-  { id: 'piyesta', name: 'Piyesta', effect: 'Voices surge — next Act charges much faster.', unlocked: false },
-];
 
 // ---------------------------------------------------------------- helpers
 
@@ -135,9 +120,8 @@ interface CompanionHint {
 }
 
 export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: PreparationScreenProps) {
-  const [selectedAct, setSelectedAct] = useState<string>('people_power');
-  const [actPickerOpen, setActPickerOpen] = useState(false);
   const [, forceUpdate] = useReducer((x) => x + 1, 0);
+  const [selectedEnemy, setSelectedEnemy] = useState<EnemyId | null>(null);
 
   useEffect(() => subscribeMetaState(forceUpdate), []);
 
@@ -152,7 +136,6 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
     act: `Act ${stageAct}`,
     id: (stageAct - 1) * 10 + stageId + 1,
     name: `Stage ${stageId + 1}`,
-    map: '/assets/maps/map-barangay.svg',
     permitCost: 1,
   };
 
@@ -170,6 +153,8 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
   const ENEMY_INTEL: EnemyIntel[] = Object.entries(enemyCounts).map(([id, count]) => {
     const def = ENEMY_DEFINITIONS[id as EnemyId];
     return {
+      id,
+      color: def?.color ?? 0xef4444,
       name: def?.name || id,
       form: `${def?.sizeClass === 'boss' ? 'Boss' : def?.sizeClass === 'miniboss' ? 'Elite' : 'Swarm'} class`,
       note: `HP: ${def?.maxHp || '?'} | DMG: ${def?.damage || '?'}`,
@@ -207,71 +192,17 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
         position: 'absolute',
         inset: 0,
         backgroundColor: theme.colors.background,
-        background: 'radial-gradient(circle at 50% 38%, rgba(234, 88, 12, 0.06) 0%, #09090b 55%, #050505 100%)',
+        // Calm briefing-room slate — deliberately not the battle rally's orange
+        // ember wash, so prep reads as planning, not combat.
+        background: 'radial-gradient(circle at 50% 30%, #1b2436 0%, #0e131c 55%, #070a10 100%)',
         overflowY: 'auto',
         color: theme.colors.textPrimary,
         zIndex: 100,
       }}
     >
-      <Embers count={9} />
-
-      {/* Cracked, soot-streaked war-room wall behind the command table */}
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 400 300"
-        preserveAspectRatio="xMidYMax slice"
-        style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '45%', opacity: 0.35, pointerEvents: 'none', zIndex: 0 }}
-      >
-        <g stroke={theme.materials.charredWall} strokeWidth="2" fill="none" opacity="0.9">
-          <path d="M40 300V210l14-18-8-22 18-26M120 300v-70l-16-20 20-24M300 300v-110l18-16-10-26M360 300v-60l-14-18 16-22" />
-          <path d="M0 250h60l14 16 40-8M210 300v-46l24-14M250 260l40 10 30-16" />
-        </g>
-      </svg>
-
-      {/* Warm brazier glow rising near the deploy bar */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 480,
-          maxWidth: '100%',
-          height: 220,
-          background: 'radial-gradient(ellipse at 50% 100%, rgba(234,88,12,0.16) 0%, transparent 65%)',
-          pointerEvents: 'none',
-          zIndex: 1,
-        }}
-      />
-
-      {/* Hanging bulb over the command table */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          pointerEvents: 'none',
-          zIndex: 1,
-        }}
-      >
-        <div style={{ width: 2, height: 64, backgroundColor: theme.materials.metalDark }} />
-        <div
-          className="rally-flicker"
-          style={{
-            width: 16,
-            height: 20,
-            borderRadius: '50% 50% 45% 45%',
-            backgroundColor: '#c2410c',
-            boxShadow: '0 0 80px 32px rgba(234, 88, 12, 0.22), 0 0 160px 60px rgba(234, 88, 12, 0.08), 0 40px 120px 40px rgba(0,0,0,0.7)',
-          }}
-        />
-      </div>
+      {/* Subtle drifting embers only — the heavier battle scenery (war-room
+          wall, brazier glow, flickering bulb) is intentionally left out here. */}
+      <Embers count={5} />
 
       <div
         style={{
@@ -320,61 +251,6 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
         >
           <SectionLabel>On the table — stage intel</SectionLabel>
           <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap' }}>
-            {/* Taped-down surveyor's map */}
-            <div style={{ position: 'relative', transform: 'rotate(-1.5deg)', flexShrink: 0, alignSelf: 'flex-start' }}>
-              <img
-                src={STAGE.map}
-                alt={`Map of ${STAGE.name}`}
-                style={{
-                  width: 132,
-                  height: 214,
-                  objectFit: 'cover',
-                  borderRadius: 4,
-                  border: `4px solid ${theme.materials.paperAged}`,
-                  boxShadow: '0 8px 22px rgba(0,0,0,0.6)',
-                  display: 'block',
-                  filter: 'sepia(0.3) brightness(0.7)',
-                }}
-              />
-              {/* tape corners */}
-              {[
-                { top: -8, left: -12, rotate: -45 },
-                { top: -8, right: -12, rotate: 45 },
-                { bottom: -8, left: -12, rotate: 45 },
-                { bottom: -8, right: -12, rotate: -45 },
-              ].map(({ rotate, ...pos }, i) => (
-                <span
-                  key={i}
-                  aria-hidden="true"
-                  style={{
-                    position: 'absolute',
-                    width: 38,
-                    height: 14,
-                    backgroundColor: theme.materials.tape,
-                    transform: `rotate(${rotate}deg)`,
-                    boxShadow: '0 1px 2px rgba(0,0,0,0.3)',
-                    ...pos,
-                  }}
-                />
-              ))}
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: 6,
-                  left: '50%',
-                  transform: 'translateX(-50%) rotate(-2deg)',
-                  fontFamily: MARKER_FONT,
-                  fontSize: 11,
-                  color: theme.materials.ink,
-                  backgroundColor: theme.materials.paperAged,
-                  padding: '1px 8px',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {STAGE.name}
-              </div>
-            </div>
-
             {/* Enemy intel — the same pinned case-file cards as the Archive */}
             <div
               style={{
@@ -391,9 +267,12 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
                 <EnemyCaseCard
                   key={intel.name}
                   name={intel.name}
-                  colorHex={theme.colors.danger}
+                  enemyId={intel.id}
+                  colorHex={hexColor(intel.color)}
                   tag={{ label: intel.count, color: theme.materials.tarpRed }}
                   rotation={(i % 2 === 0 ? 1 : -1) * (1 + (i % 2))}
+                  onClick={() => setSelectedEnemy(intel.id as EnemyId)}
+                  ariaLabel={`Open anomaly intel: ${intel.name}`}
                 >
                   <div
                     style={{
@@ -542,145 +421,7 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
             </div>
           )}
         </div>
-
-        {/* Bayanihan Act — a single button that opens a popup selector, so the
-            section stays compact on mobile. */}
-        <div>
-          <SectionLabel>Bayanihan Act — the barrier's ultimate</SectionLabel>
-          {(() => {
-            const act = BAYANIHAN_ACTS.find((a) => a.id === selectedAct);
-            return (
-              <SoulsButton
-                variant="primary"
-                onClick={() => setActPickerOpen(true)}
-                aria-haspopup="dialog"
-                style={{
-                  width: '100%',
-                  gap: 12,
-                  minHeight: 60,
-                  textAlign: 'left',
-                  justifyContent: 'flex-start',
-                }}
-              >
-                <span style={{ color: theme.colors.accent, display: 'flex', flexShrink: 0 }}>
-                  <MegaphoneIcon size={24} />
-                </span>
-                <span style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
-                  <span style={{ fontWeight: 900, fontSize: 15, textTransform: 'none', letterSpacing: 0 }}>{act?.name ?? 'Choose an Act'}</span>
-                  <span style={{ fontSize: 11.5, color: theme.colors.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textTransform: 'none', letterSpacing: 0, fontWeight: 400 }}>
-                    {act?.effect ?? 'Tap to pick the barrier ultimate'}
-                  </span>
-                </span>
-                <span style={{ fontSize: 10, letterSpacing: 1.5, fontWeight: 900, color: theme.colors.accent, flexShrink: 0 }}>
-                  CHANGE
-                </span>
-              </SoulsButton>
-            );
-          })()}
-        </div>
       </div>
-
-      {/* Bayanihan Act picker — popup dialog */}
-      {actPickerOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Choose a Bayanihan Act"
-          onClick={() => setActPickerOpen(false)}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 200,
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'center',
-            backgroundColor: 'rgba(9, 9, 11, 0.82)',
-            backdropFilter: 'blur(8px)',
-            padding: 16,
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: '100%',
-              maxWidth: 560,
-              maxHeight: '80vh',
-              overflowY: 'auto',
-              backgroundColor: theme.colors.surface,
-              border: `1px solid ${theme.colors.borderGlass}`,
-              borderRadius: 16,
-              padding: 'clamp(16px, 4vw, 24px)',
-              boxShadow: '0 -12px 50px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.04)',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-              <h2 style={{ margin: 0, fontSize: 18, textTransform: 'uppercase', letterSpacing: 2 }}>
-                Bayanihan Act
-              </h2>
-              <button
-                onClick={() => setActPickerOpen(false)}
-                aria-label="Close"
-                style={{
-                  width: 36,
-                  height: 36,
-                  minHeight: 36,
-                  borderRadius: 8,
-                  border: `1px solid ${theme.colors.borderGlass}`,
-                  backgroundColor: 'transparent',
-                  color: theme.colors.textPrimary,
-                  fontSize: 18,
-                  cursor: 'pointer',
-                }}
-              >
-                ×
-              </button>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 8 }}>
-              {BAYANIHAN_ACTS.map((act) => {
-                const selected = selectedAct === act.id;
-                return (
-                  <button
-                    key={act.id}
-                    onClick={() => {
-                      if (!act.unlocked) return;
-                      setSelectedAct(act.id);
-                      setActPickerOpen(false);
-                    }}
-                    disabled={!act.unlocked}
-                    aria-pressed={selected}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 10,
-                      minHeight: 56,
-                      padding: '10px 12px',
-                      borderRadius: 10,
-                      textAlign: 'left',
-                      border: `2px solid ${selected ? theme.colors.accent : theme.colors.borderGlass}`,
-                      backgroundColor: selected ? theme.materials.corruptionEmber : theme.colors.surfaceGlass,
-                      color: 'inherit',
-                      cursor: act.unlocked ? 'pointer' : 'not-allowed',
-                      opacity: act.unlocked ? 1 : 0.45,
-                      boxShadow: selected ? '0 0 18px rgba(234, 88, 12, 0.25)' : 'none',
-                      fontFamily: 'inherit',
-                    }}
-                  >
-                    <span style={{ color: selected ? theme.colors.accent : theme.colors.textMuted, display: 'flex', flexShrink: 0 }}>
-                      {act.unlocked ? (selected ? <CheckIcon size={20} /> : <MegaphoneIcon size={20} />) : <LockIcon size={20} />}
-                    </span>
-                    <span style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                      <span style={{ fontWeight: 900, fontSize: 14 }}>{act.name}</span>
-                      <span style={{ fontSize: 11.5, color: theme.colors.textMuted }}>
-                        {act.unlocked ? act.effect : 'Locked — earn it on the march or at the store.'}
-                      </span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Deploy bar — floating, megaphone-styled primary CTA */}
       <div
@@ -739,6 +480,54 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
           </span>
         </SoulsButton>
       </div>
+
+      {/* Anomaly intel — tapping a case file opens its full TCG card. */}
+      {selectedEnemy && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Anomaly intel"
+          onClick={() => setSelectedEnemy(null)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 300,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 16,
+            background: 'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.95) 100%)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            animation: 'reward-overlay-in 0.25s ease both',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 20,
+              maxHeight: '90vh',
+              overflowY: 'auto',
+            }}
+          >
+            <EnemyTcgCard
+              enemyId={selectedEnemy}
+              style={{ animation: 'reward-pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.1) both' }}
+            />
+            <SoulsButton
+              variant="primary"
+              onClick={() => setSelectedEnemy(null)}
+              aria-label="Close anomaly intel"
+            >
+              Close
+            </SoulsButton>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

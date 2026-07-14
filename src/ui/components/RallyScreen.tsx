@@ -644,32 +644,6 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
           >
             <SkullIcon size={20} />
           </button>
-
-          {/* Bayanihan Act — the rally's focal CTA, now stacked below surrender. */}
-          <button
-            type="button"
-            className="hud-btn"
-            disabled={gameOver}
-            aria-label="Bayanihan Act"
-            title="Bayanihan Act — Ready!"
-            style={{
-              ...fab,
-              flexDirection: 'column',
-              gap: 1,
-              backgroundColor: withAlpha(theme.colors.background, 0.92),
-              border: `2px solid ${theme.colors.accent}`,
-              color: theme.colors.accent,
-              boxShadow: `0 0 16px ${withAlpha(theme.colors.accent, 0.6)}, inset 0 0 8px ${withAlpha(theme.colors.accent, 0.35)}`,
-              animation: 'pulse-glow 2s infinite',
-            }}
-            onClick={() => {
-              playBtnSound();
-              // In the future: emit bayanihan act event
-            }}
-          >
-            <MegaphoneIcon size={20} />
-            <span style={{ ...stampLabel, fontSize: 8 }}>Act</span>
-          </button>
         </div>
       </div>
 

@@ -31,7 +31,7 @@ interface SariSariStoreProps {
 const MARKER_FONT = '"Segoe Print", "Bradley Hand", "Comic Sans MS", cursive';
 
 // Catalog per docs/PROGRESSION.md: Hero Cards, Hero unlocks, Rally Permits, Cosmetics — all priced in Hope Points.
-type CatalogCategory = 'Hero Cards' | 'Hero Unlocks' | 'Rally Permits' | 'Bayanihan Acts' | 'Cosmetics';
+type CatalogCategory = 'Hero Cards' | 'Hero Unlocks' | 'Rally Permits' | 'Cosmetics';
 
 interface CatalogItem {
   id: string;
