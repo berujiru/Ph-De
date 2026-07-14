@@ -68,6 +68,8 @@ export interface HeroDefinition {
    */
   projectileSizePx?: number;
   canSeeStealth?: boolean;
+  /** Cooldown in milliseconds for the signature skill. Defaults to 40000ms (40s) if omitted. */
+  skillCooldownMs?: number;
   cutInDurationMs?: number;
   /** Top/bottom inset for the framed cut-in. 0 = fullscreen height. */
   cutInMarginY?: number;
@@ -237,6 +239,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     range: 1050,
     damage: 9, // retuned 2026-07: collision fix (was 11) — splash grew ~50px->122px vs minions & stopped whiffing
     attackRateMs: 1700,
+    skillCooldownMs: 50000,
     color: 0xe2e8f0,
     purpose: 'Lobs scalding syrup that slows and splashes a small area; strips enemy speed buffs off whatever it hits.',
     signatureSkill: { name: 'Hot Syrup', shortName: 'Syrup', description: 'Throws a Molotov creating a 20s AoE fire patch that deals DoT.' },
@@ -322,6 +325,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     range: 1050,
     damage: 19,
     attackRateMs: 1800, // slowed 2026-07: 13.6/hit on a multi-hit chain was OP
+    skillCooldownMs: 60000,
     color: 0x15803d,
     purpose: 'Chain-lightning ranged attacker whose Tree of Life periodically roots and lightly damages enemies in a large AoE.',
     signatureSkill: { name: 'Tree of Life', description: 'Summons a Golden Tree that periodically Roots and damages nearby enemies.' },
@@ -339,6 +343,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     damage: 10, // retuned 2026-07: collision fix (was 9) — 5 instant line-hits became real pass-throughs; rate already slowed, so only a small bump
     // per-hit across up to 5 pierced enemies — group DPS is the payoff
     attackRateMs: 1600, // slowed 2026-07: 5-pierce line clear was OP at 1300
+    skillCooldownMs: 45000,
     basePierce: 5,
     color: 0xf43f5e,
     purpose: 'Skewers a whole line — one Tuhog throw pierces up to 5 anomalies. The squad\'s premier line-clearer.',
@@ -418,6 +423,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     range: 1100,
     damage: 11, // retuned 2026-07: collision fix (was 13) — bigger splash + burn-zone passive, so slightly larger trim than Taho
     attackRateMs: 1800,
+    skillCooldownMs: 45000,
     color: 0xef4444,
     purpose: 'Lobs hot pandesal that explodes in fire splash and leaves a burning zone — sustained AoE against packed waves.',
     signatureSkill: { name: 'Dough Knead', description: 'Flattens enemies, reducing their armor and damage by 50%.' },

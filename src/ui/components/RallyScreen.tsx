@@ -1153,18 +1153,18 @@ export function RallyScreen({ stage, onReturnToMenu }: RallyScreenProps) {
             zIndex: 250,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'flex-start',
+            paddingLeft: '5vw',
             pointerEvents: 'none', // So it doesn't block inputs if they somehow leak, though game is paused
-            background: `radial-gradient(circle at 50% 50%, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.85) 100%)`,
+            background: `radial-gradient(circle at 30% 50%, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.85) 100%)`,
             animation: 'overlay-fade 0.2s ease both',
           }}
         >
           <HeroTcgCard 
             heroId={tcgCutIn.heroId as HeroId} 
             style={{ 
-              transform: 'scale(1.15)',
-              transformOrigin: 'center',
-              animation: 'placard-drop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both',
+              transformOrigin: 'center left',
+              animation: 'cutin-slide 3.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both',
               boxShadow: `0 0 40px ${withAlpha(theme.colors.accent, 0.6)}`
             }} 
           />

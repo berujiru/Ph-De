@@ -105,12 +105,13 @@ export class SkillCutIn {
     } else if (options.heroId) {
       // NEW FALLBACK: Show Hero TCG Card in the React UI Layer
       // We don't render anything in Phaser, just emit the event and wait.
+      const fallbackDurationMs = 1000;
       gameToUiEvents.emit('showHeroTcgCutIn', { 
         heroId: options.heroId, 
-        durationMs: options.durationMs ?? SkillCutIn.HOLD_MS 
+        durationMs: fallbackDurationMs
       });
       
-      scene.time.delayedCall(options.durationMs ?? SkillCutIn.HOLD_MS, () => {
+      scene.time.delayedCall(fallbackDurationMs, () => {
         container.destroy();
         options.onComplete?.();
       });

@@ -41,8 +41,8 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
    *  drops" / maxStacks filter in core/Drops.ts. */
   public upgradeStacks: Partial<Record<UpgradeKind, number>> = {};
 
-  public skillCooldownMs = 5000;
-  public currentSkillCooldown = 5000; // start on cooldown
+  public skillCooldownMs: number;
+  public currentSkillCooldown: number; // start on cooldown
 
   public passiveOverride?: string;
 
@@ -81,6 +81,10 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     // derives from hero.damage). Voice-drop bonuses stack on top downstream.
     // Sandbox testers have no saved level → getHeroLevel returns 1 → ×1.0.
     this.damage = leveledDamage(def.damage, getHeroLevel(def.id));
+    this.attackCooldown = 0;
+    this.skillCooldownMs = def.skillCooldownMs ?? 40000;
+    this.currentSkillCooldown = this.skillCooldownMs;
+    this.stunTimer = 0;
     this.attackRateMs = def.attackRateMs;
     this.range = def.range;
     this.onAttack = onAttack;
