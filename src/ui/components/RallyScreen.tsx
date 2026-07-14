@@ -129,18 +129,23 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
   const kindMeta = KIND_META[kind];
   const isBuhis = kind === 'buhisBuhay';
   const isHero = kind === 'hero';
+  const hasPortrait = kind === 'hero' || kind === 'heroUpgrade';
   const DamageIcon = option.damageType ? damageTypeIcons[option.damageType] : undefined;
-  // Hero drops carry the hero id as `hero:<id>` — the equipped skin's portrait
-  // cell renders as the recruit photo.
-  const heroId = kind === 'hero' && option.id.startsWith('hero:') ? option.id.slice('hero:'.length) : undefined;
+  
+  // Hero drops and upgrades carry the hero id.
+  let heroId: string | undefined;
+  if (kind === 'hero' && option.id.startsWith('hero:')) {
+    heroId = option.id.slice('hero:'.length);
+  } else if (kind === 'heroUpgrade' && option.id.startsWith('upgrade:')) {
+    heroId = option.id.split(':')[1];
+  }
   const heroSkin = heroId ? getSelectedSkin(heroId as HeroId) : undefined;
 
-  /* Hero recruits render as a full-bleed portrait card (see the JSX below), so
-     only the non-hero kinds build a centered emblem `visual`: a damage chip for
-     a hero upgrade, a solidarity fist for a global boon, a hazard mark for a
-     Buhis-Buhay pact. */
+  /* Hero recruits and upgrades render as full-bleed portrait cards (see the JSX below).
+     For other non-hero kinds, we build a centered emblem `visual`. */
   let visual: ReactNode = null;
-  if (!isHero) {
+  
+  if (!hasPortrait) {
     const Icon =
       isBuhis
         ? SkullIcon
@@ -167,30 +172,6 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
         }}
       >
         <Icon size={28} />
-        {kind === 'heroUpgrade' && (
-          // Small "up" chevron badge to read as an *upgrade* to a hero, not a fresh recruit.
-          <span
-            style={{
-              position: 'absolute',
-              right: -6,
-              top: -6,
-              width: 22,
-              height: 22,
-              borderRadius: '50%',
-              backgroundColor: theme.colors.background,
-              border: `1px solid ${withAlpha(emblemTint, 0.7)}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: emblemTint,
-              fontSize: 13,
-              fontWeight: 900,
-              lineHeight: 1,
-            }}
-          >
-            ▲
-          </span>
-        )}
       </div>
     );
   }
@@ -228,9 +209,9 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
           animationDelay: `${index * 80}ms`,
         }}
       >
-        {/* Hero recruits: the portrait fills the whole card (full-bleed), with a
-            bottom gradient so the overlaid name stays legible. */}
-        {isHero && (
+        {/* Hero recruits and upgrades: the portrait fills the whole card (full-bleed), with a
+            bottom gradient so the overlaid name/details stay legible. */}
+        {hasPortrait && (
           <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
             <SkinPortrait
               skin={heroSkin}
@@ -241,7 +222,7 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
                 position: 'absolute',
                 inset: 0,
                 background:
-                  'linear-gradient(to bottom, rgba(2,6,23,0.5) 0%, rgba(2,6,23,0) 30%, rgba(2,6,23,0) 48%, rgba(2,6,23,0.92) 100%)',
+                  'linear-gradient(to bottom, rgba(2,6,23,0.4) 0%, rgba(2,6,23,0) 25%, rgba(2,6,23,0.5) 55%, rgba(2,6,23,0.95) 100%)',
               }}
             />
           </div>
@@ -257,7 +238,9 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
             justifyContent: 'center',
             gap: 5,
             padding: '5px 6px',
-            backgroundColor: withAlpha(kindMeta.tint, 0.16),
+            backgroundColor: withAlpha(kindMeta.tint, hasPortrait ? 0.4 : 0.16),
+            backdropFilter: hasPortrait ? 'blur(4px)' : 'none',
+            WebkitBackdropFilter: hasPortrait ? 'blur(4px)' : 'none',
             borderBottom: `1px solid ${withAlpha(kindMeta.tint, 0.4)}`,
             color: kindMeta.tint,
             ...stampLabel,
@@ -268,7 +251,7 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
           {kindMeta.ribbon}
         </span>
 
-        {isHero ? (
+        {hasPortrait ? (
           /* Portrait carries the card; rarity + name overlay the bottom. */
           <>
             <div style={{ flex: 1 }} />
@@ -286,7 +269,7 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
               <RarityStars rarity={rarity} />
               <span
                 style={{
-                  fontSize: 'clamp(15px, 4vw, 18px)',
+                  fontSize: 'clamp(14px, 3.8vw, 17px)',
                   fontWeight: 900,
                   lineHeight: 1.15,
                   letterSpacing: 0.3,
@@ -295,6 +278,19 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
               >
                 {option.title}
               </span>
+              {kind === 'heroUpgrade' && (
+                <span
+                  style={{
+                    fontSize: 'clamp(10px, 2.5vw, 12px)',
+                    color: theme.colors.textPrimary,
+                    opacity: 0.9,
+                    lineHeight: 1.2,
+                    textShadow: '0 1px 4px rgba(0,0,0,0.8)',
+                  }}
+                >
+                  {option.description}
+                </span>
+              )}
             </div>
           </>
         ) : (
