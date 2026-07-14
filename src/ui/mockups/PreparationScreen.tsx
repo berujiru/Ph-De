@@ -10,6 +10,7 @@ import {
   damageTypeIcons,
 } from '../icons';
 import { BackButton } from '../components/BackButton';
+import { Embers, SoulsButton } from '../components/ApocalypseScenery';
 import { EnemyCaseCard, HeroPolaroidCard, SkinPortrait } from '../components/ArchiveCards';
 import { getSelectedSkin } from '../../game/data/skinSelection';
 import { HERO_DEFINITIONS, type HeroDefinition, type HeroId } from '../../game/data/heroes';
@@ -212,6 +213,38 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
         zIndex: 100,
       }}
     >
+      <Embers count={9} />
+
+      {/* Cracked, soot-streaked war-room wall behind the command table */}
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 400 300"
+        preserveAspectRatio="xMidYMax slice"
+        style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '45%', opacity: 0.35, pointerEvents: 'none', zIndex: 0 }}
+      >
+        <g stroke={theme.materials.charredWall} strokeWidth="2" fill="none" opacity="0.9">
+          <path d="M40 300V210l14-18-8-22 18-26M120 300v-70l-16-20 20-24M300 300v-110l18-16-10-26M360 300v-60l-14-18 16-22" />
+          <path d="M0 250h60l14 16 40-8M210 300v-46l24-14M250 260l40 10 30-16" />
+        </g>
+      </svg>
+
+      {/* Warm brazier glow rising near the deploy bar */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 480,
+          maxWidth: '100%',
+          height: 220,
+          background: 'radial-gradient(ellipse at 50% 100%, rgba(234,88,12,0.16) 0%, transparent 65%)',
+          pointerEvents: 'none',
+          zIndex: 1,
+        }}
+      />
+
       {/* Hanging bulb over the command table */}
       <div
         aria-hidden="true"
@@ -517,39 +550,31 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
           {(() => {
             const act = BAYANIHAN_ACTS.find((a) => a.id === selectedAct);
             return (
-              <button
+              <SoulsButton
+                variant="primary"
                 onClick={() => setActPickerOpen(true)}
                 aria-haspopup="dialog"
                 style={{
                   width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
                   gap: 12,
                   minHeight: 60,
-                  padding: '12px 16px',
-                  borderRadius: 12,
                   textAlign: 'left',
-                  border: `2px solid ${theme.colors.accent}`,
-                  backgroundColor: theme.materials.corruptionEmber,
-                  color: 'inherit',
-                  cursor: 'pointer',
-                  boxShadow: '0 0 18px rgba(234, 88, 12, 0.2)',
-                  fontFamily: 'inherit',
+                  justifyContent: 'flex-start',
                 }}
               >
                 <span style={{ color: theme.colors.accent, display: 'flex', flexShrink: 0 }}>
                   <MegaphoneIcon size={24} />
                 </span>
                 <span style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
-                  <span style={{ fontWeight: 900, fontSize: 15 }}>{act?.name ?? 'Choose an Act'}</span>
-                  <span style={{ fontSize: 11.5, color: theme.colors.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span style={{ fontWeight: 900, fontSize: 15, textTransform: 'none', letterSpacing: 0 }}>{act?.name ?? 'Choose an Act'}</span>
+                  <span style={{ fontSize: 11.5, color: theme.colors.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textTransform: 'none', letterSpacing: 0, fontWeight: 400 }}>
                     {act?.effect ?? 'Tap to pick the barrier ultimate'}
                   </span>
                 </span>
                 <span style={{ fontSize: 10, letterSpacing: 1.5, fontWeight: 900, color: theme.colors.accent, flexShrink: 0 }}>
                   CHANGE
                 </span>
-              </button>
+              </SoulsButton>
             );
           })()}
         </div>
@@ -689,29 +714,12 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
           </span>
           Permits: {permits}
         </div>
-        <button
+        <SoulsButton
+          variant="primary"
+          size="lg"
           onClick={onDeploy}
           disabled={!canDeploy}
           aria-label={`Deploy to the streets — costs ${STAGE.permitCost} rally permit`}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            minHeight: 60,
-            padding: '14px 34px',
-            fontSize: 'clamp(16px, 3.5vw, 21px)',
-            fontWeight: 900,
-            textTransform: 'uppercase',
-            letterSpacing: 2,
-            backgroundColor: canDeploy ? theme.colors.accent : theme.colors.surface,
-            color: canDeploy ? theme.colors.background : theme.colors.textMuted,
-            border: 'none',
-            borderRadius: 999,
-            cursor: canDeploy ? 'pointer' : 'not-allowed',
-            opacity: canDeploy ? 1 : 0.5,
-            boxShadow: canDeploy ? '0 0 30px rgba(234, 88, 12, 0.45), 0 5px 0 #9a3412' : 'none',
-            fontFamily: 'inherit',
-          }}
         >
           <MegaphoneIcon size={26} />
           Deploy to the Streets
@@ -721,14 +729,15 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
               alignItems: 'center',
               gap: 4,
               fontSize: 13,
-              backgroundColor: 'rgba(15, 23, 42, 0.2)',
+              backgroundColor: 'rgba(0, 0, 0, 0.35)',
+              border: `1px solid ${theme.materials.rust}`,
               borderRadius: 999,
               padding: '4px 10px',
             }}
           >
             <RallyPermitIcon size={15} />−{STAGE.permitCost}
           </span>
-        </button>
+        </SoulsButton>
       </div>
     </div>
   );

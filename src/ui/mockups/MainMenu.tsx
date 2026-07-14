@@ -8,6 +8,7 @@ import {
   MegaphoneIcon,
   RallyPermitIcon,
 } from '../icons';
+import { Embers, FireVignette, RuinedSkyline, Bonfire, SoulsButton } from '../components/ApocalypseScenery';
 
 interface MainMenuProps {
   onPlay: () => void;
@@ -19,42 +20,7 @@ import { getHope, getPermits, subscribeMetaState } from '../../game/data/metaSta
 
 const MARKER_FONT = '"Segoe Print", "Bradley Hand", "Comic Sans MS", cursive';
 
-/** Distant ruined city skyline behind the rally. */
-function Skyline() {
-  return (
-    <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '50%' }}>
-      <svg
-        viewBox="0 0 800 200"
-        preserveAspectRatio="xMidYMax slice"
-        aria-hidden="true"
-        style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '100%', opacity: 0.8 }}
-      >
-        <g fill="#0c0a09" opacity="0.9">
-          <rect x="0" y="90" width="70" height="110" />
-          <rect x="80" y="50" width="55" height="150" />
-          <rect x="145" y="110" width="80" height="90" />
-          <rect x="240" y="30" width="60" height="170" />
-          <rect x="315" y="80" width="90" height="120" />
-          <rect x="420" y="55" width="50" height="145" />
-          <rect x="485" y="100" width="85" height="100" />
-          <rect x="585" y="40" width="65" height="160" />
-          <rect x="665" y="85" width="70" height="115" />
-          <rect x="745" y="120" width="55" height="80" />
-        </g>
-      </svg>
-      {/* Corruption miasma fog over the city */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: `linear-gradient(to top, ${theme.materials.corruptionFog}, transparent)`,
-        }}
-      />
-    </div>
-  );
-}
-
-/** The crowd at the bottom edge: placards, raised fists, and the squad. */
+/** The crowd at the bottom edge: survivors, charred placards, and the squad. */
 function RallyCrowd() {
   return (
     <div
@@ -107,6 +73,19 @@ function RallyCrowd() {
           <path d="M486 72h58M486 88h36" transform="rotate(5 518 82)" />
         </g>
       </svg>
+
+      {/* Bonfire — the movement's safe-point, survivors gather around it */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 1,
+        }}
+      >
+        <Bonfire size={150} />
+      </div>
 
       {/* Heroes rallying at the sides */}
       {/* Left flank */}
@@ -191,7 +170,7 @@ function BalancePill({ icon, label, value, valueColor }: {
   );
 }
 
-/** Secondary nav styled as a hand-held protest placard. */
+/** Secondary nav styled as a charred iron menu slot, tacked up at a tilt. */
 function PlacardButton({ icon, label, sublabel, tilt, onClick }: {
   icon: ReactNode;
   label: string;
@@ -200,44 +179,16 @@ function PlacardButton({ icon, label, sublabel, tilt, onClick }: {
   onClick: () => void;
 }) {
   return (
-    <button
+    <SoulsButton
       onClick={onClick}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        minHeight: 64,
-        minWidth: 200,
-        padding: '10px 18px',
-        backgroundColor: theme.colors.surfaceGlass,
-        color: theme.colors.textPrimary,
-        border: `1px solid ${theme.colors.borderGlass}`,
-        borderTop: `4px solid ${theme.materials.woodLight}`,
-        borderRadius: 8,
-        cursor: 'pointer',
-        backdropFilter: 'blur(12px)',
-        boxShadow: '0 6px 16px rgba(0,0,0,0.45)',
-        transform: `rotate(${tilt}deg)`,
-        transition: 'transform 0.12s, border-color 0.12s',
-        textAlign: 'left',
-        fontFamily: 'inherit',
-      }}
-      onMouseOver={(e) => {
-        e.currentTarget.style.transform = 'rotate(0deg) translateY(-3px)';
-        e.currentTarget.style.borderColor = theme.colors.accent;
-      }}
-      onMouseOut={(e) => {
-        e.currentTarget.style.transform = `rotate(${tilt}deg)`;
-        e.currentTarget.style.borderColor = theme.colors.borderGlass;
-        e.currentTarget.style.borderTopColor = theme.materials.woodLight;
-      }}
+      style={{ minWidth: 200, transform: `rotate(${tilt}deg)`, textAlign: 'left', justifyContent: 'flex-start' }}
     >
       <span style={{ color: theme.colors.accent, display: 'flex' }}>{icon}</span>
       <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
-        <span style={{ fontWeight: 900, fontSize: 16, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</span>
-        <span style={{ fontSize: 12, color: theme.colors.textMuted }}>{sublabel}</span>
+        <span style={{ fontWeight: 900, fontSize: 16, textTransform: 'uppercase', letterSpacing: 1, color: theme.colors.textPrimary }}>{label}</span>
+        <span style={{ fontSize: 11, color: theme.colors.textMuted, letterSpacing: 0.5, textTransform: 'none' }}>{sublabel}</span>
       </span>
-    </button>
+    </SoulsButton>
   );
 }
 
@@ -259,12 +210,14 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
         zIndex: 100,
         display: 'flex',
         flexDirection: 'column',
-        background: `linear-gradient(180deg, ${theme.colors.background} 0%, #1c1917 55%, #0c0a09 100%)`,
+        background: `radial-gradient(ellipse at 50% 8%, rgba(88, 28, 8, 0.4) 0%, transparent 45%), linear-gradient(180deg, ${theme.colors.background} 0%, #14100e 55%, #0c0a09 100%)`,
       }}
     >
-      <Skyline />
+      <RuinedSkyline height="52%" />
+      <FireVignette />
+      <Embers count={14} />
 
-      {/* strung-up street wire with bulbs */}
+      {/* strung-up street wire with bulbs — half of them dead/dark */}
       <svg
         viewBox="0 0 800 90"
         preserveAspectRatio="none"
@@ -272,13 +225,17 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
         style={{ position: 'absolute', top: 64, left: 0, width: '100%', height: 90, pointerEvents: 'none' }}
       >
         <path d="M-10 12 Q 200 66 400 34 T 810 22" fill="none" stroke={theme.materials.metalDark} strokeWidth="2" />
-        {[90, 230, 390, 545, 700].map((x, i) => (
-          <g key={x}>
-            <line x1={x} y1={i % 2 === 0 ? 34 : 40} x2={x} y2={(i % 2 === 0 ? 34 : 40) + 14} stroke={theme.materials.metalDark} strokeWidth="2" />
-            <circle cx={x} cy={(i % 2 === 0 ? 34 : 40) + 20} r="5" fill="#ea580c" opacity="0.85" />
-            <circle cx={x} cy={(i % 2 === 0 ? 34 : 40) + 20} r="16" fill="#ea580c" opacity="0.18" />
-          </g>
-        ))}
+        {[90, 230, 390, 545, 700].map((x, i) => {
+          const dead = i % 2 === 1; // every other bulb is smashed/dark
+          const cy = (i % 2 === 0 ? 34 : 40) + 20;
+          return (
+            <g key={x}>
+              <line x1={x} y1={i % 2 === 0 ? 34 : 40} x2={x} y2={(i % 2 === 0 ? 34 : 40) + 14} stroke={theme.materials.metalDark} strokeWidth="2" />
+              <circle cx={x} cy={cy} r="5" fill={dead ? '#3f3f46' : '#ea580c'} opacity={dead ? 0.6 : 0.85} />
+              {!dead && <circle cx={x} cy={cy} r="16" fill="#ea580c" opacity="0.18" />}
+            </g>
+          );
+        })}
       </svg>
 
       <RallyCrowd />
@@ -315,10 +272,11 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
           style={{
             position: 'relative',
             padding: '18px 34px 22px',
-            backgroundColor: theme.materials.tarpRed,
-            border: '2px solid rgba(0,0,0,0.65)',
-            borderRadius: 4,
-            boxShadow: '0 14px 34px rgba(0,0,0,0.55), inset 0 0 40px rgba(0,0,0,0.35)',
+            background: 'linear-gradient(160deg, #4a1414 0%, #2a0e0e 60%, #140808 100%)',
+            border: `2px solid ${theme.materials.rustDark}`,
+            // singed, torn banner edge
+            clipPath: 'polygon(0 8%, 4% 0, 96% 3%, 100% 10%, 98% 90%, 100% 100%, 3% 97%, 0 88%)',
+            boxShadow: '0 14px 34px rgba(0,0,0,0.6), inset 0 0 40px rgba(0,0,0,0.55), 0 0 40px rgba(234,88,12,0.18)',
             transform: 'rotate(-1.2deg)',
             textAlign: 'center',
             maxWidth: '92%',
@@ -386,39 +344,10 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
           padding: '0 16px calc(24px + 6vh)',
         }}
       >
-        <button
-          onClick={onPlay}
-          className="rally-pulse"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 14,
-            minHeight: 64,
-            padding: '16px 36px',
-            fontSize: 'clamp(18px, 4vw, 26px)',
-            backgroundColor: theme.colors.accent,
-            color: theme.colors.textPrimary,
-            border: 'none',
-            borderRadius: 999,
-            cursor: 'pointer',
-            fontWeight: 900,
-            textTransform: 'uppercase',
-            letterSpacing: 2,
-            boxShadow: '0 0 34px rgba(234, 88, 12, 0.45), 0 6px 0 #9a3412',
-            fontFamily: 'inherit',
-          }}
-          onMouseDown={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 16px rgba(234, 88, 12, 0.3), 0 1px 0 #9a3412';
-            e.currentTarget.style.transform = 'translateY(4px)';
-          }}
-          onMouseUp={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 34px rgba(234, 88, 12, 0.45), 0 6px 0 #9a3412';
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
-        >
+        <SoulsButton variant="primary" size="lg" onClick={onPlay} className="rally-pulse">
           <MegaphoneIcon size={30} />
           Start the Rally
-        </button>
+        </SoulsButton>
 
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center' }}>
           <PlacardButton

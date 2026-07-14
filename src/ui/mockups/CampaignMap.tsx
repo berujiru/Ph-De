@@ -12,6 +12,7 @@ import {
   StarOutlineIcon,
 } from '../icons';
 import { BackButton } from '../components/BackButton';
+import { Embers, RuinedSkyline, SoulsButton } from '../components/ApocalypseScenery';
 import { bossForStage, buildWaveTable, isBossStage } from '../../game/data/waves';
 import { ENEMY_DEFINITIONS, enemySizeClass } from '../../game/data/enemies';
 import { ENEMY_INTRO_STAGE, type GatedEnemyId } from '../../game/data/enemyUnlocks';
@@ -259,25 +260,11 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
         color: theme.colors.textPrimary,
         overflowY: 'auto',
         zIndex: 100,
+        animation: 'miasma-drift 30s ease-in-out infinite',
       }}
     >
-      {/* Souls-inspired atmospheric animations */}
-      <style>{`
-        @keyframes miasma-drift {
-          0%   { background-position: 0% 50%, 100% 50%, 50% 100%; }
-          50%  { background-position: 30% 60%, 70% 40%, 60% 80%; }
-          100% { background-position: 0% 50%, 100% 50%, 50% 100%; }
-        }
-        @keyframes ember-pulse {
-          0%, 100% { opacity: 0.85; text-shadow: 0 0 8px rgba(234,88,12,0.5), 0 0 20px rgba(234,88,12,0.2); }
-          50%      { opacity: 1;    text-shadow: 0 0 14px rgba(234,88,12,0.7), 0 0 32px rgba(234,88,12,0.35); }
-        }
-        @keyframes bonfire-flicker {
-          0%, 100% { box-shadow: 0 0 8px rgba(234,88,12,0.4), 0 0 16px rgba(234,88,12,0.15); }
-          50%      { box-shadow: 0 0 12px rgba(234,88,12,0.6), 0 0 24px rgba(234,88,12,0.25); }
-        }
-        .rally-screen { animation: miasma-drift 30s ease-in-out infinite; }
-      `}</style>
+      <RuinedSkyline height="34%" opacity={0.5} style={{ zIndex: 0 }} />
+      <Embers count={12} />
       {/* Header */}
       <div
         style={{
@@ -290,6 +277,8 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
           maxWidth: 640,
           margin: '0 auto 24px',
           width: '100%',
+          position: 'relative',
+          zIndex: 3,
         }}
       >
         <div>
@@ -337,7 +326,7 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 640, margin: '0 auto', width: '100%' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 640, margin: '0 auto', width: '100%', position: 'relative', zIndex: 3 }}>
         {/* Sandbox Entry */}
         <div
           style={{
@@ -364,24 +353,9 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
               </p>
             </div>
           </div>
-          <button
-            onClick={onStartSandbox}
-            style={{
-              minHeight: 44,
-              padding: '10px 20px',
-              backgroundColor: theme.colors.accent,
-              color: theme.colors.background,
-              border: 'none',
-              borderRadius: 8,
-              cursor: 'pointer',
-              fontWeight: 900,
-              fontSize: 14,
-              boxShadow: '0 4px 0 #9a3412, 0 0 12px rgba(234,88,12,0.3)',
-              fontFamily: 'inherit',
-            }}
-          >
+          <SoulsButton variant="primary" onClick={onStartSandbox}>
             ENTER SANDBOX
-          </button>
+          </SoulsButton>
         </div>
 
         {/* Acts Accordion */}
@@ -403,7 +377,7 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                 borderRadius: 12,
                 display: 'flex',
                 flexDirection: 'column',
-                opacity: isActUnlocked ? 1 : 0.5,
+                opacity: isActUnlocked ? 1 : isExpanded ? 0.82 : 0.55,
                 overflow: 'hidden',
                 backdropFilter: 'blur(12px)',
                 transition: 'all 0.3s',
@@ -412,19 +386,17 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                   : `inset 0 0 30px ${theme.materials.corruptionFog}`,
               }}
             >
-              {/* Accordion Header */}
+              {/* Accordion Header — every act expands so the full march is visible,
+                  even before it's been reached (locked stages just can't deploy). */}
               <button
-                onClick={() => {
-                  if (isActUnlocked) setSelectedActId(isExpanded ? 0 : act.id);
-                }}
-                disabled={!isActUnlocked}
+                onClick={() => setSelectedActId(isExpanded ? 0 : act.id)}
                 aria-expanded={isExpanded}
                 style={{
                   padding: 14,
                   display: 'flex',
                   alignItems: 'center',
                   gap: 14,
-                  cursor: isActUnlocked ? 'pointer' : 'not-allowed',
+                  cursor: 'pointer',
                   backgroundColor: isExpanded ? theme.materials.corruptionEmber : 'transparent',
                   border: 'none',
                   borderBottom: isExpanded ? `1px solid rgba(234,88,12,0.15)` : 'none',
@@ -452,40 +424,59 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                 />
 
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <h3
-                    style={{
-                      margin: '0 0 3px 0',
-                      fontSize: 17,
-                      color: isActUnlocked ? theme.colors.textPrimary : theme.colors.textSecondary,
-                    }}
-                  >
-                    {act.title}
-                  </h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 3 }}>
+                    <h3
+                      style={{
+                        margin: 0,
+                        fontSize: 17,
+                        color: isActUnlocked ? theme.colors.textPrimary : theme.colors.textSecondary,
+                      }}
+                    >
+                      {act.title}
+                    </h3>
+                    {!isActUnlocked && (
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          fontSize: 9,
+                          fontWeight: 900,
+                          letterSpacing: 1,
+                          textTransform: 'uppercase',
+                          color: theme.colors.textSecondary,
+                          border: `1px solid ${theme.materials.rust}`,
+                          borderRadius: 3,
+                          padding: '2px 6px',
+                          backgroundColor: 'rgba(12,10,9,0.6)',
+                        }}
+                      >
+                        <LockIcon size={10} /> Not yet reached
+                      </span>
+                    )}
+                  </div>
                   <p style={{ margin: 0, fontSize: 12.5, color: theme.colors.textMuted }}>
-                    {isActUnlocked ? act.description : 'Act locked. Complete previous acts to unlock.'}
+                    {act.description}
                   </p>
                   {isActUnlocked && <CautionTapeMeter cleared={actClearedStages} total={act.stages.length} />}
                 </div>
 
                 <span style={{ color: theme.colors.textSecondary, display: 'flex', flexShrink: 0 }}>
-                  {isActUnlocked ? (
-                    <span
-                      style={{
-                        display: 'flex',
-                        transform: isExpanded ? 'rotate(-90deg)' : 'rotate(90deg)',
-                        transition: 'transform 0.2s',
-                      }}
-                    >
-                      <PlayIcon size={18} />
-                    </span>
-                  ) : (
-                    <LockIcon size={22} />
-                  )}
+                  <span
+                    style={{
+                      display: 'flex',
+                      transform: isExpanded ? 'rotate(-90deg)' : 'rotate(90deg)',
+                      transition: 'transform 0.2s',
+                    }}
+                  >
+                    <PlayIcon size={18} />
+                  </span>
                 </span>
               </button>
 
-              {/* Accordion Body (Stages List) */}
-              {isExpanded && isActUnlocked && (
+              {/* Accordion Body (Stages List) — shown for locked acts too, so
+                  the whole journey is visible; unreached stages stay LOCKED. */}
+              {isExpanded && (
                 <div style={{ padding: 16, backgroundColor: 'rgba(9, 9, 11, 0.6)' }}>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     {act.stages.map((stageEntry, stageIdx) => {
@@ -606,32 +597,19 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                             </div>
 
                             {!isLocked ? (
-                              <button
+                              <SoulsButton
+                                variant={isNext ? 'primary' : 'secondary'}
                                 onClick={() => onPrepareBattle(act.id, stageIdx)}
                                 disabled={!canAffordRun}
                                 aria-label={`${isCleared ? 'Replay' : 'Prepare'} ${stageEntry.name} — costs ${stageEntry.permitCost} rally permit${stageEntry.permitCost > 1 ? 's' : ''}`}
                                 style={{
                                   minHeight: 44,
                                   padding: '6px 14px',
-                                  backgroundColor: isNext ? theme.colors.accent : 'transparent',
-                                  color: !canAffordRun
-                                    ? theme.colors.textMuted
-                                    : isNext
-                                      ? theme.colors.background
-                                      : theme.colors.textPrimary,
-                                  border: isNext ? 'none' : `1px solid ${theme.colors.border}`,
-                                  borderRadius: 6,
-                                  cursor: canAffordRun ? 'pointer' : 'not-allowed',
-                                  opacity: canAffordRun ? 1 : 0.45,
-                                  fontWeight: 900,
                                   fontSize: 12,
-                                  boxShadow: isNext && canAffordRun ? '0 3px 0 #9a3412, 0 0 10px rgba(234,88,12,0.3)' : 'none',
-                                  display: 'flex',
                                   flexDirection: 'column',
-                                  alignItems: 'center',
                                   gap: 2,
                                   flexShrink: 0,
-                                  fontFamily: 'inherit',
+                                  opacity: canAffordRun ? 1 : 0.5,
                                 }}
                               >
                                 <span>{isCleared ? 'REPLAY' : 'PREPARE'}</span>
@@ -642,17 +620,15 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                                     gap: 4,
                                     fontSize: 11,
                                     fontWeight: 700,
-                                    color: !canAffordRun
-                                      ? theme.colors.textMuted
-                                      : isNext
-                                        ? 'rgba(9,9,11,0.85)'
-                                        : theme.colors.accent,
+                                    letterSpacing: 0,
+                                    textTransform: 'none',
+                                    color: !canAffordRun ? theme.colors.textMuted : theme.colors.accent,
                                   }}
                                 >
                                   <RallyPermitIcon size={13} />
                                   {stageEntry.permitCost} permit{stageEntry.permitCost > 1 ? 's' : ''}
                                 </span>
-                              </button>
+                              </SoulsButton>
                             ) : (
                               <div
                                 style={{

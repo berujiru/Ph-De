@@ -52,5 +52,14 @@ export const theme = {
     corruptionFog: 'rgba(55, 20, 60, 0.35)',
     /** Anomaly ember glow — faint warm light pushing back the dark. */
     corruptionEmber: 'rgba(234, 88, 12, 0.18)',
+    /** Collapsed-building / broken-wall fill — near-black char. */
+    charredWall: '#141210',
+    /** Rusted iron — souls-style button frames and ruined metal. */
+    rust: '#7c4a2d',
+    rustDark: '#4a2c1a',
+    /** Bright ember particle core — drifting sparks. */
+    emberGlow: 'rgba(251, 146, 60, 0.55)',
+    /** Drifting ash / smoke plume. */
+    ashSmoke: 'rgba(120, 113, 108, 0.25)',
   },
 } as const;

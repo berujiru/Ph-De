@@ -266,13 +266,75 @@
   transform-style: preserve-3d;
 }
 
+/* ------------------------------------------------------------------ */
+/* Souls-inspired post-apocalypse atmosphere (shared across meta screens) */
+/* ------------------------------------------------------------------ */
+
+/* Slow drift of the corruption miasma layered on a screen's background. */
+@keyframes miasma-drift {
+  0%   { background-position: 0% 50%, 100% 50%, 50% 100%; }
+  50%  { background-position: 30% 60%, 70% 40%, 60% 80%; }
+  100% { background-position: 0% 50%, 100% 50%, 50% 100%; }
+}
+
+/* Ember-orange text/heading breathing glow. */
+@keyframes ember-pulse {
+  0%, 100% { opacity: 0.85; text-shadow: 0 0 8px rgba(234,88,12,0.5), 0 0 20px rgba(234,88,12,0.2); }
+  50%      { opacity: 1;    text-shadow: 0 0 14px rgba(234,88,12,0.7), 0 0 32px rgba(234,88,12,0.35); }
+}
+
+/* Bonfire flicker — a warm box-shadow that never quite settles. */
+@keyframes bonfire-flicker {
+  0%, 100% { box-shadow: 0 0 8px rgba(234,88,12,0.4), 0 0 16px rgba(234,88,12,0.15); }
+  50%      { box-shadow: 0 0 12px rgba(234,88,12,0.6), 0 0 24px rgba(234,88,12,0.25); }
+}
+
+/* Sparks lifting off the ruins — rise, drift, fade. */
+@keyframes ember-rise {
+  0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+  10%  { opacity: 0.9; }
+  60%  { opacity: 0.6; }
+  100% { transform: translateY(-120px) translateX(var(--ember-drift, 8px)) scale(0.4); opacity: 0; }
+}
+
+.ember-particle {
+  position: absolute;
+  bottom: -8px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(251,146,60,0.95) 0%, rgba(234,88,12,0.6) 45%, transparent 70%);
+  box-shadow: 0 0 6px rgba(251,146,60,0.6);
+  pointer-events: none;
+  animation: ember-rise var(--ember-dur, 6s) linear infinite;
+  animation-delay: var(--ember-delay, 0s);
+}
+
+/* Souls-style menu slot — charred frame that lights with ember-fire on hover. */
+.souls-btn {
+  transition: border-color 0.15s ease, box-shadow 0.2s ease, transform 0.12s ease, filter 0.15s ease;
+}
+.souls-btn:not(:disabled):hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 14px rgba(234,88,12,0.5), inset 0 0 12px rgba(234,88,12,0.18);
+  filter: brightness(1.08);
+}
+.souls-btn:not(:disabled):active {
+  transform: translateY(2px);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rally-sway,
   .rally-march,
   .rally-pulse,
   .rally-flicker,
-  .reward-card {
+  .reward-card,
+  .ember-particle,
+  .rally-screen {
     animation: none;
+  }
+  .ember-particle {
+    opacity: 0.5;
   }
   .reward-burst {
     display: none;

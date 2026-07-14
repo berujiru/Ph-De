@@ -4,6 +4,7 @@ import { HERO_DEFINITIONS, type HeroDefinition, type HeroId } from '../../game/d
 import { ENEMY_DEFINITIONS, type EnemyDefinition, type EnemyId } from '../../game/data/enemies';
 import { HopeCoinIcon, RallyPermitIcon, LockIcon, InfoIcon } from '../icons';
 import { BackButton } from '../components/BackButton';
+import { Embers, SoulsButton } from '../components/ApocalypseScenery';
 import {
   HeroPolaroidCard,
   PORTRAIT_BG,
@@ -90,20 +91,23 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
     <div className="rally-screen" style={{
       position: 'absolute',
       inset: 0,
-      backgroundColor: theme.materials.cork, // Ash-stained cork
+      backgroundColor: theme.materials.corkDark, // Ash-stained, soot-darkened cork
       backgroundImage: `
-        radial-gradient(${theme.materials.corkDark} 10%, transparent 11%),
-        radial-gradient(${theme.materials.corkDark} 10%, transparent 11%)
+        radial-gradient(ellipse at 15% 0%, rgba(0,0,0,0.6) 0%, transparent 45%),
+        radial-gradient(ellipse at 85% 100%, rgba(0,0,0,0.55) 0%, transparent 50%),
+        radial-gradient(${theme.materials.charredWall} 10%, transparent 11%),
+        radial-gradient(${theme.materials.charredWall} 10%, transparent 11%)
       `,
-      backgroundSize: '20px 20px',
-      backgroundPosition: '0 0, 10px 10px',
+      backgroundSize: '100% 100%, 100% 100%, 20px 20px, 20px 20px',
+      backgroundPosition: '0 0, 0 0, 0 0, 10px 10px',
       display: 'flex',
       flexDirection: 'column',
       padding: 'clamp(12px, 3vw, 24px)',
       color: theme.colors.textPrimary,
       overflowY: 'auto',
-      boxShadow: 'inset 0 0 120px rgba(0,0,0,0.9)'
+      boxShadow: 'inset 0 0 140px rgba(0,0,0,0.95)'
     }}>
+      <Embers count={7} />
 
       {/* Top Header / Nav Bar */}
       <div style={{
@@ -199,33 +203,24 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
         ]).map((t) => {
           const active = tab === t.id;
           return (
-            <button
+            <SoulsButton
               key={t.id}
+              variant={active ? 'primary' : 'secondary'}
               onClick={() => setTab(t.id)}
               aria-pressed={active}
               style={{
-                display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'flex-start',
+                gap: 1,
                 minHeight: 44,
-                padding: '8px 20px',
-                cursor: 'pointer',
                 fontFamily: TYPEWRITER_FONT,
-                fontWeight: 900,
-                textTransform: 'uppercase',
                 letterSpacing: 1,
-                color: active ? theme.colors.textPrimary : theme.colors.textSecondary,
-                backgroundColor: active ? theme.colors.accent : 'rgba(9, 9, 11, 0.8)',
-                border: active ? `2px solid ${theme.colors.accent}` : `2px solid ${theme.colors.border}`,
-                borderRadius: 6,
                 transform: active ? 'rotate(-1deg)' : 'none',
-                boxShadow: active ? `0 0 15px rgba(234, 88, 12, 0.5), inset 0 0 8px rgba(234, 88, 12, 0.3)` : 'none',
-                textShadow: active ? '0 1px 3px rgba(0,0,0,0.8)' : 'none',
               }}
             >
-              <span style={{ fontSize: 16 }}>{t.label}</span>
-              <span style={{ fontSize: 10, opacity: 0.8 }}>{t.count}</span>
-            </button>
+              <span style={{ fontSize: 16, color: active ? theme.colors.textPrimary : theme.colors.textSecondary }}>{t.label}</span>
+              <span style={{ fontSize: 10, opacity: 0.8, textTransform: 'none', letterSpacing: 0, fontWeight: 400 }}>{t.count}</span>
+            </SoulsButton>
           );
         })}
       </div>
@@ -495,34 +490,12 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 </span>
               </div>
 
-              <button style={{
-                backgroundColor: (selectedHero.id === 'eden') ? '#18181b' : theme.colors.accent,
-                color: (selectedHero.id === 'eden') ? theme.colors.textMuted : theme.colors.textPrimary,
-                border: (selectedHero.id === 'eden') ? `2px solid ${theme.colors.border}` : `2px solid ${theme.colors.accent}`,
-                padding: '12px 24px',
-                minHeight: 44,
-                fontWeight: '900',
-                cursor: (selectedHero.id === 'eden') ? 'not-allowed' : 'pointer',
-                textTransform: 'uppercase',
-                boxShadow: (selectedHero.id === 'eden') ? 'none' : '0 0 20px rgba(234, 88, 12, 0.6), inset 0 0 10px rgba(234, 88, 12, 0.4)',
-                textShadow: (selectedHero.id === 'eden') ? 'none' : '0 2px 4px rgba(0,0,0,0.6)',
-                transition: 'transform 0.1s, box-shadow 0.1s'
-              }}
-                onMouseDown={(e) => {
-                  if (selectedHero.id !== 'eden') {
-                    e.currentTarget.style.transform = 'translate(2px, 2px)';
-                    e.currentTarget.style.boxShadow = '0 0 10px rgba(234, 88, 12, 0.8), inset 0 0 5px rgba(234, 88, 12, 0.6)';
-                  }
-                }}
-                onMouseUp={(e) => {
-                  if (selectedHero.id !== 'eden') {
-                    e.currentTarget.style.transform = 'translate(0px, 0px)';
-                    e.currentTarget.style.boxShadow = '0 0 20px rgba(234, 88, 12, 0.6), inset 0 0 10px rgba(234, 88, 12, 0.4)';
-                  }
-                }}
+              <SoulsButton
+                variant="primary"
+                disabled={selectedHero.id === 'eden'}
               >
                 Promote Worker
-              </button>
+              </SoulsButton>
             </div>
 
           </div>

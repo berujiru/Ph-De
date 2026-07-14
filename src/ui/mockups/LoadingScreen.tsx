@@ -187,6 +187,10 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
           color: theme.colors.textPrimary,
           margin: 0,
           letterSpacing: 'clamp(1px, 0.6vw, 3px)',
+          // Balance the trailing letter-spacing after the last glyph with an
+          // equal leading indent so the title reads centred in its placard.
+          textIndent: 'clamp(1px, 0.6vw, 3px)',
+          textAlign: 'center',
           fontWeight: 900,
           textTransform: 'uppercase',
           textShadow: `0 0 12px ${theme.colors.accent}, 0 0 30px ${theme.colors.accent}, 0 0 50px rgba(234, 88, 12, 0.25)`,

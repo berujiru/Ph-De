@@ -13,15 +13,18 @@ interface BackButtonProps {
 }
 
 const TONE: Record<NonNullable<BackButtonProps['tone']>, { bg: string; edge: string }> = {
-  dark: { bg: 'rgba(24, 24, 27, 0.85)', edge: theme.materials.metalDark },
-  wood: { bg: 'rgba(26, 20, 16, 0.85)', edge: theme.materials.woodLight },
-  cork: { bg: 'rgba(30, 24, 20, 0.85)', edge: theme.materials.woodLight },
+  dark: { bg: 'linear-gradient(180deg, #1f1a16 0%, #0c0a09 100%)', edge: theme.materials.rust },
+  wood: { bg: 'linear-gradient(180deg, #241812 0%, #0c0a09 100%)', edge: theme.materials.woodLight },
+  cork: { bg: 'linear-gradient(180deg, #241c16 0%, #0c0a09 100%)', edge: theme.materials.woodLight },
 };
 
+/** Cut-corner clip matching the souls menu-slot silhouette. */
+const CUT = 'polygon(8px 0, 100% 0, 100% 100%, 0 100%, 0 8px)';
+
 /**
- * Shared rally-themed back control — a small protest placard on a stick.
- * The arrow sits in an accent chip; a caution-tape edge runs down the left so
- * the control reads as "street signage" rather than a generic browser back.
+ * Shared back control — a charred iron sign nailed to a post.  The arrow
+ * sits in an ember chip; a rust edge runs down the left so the control reads
+ * as souls-style ruined signage rather than a generic browser back.
  */
 export function BackButton({ onClick, label = 'Back', tone = 'dark' }: BackButtonProps) {
   const t = TONE[tone];
@@ -37,14 +40,12 @@ export function BackButton({ onClick, label = 'Back', tone = 'dark' }: BackButto
         minHeight: 44,
         padding: '8px 16px 8px 10px',
         position: 'relative',
-        backgroundColor: t.bg,
+        background: t.bg,
         color: theme.colors.textPrimary,
-        border: `1px solid ${theme.colors.borderGlass}`,
+        border: `1px solid ${theme.materials.rust}`,
         borderLeft: `4px solid ${theme.colors.accent}`,
-        borderRadius: '4px 10px 10px 4px',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        boxShadow: `0 6px 14px rgba(0,0,0,0.4)`,
+        clipPath: CUT,
+        boxShadow: `0 6px 14px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.5)`,
         cursor: 'pointer',
         fontFamily: 'inherit',
         fontWeight: 800,
@@ -55,11 +56,13 @@ export function BackButton({ onClick, label = 'Back', tone = 'dark' }: BackButto
       }}
       onMouseOver={(e) => {
         e.currentTarget.style.transform = 'translateX(-3px)';
-        e.currentTarget.style.boxShadow = '0 0 20px rgba(234, 88, 12, 0.4)';
+        e.currentTarget.style.borderColor = theme.colors.accent;
+        e.currentTarget.style.boxShadow = '0 0 20px rgba(234, 88, 12, 0.45), inset 0 0 10px rgba(234,88,12,0.15)';
       }}
       onMouseOut={(e) => {
         e.currentTarget.style.transform = 'translateX(0)';
-        e.currentTarget.style.boxShadow = '0 6px 14px rgba(0,0,0,0.4)';
+        e.currentTarget.style.borderColor = theme.materials.rust;
+        e.currentTarget.style.boxShadow = '0 6px 14px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.5)';
       }}
     >
       {/* nail head, like a sign tacked to a post */}

@@ -9,6 +9,7 @@ import {
   VictoryIcon,
 } from '../icons';
 import { BackButton } from '../components/BackButton';
+import { Embers } from '../components/ApocalypseScenery';
 import { RewardReveal, type RevealReward } from '../components/RewardReveal';
 import type { DropRarity } from '../../game/core/GameEvents';
 import { HERO_DEFINITIONS, type HeroId } from '../../game/data/heroes';
@@ -92,23 +93,35 @@ const BASE_CATALOG: CatalogItem[] = [
   },
 ];
 
-/** Corrugated-iron awning with scalloped edge. */
+/** Battered corrugated-iron awning — scorched, sagging, half its scallops torn. */
 function Awning() {
   return (
-    <div aria-hidden="true" style={{ position: 'relative', zIndex: 6 }}>
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'relative',
+        zIndex: 6,
+        transform: 'rotate(-0.8deg)', // one side sags off its bracket
+        transformOrigin: 'left center',
+      }}
+    >
       <div
         style={{
           height: 22,
-          backgroundImage: `repeating-linear-gradient(90deg, ${theme.materials.tarpRed}, ${theme.materials.tarpRed} 42px, rgba(200, 190, 175, 0.45) 42px, rgba(200, 190, 175, 0.45) 84px), repeating-linear-gradient(180deg, transparent, transparent 3px, rgba(120, 60, 20, 0.3) 3px, rgba(120, 60, 20, 0.3) 5px)`,
-          boxShadow: '0 6px 18px rgba(0,0,0,0.75), inset 0 -6px 10px rgba(0,0,0,0.5)',
+          // faded, soot-darkened stripes with charring streaks bleeding down
+          backgroundImage: `repeating-linear-gradient(90deg, ${theme.materials.rustDark}, ${theme.materials.rustDark} 42px, rgba(120, 110, 100, 0.35) 42px, rgba(120, 110, 100, 0.35) 84px), repeating-linear-gradient(180deg, transparent, transparent 3px, rgba(0, 0, 0, 0.4) 3px, rgba(0, 0, 0, 0.4) 5px), linear-gradient(90deg, transparent 60%, rgba(0,0,0,0.5) 72%, transparent 80%)`,
+          boxShadow: '0 6px 18px rgba(0,0,0,0.8), inset 0 -6px 10px rgba(0,0,0,0.6)',
         }}
       />
       <div
         style={{
           height: 10,
-          backgroundImage: `radial-gradient(circle at 21px -2px, ${theme.materials.tarpRed} 20px, transparent 21px), radial-gradient(circle at 63px -2px, rgba(200, 190, 175, 0.45) 20px, transparent 21px)`,
+          // torn scalloped fringe — a mask punches gaps where the cloth is ripped away
+          backgroundImage: `radial-gradient(circle at 21px -2px, ${theme.materials.rustDark} 20px, transparent 21px), radial-gradient(circle at 63px -2px, rgba(120, 110, 100, 0.35) 20px, transparent 21px)`,
           backgroundSize: '84px 14px',
-          filter: 'drop-shadow(0 3px 4px rgba(0,0,0,0.6))',
+          filter: 'drop-shadow(0 3px 4px rgba(0,0,0,0.7))',
+          WebkitMaskImage: 'repeating-linear-gradient(90deg, #000 0 120px, transparent 120px 168px)',
+          maskImage: 'repeating-linear-gradient(90deg, #000 0 120px, transparent 120px 168px)',
         }}
       />
     </div>
@@ -240,7 +253,7 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
           backgroundImage:
             'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px)',
           color: theme.colors.textPrimary,
-          border: `1px solid ${theme.materials.cardboardEdge}`,
+          border: `1px solid ${theme.materials.rustDark}`,
           padding: '5px 10px',
           borderRadius: 2,
           fontWeight: 900,
@@ -251,17 +264,22 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
           flexDirection: 'column',
           alignItems: 'center',
           gap: 2,
-          boxShadow: '2px 4px 10px rgba(0,0,0,0.5)',
+          // scorched corners bleeding in from the edges of the cardboard
+          boxShadow: '2px 4px 10px rgba(0,0,0,0.6), inset 0 0 14px rgba(0,0,0,0.5)',
           transform: `rotate(${tagTilt}deg)`,
           zIndex: 10,
-          transition: 'transform 0.1s',
+          transition: 'transform 0.1s, box-shadow 0.15s',
           opacity: affordable ? 1 : 0.5,
         }}
         onMouseOver={(e) => {
-          if (affordable) e.currentTarget.style.transform = `rotate(${tagTilt}deg) scale(1.08)`;
+          if (affordable) {
+            e.currentTarget.style.transform = `rotate(${tagTilt}deg) scale(1.08)`;
+            e.currentTarget.style.boxShadow = '2px 4px 10px rgba(0,0,0,0.6), inset 0 0 14px rgba(0,0,0,0.5), 0 0 16px rgba(234,88,12,0.5)';
+          }
         }}
         onMouseOut={(e) => {
           e.currentTarget.style.transform = `rotate(${tagTilt}deg) scale(1)`;
+          e.currentTarget.style.boxShadow = '2px 4px 10px rgba(0,0,0,0.6), inset 0 0 14px rgba(0,0,0,0.5)';
         }}
         onMouseDown={(e) => {
           if (affordable) e.currentTarget.style.transform = `rotate(${tagTilt}deg) scale(0.95)`;
@@ -423,10 +441,34 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
       }}
     >
       <Awning />
+      <Embers count={8} />
 
-      {/* Warm bulb glow over the counter */}
+      {/* Boarded-up patch — a plank nailed over a smashed section of wall */}
       <div
         aria-hidden="true"
+        style={{
+          position: 'absolute',
+          top: '30%',
+          right: '6%',
+          width: 96,
+          height: 34,
+          background: `linear-gradient(90deg, ${theme.materials.woodDark}, ${theme.materials.wood})`,
+          border: `1px solid #000`,
+          transform: 'rotate(-8deg)',
+          boxShadow: '0 4px 10px rgba(0,0,0,0.6)',
+          zIndex: 1,
+          opacity: 0.85,
+        }}
+      >
+        {/* two crossed nails */}
+        <span style={{ position: 'absolute', top: 5, left: 6, width: 5, height: 5, borderRadius: '50%', backgroundColor: '#5c3d2a' }} />
+        <span style={{ position: 'absolute', bottom: 5, right: 6, width: 5, height: 5, borderRadius: '50%', backgroundColor: '#5c3d2a' }} />
+      </div>
+
+      {/* Warm bulb glow over the counter — the store is the one warm refuge */}
+      <div
+        aria-hidden="true"
+        className="rally-flicker"
         style={{
           position: 'absolute',
           top: '18%',
@@ -435,7 +477,7 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
           width: 620,
           maxWidth: '100%',
           height: 400,
-          background: 'radial-gradient(ellipse, rgba(234, 88, 12, 0.12) 0%, rgba(234, 88, 12, 0.04) 40%, transparent 70%)',
+          background: 'radial-gradient(ellipse, rgba(234, 88, 12, 0.2) 0%, rgba(234, 88, 12, 0.07) 40%, transparent 70%)',
           pointerEvents: 'none',
           zIndex: 0,
         }}
