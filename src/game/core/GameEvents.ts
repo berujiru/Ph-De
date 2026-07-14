@@ -74,6 +74,7 @@ export interface GameToUiEvents extends Record<string, unknown> {
   stateChanged: GameStateSnapshot;
   voicesFull: { options: DropOption[] };
   enemyEncountered: { enemyId: string };
+  showHeroTcgCutIn: { heroId: string, durationMs: number };
   /** Phaser loader progress — value is 0‒1. */
   loadProgress: { progress: number };
   /** Fired once at the end of create() when all game objects are built. */

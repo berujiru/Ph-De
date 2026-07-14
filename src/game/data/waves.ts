@@ -177,10 +177,10 @@ export function buildWaveTable(
   }
 
   return honestWarnings([
-    { waveNumber: 1, events: [spawn('grunt', 4, 1600)] },
-    { waveNumber: 2, events: [spawn('grunt', 5, 1500), spawn('runner', 2, 800)] },
-    { waveNumber: 3, events: [spawn('grunt', 5, 1400), spawn('runner', 3, 800)] },
-    { waveNumber: 4, events: [spawn('grunt', 5, 1300), spawn('ghost_employee', 2, 1200)] },
+    { waveNumber: 1, events: [spawn('grunt', 3, 2500)] },
+    { waveNumber: 2, events: [spawn('grunt', 4, 2000), spawn('runner', 1, 1500)] },
+    { waveNumber: 3, events: [spawn('grunt', 4, 1800), spawn('runner', 2, 1200)] },
+    { waveNumber: 4, events: [spawn('grunt', 4, 1600), spawn('ghost_employee', 1, 1500)] },
     { waveNumber: 5, events: [warning('mini-boss', '⚠ MINI-BOSS INCOMING ⚠'), spawn('grunt', 4, 1200), spawn('brute', 1, 1000)] },
     { waveNumber: 6, events: [spawn('runner', 4, 700), spawn('grunt', 4, 1200), spawn('tender_rigger', 1, 1000)] },
     { waveNumber: 7, events: [spawn('the_overpriced', 3, 1500), spawn('grunt', 4, 1200)] },

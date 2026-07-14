@@ -375,6 +375,7 @@ export function setupInternalEvents(scene: GameScene): () => void {
     const isCombo = scene.comboCount > 1;
 
     scene.skillCutIn.play({
+      heroId: hero.id,
       skillName: isCombo ? `${hero.definition.signatureSkill.name}\nCOMBO x${scene.comboCount}!` : hero.definition.signatureSkill.name,
       faction: 'hero',
       portraitKey: hero.definition.portraitKey,

@@ -144,7 +144,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     name: 'Petty Corruptor',
     
     speed: 70,
-    maxHp: 25,
+    maxHp: 20,
     reward: 5,
     damage: 4,
     attackRateMs: 1500,
@@ -156,7 +156,7 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     
     
     speed: 130,
-    maxHp: 15,
+    maxHp: 10,
     reward: 4,
     damage: 3,
     attackRateMs: 900,

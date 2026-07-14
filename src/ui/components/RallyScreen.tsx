@@ -42,10 +42,10 @@ import { SkinPortrait } from './ArchiveCards';
 import { getSelectedSkin } from '../../game/data/skinSelection';
 import { HERO_DEFINITIONS, type HeroId } from '../../game/data/heroes';
 import { getHighestClearedStage, getStoreUnlockedHeroes } from '../../game/data/metaState';
-import { availableHeroIds } from '../../game/data/heroUnlocks';
-import { computeBattleRewards, applyBattleRewards, type BattleRewards } from '../../game/data/battleRewards';
+import { applyBattleRewards, type BattleRewards } from '../../game/data/battleRewards';
 import { IntelModal } from './IntelModal';
 import { EnemyTcgCard } from './EnemyTcgCard';
+import { HeroTcgCard } from './HeroTcgCard';
 
 interface RallyScreenProps {
   /** Campaign stage being played (null for non-campaign runs); drives stage-clear recording. */
@@ -418,6 +418,7 @@ export function RallyScreen({ stage, onReturnToMenu }: RallyScreenProps) {
   const [intelOpen, setIntelOpen] = useState(false);
   const [introducedEnemy, setIntroducedEnemy] = useState<string | null>(null);
   const [spoils, setSpoils] = useState<BattleRewards | null>(null);
+  const [tcgCutIn, setTcgCutIn] = useState<{ heroId: string } | null>(null);
   const lastSpeedRef = useRef(1);
   /** True only when the Intel modal itself paused the game (vs. the user's pause button). */
   const intelPausedGameRef = useRef(false);
@@ -431,10 +432,15 @@ export function RallyScreen({ stage, onReturnToMenu }: RallyScreenProps) {
       uiToGameEvents.emit('setSpeed', { speed: 0 });
       setIntroducedEnemy(enemyId);
     });
+    const unsubTcgCutIn = gameToUiEvents.on('showHeroTcgCutIn', ({ heroId, durationMs }) => {
+      setTcgCutIn({ heroId });
+      setTimeout(() => setTcgCutIn(null), durationMs);
+    });
     return () => {
       unsubState();
       unsubVoices();
       unsubEncounter();
+      unsubTcgCutIn();
     };
   }, []);
 
@@ -1135,6 +1141,33 @@ export function RallyScreen({ stage, onReturnToMenu }: RallyScreenProps) {
           >
             Acknowledge
           </button>
+        </div>
+      )}
+
+      {/* 6. Hero TCG Cut-In Overlay */}
+      {tcgCutIn && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 250,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none', // So it doesn't block inputs if they somehow leak, though game is paused
+            background: `radial-gradient(circle at 50% 50%, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.85) 100%)`,
+            animation: 'overlay-fade 0.2s ease both',
+          }}
+        >
+          <HeroTcgCard 
+            heroId={tcgCutIn.heroId as HeroId} 
+            style={{ 
+              transform: 'scale(1.15)',
+              transformOrigin: 'center',
+              animation: 'placard-drop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both',
+              boxShadow: `0 0 40px ${withAlpha(theme.colors.accent, 0.6)}`
+            }} 
+          />
         </div>
       )}
     </div>

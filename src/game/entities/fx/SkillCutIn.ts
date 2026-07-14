@@ -1,10 +1,13 @@
 import Phaser from 'phaser';
 import { GAME_HEIGHT, GAME_WIDTH } from '../../data/level';
+import { gameToUiEvents } from '../../core/GameEvents';
 
 /** Which side a cut-in belongs to — drives the frame accent color. */
 export type CutInFaction = 'hero' | 'enemy';
 
 export interface SkillCutInOptions {
+  /** Optional hero ID to trigger the React HeroTcgCard fallback if no portrait exists. */
+  heroId?: string;
   /** Skill name shown big and bold. */
   skillName: string;
   /**
@@ -99,8 +102,20 @@ export class SkillCutIn {
       // clipped to the cutout, so per-character tuning is limited to
       // artScale / artOffset{X,Y}.
       this.playDiagonal(container, accent, options);
+    } else if (options.heroId) {
+      // NEW FALLBACK: Show Hero TCG Card in the React UI Layer
+      // We don't render anything in Phaser, just emit the event and wait.
+      gameToUiEvents.emit('showHeroTcgCutIn', { 
+        heroId: options.heroId, 
+        durationMs: options.durationMs ?? SkillCutIn.HOLD_MS 
+      });
+      
+      scene.time.delayedCall(options.durationMs ?? SkillCutIn.HOLD_MS, () => {
+        container.destroy();
+        options.onComplete?.();
+      });
     } else {
-      // LEGACY DIAGONAL SLIDING PANEL (For silhouettes)
+      // LEGACY DIAGONAL SLIDING PANEL (For enemies without art)
       const panelWidth = GAME_WIDTH * 1.4;
       const panelHeight = 190;
       
