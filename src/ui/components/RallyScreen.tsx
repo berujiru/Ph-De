@@ -41,7 +41,7 @@ import {
 } from '../mockups/battleStyles';
 import { SkinPortrait } from './ArchiveCards';
 import { getSelectedSkin } from '../../game/data/skinSelection';
-import { type HeroId } from '../../game/data/heroes';
+import { HERO_DEFINITIONS, type HeroId } from '../../game/data/heroes';
 import { IntelModal } from './IntelModal';
 import { EnemyTcgCard } from './EnemyTcgCard';
 
@@ -139,6 +139,14 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
     heroId = option.id.split(':')[1];
   }
   const heroSkin = heroId ? getSelectedSkin(heroId as HeroId) : undefined;
+
+  // Buff (hero-upgrade) cards already show the hero via the full-bleed portrait,
+  // so drop the redundant "Hero — " prefix baked into the title (see Drops.ts).
+  const heroName = heroId ? HERO_DEFINITIONS[heroId as HeroId]?.name : undefined;
+  const displayTitle =
+    kind === 'heroUpgrade' && heroName && option.title.startsWith(heroName)
+      ? option.title.slice(heroName.length).replace(/^\s*[—-]\s*/, '')
+      : option.title;
 
   /* Hero recruits and upgrades render as full-bleed portrait cards (see the JSX below).
      For other non-hero kinds, we build a centered emblem `visual`. */
@@ -275,7 +283,7 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
                   textShadow: '0 2px 8px rgba(0,0,0,0.95)',
                 }}
               >
-                {option.title}
+                {displayTitle}
               </span>
               {kind === 'heroUpgrade' && (
                 <span
@@ -809,7 +817,7 @@ export function RallyScreen({ onReturnToMenu }: RallyScreenProps) {
                 opacity: 0.9,
               }}
             />
-            <div style={{ marginTop: 10, ...stampLabel, fontSize: 11, letterSpacing: 1.2, color: theme.colors.textMuted }}>
+            <div style={{ marginTop: 10, ...stampLabel, fontSize: 11, letterSpacing: 1.2, color: theme.colors.textSecondary, textShadow: `0 1px 6px ${withAlpha(theme.colors.background, 0.9)}` }}>
               The crowd answers — choose your boon
             </div>
           </div>
