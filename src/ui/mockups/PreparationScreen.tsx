@@ -203,8 +203,8 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
       style={{
         position: 'absolute',
         inset: 0,
-        backgroundColor: '#0a0f1e',
-        background: 'radial-gradient(circle at 50% 42%, #16223b 0%, #060a15 78%)',
+        backgroundColor: theme.colors.background,
+        background: 'radial-gradient(circle at 50% 38%, rgba(234, 88, 12, 0.06) 0%, #09090b 55%, #050505 100%)',
         overflowY: 'auto',
         color: theme.colors.textPrimary,
         zIndex: 100,
@@ -232,8 +232,8 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
             width: 16,
             height: 20,
             borderRadius: '50% 50% 45% 45%',
-            backgroundColor: theme.materials.cautionYellow,
-            boxShadow: '0 0 60px 24px rgba(234, 179, 8, 0.18)',
+            backgroundColor: '#c2410c',
+            boxShadow: '0 0 80px 32px rgba(234, 88, 12, 0.22), 0 0 160px 60px rgba(234, 88, 12, 0.08), 0 40px 120px 40px rgba(0,0,0,0.7)',
           }}
         />
       </div>
@@ -262,7 +262,7 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
               fontSize: 'clamp(26px, 6vw, 40px)',
               textTransform: 'uppercase',
               letterSpacing: 3,
-              textShadow: '0 0 24px rgba(234, 179, 8, 0.25)',
+              textShadow: '0 0 24px rgba(234, 88, 12, 0.3)',
             }}
           >
             Briefing Room
@@ -280,7 +280,7 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
             borderRadius: 14,
             backdropFilter: 'blur(12px)',
             padding: 'clamp(14px, 3vw, 22px)',
-            boxShadow: '0 24px 60px rgba(0,0,0,0.55), inset 0 0 60px rgba(234, 179, 8, 0.04)',
+            boxShadow: '0 24px 80px rgba(0,0,0,0.75), 0 8px 24px rgba(0,0,0,0.5), inset 0 0 60px rgba(234, 88, 12, 0.05), inset 0 1px 0 rgba(255,255,255,0.03)',
           }}
         >
           <SectionLabel>On the table — stage intel</SectionLabel>
@@ -298,6 +298,7 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
                   border: `4px solid ${theme.materials.paperAged}`,
                   boxShadow: '0 8px 22px rgba(0,0,0,0.6)',
                   display: 'block',
+                  filter: 'sepia(0.3) brightness(0.7)',
                 }}
               />
               {/* tape corners */}
@@ -403,8 +404,8 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
               marginBottom: 14,
               borderRadius: 12,
               border: `2px solid ${theme.colors.accent}`,
-              backgroundColor: 'rgba(56, 189, 248, 0.08)',
-              boxShadow: '0 0 16px rgba(56, 189, 248, 0.2)',
+              backgroundColor: theme.materials.corruptionEmber,
+              boxShadow: '0 0 20px rgba(234, 88, 12, 0.2), 0 0 60px rgba(234, 88, 12, 0.06)',
             }}
           >
             <SkinPortrait
@@ -422,7 +423,7 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                 <span style={{ fontSize: 15, fontWeight: 900 }}>{EDEN.name}</span>
                 <DamageTypeChip type={EDEN.damageType} />
-                <span style={{ fontSize: 9.5, letterSpacing: 1.5, color: theme.colors.accent, fontWeight: 900 }}>
+                <span style={{ fontSize: 9.5, letterSpacing: 1.5, color: theme.colors.accent, fontWeight: 900, textShadow: '0 0 8px rgba(234, 88, 12, 0.5)' }}>
                   LEADER · DEPLOYS AT WAVE 1
                 </span>
               </div>
@@ -442,7 +443,7 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
               marginBottom: 10,
             }}
           >
-            <span style={{ color: theme.colors.accent, display: 'flex' }}>
+            <span style={{ color: theme.colors.accent, display: 'flex', filter: 'drop-shadow(0 0 4px rgba(234, 88, 12, 0.4))' }}>
               <VoicesIcon size={16} />
             </span>
             Hope for these recruited workers from your drops — they counter this stage:
@@ -483,16 +484,16 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: 10,
-                backgroundColor: 'rgba(234, 179, 8, 0.1)',
-                border: `1px solid ${theme.materials.cautionYellow}`,
-                borderLeft: `5px solid ${theme.materials.cautionYellow}`,
+                backgroundColor: 'rgba(120, 113, 108, 0.1)',
+                border: `1px solid ${theme.colors.border}`,
+                borderLeft: `5px solid ${theme.colors.textMuted}`,
                 borderRadius: 8,
                 padding: '10px 14px',
                 marginTop: 14,
                 fontSize: 13,
               }}
             >
-              <span style={{ color: theme.materials.cautionYellow, display: 'flex', flexShrink: 0, marginTop: 1 }}>
+              <span style={{ color: theme.colors.textMuted, display: 'flex', flexShrink: 0, marginTop: 1 }}>
                 <InfoIcon size={18} />
               </span>
               <div>
@@ -527,10 +528,10 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
                   borderRadius: 12,
                   textAlign: 'left',
                   border: `2px solid ${theme.colors.accent}`,
-                  backgroundColor: 'rgba(56, 189, 248, 0.08)',
+                  backgroundColor: theme.materials.corruptionEmber,
                   color: 'inherit',
                   cursor: 'pointer',
-                  boxShadow: '0 0 14px rgba(56, 189, 248, 0.2)',
+                  boxShadow: '0 0 18px rgba(234, 88, 12, 0.2)',
                   fontFamily: 'inherit',
                 }}
               >
@@ -566,8 +567,8 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
             display: 'flex',
             alignItems: 'flex-end',
             justifyContent: 'center',
-            backgroundColor: 'rgba(6, 10, 21, 0.72)',
-            backdropFilter: 'blur(6px)',
+            backgroundColor: 'rgba(9, 9, 11, 0.82)',
+            backdropFilter: 'blur(8px)',
             padding: 16,
           }}
         >
@@ -582,7 +583,7 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
               border: `1px solid ${theme.colors.borderGlass}`,
               borderRadius: 16,
               padding: 'clamp(16px, 4vw, 24px)',
-              boxShadow: '0 -12px 50px rgba(0,0,0,0.6)',
+              boxShadow: '0 -12px 50px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.04)',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
@@ -629,11 +630,11 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
                       borderRadius: 10,
                       textAlign: 'left',
                       border: `2px solid ${selected ? theme.colors.accent : theme.colors.borderGlass}`,
-                      backgroundColor: selected ? 'rgba(56, 189, 248, 0.1)' : theme.colors.surfaceGlass,
+                      backgroundColor: selected ? theme.materials.corruptionEmber : theme.colors.surfaceGlass,
                       color: 'inherit',
                       cursor: act.unlocked ? 'pointer' : 'not-allowed',
                       opacity: act.unlocked ? 1 : 0.45,
-                      boxShadow: selected ? '0 0 14px rgba(56, 189, 248, 0.25)' : 'none',
+                      boxShadow: selected ? '0 0 18px rgba(234, 88, 12, 0.25)' : 'none',
                       fontFamily: 'inherit',
                     }}
                   >
@@ -666,7 +667,7 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
           alignItems: 'center',
           gap: 14,
           padding: '14px 16px calc(14px + env(safe-area-inset-bottom, 0px))',
-          background: 'linear-gradient(180deg, transparent, rgba(6, 10, 21, 0.9) 40%)',
+          background: 'linear-gradient(180deg, transparent, rgba(9, 9, 11, 0.92) 40%)',
           zIndex: 20,
           flexWrap: 'wrap',
         }}
@@ -706,7 +707,7 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
             borderRadius: 999,
             cursor: canDeploy ? 'pointer' : 'not-allowed',
             opacity: canDeploy ? 1 : 0.5,
-            boxShadow: canDeploy ? '0 0 30px rgba(56, 189, 248, 0.45), 0 5px 0 #0284c7' : 'none',
+            boxShadow: canDeploy ? '0 0 30px rgba(234, 88, 12, 0.45), 0 5px 0 #9a3412' : 'none',
             fontFamily: 'inherit',
           }}
         >

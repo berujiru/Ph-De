@@ -1,21 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Oswald:wght@200..700&display=swap');
+
 :root {
-  --bg: #0f172a;
-  --surface: #1e293b;
-  --border: #475569;
-  --text-primary: #f8fafc;
-  --text-muted: #94a3b8;
+  --bg: #09090b;
+  --surface: #18181b;
+  --border: #3f3f46;
+  --text-primary: #fafaf9;
+  --text-muted: #78716c;
   --gold: #facc15;
-  --danger: #ef4444;
-  --success: #22c55e;
-  --accent: #38bdf8;
+  --danger: #dc2626;
+  --success: #16a34a;
+  --accent: #ea580c;
 
   color-scheme: dark;
-  font: 16px/1.4 system-ui, 'Segoe UI', Roboto, sans-serif;
+  font: 16px/1.4 'Oswald', system-ui, 'Segoe UI', Roboto, sans-serif;
   color: var(--text-primary);
   background: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Cinzel', serif;
 }
 
 * {

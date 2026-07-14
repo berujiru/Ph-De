@@ -20,28 +20,38 @@ const MARKER_FONT = '"Segoe Print", "Bradley Hand", "Comic Sans MS", cursive';
 const MOCK_HOPE = 1450;
 const MOCK_PERMITS = 3;
 
-/** Distant city skyline behind the rally. */
+/** Distant ruined city skyline behind the rally. */
 function Skyline() {
   return (
-    <svg
-      viewBox="0 0 800 200"
-      preserveAspectRatio="xMidYMax slice"
-      aria-hidden="true"
-      style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '45%', opacity: 0.55 }}
-    >
-      <g fill="#64748b" opacity="0.4">
-        <rect x="0" y="90" width="70" height="110" />
-        <rect x="80" y="50" width="55" height="150" />
-        <rect x="145" y="110" width="80" height="90" />
-        <rect x="240" y="30" width="60" height="170" />
-        <rect x="315" y="80" width="90" height="120" />
-        <rect x="420" y="55" width="50" height="145" />
-        <rect x="485" y="100" width="85" height="100" />
-        <rect x="585" y="40" width="65" height="160" />
-        <rect x="665" y="85" width="70" height="115" />
-        <rect x="745" y="120" width="55" height="80" />
-      </g>
-    </svg>
+    <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '50%' }}>
+      <svg
+        viewBox="0 0 800 200"
+        preserveAspectRatio="xMidYMax slice"
+        aria-hidden="true"
+        style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '100%', opacity: 0.8 }}
+      >
+        <g fill="#0c0a09" opacity="0.9">
+          <rect x="0" y="90" width="70" height="110" />
+          <rect x="80" y="50" width="55" height="150" />
+          <rect x="145" y="110" width="80" height="90" />
+          <rect x="240" y="30" width="60" height="170" />
+          <rect x="315" y="80" width="90" height="120" />
+          <rect x="420" y="55" width="50" height="145" />
+          <rect x="485" y="100" width="85" height="100" />
+          <rect x="585" y="40" width="65" height="160" />
+          <rect x="665" y="85" width="70" height="115" />
+          <rect x="745" y="120" width="55" height="80" />
+        </g>
+      </svg>
+      {/* Corruption miasma fog over the city */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: `linear-gradient(to top, ${theme.materials.corruptionFog}, transparent)`,
+        }}
+      />
+    </div>
   );
 }
 
@@ -67,7 +77,7 @@ function RallyCrowd() {
         preserveAspectRatio="xMidYMax slice"
         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.9 }}
       >
-        <g fill="#334155">
+        <g fill="#0c0a09">
           {/* rolling heads of the crowd */}
           <path d="M0 260V190q30-24 60-10t60-6 62 10 58-14 62 8 60-10 62 12 58-12 62 10 60-8 62 12 58-10 62 8 54-6v66z" />
           {/* placards on sticks */}
@@ -92,7 +102,7 @@ function RallyCrowd() {
           </g>
         </g>
         {/* placard slogans, barely readable strokes */}
-        <g stroke="#94a3b8" strokeWidth="5" strokeLinecap="round" opacity="0.6">
+        <g stroke="#3f3f46" strokeWidth="5" strokeLinecap="round" opacity="0.6">
           <path d="M86 80h58M86 96h38" />
           <path d="M268 52h64M268 68h44" transform="rotate(-6 302 62)" />
           <path d="M486 72h58M486 88h36" transform="rotate(5 518 82)" />
@@ -114,12 +124,12 @@ function RallyCrowd() {
         <img
           src="/assets/heroes/hero-placeholder.svg"
           alt=""
-          style={{ width: 160, height: 160, filter: 'drop-shadow(0 0 16px rgba(56, 189, 248, 0.3))' }}
+          style={{ width: 160, height: 160, filter: 'drop-shadow(0 0 16px rgba(234, 88, 12, 0.3))' }}
         />
         <img
           src="/assets/heroes/hero-placeholder.svg"
           alt=""
-          style={{ width: 120, height: 120, opacity: 0.9, transform: 'scaleX(-1)' }}
+          style={{ width: 120, height: 120, opacity: 0.9, transform: 'scaleX(-1)', filter: 'brightness(0.6) sepia(0.5) hue-rotate(-20deg)' }}
         />
       </div>
 
@@ -137,12 +147,12 @@ function RallyCrowd() {
         <img
           src="/assets/heroes/hero-placeholder.svg"
           alt=""
-          style={{ width: 120, height: 120, opacity: 0.9 }}
+          style={{ width: 120, height: 120, opacity: 0.9, filter: 'brightness(0.6) sepia(0.5) hue-rotate(-20deg)' }}
         />
         <img
           src="/assets/heroes/hero-placeholder.svg"
           alt=""
-          style={{ width: 160, height: 160, filter: 'drop-shadow(0 0 16px rgba(56, 189, 248, 0.3))', transform: 'scaleX(-1)' }}
+          style={{ width: 160, height: 160, filter: 'drop-shadow(0 0 16px rgba(234, 88, 12, 0.3))', transform: 'scaleX(-1)' }}
         />
       </div>
     </div>
@@ -244,7 +254,7 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
         zIndex: 100,
         display: 'flex',
         flexDirection: 'column',
-        background: 'linear-gradient(180deg, #7dd3fc 0%, #bae6fd 55%, #e0f2fe 100%)',
+        background: `linear-gradient(180deg, ${theme.colors.background} 0%, #1c1917 55%, #0c0a09 100%)`,
       }}
     >
       <Skyline />
@@ -260,8 +270,8 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
         {[90, 230, 390, 545, 700].map((x, i) => (
           <g key={x}>
             <line x1={x} y1={i % 2 === 0 ? 34 : 40} x2={x} y2={(i % 2 === 0 ? 34 : 40) + 14} stroke={theme.materials.metalDark} strokeWidth="2" />
-            <circle cx={x} cy={(i % 2 === 0 ? 34 : 40) + 20} r="5" fill={theme.materials.cautionYellow} opacity="0.75" />
-            <circle cx={x} cy={(i % 2 === 0 ? 34 : 40) + 20} r="11" fill={theme.materials.cautionYellow} opacity="0.12" />
+            <circle cx={x} cy={(i % 2 === 0 ? 34 : 40) + 20} r="5" fill="#ea580c" opacity="0.85" />
+            <circle cx={x} cy={(i % 2 === 0 ? 34 : 40) + 20} r="16" fill="#ea580c" opacity="0.18" />
           </g>
         ))}
       </svg>
@@ -300,8 +310,8 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
           style={{
             position: 'relative',
             padding: '18px 34px 22px',
-            backgroundColor: 'rgba(185, 28, 28, 0.92)',
-            border: '2px solid rgba(0,0,0,0.35)',
+            backgroundColor: theme.materials.tarpRed,
+            border: '2px solid rgba(0,0,0,0.65)',
             borderRadius: 4,
             boxShadow: '0 14px 34px rgba(0,0,0,0.55), inset 0 0 40px rgba(0,0,0,0.35)',
             transform: 'rotate(-1.2deg)',
@@ -334,11 +344,11 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
             style={{
               margin: 0,
               fontSize: 'clamp(34px, 8vw, 68px)',
-              color: theme.materials.paper,
+              color: theme.materials.paperAged,
               fontWeight: 900,
               letterSpacing: 4,
               textTransform: 'uppercase',
-              textShadow: '3px 3px 0 rgba(0,0,0,0.45)',
+              textShadow: `0 0 16px ${theme.colors.accent}, 0 4px 12px rgba(0,0,0,0.8)`,
               lineHeight: 1,
             }}
           >
@@ -382,22 +392,22 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
             padding: '16px 36px',
             fontSize: 'clamp(18px, 4vw, 26px)',
             backgroundColor: theme.colors.accent,
-            color: theme.colors.background,
+            color: theme.colors.textPrimary,
             border: 'none',
             borderRadius: 999,
             cursor: 'pointer',
             fontWeight: 900,
             textTransform: 'uppercase',
             letterSpacing: 2,
-            boxShadow: '0 0 34px rgba(56, 189, 248, 0.45), 0 6px 0 #0284c7',
+            boxShadow: '0 0 34px rgba(234, 88, 12, 0.45), 0 6px 0 #9a3412',
             fontFamily: 'inherit',
           }}
           onMouseDown={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 16px rgba(56, 189, 248, 0.3), 0 1px 0 #0284c7';
+            e.currentTarget.style.boxShadow = '0 0 16px rgba(234, 88, 12, 0.3), 0 1px 0 #9a3412';
             e.currentTarget.style.transform = 'translateY(4px)';
           }}
           onMouseUp={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 34px rgba(56, 189, 248, 0.45), 0 6px 0 #0284c7';
+            e.currentTarget.style.boxShadow = '0 0 34px rgba(234, 88, 12, 0.45), 0 6px 0 #9a3412';
             e.currentTarget.style.transform = 'translateY(0)';
           }}
         >

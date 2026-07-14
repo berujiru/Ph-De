@@ -211,8 +211,8 @@ function CautionTapeMeter({ cleared, total }: { cleared: number; total: number }
           style={{
             width: `${pct}%`,
             height: '100%',
-            backgroundImage: `repeating-linear-gradient(45deg, ${theme.materials.cautionYellow}, ${theme.materials.cautionYellow} 10px, ${theme.materials.ink} 10px, ${theme.materials.ink} 20px)`,
-            boxShadow: '0 0 8px rgba(234, 179, 8, 0.35)',
+            backgroundImage: `repeating-linear-gradient(45deg, ${theme.colors.accent}, ${theme.colors.accent} 10px, #1c1917 10px, #1c1917 20px)`,
+            boxShadow: '0 0 8px rgba(234,88,12,0.35), inset 0 0 4px rgba(0,0,0,0.4)',
             transition: 'width 0.3s',
           }}
         />
@@ -242,7 +242,11 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
         position: 'absolute',
         inset: 0,
         backgroundColor: theme.colors.background,
-        backgroundImage: 'radial-gradient(ellipse at 50% -10%, rgba(56,189,248,0.08), transparent 60%)',
+        backgroundImage: `
+          radial-gradient(ellipse at 50% -10%, ${theme.materials.corruptionEmber}, transparent 50%),
+          radial-gradient(ellipse at 0% 100%, ${theme.materials.corruptionFog}, transparent 55%),
+          radial-gradient(ellipse at 100% 80%, ${theme.materials.corruptionFog}, transparent 55%)
+        `,
         display: 'flex',
         flexDirection: 'column',
         padding: 'clamp(16px, 4vw, 40px)',
@@ -251,6 +255,23 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
         zIndex: 100,
       }}
     >
+      {/* Souls-inspired atmospheric animations */}
+      <style>{`
+        @keyframes miasma-drift {
+          0%   { background-position: 0% 50%, 100% 50%, 50% 100%; }
+          50%  { background-position: 30% 60%, 70% 40%, 60% 80%; }
+          100% { background-position: 0% 50%, 100% 50%, 50% 100%; }
+        }
+        @keyframes ember-pulse {
+          0%, 100% { opacity: 0.85; text-shadow: 0 0 8px rgba(234,88,12,0.5), 0 0 20px rgba(234,88,12,0.2); }
+          50%      { opacity: 1;    text-shadow: 0 0 14px rgba(234,88,12,0.7), 0 0 32px rgba(234,88,12,0.35); }
+        }
+        @keyframes bonfire-flicker {
+          0%, 100% { box-shadow: 0 0 8px rgba(234,88,12,0.4), 0 0 16px rgba(234,88,12,0.15); }
+          50%      { box-shadow: 0 0 12px rgba(234,88,12,0.6), 0 0 24px rgba(234,88,12,0.25); }
+        }
+        .rally-screen { animation: miasma-drift 30s ease-in-out infinite; }
+      `}</style>
       {/* Header */}
       <div
         style={{
@@ -269,10 +290,18 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
           <div style={{ marginBottom: 12 }}>
             <BackButton onClick={onBack} label="Back to the Rally" />
           </div>
-          <h1 style={{ margin: 0, fontSize: 'clamp(24px, 5vw, 32px)', textTransform: 'uppercase', letterSpacing: 2 }}>
+          <h1 style={{
+            margin: 0,
+            fontSize: 'clamp(24px, 5vw, 32px)',
+            textTransform: 'uppercase',
+            letterSpacing: 2,
+            color: theme.colors.accent,
+            textShadow: `0 0 10px rgba(234,88,12,0.5), 0 0 28px rgba(234,88,12,0.2)`,
+            animation: 'ember-pulse 4s ease-in-out infinite',
+          }}>
             The March
           </h1>
-          <div style={{ color: theme.colors.textMuted, fontSize: 14 }}>
+          <div style={{ color: theme.colors.textMuted, fontSize: 14, opacity: 0.7, textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
             Barangay to Bayan to the whole archipelago — one street at a time.
           </div>
         </div>
@@ -286,19 +315,20 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
             minHeight: 44,
             padding: '8px 16px',
             backgroundColor: theme.colors.surfaceGlass,
-            border: `1px solid ${theme.colors.borderGlass}`,
+            border: `1px solid rgba(234,88,12,0.25)`,
             borderRadius: 999,
             backdropFilter: 'blur(12px)',
+            boxShadow: '0 0 12px rgba(234,88,12,0.12), inset 0 0 8px rgba(234,88,12,0.06)',
           }}
         >
-          <span style={{ color: theme.colors.accent, display: 'flex' }}>
+          <span style={{ color: theme.colors.accent, display: 'flex', filter: 'drop-shadow(0 0 4px rgba(234,88,12,0.5))' }}>
             <RallyPermitIcon size={24} />
           </span>
           <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
             <span style={{ fontSize: 10, letterSpacing: 1, color: theme.colors.textMuted, fontWeight: 700 }}>
               RALLY PERMITS
             </span>
-            <span style={{ fontSize: 17, fontWeight: 900 }}>{MOCK_PERMITS}</span>
+            <span style={{ fontSize: 17, fontWeight: 900, color: theme.colors.accent }}>{MOCK_PERMITS}</span>
           </div>
         </div>
       </div>
@@ -307,7 +337,7 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
         {/* Sandbox Entry */}
         <div
           style={{
-            backgroundColor: 'rgba(56, 189, 248, 0.08)',
+            backgroundColor: theme.materials.corruptionEmber,
             border: `2px dashed ${theme.colors.accent}`,
             borderRadius: 12,
             padding: 16,
@@ -316,14 +346,15 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
             alignItems: 'center',
             gap: 12,
             flexWrap: 'wrap',
+            boxShadow: 'inset 0 0 20px rgba(234,88,12,0.08)',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ color: theme.colors.accent, display: 'flex' }}>
+            <span style={{ color: theme.colors.accent, display: 'flex', filter: 'drop-shadow(0 0 3px rgba(234,88,12,0.4))' }}>
               <SettingsIcon size={26} />
             </span>
             <div>
-              <h3 style={{ margin: '0 0 2px 0', fontSize: 18, color: theme.colors.accent }}>Attack Sandbox</h3>
+              <h3 style={{ margin: '0 0 2px 0', fontSize: 18, color: theme.colors.accent, textShadow: '0 0 8px rgba(234,88,12,0.3)' }}>Attack Sandbox</h3>
               <p style={{ margin: 0, fontSize: 13, color: theme.colors.textMuted }}>
                 Isolated environment for testing mechanics. No permit needed.
               </p>
@@ -341,7 +372,7 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
               cursor: 'pointer',
               fontWeight: 900,
               fontSize: 14,
-              boxShadow: '0 4px 0 #0284c7',
+              boxShadow: '0 4px 0 #9a3412, 0 0 12px rgba(234,88,12,0.3)',
               fontFamily: 'inherit',
             }}
           >
@@ -363,15 +394,18 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
             <div
               key={act.id}
               style={{
-                backgroundColor: isActUnlocked ? theme.colors.surfaceGlass : 'rgba(30, 41, 59, 0.4)',
-                border: `1px solid ${isActUnlocked ? theme.colors.borderGlass : 'rgba(51, 65, 85, 0.5)'}`,
+                backgroundColor: isActUnlocked ? theme.colors.surfaceGlass : `rgba(12, 10, 9, 0.7)`,
+                border: `1px solid ${isActUnlocked ? 'rgba(234,88,12,0.15)' : 'rgba(63,63,70,0.3)'}`,
                 borderRadius: 12,
                 display: 'flex',
                 flexDirection: 'column',
-                opacity: isActUnlocked ? 1 : 0.6,
+                opacity: isActUnlocked ? 1 : 0.5,
                 overflow: 'hidden',
                 backdropFilter: 'blur(12px)',
                 transition: 'all 0.3s',
+                boxShadow: isActUnlocked
+                  ? '0 0 16px rgba(234,88,12,0.06)'
+                  : `inset 0 0 30px ${theme.materials.corruptionFog}`,
               }}
             >
               {/* Accordion Header */}
@@ -387,13 +421,14 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                   alignItems: 'center',
                   gap: 14,
                   cursor: isActUnlocked ? 'pointer' : 'not-allowed',
-                  backgroundColor: isExpanded ? 'rgba(56, 189, 248, 0.05)' : 'transparent',
+                  backgroundColor: isExpanded ? theme.materials.corruptionEmber : 'transparent',
                   border: 'none',
-                  borderBottom: isExpanded ? `1px solid ${theme.colors.borderGlass}` : 'none',
+                  borderBottom: isExpanded ? `1px solid rgba(234,88,12,0.15)` : 'none',
                   color: 'inherit',
                   textAlign: 'left',
                   width: '100%',
                   fontFamily: 'inherit',
+                  boxShadow: isExpanded ? 'inset 0 -1px 12px rgba(234,88,12,0.08)' : 'none',
                 }}
               >
                 {/* Tier map thumbnail */}
@@ -405,8 +440,9 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                     height: 88,
                     objectFit: 'cover',
                     borderRadius: 6,
-                    border: `2px solid ${isActUnlocked ? theme.materials.metalDark : 'rgba(51,65,85,0.6)'}`,
-                    filter: isActUnlocked ? 'none' : 'grayscale(90%) brightness(0.6)',
+                    border: `2px solid ${isActUnlocked ? theme.materials.metalDark : 'rgba(63,63,70,0.4)'}`,
+                    filter: isActUnlocked ? 'saturate(0.7) brightness(0.85)' : 'grayscale(100%) brightness(0.35)',
+                    boxShadow: isActUnlocked ? '0 0 6px rgba(234,88,12,0.15)' : 'none',
                     flexShrink: 0,
                   }}
                 />
@@ -446,7 +482,7 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
 
               {/* Accordion Body (Stages List) */}
               {isExpanded && isActUnlocked && (
-                <div style={{ padding: 16, backgroundColor: 'rgba(15, 23, 42, 0.5)' }}>
+                <div style={{ padding: 16, backgroundColor: 'rgba(9, 9, 11, 0.6)' }}>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     {act.stages.map((stageEntry, stageIdx) => {
                       const isCleared = HIGHEST_CLEARED_STAGE >= stageEntry.id;
@@ -461,20 +497,20 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                       const minibossDebuts = MINIBOSS_DEBUTS.get(stageEntry.id) ?? [];
 
                       const nodeColor: string = isCleared
-                        ? theme.colors.success
+                        ? theme.colors.accent
                         : isNext
                           ? theme.colors.accent
-                          : theme.colors.textSecondary;
+                          : theme.colors.textMuted;
                       const borderColor: string = isCleared
-                        ? theme.colors.success
+                        ? 'rgba(234,88,12,0.6)'
                         : isNext
                           ? theme.colors.accent
-                          : 'rgba(51, 65, 85, 0.5)';
+                          : 'rgba(63,63,70,0.35)';
                       const nodeBg: string = isCleared
-                        ? 'rgba(34, 197, 94, 0.1)'
+                        ? 'rgba(234,88,12,0.12)'
                         : isNext
-                          ? 'rgba(56, 189, 248, 0.2)'
-                          : 'rgba(30, 41, 59, 0.5)';
+                          ? 'rgba(234,88,12,0.25)'
+                          : `rgba(12,10,9,0.6)`;
 
                       return (
                         <div
@@ -493,9 +529,14 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                                 display: 'flex',
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                boxShadow: isNext ? `0 0 10px ${theme.colors.accent}` : 'none',
-                                color: theme.colors.success,
+                                boxShadow: isCleared
+                                  ? '0 0 8px rgba(234,88,12,0.4), 0 0 16px rgba(234,88,12,0.15)'
+                                  : isNext
+                                    ? `0 0 12px rgba(234,88,12,0.6), 0 0 24px rgba(234,88,12,0.25)`
+                                    : `inset 0 0 6px ${theme.materials.corruptionFog}`,
+                                color: theme.colors.accent,
                                 flexShrink: 0,
+                                animation: isNext ? 'bonfire-flicker 2s ease-in-out infinite' : undefined,
                               }}
                             >
                               {isCleared && <CheckIcon size={14} />}
@@ -513,11 +554,12 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                               justifyContent: 'space-between',
                               alignItems: 'center',
                               gap: 10,
-                              backgroundColor: 'rgba(30, 41, 59, 0.35)',
+                              backgroundColor: isLocked ? 'rgba(12,10,9,0.5)' : theme.colors.surfaceGlass,
                               padding: '10px 14px',
                               borderRadius: 8,
                               border: `1px solid ${borderColor}`,
                               marginBottom: isLast ? 0 : 12,
+                              boxShadow: isLocked ? `inset 0 0 12px ${theme.materials.corruptionFog}` : 'none',
                             }}
                           >
                             <div style={{ minWidth: 0 }}>
@@ -566,7 +608,7 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                                 style={{
                                   minHeight: 44,
                                   padding: '6px 14px',
-                                  backgroundColor: isNext ? theme.colors.success : 'transparent',
+                                  backgroundColor: isNext ? theme.colors.accent : 'transparent',
                                   color: !canAffordRun
                                     ? theme.colors.textMuted
                                     : isNext
@@ -578,7 +620,7 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                                   opacity: canAffordRun ? 1 : 0.45,
                                   fontWeight: 900,
                                   fontSize: 12,
-                                  boxShadow: isNext && canAffordRun ? '0 3px 0 #166534' : 'none',
+                                  boxShadow: isNext && canAffordRun ? '0 3px 0 #9a3412, 0 0 10px rgba(234,88,12,0.3)' : 'none',
                                   display: 'flex',
                                   flexDirection: 'column',
                                   alignItems: 'center',
@@ -598,7 +640,7 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                                     color: !canAffordRun
                                       ? theme.colors.textMuted
                                       : isNext
-                                        ? 'rgba(15,23,42,0.8)'
+                                        ? 'rgba(9,9,11,0.85)'
                                         : theme.colors.accent,
                                   }}
                                 >
@@ -636,9 +678,12 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
           style={{
             textAlign: 'center',
             fontFamily: MARKER_FONT,
-            color: theme.colors.textMuted,
+            color: theme.colors.accent,
             fontSize: 13,
             paddingBottom: 24,
+            opacity: 0.55,
+            textShadow: '0 0 10px rgba(234,88,12,0.35), 0 0 24px rgba(234,88,12,0.12)',
+            letterSpacing: 1,
           }}
         >
           Buong Pilipinas, protektado.

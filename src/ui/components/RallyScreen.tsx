@@ -128,7 +128,6 @@ function DropCard({ option, index, onSelect }: DropCardProps) {
   const kind: DropKind = option.kind ?? (option.type === 'spawn' ? 'hero' : 'generalUpgrade');
   const kindMeta = KIND_META[kind];
   const isBuhis = kind === 'buhisBuhay';
-  const isHero = kind === 'hero';
   const hasPortrait = kind === 'hero' || kind === 'heroUpgrade';
   const DamageIcon = option.damageType ? damageTypeIcons[option.damageType] : undefined;
   

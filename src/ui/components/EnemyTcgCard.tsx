@@ -70,8 +70,8 @@ export function EnemyTcgCard({ enemyId, style, rotation = 0 }: EnemyTcgCardProps
         borderRadius: 16,
         padding: 12,
         // Metallic dark border with a bit of the unit's color mixed in
-        background: `linear-gradient(145deg, #334155, #0f172a)`,
-        border: `2px solid #64748b`,
+        background: `linear-gradient(145deg, #1e1b4b, #0c0a09)`,
+        border: `2px solid #312e81`,
         boxShadow: `0 20px 40px rgba(0,0,0,0.8), inset 0 0 4px rgba(255,255,255,0.3), 0 0 15px ${color}40`,
         display: 'flex',
         flexDirection: 'column',
@@ -87,7 +87,7 @@ export function EnemyTcgCard({ enemyId, style, rotation = 0 }: EnemyTcgCardProps
       <div style={{
         position: 'absolute',
         inset: 0,
-        background: 'linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.4) 35%, rgba(255,255,255,0.1) 45%, transparent 60%)',
+        background: 'linear-gradient(115deg, transparent 20%, rgba(139,92,246,0.15) 35%, rgba(139,92,246,0.05) 45%, transparent 60%)',
         pointerEvents: 'none',
         zIndex: 50,
         mixBlendMode: 'screen',
@@ -143,9 +143,9 @@ export function EnemyTcgCard({ enemyId, style, rotation = 0 }: EnemyTcgCardProps
         width: '100%',
         height: 220,
         backgroundColor: '#000',
-        border: '3px solid #94a3b8',
+        border: '3px solid #312e81',
         borderRadius: 4,
-        boxShadow: `0 8px 16px rgba(0,0,0,0.6), inset 0 0 20px ${color}80`,
+        boxShadow: `0 8px 16px rgba(0,0,0,0.6), inset 0 0 30px rgba(55,20,60,0.9)`,
         marginBottom: 12,
         display: 'flex',
         alignItems: 'center',
@@ -201,19 +201,19 @@ export function EnemyTcgCard({ enemyId, style, rotation = 0 }: EnemyTcgCardProps
 
       {/* Mechanic/Description Box (The "Text Box") */}
       <div style={{
-        backgroundColor: 'rgba(241, 245, 249, 0.9)',
-        border: '2px solid #cbd5e1',
+        backgroundColor: '#0c0a09',
+        border: '2px solid #312e81',
         borderRadius: 4,
         padding: 10,
         fontSize: 13,
-        color: '#1e293b',
-        boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.2)',
+        color: '#e2e8f0',
+        boxShadow: 'inset 0 0 30px rgba(55,20,60,0.5)',
         flexGrow: 1,
         zIndex: 10,
         display: 'flex',
         flexDirection: 'column'
       }}>
-        <div style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: '#64748b', borderBottom: '1px solid #cbd5e1', paddingBottom: 4, marginBottom: 6 }}>
+        <div style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: '#a8a29e', borderBottom: '1px solid #312e81', paddingBottom: 4, marginBottom: 6 }}>
           [ Rank {rank} Anomaly / {tier} ]
         </div>
         
@@ -223,10 +223,10 @@ export function EnemyTcgCard({ enemyId, style, rotation = 0 }: EnemyTcgCardProps
             fontStyle: 'italic', 
             fontSize: def.lore.length > 150 ? 9 : 11,
             lineHeight: 1.2,
-            color: '#475569', 
+            color: '#a8a29e', 
             marginBottom: 8, 
             paddingBottom: 6, 
-            borderBottom: '1px dashed #cbd5e1' 
+            borderBottom: '1px dashed #312e81' 
           }}>
             "{def.lore}"
           </div>
@@ -239,10 +239,10 @@ export function EnemyTcgCard({ enemyId, style, rotation = 0 }: EnemyTcgCardProps
         
         {/* Active Skill */}
         {def.activeSkill && (
-          <div style={{ marginTop: 8, borderTop: '1px solid #cbd5e1', paddingTop: 6, fontSize: 12 }}>
-            <span style={{ fontWeight: 900, color: '#b91c1c' }}>ACTV: </span>
+          <div style={{ marginTop: 8, borderTop: '1px solid #312e81', paddingTop: 6, fontSize: 12 }}>
+            <span style={{ fontWeight: 900, color: '#ea580c' }}>ACTV: </span>
             <span style={{ fontWeight: 800 }}>{def.activeSkill.name}</span>
-            <div style={{ marginTop: 2, fontSize: 11, color: '#475569', lineHeight: 1.3 }}>
+            <div style={{ marginTop: 2, fontSize: 11, color: '#a8a29e', lineHeight: 1.3 }}>
               {def.activeSkill.description || ACTIVE_SKILL_DESCRIPTIONS[def.activeSkill.effect]}
             </div>
           </div>

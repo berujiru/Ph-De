@@ -76,10 +76,10 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
     <div className="rally-screen" style={{
       position: 'absolute',
       inset: 0,
-      backgroundColor: '#785b46', // Base cork color
+      backgroundColor: theme.materials.cork, // Ash-stained cork
       backgroundImage: `
-        radial-gradient(#5a4231 15%, transparent 16%),
-        radial-gradient(#5a4231 15%, transparent 16%)
+        radial-gradient(${theme.materials.corkDark} 10%, transparent 11%),
+        radial-gradient(${theme.materials.corkDark} 10%, transparent 11%)
       `,
       backgroundSize: '20px 20px',
       backgroundPosition: '0 0, 10px 10px',
@@ -88,7 +88,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
       padding: 'clamp(12px, 3vw, 24px)',
       color: theme.colors.textPrimary,
       overflowY: 'auto',
-      boxShadow: 'inset 0 0 100px rgba(0,0,0,0.8)'
+      boxShadow: 'inset 0 0 120px rgba(0,0,0,0.9)'
     }}>
 
       {/* Top Header / Nav Bar */}
@@ -109,11 +109,11 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
 
           {/* Taped Sign Title */}
           <div style={{
-            backgroundColor: '#fef08a',
-            color: '#000',
+            backgroundColor: '#44403c', // Scorched parchment
+            color: theme.colors.textPrimary,
             padding: '10px clamp(14px, 5vw, 30px)',
             transform: 'rotate(-2deg)',
-            boxShadow: '2px 4px 10px rgba(0,0,0,0.3)',
+            boxShadow: '2px 4px 10px rgba(0,0,0,0.6)',
             display: 'inline-block',
             position: 'relative',
             maxWidth: '100%'
@@ -125,8 +125,8 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
               transform: 'translateX(-50%)',
               width: '40px',
               height: '15px',
-              backgroundColor: 'rgba(255,255,255,0.7)',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+              backgroundColor: theme.materials.tape, // Burnt/aged tape
+              boxShadow: '0 1px 3px rgba(0,0,0,0.4)'
             }} /> {/* Masking tape */}
             <h1 style={{ margin: 0, fontSize: 'clamp(20px, 6vw, 32px)', fontFamily: TYPEWRITER_FONT, fontWeight: '900', textTransform: 'uppercase', lineHeight: 1.1 }}>
               The Movement Archive
@@ -136,14 +136,15 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
 
         {/* Currency Display (Pinned Card) */}
         <div style={{
-          backgroundColor: '#fff',
+          backgroundColor: '#292524', // Weathered dark card
           padding: '15px 25px',
           borderRadius: '4px',
-          boxShadow: '2px 4px 15px rgba(0,0,0,0.4)',
+          boxShadow: '2px 4px 15px rgba(0,0,0,0.6)',
           transform: 'rotate(1deg)',
           display: 'flex',
           gap: '30px',
-          position: 'relative'
+          position: 'relative',
+          border: `1px solid ${theme.colors.border}`
         }}>
           {/* Push Pin */}
           <div style={{
@@ -153,24 +154,24 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
             transform: 'translateX(-50%)',
             width: '12px',
             height: '12px',
-            backgroundColor: '#ef4444',
+            backgroundColor: '#78716c', // Duller, rusted pin
             borderRadius: '50%',
-            boxShadow: 'inset -2px -2px 4px rgba(0,0,0,0.3), 2px 2px 5px rgba(0,0,0,0.5)'
+            boxShadow: 'inset -2px -2px 4px rgba(0,0,0,0.5), 2px 2px 5px rgba(0,0,0,0.7)'
           }} />
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ color: theme.colors.gold, display: 'flex' }}><HopeCoinIcon size={22} /></span>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold' }}>HOPE POINTS</span>
-              <span style={{ fontSize: '20px', color: '#000', fontWeight: '900' }}>{currentHope}</span>
+              <span style={{ fontSize: '12px', color: theme.colors.textMuted, fontWeight: 'bold' }}>HOPE POINTS</span>
+              <span style={{ fontSize: '20px', color: theme.colors.textPrimary, fontWeight: '900' }}>{currentHope}</span>
             </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ color: '#334155', display: 'flex' }}><RallyPermitIcon size={22} /></span>
+            <span style={{ color: theme.colors.textSecondary, display: 'flex' }}><RallyPermitIcon size={22} /></span>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold' }}>RALLY PERMITS</span>
-              <span style={{ fontSize: '20px', color: '#000', fontWeight: '900' }}>{currentPermits}</span>
+              <span style={{ fontSize: '12px', color: theme.colors.textMuted, fontWeight: 'bold' }}>RALLY PERMITS</span>
+              <span style={{ fontSize: '20px', color: theme.colors.textPrimary, fontWeight: '900' }}>{currentPermits}</span>
             </div>
           </div>
         </div>
@@ -199,12 +200,13 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 fontWeight: 900,
                 textTransform: 'uppercase',
                 letterSpacing: 1,
-                color: active ? '#000' : '#e2e8f0',
-                backgroundColor: active ? '#fef08a' : 'rgba(0,0,0,0.45)',
-                border: active ? '2px solid #000' : `2px solid ${theme.colors.borderGlass}`,
+                color: active ? theme.colors.textPrimary : theme.colors.textSecondary,
+                backgroundColor: active ? theme.colors.accent : 'rgba(9, 9, 11, 0.8)',
+                border: active ? `2px solid ${theme.colors.accent}` : `2px solid ${theme.colors.border}`,
                 borderRadius: 6,
                 transform: active ? 'rotate(-1deg)' : 'none',
-                boxShadow: active ? '2px 3px 8px rgba(0,0,0,0.4)' : 'none',
+                boxShadow: active ? `0 0 15px rgba(234, 88, 12, 0.5), inset 0 0 8px rgba(234, 88, 12, 0.3)` : 'none',
+                textShadow: active ? '0 1px 3px rgba(0,0,0,0.8)' : 'none',
               }}
             >
               <span style={{ fontSize: 16 }}>{t.label}</span>
@@ -242,9 +244,9 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                   <div style={{
                     fontSize: '7.5px',
                     fontWeight: 'bold',
-                    color: '#854d0e',
-                    backgroundColor: '#fef9c3',
-                    border: '1px solid #ca8a04',
+                    color: theme.colors.textSecondary,
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    border: `1px solid ${theme.colors.border}`,
                     padding: '1px 5px',
                     borderRadius: '10px'
                   }}>
@@ -252,14 +254,15 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                   </div>
                 }
               >
-                <span style={{ fontSize: '7px', padding: '1px 4px', backgroundColor: '#e2e8f0', color: '#334155', border: '1px solid #cbd5e1', fontWeight: 'bold' }}>
+                <span style={{ fontSize: '7px', padding: '1px 4px', backgroundColor: 'rgba(0,0,0,0.4)', color: theme.colors.textSecondary, border: `1px solid ${theme.colors.border}`, fontWeight: 'bold' }}>
                   {hero.damageType.toUpperCase()}
                 </span>
                 <div style={{
                   fontSize: '7.5px',
                   fontWeight: 'bold',
-                  color: mockCards >= mockCardsNeeded ? '#166534' : '#b91c1c',
-                  backgroundColor: mockCards >= mockCardsNeeded ? '#bbf7d0' : '#fecaca',
+                  color: mockCards >= mockCardsNeeded ? theme.colors.accent : theme.colors.textMuted,
+                  backgroundColor: mockCards >= mockCardsNeeded ? 'rgba(234, 88, 12, 0.15)' : 'rgba(0,0,0,0.6)',
+                  border: mockCards >= mockCardsNeeded ? `1px solid ${theme.colors.accent}` : `1px solid ${theme.colors.border}`,
                   padding: '1px 5px',
                   borderRadius: '10px'
                 }}>
@@ -275,9 +278,10 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
       {tab === 'codex' && (
         <div style={{ zIndex: 10 }}>
           <div style={{
-            display: 'flex', alignItems: 'center', gap: 8, color: '#e2e8f0',
-            fontSize: 13, marginBottom: 18, backgroundColor: 'rgba(0,0,0,0.4)',
-            padding: '8px 14px', borderRadius: 8, width: 'fit-content'
+            display: 'flex', alignItems: 'center', gap: 8, color: theme.colors.textPrimary,
+            fontSize: 13, marginBottom: 18, backgroundColor: '#09090b',
+            padding: '8px 14px', borderRadius: 8, width: 'fit-content', border: `1px solid ${theme.colors.border}`,
+            boxShadow: '0 4px 10px rgba(0,0,0,0.8)'
           }}>
             <InfoIcon size={16} />
             Every anomaly you face in the field is filed here — a lie debunked.
@@ -299,7 +303,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                   onClick={() => setSelectedEnemy(def)}
                 >
                   {faced ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 4, color: '#78350f', fontSize: 7.5, fontWeight: 800, letterSpacing: 0.3, textTransform: 'uppercase' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 4, color: theme.colors.accent, fontSize: 7.5, fontWeight: 800, letterSpacing: 0.3, textTransform: 'uppercase' }}>
                       <InfoIcon size={9} /> Tap to open
                     </div>
                   ) : (
@@ -321,7 +325,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.8)',
+            backgroundColor: 'rgba(0,0,0,0.88)',
             display: 'flex',
             zIndex: 1000,
             backdropFilter: 'blur(5px)',
@@ -333,15 +337,15 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
             onClick={(e) => e.stopPropagation()}
             style={{
               margin: 'auto',
-              backgroundColor: '#e5d5b5', // Manila folder color
-              border: '1px solid #c2b291',
+              backgroundColor: '#292018', // Scorched manila folder
+              border: `1px solid ${theme.colors.border}`,
               borderRadius: '4px 20px 4px 4px',
               padding: 'clamp(14px, 3vw, 28px)',
               width: '100%',
               maxWidth: '550px',
               position: 'relative',
-              boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
-              backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(0,0,0,0.02) 20px, rgba(0,0,0,0.02) 21px)'
+              boxShadow: '0 20px 50px rgba(0,0,0,0.7), 0 0 40px rgba(234,88,12,0.06)',
+              backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(255,255,255,0.02) 20px, rgba(255,255,255,0.02) 21px)'
             }}>
             {/* Top Tab — compact so it fits on short/landscape viewports */}
             <div style={{
@@ -349,12 +353,12 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
               top: '-22px',
               left: '0',
               maxWidth: '100%',
-              backgroundColor: '#e5d5b5',
+              backgroundColor: '#1a1410', // Dark tab
               padding: '3px 10px',
-              border: '1px solid #c2b291',
+              border: `1px solid ${theme.colors.border}`,
               borderBottom: 'none',
               borderRadius: '8px 8px 0 0',
-              color: '#000',
+              color: theme.colors.textSecondary,
               fontWeight: 'bold',
               fontSize: '9px',
               letterSpacing: 1,
@@ -362,7 +366,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               fontFamily: TYPEWRITER_FONT,
-              boxShadow: '0 -2px 5px rgba(0,0,0,0.1)'
+              boxShadow: '0 -2px 5px rgba(0,0,0,0.3)'
             }}>
               CONFIDENTIAL · FILE {selectedHero.id.toUpperCase()}
             </div>
@@ -374,8 +378,8 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 position: 'absolute',
                 top: '15px',
                 right: '15px',
-                background: '#ef4444',
-                border: '2px solid #000',
+                background: '#991b1b', // Darker red close button
+                border: `2px solid ${theme.colors.border}`,
                 color: '#fff',
                 fontSize: '20px',
                 fontWeight: 'bold',
@@ -386,7 +390,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                boxShadow: '2px 2px 0 #000',
+                boxShadow: '2px 2px 0 rgba(0,0,0,0.5)',
                 lineHeight: 1,
                 zIndex: 100
               }}
@@ -400,8 +404,8 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
 
             {/* Skins — pick which sheet this worker wears into battle */}
             {heroSkins(selectedHero.id).length > 0 && (
-              <div style={{ marginBottom: '18px', color: '#000' }}>
-                <h3 style={{ margin: '0 0 8px 0', fontSize: '13px', borderBottom: '1px solid #000', display: 'inline-block' }}>SKINS</h3>
+              <div style={{ marginBottom: '18px', color: theme.colors.textPrimary }}>
+                <h3 style={{ margin: '0 0 8px 0', fontSize: '13px', borderBottom: `1px solid ${theme.colors.textMuted}`, display: 'inline-block' }}>SKINS</h3>
                 <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                   {heroSkins(selectedHero.id).map((skin) => {
                     const active = getSelectedSkin(selectedHero.id)?.id === skin.id;
@@ -417,17 +421,17 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                           alignItems: 'center',
                           gap: 4,
                           padding: 5,
-                          backgroundColor: active ? '#fef08a' : '#f8fafc',
-                          border: active ? '2px solid #000' : '1px solid #c2b291',
-                          boxShadow: active ? '2px 2px 0 #000' : '1px 2px 6px rgba(0,0,0,0.25)',
+                          backgroundColor: active ? 'rgba(234, 88, 12, 0.18)' : 'rgba(0,0,0,0.3)',
+                          border: active ? `2px solid ${theme.colors.accent}` : `1px solid ${theme.colors.border}`,
+                          boxShadow: active ? `0 0 10px rgba(234, 88, 12, 0.4), inset 0 0 8px rgba(234, 88, 12, 0.3)` : '1px 2px 6px rgba(0,0,0,0.4)',
                           cursor: 'pointer',
                           fontFamily: TYPEWRITER_FONT,
                         }}
                       >
-                        <div style={{ width: 56, height: 56, background: PORTRAIT_BG, overflow: 'hidden', border: '1px solid #94a3b8' }}>
+                        <div style={{ width: 56, height: 56, background: PORTRAIT_BG, overflow: 'hidden', border: `1px solid ${theme.colors.border}` }}>
                           <SkinPortrait skin={skin} alt={skin.name} />
                         </div>
-                        <span style={{ fontSize: 9, fontWeight: 900, textTransform: 'uppercase', color: '#000' }}>
+                        <span style={{ fontSize: 9, fontWeight: 900, textTransform: 'uppercase', color: theme.colors.textPrimary }}>
                           {active ? `✓ ${skin.name}` : skin.name}
                         </span>
                       </button>
@@ -455,20 +459,22 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                   top: '10px',
                   left: '40%',
                   transform: 'rotate(-15deg)',
-                  color: '#ef4444',
-                  border: '4px solid #ef4444',
+                  color: theme.colors.accent, // Ember-orange stamp
+                  border: `4px solid ${theme.colors.accent}`,
                   padding: '5px 15px',
                   fontSize: '24px',
                   fontWeight: '900',
                   fontFamily: TYPEWRITER_FONT,
-                  opacity: 0.7,
+                  opacity: 0.85,
+                  textShadow: '0 0 10px rgba(234,88,12,0.5)',
+                  boxShadow: '0 0 15px rgba(234,88,12,0.3), inset 0 0 10px rgba(234,88,12,0.3)',
                   pointerEvents: 'none'
                 }}>
                   READY FOR PROMOTION
                 </div>
               )}
 
-              <div style={{ display: 'flex', flexDirection: 'column', color: '#000' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', color: theme.colors.textPrimary }}>
                 <span style={{ fontSize: '14px', fontWeight: 'bold', fontFamily: TYPEWRITER_FONT }}>CARDS GATHERED:</span>
                 <span style={{ fontSize: '24px', fontWeight: '900' }}>
                   {selectedHero.id === 'eden' ? '4 / 15' : '8 / 5'}
@@ -476,27 +482,28 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
               </div>
 
               <button style={{
-                backgroundColor: (selectedHero.id === 'eden') ? '#94a3b8' : '#22c55e',
-                color: (selectedHero.id === 'eden') ? '#cbd5e1' : '#000',
-                border: '2px solid #000',
+                backgroundColor: (selectedHero.id === 'eden') ? '#18181b' : theme.colors.accent,
+                color: (selectedHero.id === 'eden') ? theme.colors.textMuted : theme.colors.textPrimary,
+                border: (selectedHero.id === 'eden') ? `2px solid ${theme.colors.border}` : `2px solid ${theme.colors.accent}`,
                 padding: '12px 24px',
                 minHeight: 44,
                 fontWeight: '900',
                 cursor: (selectedHero.id === 'eden') ? 'not-allowed' : 'pointer',
                 textTransform: 'uppercase',
-                boxShadow: (selectedHero.id === 'eden') ? 'none' : '4px 4px 0 #000',
+                boxShadow: (selectedHero.id === 'eden') ? 'none' : '0 0 20px rgba(234, 88, 12, 0.6), inset 0 0 10px rgba(234, 88, 12, 0.4)',
+                textShadow: (selectedHero.id === 'eden') ? 'none' : '0 2px 4px rgba(0,0,0,0.6)',
                 transition: 'transform 0.1s, box-shadow 0.1s'
               }}
                 onMouseDown={(e) => {
                   if (selectedHero.id !== 'eden') {
-                    e.currentTarget.style.transform = 'translate(4px, 4px)';
-                    e.currentTarget.style.boxShadow = '0px 0px 0 #000';
+                    e.currentTarget.style.transform = 'translate(2px, 2px)';
+                    e.currentTarget.style.boxShadow = '0 0 10px rgba(234, 88, 12, 0.8), inset 0 0 5px rgba(234, 88, 12, 0.6)';
                   }
                 }}
                 onMouseUp={(e) => {
                   if (selectedHero.id !== 'eden') {
                     e.currentTarget.style.transform = 'translate(0px, 0px)';
-                    e.currentTarget.style.boxShadow = '4px 4px 0 #000';
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(234, 88, 12, 0.6), inset 0 0 10px rgba(234, 88, 12, 0.4)';
                   }
                 }}
               >
@@ -516,7 +523,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
             style={{
               position: 'fixed',
               inset: 0,
-              backgroundColor: 'rgba(0,0,0,0.8)',
+              backgroundColor: 'rgba(0,0,0,0.9)', // Darker enemy modal backdrop
               display: 'flex',
               zIndex: 1000,
               backdropFilter: 'blur(5px)',
@@ -535,9 +542,9 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                   position: 'absolute',
                   top: '-40px',
                   right: '0',
-                  background: '#ef4444',
-                  border: '2px solid #000',
-                  color: '#fff',
+                  background: '#991b1b', // Darker close button
+                  border: `2px solid ${theme.colors.border}`,
+                  color: theme.colors.textPrimary,
                   fontSize: '20px',
                   fontWeight: 'bold',
                   width: '32px',
@@ -546,7 +553,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  boxShadow: '2px 2px 0 #000',
+                  boxShadow: '2px 2px 0 rgba(0,0,0,0.5)',
                   lineHeight: 1,
                   zIndex: 10,
                   borderRadius: '50%'

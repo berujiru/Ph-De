@@ -13,9 +13,9 @@ interface BackButtonProps {
 }
 
 const TONE: Record<NonNullable<BackButtonProps['tone']>, { bg: string; edge: string }> = {
-  dark: { bg: 'rgba(15, 23, 42, 0.72)', edge: theme.materials.metalDark },
-  wood: { bg: 'rgba(41, 27, 18, 0.82)', edge: theme.materials.woodLight },
-  cork: { bg: 'rgba(42, 32, 25, 0.82)', edge: theme.materials.woodLight },
+  dark: { bg: 'rgba(24, 24, 27, 0.85)', edge: theme.materials.metalDark },
+  wood: { bg: 'rgba(26, 20, 16, 0.85)', edge: theme.materials.woodLight },
+  cork: { bg: 'rgba(30, 24, 20, 0.85)', edge: theme.materials.woodLight },
 };
 
 /**
@@ -51,13 +51,15 @@ export function BackButton({ onClick, label = 'Back', tone = 'dark' }: BackButto
         fontSize: 13,
         letterSpacing: 1,
         textTransform: 'uppercase',
-        transition: 'transform 0.12s ease, border-color 0.12s ease',
+        transition: 'transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease',
       }}
       onMouseOver={(e) => {
         e.currentTarget.style.transform = 'translateX(-3px)';
+        e.currentTarget.style.boxShadow = '0 0 20px rgba(234, 88, 12, 0.4)';
       }}
       onMouseOut={(e) => {
         e.currentTarget.style.transform = 'translateX(0)';
+        e.currentTarget.style.boxShadow = '0 6px 14px rgba(0,0,0,0.4)';
       }}
     >
       {/* nail head, like a sign tacked to a post */}
@@ -83,7 +85,7 @@ export function BackButton({ onClick, label = 'Back', tone = 'dark' }: BackButto
           width: 26,
           height: 26,
           borderRadius: '50%',
-          backgroundColor: 'rgba(56, 189, 248, 0.15)',
+          backgroundColor: 'rgba(234, 88, 12, 0.15)',
           border: `1px solid ${theme.colors.accent}`,
           color: theme.colors.accent,
           flexShrink: 0,

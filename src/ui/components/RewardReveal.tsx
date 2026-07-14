@@ -24,9 +24,9 @@ interface RewardRevealProps {
 const RARITY_STARS: Record<DropRarity, number> = { common: 1, rare: 2, epic: 3 };
 
 const RARITY_FRAME: Record<DropRarity, { border: string; glow: string }> = {
-  common: { border: theme.colors.borderGlass, glow: 'rgba(148,163,184,0.25)' },
-  rare: { border: 'rgba(56, 189, 248, 0.6)', glow: 'rgba(56, 189, 248, 0.45)' },
-  epic: { border: theme.colors.accent, glow: 'rgba(56, 189, 248, 0.75)' },
+  common: { border: theme.colors.borderGlass, glow: 'rgba(168, 162, 158, 0.25)' },
+  rare: { border: 'rgba(250, 204, 21, 0.6)', glow: 'rgba(250, 204, 21, 0.45)' },
+  epic: { border: theme.colors.accent, glow: 'rgba(234, 88, 12, 0.6)' },
 };
 
 function RarityStars({ rarity }: { rarity: DropRarity }) {
@@ -65,24 +65,36 @@ export function RewardReveal({ heading, rewards, onClose, closeLabel = 'Collect'
         animation: 'reward-overlay-in 0.2s ease both',
       }}
     >
-      <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-        <span style={{ color: theme.colors.accent, display: 'flex' }}>
-          <MegaphoneIcon size={30} />
-        </span>
-        <h1
-          style={{
-            margin: 0,
-            fontSize: 'clamp(18px, 5vw, 24px)',
-            fontWeight: 900,
-            letterSpacing: 1,
-            textTransform: 'uppercase',
-            color: theme.colors.textPrimary,
-            textShadow: `0 0 20px rgba(56, 189, 248, 0.5)`,
-          }}
-        >
-          {heading}
-        </h1>
-      </div>
+      <div style={{
+        backgroundColor: '#1c1917',
+        border: `3px solid ${theme.materials.metalDark}`,
+        borderRadius: 12,
+        padding: '32px 24px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 24,
+        boxShadow: `0 0 40px ${theme.materials.corruptionFog}, inset 0 0 20px ${theme.materials.corruptionEmber}`,
+        maxWidth: '90vw',
+      }}>
+        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <span style={{ color: theme.colors.accent, display: 'flex' }}>
+            <MegaphoneIcon size={30} />
+          </span>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: 'clamp(18px, 5vw, 24px)',
+              fontWeight: 900,
+              letterSpacing: 1,
+              textTransform: 'uppercase',
+              color: theme.colors.textPrimary,
+              textShadow: `0 0 20px rgba(234, 88, 12, 0.5)`,
+            }}
+          >
+            {heading}
+          </h1>
+        </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center', maxWidth: 720 }}>
         {rewards.map((reward, index) => {
@@ -102,7 +114,7 @@ export function RewardReveal({ heading, rewards, onClose, closeLabel = 'Collect'
                 alignItems: 'center',
                 gap: 6,
                 textAlign: 'center',
-                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                backgroundColor: 'rgba(41, 37, 36, 0.95)',
                 border: `${rarity === 'epic' ? 2 : 1}px solid ${frame.border}`,
                 borderRadius: 10,
                 boxShadow: `0 0 26px ${frame.glow}`,
@@ -134,7 +146,7 @@ export function RewardReveal({ heading, rewards, onClose, closeLabel = 'Collect'
                   alignItems: 'center',
                   justifyContent: 'center',
                   borderRadius: 8,
-                  backgroundColor: 'rgba(56, 189, 248, 0.08)',
+                  backgroundColor: 'rgba(234, 88, 12, 0.08)',
                   border: `1px solid ${theme.colors.borderGlass}`,
                   color: theme.colors.accent,
                   position: 'relative',
@@ -161,32 +173,33 @@ export function RewardReveal({ heading, rewards, onClose, closeLabel = 'Collect'
         })}
       </div>
 
-      <button
-        type="button"
-        onClick={onClose}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 10,
-          minHeight: 44,
-          padding: '10px 32px',
-          borderRadius: 999,
-          border: 'none',
-          backgroundColor: theme.colors.accent,
-          color: theme.colors.background,
-          fontSize: 14,
-          fontWeight: 900,
-          letterSpacing: 1,
-          textTransform: 'uppercase',
-          cursor: 'pointer',
-          fontFamily: 'inherit',
-          boxShadow: `0 0 24px rgba(56, 189, 248, 0.5)`,
-        }}
-      >
-        <MegaphoneIcon size={20} />
-        {closeLabel}
-      </button>
+        <button
+          type="button"
+          onClick={onClose}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 10,
+            minHeight: 44,
+            padding: '10px 32px',
+            borderRadius: 999,
+            border: 'none',
+            backgroundColor: theme.colors.accent,
+            color: theme.colors.background,
+            fontSize: 14,
+            fontWeight: 900,
+            letterSpacing: 1,
+            textTransform: 'uppercase',
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+            boxShadow: `0 0 24px rgba(234, 88, 12, 0.5)`,
+          }}
+        >
+          <MegaphoneIcon size={20} />
+          {closeLabel}
+        </button>
+      </div>
     </div>
   );
 }

@@ -10,12 +10,12 @@ import type { HeroSkin } from '../../game/data/skins';
  * (Archive, Briefing Room, …) shows heroes/enemies with the same visual DNA.
  */
 
-export const TYPEWRITER_FONT = '"Courier New", Courier, monospace';
+export const TYPEWRITER_FONT = '"Oswald", "Courier New", Courier, monospace';
 export const HERO_PLACEHOLDER_SRC = '/assets/heroes/hero-placeholder.svg';
 
 /** Photo-studio backdrop so the dark hero silhouette reads as a portrait. */
-export const PORTRAIT_BG = 'radial-gradient(circle at 50% 34%, #e2e8f0 0%, #94a3b8 52%, #475569 100%)';
-export const PORTRAIT_BG_LOCKED = 'radial-gradient(circle at 50% 34%, #64748b 0%, #334155 55%, #1e293b 100%)';
+export const PORTRAIT_BG = 'radial-gradient(circle at 50% 34%, rgba(234,88,12,0.15) 0%, #1c1917 50%, #0c0a09 100%)';
+export const PORTRAIT_BG_LOCKED = 'radial-gradient(circle at 50% 34%, #3b0764 0%, #1e1b4b 55%, #020617 100%)';
 // eslint-disable-next-line react-refresh/only-export-components
 export const hexColor = (color: number) => `#${color.toString(16).padStart(6, '0')}`;
 
@@ -149,7 +149,7 @@ export function HeroPolaroidCard({
     <div
       onClick={() => interactive && onClick!()}
       style={{
-        backgroundColor: '#f8fafc',
+        backgroundColor: '#d6d3d1',
         padding: '5px 5px 10px 5px', // Extra padding at bottom for polaroid look
         boxShadow: '2px 5px 15px rgba(0,0,0,0.5)',
         display: 'flex',
@@ -242,11 +242,11 @@ export function HeroPolaroidCard({
 
       {/* Text Area */}
       <div style={{ width: '100%', textAlign: 'center' }}>
-        <h3 style={{ margin: '0 0 3px 0', fontSize: '9.5px', color: '#0f172a', fontFamily: '"Marker Felt", "Comic Sans MS", fantasy', lineHeight: 1.1 }}>
+        <h3 style={{ margin: '0 0 3px 0', fontSize: '9.5px', color: '#1c1917', fontFamily: '"Marker Felt", "Comic Sans MS", fantasy', lineHeight: 1.1 }}>
           {unlocked ? name : 'REDACTED'}
         </h3>
         {subtitle && (
-          <div style={{ fontSize: '7.5px', color: '#475569', fontWeight: 'bold', marginBottom: '4px', fontStyle: unlocked ? 'normal' : 'italic', lineHeight: 1.2 }}>
+          <div style={{ fontSize: '7.5px', color: '#1c1917', fontWeight: 'bold', marginBottom: '4px', fontStyle: unlocked ? 'normal' : 'italic', lineHeight: 1.2 }}>
             {subtitle}
           </div>
         )}
@@ -312,8 +312,8 @@ export function EnemyCaseCard({
         }
       }}
       style={{
-        backgroundColor: faced ? '#e5d5b5' : '#4b5563',
-        color: '#1c1917',
+        backgroundColor: faced ? '#3f3f46' : '#27272a',
+        color: theme.colors.textPrimary,
         borderRadius: 4,
         padding: '6px 5px 8px',
         position: 'relative',

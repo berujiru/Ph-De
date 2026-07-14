@@ -136,16 +136,16 @@ function Awning() {
       <div
         style={{
           height: 22,
-          backgroundImage: `repeating-linear-gradient(90deg, ${theme.materials.tarpRed}, ${theme.materials.tarpRed} 42px, ${theme.materials.paper} 42px, ${theme.materials.paper} 84px)`,
-          boxShadow: '0 6px 16px rgba(0,0,0,0.6), inset 0 -6px 10px rgba(0,0,0,0.35)',
+          backgroundImage: `repeating-linear-gradient(90deg, ${theme.materials.tarpRed}, ${theme.materials.tarpRed} 42px, rgba(200, 190, 175, 0.45) 42px, rgba(200, 190, 175, 0.45) 84px), repeating-linear-gradient(180deg, transparent, transparent 3px, rgba(120, 60, 20, 0.3) 3px, rgba(120, 60, 20, 0.3) 5px)`,
+          boxShadow: '0 6px 18px rgba(0,0,0,0.75), inset 0 -6px 10px rgba(0,0,0,0.5)',
         }}
       />
       <div
         style={{
           height: 10,
-          backgroundImage: `radial-gradient(circle at 21px -2px, ${theme.materials.tarpRed} 20px, transparent 21px), radial-gradient(circle at 63px -2px, ${theme.materials.paper} 20px, transparent 21px)`,
+          backgroundImage: `radial-gradient(circle at 21px -2px, ${theme.materials.tarpRed} 20px, transparent 21px), radial-gradient(circle at 63px -2px, rgba(200, 190, 175, 0.45) 20px, transparent 21px)`,
           backgroundSize: '84px 14px',
-          filter: 'drop-shadow(0 3px 3px rgba(0,0,0,0.4))',
+          filter: 'drop-shadow(0 3px 4px rgba(0,0,0,0.6))',
         }}
       />
     </div>
@@ -177,21 +177,22 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
         style={{
           width: 14,
           height: 34,
-          backgroundColor: theme.materials.metal,
-          border: `1px solid ${theme.materials.metalDark}`,
+          backgroundColor: '#52433a',
+          border: `1px solid ${theme.materials.woodDark}`,
           borderRadius: 7,
           position: 'absolute',
           top: -34,
           zIndex: 2,
-          boxShadow: 'inset -2px -2px 5px rgba(0,0,0,0.3)',
+          boxShadow: 'inset -2px -2px 5px rgba(0,0,0,0.5)',
+          backgroundImage: 'linear-gradient(180deg, rgba(120,70,30,0.3) 0%, transparent 50%, rgba(0,0,0,0.2) 100%)',
         }}
       />
 
       {/* Plastic-wrapped goods */}
       <div
         style={{
-          backgroundColor: 'rgba(248, 250, 252, 0.96)',
-          border: '2px solid #e2e8f0',
+          backgroundColor: 'rgba(41, 37, 36, 0.95)',
+          border: `2px solid ${theme.colors.border}`,
           borderRadius: 8,
           padding: '6px 5px',
           width: '100%',
@@ -200,15 +201,26 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 10px 20px rgba(0,0,0,0.6), inset 0 0 20px rgba(255,255,255,0.5)',
+          boxShadow: '0 10px 20px rgba(0,0,0,0.7), inset 0 0 20px rgba(234, 88, 12, 0.06)',
           zIndex: 3,
           opacity: affordable ? 1 : 0.75,
+          transition: 'box-shadow 0.2s ease',
+        }}
+        onMouseOver={(e) => {
+          if (affordable) {
+            e.currentTarget.style.boxShadow = `0 10px 20px rgba(0,0,0,0.7), inset 0 0 20px rgba(234, 88, 12, 0.06), 0 0 15px ${theme.colors.accent}`;
+          }
+        }}
+        onMouseOut={(e) => {
+          if (affordable) {
+            e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.7), inset 0 0 20px rgba(234, 88, 12, 0.06)';
+          }
         }}
       >
         <div
           style={{
             marginBottom: 4,
-            color: theme.materials.ink,
+            color: theme.colors.textSecondary,
             filter: affordable ? 'none' : 'grayscale(60%)',
             display: 'flex',
           }}
@@ -220,7 +232,7 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
             fontSize: 7,
             letterSpacing: 0.5,
             fontWeight: 900,
-            color: theme.materials.tarpRed,
+            color: theme.colors.accent,
             textTransform: 'uppercase',
             marginBottom: 2,
           }}
@@ -231,7 +243,7 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
           style={{
             margin: '0 0 3px 0',
             fontSize: 10,
-            color: theme.materials.ink,
+            color: theme.colors.textPrimary,
             textAlign: 'center',
             fontWeight: 900,
             textTransform: 'uppercase',
@@ -240,7 +252,7 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
         >
           {item.title}
         </h3>
-        <p style={{ margin: 0, fontSize: 8, color: '#475569', textAlign: 'center', lineHeight: 1.3 }}>
+        <p style={{ margin: 0, fontSize: 8, color: theme.colors.textMuted, textAlign: 'center', lineHeight: 1.3 }}>
           {item.description}
         </p>
       </div>
@@ -263,8 +275,8 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
           minWidth: 72,
           backgroundColor: theme.materials.cardboard,
           backgroundImage:
-            'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px)',
-          color: theme.materials.ink,
+            'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px)',
+          color: theme.colors.textPrimary,
           border: `1px solid ${theme.materials.cardboardEdge}`,
           padding: '5px 10px',
           borderRadius: 2,
@@ -304,7 +316,7 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
             left: -10,
             width: 34,
             height: 12,
-            backgroundColor: theme.materials.tape,
+            backgroundColor: 'rgba(120, 100, 70, 0.55)',
             transform: 'rotate(-40deg)',
             boxShadow: '0 1px 2px rgba(0,0,0,0.3)',
           }}
@@ -318,13 +330,13 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
             right: 14,
             width: 2,
             height: 18,
-            backgroundColor: '#cbd5e1',
+            backgroundColor: '#52524e',
             transform: 'rotate(18deg)',
           }}
         />
         <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           {item.cost.toLocaleString()}
-          <span style={{ color: '#a16207', display: 'flex' }}>
+          <span style={{ color: theme.colors.gold, display: 'flex', filter: 'drop-shadow(0 0 4px rgba(250, 204, 21, 0.4))' }}>
             <HopeCoinIcon size={18} />
           </span>
         </span>
@@ -393,13 +405,13 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
       style={{
         position: 'absolute',
         inset: 0,
-        backgroundColor: '#12100e',
+        backgroundColor: '#0a0806',
         backgroundImage: `repeating-linear-gradient(0deg, ${theme.materials.wood}, ${theme.materials.wood} 100px, ${theme.materials.woodDark} 100px, ${theme.materials.woodDark} 103px)`,
         display: 'flex',
         flexDirection: 'column',
         color: theme.colors.textPrimary,
         overflowY: 'auto',
-        boxShadow: 'inset 0 0 150px rgba(0,0,0,0.9)',
+        boxShadow: 'inset 0 0 200px rgba(0,0,0,0.95)',
         zIndex: 100,
       }}
     >
@@ -416,7 +428,7 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
           width: 620,
           maxWidth: '100%',
           height: 400,
-          background: 'radial-gradient(ellipse, rgba(253, 224, 71, 0.14) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse, rgba(234, 88, 12, 0.12) 0%, rgba(234, 88, 12, 0.04) 40%, transparent 70%)',
           pointerEvents: 'none',
           zIndex: 0,
         }}
@@ -442,13 +454,13 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
             {/* Hand-painted wooden signboard */}
             <div
               style={{
-                backgroundColor: theme.materials.woodLight,
+                backgroundColor: '#3d2a18',
                 backgroundImage:
-                  'repeating-linear-gradient(0deg, transparent, transparent 22px, rgba(0,0,0,0.15) 22px, rgba(0,0,0,0.15) 24px)',
+                  'repeating-linear-gradient(0deg, transparent, transparent 22px, rgba(0,0,0,0.3) 22px, rgba(0,0,0,0.3) 24px), linear-gradient(135deg, rgba(0,0,0,0.2) 0%, transparent 50%, rgba(0,0,0,0.15) 100%)',
                 border: `6px solid ${theme.materials.woodDark}`,
                 borderRadius: 4,
                 padding: '14px clamp(16px, 5vw, 32px)',
-                boxShadow: '0 10px 20px rgba(0,0,0,0.5), inset 0 0 24px rgba(0,0,0,0.35)',
+                boxShadow: '0 10px 24px rgba(0,0,0,0.7), inset 0 0 30px rgba(0,0,0,0.5)',
                 display: 'inline-block',
                 position: 'relative',
                 transform: 'rotate(-1deg)',
@@ -470,8 +482,8 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
                     width: 7,
                     height: 7,
                     borderRadius: '50%',
-                    backgroundColor: theme.materials.metalDark,
-                    boxShadow: 'inset -1px -1px 2px rgba(0,0,0,0.6)',
+                    backgroundColor: '#5c3d2a',
+                    boxShadow: 'inset -1px -1px 2px rgba(0,0,0,0.7), 0 0 3px rgba(120,60,20,0.3)',
                     ...pos,
                   }}
                 />
@@ -482,7 +494,7 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
                   fontSize: 'clamp(26px, 6vw, 40px)',
                   fontFamily: MARKER_FONT,
                   color: theme.materials.paper,
-                  textShadow: `2px 2px 0 ${theme.materials.woodDark}`,
+                  textShadow: `2px 2px 0 ${theme.materials.woodDark}, 0 0 12px rgba(234, 88, 12, 0.25)`,
                   letterSpacing: 2,
                 }}
               >
@@ -490,11 +502,12 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
               </h1>
               <div
                 style={{
-                  color: '#fde68a',
+                  color: theme.colors.accent,
                   fontSize: 12,
                   fontWeight: 700,
                   letterSpacing: 4,
                   textTransform: 'uppercase',
+                  textShadow: '0 0 8px rgba(234, 88, 12, 0.35)',
                 }}
               >
                 The Movement's Supply Line
@@ -506,14 +519,16 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
                   position: 'absolute',
                   top: -12,
                   right: -16,
-                  backgroundColor: theme.materials.ink,
-                  color: theme.materials.paper,
+                  backgroundColor: theme.colors.danger,
+                  color: theme.colors.textPrimary,
                   padding: '5px 10px',
                   transform: 'rotate(10deg)',
                   fontFamily: MARKER_FONT,
                   fontWeight: 700,
-                  fontSize: 12,
-                  boxShadow: '2px 2px 5px rgba(0,0,0,0.5)',
+                  fontSize: 13,
+                  letterSpacing: 2,
+                  textTransform: 'uppercase',
+                  boxShadow: '2px 2px 8px rgba(0,0,0,0.7), 0 0 10px rgba(220, 38, 38, 0.3)',
                 }}
               >
                 GISING NA!
@@ -524,12 +539,12 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
           {/* Hope jar on the counter */}
           <div
             style={{
-              backgroundColor: 'rgba(255,255,255,0.08)',
-              border: '2px solid rgba(255,255,255,0.2)',
+              backgroundColor: 'rgba(41, 32, 24, 0.85)',
+              border: '2px solid rgba(234, 88, 12, 0.35)',
               borderRadius: '14px 14px 18px 18px',
               padding: '12px 26px',
               backdropFilter: 'blur(10px)',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.5), inset 0 2px 10px rgba(255,255,255,0.1)',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.7), inset 0 2px 10px rgba(234, 88, 12, 0.08), 0 0 24px rgba(234, 88, 12, 0.12)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -549,17 +564,19 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
                 width: '70%',
                 height: 10,
                 borderRadius: 4,
-                backgroundColor: theme.materials.metalDark,
+                backgroundColor: '#5c3d2a',
+                backgroundImage: 'linear-gradient(90deg, #4a3020, #6b4530, #4a3020)',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.5)',
               }}
             />
-            <div style={{ fontSize: 11, color: '#cbd5e1', fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase' }}>
+            <div style={{ fontSize: 11, color: theme.colors.textSecondary, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase' }}>
               Hope Jar
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 28, color: theme.colors.gold, fontWeight: 900 }}>
+              <span style={{ fontSize: 28, color: theme.colors.gold, fontWeight: 900, textShadow: '0 0 10px rgba(250, 204, 21, 0.3)' }}>
                 {MOCK_HOPE.toLocaleString()}
               </span>
-              <span style={{ color: theme.colors.gold, display: 'flex' }}>
+              <span style={{ color: theme.colors.gold, display: 'flex', filter: 'drop-shadow(0 0 5px rgba(250, 204, 21, 0.35))' }}>
                 <HopeCoinIcon size={24} />
               </span>
             </div>
@@ -575,7 +592,7 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
               position: 'absolute',
               inset: '-10px -6px',
               backgroundImage:
-                'repeating-linear-gradient(90deg, transparent, transparent 64px, rgba(148,163,184,0.16) 64px, rgba(148,163,184,0.16) 67px)',
+                'repeating-linear-gradient(90deg, transparent, transparent 56px, rgba(63, 63, 70, 0.35) 56px, rgba(63, 63, 70, 0.35) 60px)',
               pointerEvents: 'none',
               zIndex: 20,
             }}
@@ -586,15 +603,15 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
             aria-hidden="true"
             style={{
               width: '100%',
-              height: 2,
-              backgroundColor: theme.materials.metal,
-              boxShadow: '0 5px 10px rgba(0,0,0,0.5)',
+              height: 3,
+              backgroundColor: '#52433a',
+              boxShadow: '0 5px 12px rgba(0,0,0,0.6)',
               position: 'relative',
               zIndex: 5,
             }}
           >
-            <span style={{ position: 'absolute', left: -6, top: -4, width: 10, height: 10, borderRadius: '50%', backgroundColor: theme.materials.metalDark }} />
-            <span style={{ position: 'absolute', right: -6, top: -4, width: 10, height: 10, borderRadius: '50%', backgroundColor: theme.materials.metalDark }} />
+            <span style={{ position: 'absolute', left: -6, top: -4, width: 10, height: 10, borderRadius: '50%', backgroundColor: '#4a3020' }} />
+            <span style={{ position: 'absolute', right: -6, top: -4, width: 10, height: 10, borderRadius: '50%', backgroundColor: '#4a3020' }} />
           </div>
 
           <div
@@ -621,15 +638,15 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
             display: 'flex',
             justifyContent: 'space-around',
             alignItems: 'flex-end',
-            opacity: 0.18,
+            opacity: 0.25,
             pointerEvents: 'none',
             marginTop: 8,
           }}
         >
-          <div style={{ width: 60, height: 80, backgroundColor: '#000', clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 100%, 0% 100%, 0% 20%)' }} />
-          <div style={{ width: 120, height: 56, backgroundColor: '#000', borderRadius: '10px 10px 0 0' }} />
-          <div style={{ width: 44, height: 100, backgroundColor: '#000', borderRadius: '5px 5px 0 0' }} />
-          <div style={{ width: 76, height: 72, backgroundColor: '#000', borderRadius: '10px 10px 0 0' }} />
+          <div style={{ width: 60, height: 80, backgroundColor: theme.materials.woodDark, clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 100%, 0% 100%, 0% 20%)' }} />
+          <div style={{ width: 120, height: 56, backgroundColor: theme.materials.woodDark, borderRadius: '10px 10px 0 0' }} />
+          <div style={{ width: 44, height: 100, backgroundColor: theme.materials.woodDark, borderRadius: '5px 5px 0 0' }} />
+          <div style={{ width: 76, height: 72, backgroundColor: theme.materials.woodDark, borderRadius: '10px 10px 0 0' }} />
         </div>
 
         <div
@@ -639,6 +656,7 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
             color: theme.colors.textMuted,
             fontSize: 13,
             paddingBottom: 12,
+            textShadow: '0 0 8px rgba(234, 88, 12, 0.18)',
           }}
         >
           Heroes are never sold for money — only Hope, earned on the streets.

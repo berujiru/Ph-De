@@ -24,15 +24,15 @@ export function HeroTcgCard({ heroId, style, rotation = 0 }: HeroTcgCardProps) {
         width: 300,
         borderRadius: 16,
         padding: 12,
-        // Metallic light border for heroes
-        background: `linear-gradient(145deg, #f8fafc, #e2e8f0)`,
-        border: `2px solid #cbd5e1`,
-        boxShadow: `0 20px 40px rgba(0,0,0,0.5), inset 0 0 4px rgba(255,255,255,0.8), 0 0 15px ${color}40`,
+        // Charred/rusted post-apocalyptic base
+        background: `linear-gradient(145deg, #1c1917, #09090b)`,
+        border: `2px solid #3f3f46`,
+        boxShadow: `0 20px 40px rgba(0,0,0,0.8), inset 0 0 4px rgba(255,255,255,0.1), 0 0 15px ${color}40`,
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
         transform: `rotate(${rotation}deg)`,
-        color: '#0f172a',
+        color: '#fafaf9',
         overflow: 'hidden',
         fontFamily: '"Inter", "Roboto", system-ui, sans-serif',
         ...style
@@ -42,7 +42,7 @@ export function HeroTcgCard({ heroId, style, rotation = 0 }: HeroTcgCardProps) {
       <div style={{
         position: 'absolute',
         inset: 0,
-        background: 'linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.6) 35%, rgba(255,255,255,0.2) 45%, transparent 60%)',
+        background: 'linear-gradient(115deg, transparent 20%, rgba(234,88,12,0.15) 35%, rgba(234,88,12,0.05) 45%, transparent 60%)',
         pointerEvents: 'none',
         zIndex: 50,
         mixBlendMode: 'screen',
@@ -57,18 +57,18 @@ export function HeroTcgCard({ heroId, style, rotation = 0 }: HeroTcgCardProps) {
             fontWeight: 900, 
             textTransform: 'uppercase', 
             letterSpacing: 0.5,
-            color: '#0f172a',
+            color: '#fafaf9',
           }}>
             {def.name}
           </h2>
-          <div style={{ fontSize: 10, fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: 10, fontWeight: 800, color: '#a8a29e', textTransform: 'uppercase' }}>
             {def.profession}
           </div>
         </div>
         
         {/* Damage Type Badge */}
         <div style={{
-          backgroundColor: '#0f172a',
+          backgroundColor: '#09090b',
           padding: '4px 8px',
           borderRadius: 4,
           fontSize: 10,
@@ -86,14 +86,14 @@ export function HeroTcgCard({ heroId, style, rotation = 0 }: HeroTcgCardProps) {
       <div style={{
         width: '100%',
         height: 220,
-        backgroundColor: '#f1f5f9',
-        border: '3px solid #94a3b8',
+        backgroundColor: '#18181b',
+        border: '3px solid #27272a',
         borderRadius: 4,
-        boxShadow: `0 8px 16px rgba(0,0,0,0.2), inset 0 0 20px ${color}40`,
+        boxShadow: `0 8px 16px rgba(0,0,0,0.4), inset 0 0 20px ${color}40`,
         marginBottom: 12,
         position: 'relative',
         overflow: 'hidden',
-        background: `radial-gradient(circle at 50% 30%, ${color} 0%, #cbd5e1 80%)`,
+        background: `radial-gradient(circle at 50% 30%, ${color}40 0%, #09090b 80%)`,
         zIndex: 10
       }}>
         <SkinPortrait skin={skin} alt={def.name} style={{ objectFit: 'cover', objectPosition: 'center top' }} />
@@ -103,13 +103,13 @@ export function HeroTcgCard({ heroId, style, rotation = 0 }: HeroTcgCardProps) {
       <div style={{ 
         display: 'flex', 
         justifyContent: 'space-between',
-        backgroundColor: '#0f172a',
+        backgroundColor: '#09090b',
         padding: '6px 12px',
         borderRadius: 4,
-        border: '1px solid rgba(0,0,0,0.1)',
+        border: '1px solid #3f3f46',
         fontSize: 12, 
         fontWeight: 800, 
-        color: '#f8fafc', 
+        color: '#fafaf9', 
         marginBottom: 10,
         zIndex: 10
       }}>
@@ -120,20 +120,20 @@ export function HeroTcgCard({ heroId, style, rotation = 0 }: HeroTcgCardProps) {
 
       {/* Mechanic/Description Box (The "Text Box") */}
       <div style={{
-        backgroundColor: '#ffffff',
-        border: '2px solid #cbd5e1',
+        backgroundColor: '#18181b',
+        border: '2px solid #3f3f46',
         borderRadius: 4,
         padding: 10,
         fontSize: 12,
-        color: '#1e293b',
-        boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.05)',
+        color: '#fafaf9',
+        boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.5)',
         flexGrow: 1,
         zIndex: 10,
         display: 'flex',
         flexDirection: 'column'
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #cbd5e1', paddingBottom: 4, marginBottom: 6 }}>
-          <div style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: '#64748b' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #3f3f46', paddingBottom: 4, marginBottom: 6 }}>
+          <div style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: '#a8a29e' }}>
             [ {def.attackKind} • WPN: {def.attackArt ? def.attackArt.replace(/-/g, ' ') : 'Standard'} ]
           </div>
           <div style={{ 
@@ -155,10 +155,10 @@ export function HeroTcgCard({ heroId, style, rotation = 0 }: HeroTcgCardProps) {
             fontStyle: 'italic', 
             fontSize: def.purpose.length > 150 ? 9 : 10,
             lineHeight: 1.2,
-            color: '#475569', 
+            color: '#78716c', 
             marginBottom: 8, 
             paddingBottom: 6, 
-            borderBottom: '1px dashed #cbd5e1' 
+            borderBottom: '1px dashed #3f3f46' 
           }}>
             "{def.purpose}"
           </div>
@@ -167,18 +167,18 @@ export function HeroTcgCard({ heroId, style, rotation = 0 }: HeroTcgCardProps) {
         {/* Skills */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexGrow: 1 }}>
           <div style={{ fontSize: 11 }}>
-            <span style={{ fontWeight: 900, color: '#0369a1' }}>SKILL: </span>
+            <span style={{ fontWeight: 900, color: '#ea580c' }}>SKILL: </span>
             <span style={{ fontWeight: 800 }}>{def.signatureSkill.name}</span>
-            <div style={{ marginTop: 2, fontSize: 10, color: '#475569', lineHeight: 1.2 }}>
+            <div style={{ marginTop: 2, fontSize: 10, color: '#a8a29e', lineHeight: 1.2 }}>
               {def.signatureSkill.description}
             </div>
           </div>
           
           {def.passive && (
-            <div style={{ fontSize: 11, borderTop: '1px solid #e2e8f0', paddingTop: 6 }}>
-              <span style={{ fontWeight: 900, color: '#15803d' }}>PASSIVE: </span>
+            <div style={{ fontSize: 11, borderTop: '1px solid #3f3f46', paddingTop: 6 }}>
+              <span style={{ fontWeight: 900, color: '#4ade80' }}>PASSIVE: </span>
               <span style={{ fontWeight: 800 }}>{def.passive.name}</span>
-              <div style={{ marginTop: 2, fontSize: 10, color: '#475569', lineHeight: 1.2 }}>
+              <div style={{ marginTop: 2, fontSize: 10, color: '#a8a29e', lineHeight: 1.2 }}>
                 {def.passive.description}
               </div>
             </div>
