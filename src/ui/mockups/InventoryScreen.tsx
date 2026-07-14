@@ -1,6 +1,6 @@
 import { useEffect, useReducer, useState } from 'react';
 import { theme } from '../theme';
-import { HERO_DEFINITIONS, type HeroDefinition } from '../../game/data/heroes';
+import { HERO_DEFINITIONS, type HeroDefinition, type HeroId } from '../../game/data/heroes';
 import { ENEMY_DEFINITIONS, type EnemyDefinition, type EnemyId } from '../../game/data/enemies';
 import { HopeCoinIcon, RallyPermitIcon, LockIcon, InfoIcon } from '../icons';
 import { BackButton } from '../components/BackButton';
@@ -20,6 +20,13 @@ import { getSelectedSkin, setSelectedSkin, subscribeSkins } from '../../game/dat
 import { heroSkins } from '../../game/data/skins';
 import { heroUnlockStage } from '../../game/data/heroUnlocks';
 import { actForStage } from '../../game/data/campaign';
+import {
+  getHope,
+  getPermits,
+  getHighestClearedStage,
+  getStoreUnlockedHeroes,
+  subscribeMetaState,
+} from '../../game/data/metaState';
 
 interface InventoryScreenProps {
   onBack: () => void;
@@ -39,9 +46,8 @@ const CODEX_ENEMIES = Object.values(ENEMY_DEFINITIONS)
     return a.name.localeCompare(b.name);
   });
 
-// Mock campaign progress (mirrors CampaignMap.tsx): heroes whose unlock stage
 // (data/heroUnlocks.ts) has been reached count as recruited into the movement.
-const HIGHEST_CLEARED_STAGE = 7;
+// Reading HIGHEST_CLEARED_STAGE from metaState now.
 
 // Mock: which anomalies the player has actually faced (unlock-on-encounter).
 const FACED_ENEMY_IDS = new Set<EnemyId>([
@@ -54,9 +60,16 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
   const [tab, setTab] = useState<ArchiveTab>('heroes');
   const [selectedHero, setSelectedHero] = useState<HeroDefinition | null>(null);
   const [selectedEnemy, setSelectedEnemy] = useState<EnemyDefinition | null>(null);
-  // Re-render when a skin is equipped so every portrait reflects the choice.
-  const [, forceSkinRefresh] = useReducer((n: number) => n + 1, 0);
-  useEffect(() => subscribeSkins(forceSkinRefresh), []);
+  // Re-render when a skin is equipped or meta progression changes
+  const [, forceUpdate] = useReducer((n: number) => n + 1, 0);
+  useEffect(() => {
+    const unsubSkins = subscribeSkins(forceUpdate);
+    const unsubMeta = subscribeMetaState(forceUpdate);
+    return () => {
+      unsubSkins();
+      unsubMeta();
+    };
+  }, []);
 
   // Real workers only — the sandbox test dummies never belong in the roster.
   // Sorted along the campaign's unlock ladder (data/heroUnlocks.ts): recruited
@@ -68,9 +81,10 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
 
   const facedCount = CODEX_ENEMIES.filter((def) => FACED_ENEMY_IDS.has(def.id)).length;
 
-  // Mock Currency Data
-  const currentHope = 1450;
-  const currentPermits = 3;
+  const currentHope = getHope();
+  const currentPermits = getPermits();
+  const highestStage = getHighestClearedStage();
+  const storeUnlocked = getStoreUnlockedHeroes();
 
   return (
     <div className="rally-screen" style={{
@@ -224,7 +238,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
             // cleared-stage progress and leveling are still mock.
             const unlockStage = heroUnlockStage(hero.id);
             const unlockAct = actForStage(unlockStage);
-            const isUnlocked = unlockStage <= HIGHEST_CLEARED_STAGE;
+            const isUnlocked = unlockStage <= highestStage || storeUnlocked.includes(hero.id as HeroId);
             const mockLevel = hero.id === 'eden' ? 3 : 1;
             const mockCards = hero.id === 'eden' ? 4 : 8;
             const mockCardsNeeded = mockLevel * 5;

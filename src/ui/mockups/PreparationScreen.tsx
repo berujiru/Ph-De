@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { theme } from '../theme';
 import {
   CheckIcon,
@@ -15,6 +15,8 @@ import { getSelectedSkin } from '../../game/data/skinSelection';
 import { HERO_DEFINITIONS, type HeroDefinition, type HeroId } from '../../game/data/heroes';
 import { buildWaveTable, bossForStage } from '../../game/data/waves';
 import { ENEMY_DEFINITIONS, type EnemyId } from '../../game/data/enemies';
+import { getPermits, getStoreUnlockedHeroes, getHighestClearedStage, subscribeMetaState } from '../../game/data/metaState';
+import { heroUnlockStage } from '../../game/data/heroUnlocks';
 
 interface PreparationScreenProps {
   act?: number;
@@ -28,7 +30,7 @@ const TYPEWRITER_FONT = '"Courier New", Courier, monospace';
 
 // ---------------------------------------------------------------- mock data
 
-const MOCK_PERMITS = 3;
+// No MOCK_PERMITS here anymore
 
 /** Telegraphed enemy intel for the stage (reuses enemy-card data shape). */
 interface EnemyIntel {
@@ -56,18 +58,7 @@ const MOCK_WEAKNESSES: Record<string, HeroDefinition['damageType']> = {
   red_tape: 'Magic',
 };
 
-/** Heroes the movement has recruited so far (mock). */
-const UNLOCKED_HERO_IDS: readonly HeroId[] = [
-  'teacher',
-  'student',
-  'jeepney_driver',
-  'fisherfolk',
-  'street_sweeper',
-  'taho_vendor',
-  'nurse',
-  'baker',
-  'electrician',
-];
+// No hardcoded UNLOCKED_HERO_IDS here anymore
 
 interface BayanihanAct {
   id: string;
@@ -145,6 +136,13 @@ interface CompanionHint {
 export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: PreparationScreenProps) {
   const [selectedAct, setSelectedAct] = useState<string>('people_power');
   const [actPickerOpen, setActPickerOpen] = useState(false);
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
+
+  useEffect(() => subscribeMetaState(forceUpdate), []);
+
+  const permits = getPermits();
+  const highestStage = getHighestClearedStage();
+  const storeUnlocked = getStoreUnlockedHeroes();
 
   const stageAct = act ?? 1;
   const stageId = stageIdx ?? 0;
@@ -179,7 +177,11 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
     };
   }).sort((a, b) => parseInt(b.count.slice(1)) - parseInt(a.count.slice(1)));
 
-  const roster = UNLOCKED_HERO_IDS.map((id) => HERO_DEFINITIONS[id]);
+  const roster = Object.values(HERO_DEFINITIONS).filter((hero) => {
+    if (hero.id.startsWith('sandbox_')) return false;
+    const unlockStage = heroUnlockStage(hero.id);
+    return unlockStage <= highestStage || storeUnlocked.includes(hero.id as HeroId);
+  });
 
   // Companions arrive mid-battle from the Voices meter — you do not pre-pick a
   // squad. The briefing only *hints* which recruited workers counter this
@@ -195,7 +197,7 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
   const coveredTypes = new Set<HeroDefinition['damageType']>(recommended.map((hint) => hint.hero.damageType));
   const uncovered = ENEMY_INTEL.filter((intel) => !coveredTypes.has(intel.weakTo));
 
-  const canDeploy = MOCK_PERMITS >= STAGE.permitCost;
+  const canDeploy = permits >= STAGE.permitCost;
 
   return (
     <div
@@ -685,7 +687,7 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
           <span style={{ color: theme.colors.accent, display: 'flex' }}>
             <RallyPermitIcon size={18} />
           </span>
-          Permits: {MOCK_PERMITS}
+          Permits: {permits}
         </div>
         <button
           onClick={onDeploy}

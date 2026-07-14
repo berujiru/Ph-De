@@ -1,17 +1,27 @@
+import { useEffect, useReducer, useState } from 'react';
 import type { ReactNode } from 'react';
 import { theme } from '../theme';
-import { useState } from 'react';
 import {
   HeroCardIcon,
   HopeCoinIcon,
   PlacardIcon,
-  RaisedFistIcon,
   RallyPermitIcon,
   VictoryIcon,
 } from '../icons';
 import { BackButton } from '../components/BackButton';
 import { RewardReveal, type RevealReward } from '../components/RewardReveal';
 import type { DropRarity } from '../../game/core/GameEvents';
+import { HERO_DEFINITIONS, type HeroId } from '../../game/data/heroes';
+import { HERO_UNLOCK_STAGE, type RecruitableHeroId } from '../../game/data/heroUnlocks';
+import {
+  getHope,
+  spendHope,
+  addPermits,
+  getStoreUnlockedHeroes,
+  unlockHeroInStore,
+  getHighestClearedStage,
+  subscribeMetaState,
+} from '../../game/data/metaState';
 
 interface SariSariStoreProps {
   onBack: () => void;
@@ -19,10 +29,7 @@ interface SariSariStoreProps {
 
 const MARKER_FONT = '"Segoe Print", "Bradley Hand", "Comic Sans MS", cursive';
 
-const MOCK_HOPE = 1250;
-
-// Catalog per docs/PROGRESSION.md: Hero Cards, Hero unlocks, Rally Permits,
-// Bayanihan Acts, Cosmetics — all priced in Hope Points.
+// Catalog per docs/PROGRESSION.md: Hero Cards, Hero unlocks, Rally Permits, Cosmetics — all priced in Hope Points.
 type CatalogCategory = 'Hero Cards' | 'Hero Unlocks' | 'Rally Permits' | 'Bayanihan Acts' | 'Cosmetics';
 
 interface CatalogItem {
@@ -34,7 +41,7 @@ interface CatalogItem {
   icon: ReactNode;
 }
 
-const CATALOG: CatalogItem[] = [
+const BASE_CATALOG: CatalogItem[] = [
   {
     id: 'card_pack',
     category: 'Hero Cards',
@@ -52,34 +59,6 @@ const CATALOG: CatalogItem[] = [
     icon: <HeroCardIcon size={30} />,
   },
   {
-    id: 'unlock_electrician',
-    category: 'Hero Unlocks',
-    title: 'Recruit: Electrician',
-    description: 'A lineman answers the call. Lightning chain attacks.',
-    cost: 1500,
-    icon: (
-      <img
-        src="/assets/heroes/hero-placeholder.svg"
-        alt=""
-        style={{ width: 34, height: 34, filter: 'brightness(0.4)' }}
-      />
-    ),
-  },
-  {
-    id: 'unlock_delivery_rider',
-    category: 'Hero Unlocks',
-    title: 'Recruit: Delivery Rider',
-    description: 'Parcels that always come back. Wind boomerang.',
-    cost: 1500,
-    icon: (
-      <img
-        src="/assets/heroes/hero-placeholder.svg"
-        alt=""
-        style={{ width: 34, height: 34, filter: 'brightness(0.4)' }}
-      />
-    ),
-  },
-  {
     id: 'permit_single',
     category: 'Rally Permits',
     title: 'Rally Permit',
@@ -94,22 +73,6 @@ const CATALOG: CatalogItem[] = [
     description: 'A whole week of marches, pre-approved.',
     cost: 450,
     icon: <RallyPermitIcon size={30} />,
-  },
-  {
-    id: 'act_baha',
-    category: 'Bayanihan Acts',
-    title: 'Act: Baha ng Tulong',
-    description: 'Flood of aid — large Barrier heal ultimate.',
-    cost: 800,
-    icon: <RaisedFistIcon size={30} />,
-  },
-  {
-    id: 'act_salu',
-    category: 'Bayanihan Acts',
-    title: 'Act: Salu-Salo',
-    description: 'Community feast — gold windfall ultimate.',
-    cost: 800,
-    icon: <RaisedFistIcon size={30} />,
   },
   {
     id: 'cosmetic_sinulog',
@@ -394,9 +357,53 @@ function rewardsFor(item: CatalogItem): { heading: string; rewards: RevealReward
 
 export function SariSariStore({ onBack }: SariSariStoreProps) {
   const [reveal, setReveal] = useState<{ heading: string; rewards: RevealReward[] } | null>(null);
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
+
+  useEffect(() => subscribeMetaState(forceUpdate), []);
+
+  const hope = getHope();
+  const highestStage = getHighestClearedStage();
+  const storeUnlocked = getStoreUnlockedHeroes();
+
+  // Dynamically build the catalog: base items + locked heroes
+  const lockedHeroes = (Object.keys(HERO_UNLOCK_STAGE) as RecruitableHeroId[]).filter((id) => {
+    const unlockStage = HERO_UNLOCK_STAGE[id];
+    return unlockStage > highestStage && !storeUnlocked.includes(id);
+  });
+
+  const catalog = [
+    ...BASE_CATALOG,
+    ...lockedHeroes.map((heroId) => {
+      const def = HERO_DEFINITIONS[heroId];
+      return {
+        id: `unlock_${heroId}`,
+        category: 'Hero Unlocks' as CatalogCategory,
+        title: `Recruit: ${def.name}`,
+        description: `Hire ${def.name} early for the movement!`,
+        cost: 5000,
+        icon: (
+          <img
+            src={HERO_PLACEHOLDER_SRC}
+            alt=""
+            style={{ width: 34, height: 34, filter: 'brightness(0.4)' }}
+          />
+        ),
+      };
+    }),
+  ];
 
   const handleBuy = (item: CatalogItem) => {
-    setReveal(rewardsFor(item));
+    if (spendHope(item.cost)) {
+      if (item.category === 'Hero Unlocks') {
+        const heroId = item.id.replace('unlock_', '') as HeroId;
+        unlockHeroInStore(heroId);
+      } else if (item.id === 'permit_single') {
+        addPermits(1);
+      } else if (item.id === 'permit_bundle') {
+        addPermits(5);
+      }
+      setReveal(rewardsFor(item));
+    }
   };
 
   return (
@@ -574,7 +581,7 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ fontSize: 28, color: theme.colors.gold, fontWeight: 900, textShadow: '0 0 10px rgba(250, 204, 21, 0.3)' }}>
-                {MOCK_HOPE.toLocaleString()}
+                {hope.toLocaleString()}
               </span>
               <span style={{ color: theme.colors.gold, display: 'flex', filter: 'drop-shadow(0 0 5px rgba(250, 204, 21, 0.35))' }}>
                 <HopeCoinIcon size={24} />
@@ -625,8 +632,8 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
               zIndex: 10,
             }}
           >
-            {CATALOG.map((item, i) => (
-              <HangingGood key={item.id} item={item} index={i} affordable={item.cost <= MOCK_HOPE} onBuy={handleBuy} />
+            {catalog.map((item, i) => (
+              <HangingGood key={item.id} item={item} index={i} affordable={item.cost <= hope} onBuy={handleBuy} />
             ))}
           </div>
         </div>

@@ -1,3 +1,4 @@
+import { useEffect, useReducer } from 'react';
 import type { ReactNode } from 'react';
 import { theme } from '../theme';
 import {
@@ -14,11 +15,9 @@ interface MainMenuProps {
   onInventory: () => void;
 }
 
-const MARKER_FONT = '"Segoe Print", "Bradley Hand", "Comic Sans MS", cursive';
+import { getHope, getPermits, subscribeMetaState } from '../../game/data/metaState';
 
-// Mock meta balances (PROGRESSION.md: Hope Points + Rally Permits).
-const MOCK_HOPE = 1450;
-const MOCK_PERMITS = 3;
+const MARKER_FONT = '"Segoe Print", "Bradley Hand", "Comic Sans MS", cursive';
 
 /** Distant ruined city skyline behind the rally. */
 function Skyline() {
@@ -243,6 +242,12 @@ function PlacardButton({ icon, label, sublabel, tilt, onClick }: {
 }
 
 export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
+  useEffect(() => subscribeMetaState(forceUpdate), []);
+  
+  const hope = getHope();
+  const permits = getPermits();
+
   return (
     <div
       className="rally-screen"
@@ -293,13 +298,13 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
         <BalancePill
           icon={<span style={{ color: theme.colors.gold, display: 'flex' }}><HopeCoinIcon size={22} /></span>}
           label="Hope Points"
-          value={MOCK_HOPE.toLocaleString()}
+          value={hope.toLocaleString()}
           valueColor={theme.colors.gold}
         />
         <BalancePill
           icon={<span style={{ color: theme.colors.accent, display: 'flex' }}><RallyPermitIcon size={22} /></span>}
           label="Rally Permits"
-          value={`${MOCK_PERMITS}`}
+          value={`${permits}`}
           valueColor={theme.colors.textPrimary}
         />
       </div>

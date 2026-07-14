@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { theme } from '../theme';
+import { getStageStars, getHighestClearedStage, getPermits, subscribeMetaState } from '../../game/data/metaState';
 import { type MapSkinId, skinsForAct } from '../../game/data/mapSkins';
 import {
   CheckIcon,
@@ -149,18 +150,8 @@ const CAMPAIGN_DATA: ActEntry[] = [
   },
 ];
 
-// Mock campaign progress: stage id → stars earned (1–3). Cleared = present.
-const MOCK_STAGE_STARS: Record<number, number> = {
-  1: 3,
-  2: 3,
-  3: 2,
-  4: 3,
-  5: 1,
-  6: 2,
-  7: 2,
-};
-const HIGHEST_CLEARED_STAGE = 7;
-const MOCK_PERMITS = 3;
+// No mocked stage stars here anymore.
+// We read from metaState inside the component.
 
 /** 0–3 star rating strip for a stage. */
 function StageStars({ stars }: { stars: number }) {
@@ -232,8 +223,23 @@ function CautionTapeMeter({ cleared, total }: { cleared: number; total: number }
 }
 
 export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: CampaignMapProps) {
-  const [expandedAct, setExpandedAct] = useState<number | null>(1);
-  const canAffordRun = MOCK_PERMITS > 0;
+  const [selectedActId, setSelectedActId] = useState(1);
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
+
+  useEffect(() => subscribeMetaState(forceUpdate), []);
+
+  const stageStars = getStageStars();
+  const highestClearedStage = getHighestClearedStage();
+  const permits = getPermits();
+
+  // Switch acts when player scrolls or clicks tabs
+  // Find which act contains the highest cleared stage to default open it
+  useState(() => {
+    const act = CAMPAIGN_DATA.find((a) => a.stages.some((s) => s.id === highestClearedStage + 1));
+    if (act) setSelectedActId(act.id);
+  });
+  
+  const canAffordRun = permits > 0;
 
   return (
     <div
@@ -324,11 +330,9 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
           <span style={{ color: theme.colors.accent, display: 'flex', filter: 'drop-shadow(0 0 4px rgba(234,88,12,0.5))' }}>
             <RallyPermitIcon size={24} />
           </span>
-          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
-            <span style={{ fontSize: 10, letterSpacing: 1, color: theme.colors.textMuted, fontWeight: 700 }}>
-              RALLY PERMITS
-            </span>
-            <span style={{ fontSize: 17, fontWeight: 900, color: theme.colors.accent }}>{MOCK_PERMITS}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
+            <span style={{ fontSize: 10, letterSpacing: 1, color: theme.colors.textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Rally Permits</span>
+            <span style={{ fontSize: 16, fontWeight: 900 }}>{permits} / 10</span>
           </div>
         </div>
       </div>
@@ -383,11 +387,11 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
         {/* Acts Accordion */}
         {CAMPAIGN_DATA.map((act) => {
           const firstStageId = act.stages[0].id;
-          const isActUnlocked = HIGHEST_CLEARED_STAGE >= firstStageId - 1;
-          const isExpanded = expandedAct === act.id;
+          const isActUnlocked = highestClearedStage >= firstStageId - 1;
+          const isExpanded = selectedActId === act.id;
           const actClearedStages = Math.max(
             0,
-            Math.min(act.stages.length, HIGHEST_CLEARED_STAGE - (firstStageId - 1)),
+            Math.min(act.stages.length, highestClearedStage - (firstStageId - 1)),
           );
 
           return (
@@ -411,7 +415,7 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
               {/* Accordion Header */}
               <button
                 onClick={() => {
-                  if (isActUnlocked) setExpandedAct(isExpanded ? null : act.id);
+                  if (isActUnlocked) setSelectedActId(isExpanded ? 0 : act.id);
                 }}
                 disabled={!isActUnlocked}
                 aria-expanded={isExpanded}
@@ -485,11 +489,12 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                 <div style={{ padding: 16, backgroundColor: 'rgba(9, 9, 11, 0.6)' }}>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     {act.stages.map((stageEntry, stageIdx) => {
-                      const isCleared = HIGHEST_CLEARED_STAGE >= stageEntry.id;
-                      const isNext = HIGHEST_CLEARED_STAGE === stageEntry.id - 1;
-                      const isLocked = HIGHEST_CLEARED_STAGE < stageEntry.id - 1;
+                      // State: is this stage cleared, next-to-play, or locked?
+                      const isCleared = stageEntry.id <= highestClearedStage;
+                      const isNext = stageEntry.id === highestClearedStage + 1;
+                      const isLocked = !isCleared && !isNext;
                       const isLast = stageIdx === act.stages.length - 1;
-                      const stars = MOCK_STAGE_STARS[stageEntry.id] ?? 0;
+                      const stars = stageStars[stageEntry.id] || 0;
                       // What anchors the stage's final wave (a boss only every
                       // BOSS_STAGE_INTERVAL-th stage), and any anomaly that
                       // debuts here (wave script + enemyUnlocks schedule).
