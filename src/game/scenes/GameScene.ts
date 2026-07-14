@@ -239,6 +239,12 @@ export class GameScene extends Phaser.Scene {
         }
       }
     });
+
+    // Relay Phaser loader progress to React so the rally loading overlay
+    // can show a real progress bar instead of a fake one.
+    this.load.on('progress', (value: number) => {
+      gameToUiEvents.emit('loadProgress', { progress: value });
+    });
   }
 
   create(): void {
@@ -259,6 +265,9 @@ export class GameScene extends Phaser.Scene {
 
     this.events.once('shutdown', cleanup);
     this.events.once('destroy', cleanup);
+
+    // Tell React the scene is fully built and ready to play.
+    gameToUiEvents.emit('sceneReady', undefined);
   }
 
   public resetGame(): void {

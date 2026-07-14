@@ -9,6 +9,7 @@ import { InventoryScreen } from './ui/mockups/InventoryScreen';
 import { PreparationScreen } from './ui/mockups/PreparationScreen';
 import { SandboxHUD } from './ui/mockups/SandboxHUD';
 import { AudioSettings } from './ui/components/AudioSettings';
+import { RallyLoadingOverlay } from './ui/components/RallyLoadingOverlay';
 import { theme } from './ui/theme';
 import { uiToGameEvents } from './game/core/GameEvents';
 import { spendPermit } from './game/data/metaState';
@@ -20,6 +21,7 @@ function App() {
   const [currentView, setCurrentView] = useState<'loading' | 'main' | 'campaign' | 'prep' | 'battle' | 'sandbox' | 'store' | 'inventory'>('loading');
   const [selectedStage, setSelectedStage] = useState<{ act: number; stageIdx: number } | null>(null);
   const [audioOpen, setAudioOpen] = useState(false);
+  const [rallyReady, setRallyReady] = useState(false);
 
   useEffect(() => {
     if (currentView !== 'loading' && currentView !== 'battle' && currentView !== 'sandbox') {
@@ -35,12 +37,14 @@ function App() {
     // Each rally costs 1 Rally Permit. The prep screen already disables Deploy at
     // 0 permits; this is the actual enforcement + deduction.
     if (!spendPermit()) return;
+    setRallyReady(false);
     setCurrentView('battle');
     // Start game systems
     uiToGameEvents.emit('restart', selectedStage ? { act: selectedStage.act, stageIdx: selectedStage.stageIdx } : undefined);
   };
 
   const handleStartSandbox = () => {
+    setRallyReady(false);
     setCurrentView('sandbox');
     uiToGameEvents.emit('restart', { mode: 'sandbox' });
   };
@@ -91,11 +95,17 @@ function App() {
       )}
 
       {currentView === 'battle' && (
-        <RallyScreen stage={selectedStage} onReturnToMenu={() => setCurrentView('main')} />
+        <>
+          <RallyScreen stage={selectedStage} onReturnToMenu={() => setCurrentView('main')} />
+          {!rallyReady && <RallyLoadingOverlay onReady={() => setRallyReady(true)} />}
+        </>
       )}
       
       {currentView === 'sandbox' && (
-        <SandboxHUD onReturnToMenu={() => setCurrentView('campaign')} />
+        <>
+          <SandboxHUD onReturnToMenu={() => setCurrentView('campaign')} />
+          {!rallyReady && <RallyLoadingOverlay onReady={() => setRallyReady(true)} />}
+        </>
       )}
       
       {currentView === 'store' && (

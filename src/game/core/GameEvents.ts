@@ -74,6 +74,10 @@ export interface GameToUiEvents extends Record<string, unknown> {
   stateChanged: GameStateSnapshot;
   voicesFull: { options: DropOption[] };
   enemyEncountered: { enemyId: string };
+  /** Phaser loader progress — value is 0‒1. */
+  loadProgress: { progress: number };
+  /** Fired once at the end of create() when all game objects are built. */
+  sceneReady: undefined;
 }
 
 export type SkillVisualEvent = 
