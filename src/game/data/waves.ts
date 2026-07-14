@@ -43,6 +43,25 @@ export const WAVE_SCALING = {
   speedMultCap: 1.15,
 } as const;
 
+/**
+ * Per-stage (campaign-wide) stat growth — the knob that makes later stages
+ * harder regardless of which enemies the gating schedule introduces. Stage 1
+ * is the baseline (1.0×); every subsequent stage adds a fraction on top.
+ * Combined with waveStatMultipliers (which scales within a single battle),
+ * this produces smooth difficulty across the full 91-stage campaign:
+ *
+ *   Stage  1: 1.0× HP / 1.0× dmg      (tutorial)
+ *   Stage 10: 1.45× HP / 1.27× dmg     (act 1 boss)
+ *   Stage 45: 3.2× HP / 2.32× dmg      (mid-campaign)
+ *   Stage 91: 5.5× HP / 3.7× dmg       (finale)
+ */
+export const STAGE_SCALING = {
+  hpGrowthPerStage: 0.05,
+  damageGrowthPerStage: 0.03,
+  speedGrowthPerStage: 0.003,
+  speedMultCap: 1.25,
+} as const;
+
 /** Stat multipliers for a spawn on the given wave (1-based). */
 export function waveStatMultipliers(wave: number): { hp: number; damage: number; speed: number } {
   const n = Math.max(0, wave - 1);
@@ -50,6 +69,19 @@ export function waveStatMultipliers(wave: number): { hp: number; damage: number;
     hp: 1 + WAVE_SCALING.hpGrowthPerWave * n,
     damage: 1 + WAVE_SCALING.damageGrowthPerWave * n,
     speed: Math.min(WAVE_SCALING.speedMultCap, 1 + WAVE_SCALING.speedGrowthPerWave * n),
+  };
+}
+
+/**
+ * Stat multipliers for the given campaign stage (1-based global stage number).
+ * Non-campaign battles (null coordinates → stage 1) return 1.0× across the board.
+ */
+export function stageStatMultipliers(globalStage: number): { hp: number; damage: number; speed: number } {
+  const n = Math.max(0, globalStage - 1);
+  return {
+    hp: 1 + STAGE_SCALING.hpGrowthPerStage * n,
+    damage: 1 + STAGE_SCALING.damageGrowthPerStage * n,
+    speed: Math.min(STAGE_SCALING.speedMultCap, 1 + STAGE_SCALING.speedGrowthPerStage * n),
   };
 }
 

@@ -4,7 +4,7 @@ import { Enemy } from '../entities/Enemy';
 import { Hero } from '../entities/Hero';
 import { ENEMY_DEFINITIONS, type EnemyId } from '../data/enemies';
 import { HERO_DEFINITIONS, type HeroId } from '../data/heroes';
-import { waveStatMultipliers } from '../data/waves';
+import { waveStatMultipliers, stageStatMultipliers } from '../data/waves';
 import { formationTargetY } from '../core/RallyMarch';
 import { getSelectedSkin } from '../data/skinSelection';
 import { GAME_WIDTH, ENEMY_SPAWN_Y_OFFSET, RALLY } from '../data/level';
@@ -28,6 +28,7 @@ import { resolveAttackSpeed } from '../data/attackSpeed';
 import { gameToUiEvents } from '../core/GameEvents';
 import { AudioManager } from '../core/AudioManager';
 import { heroAttackSfx } from '../data/soundRegistry';
+import { globalStageNumber } from '../data/campaign';
 
 export function spawnEnemy(scene: GameScene, enemyId: EnemyId = 'grunt', wave: number = 1) {
   // Scatter across the lane (X); spawn just above the visible top of the
@@ -39,13 +40,24 @@ export function spawnEnemy(scene: GameScene, enemyId: EnemyId = 'grunt', wave: n
   const y = scene.cameras.main.scrollY - ENEMY_SPAWN_Y_OFFSET;
   
   const def = { ...ENEMY_DEFINITIONS[enemyId] };
-  const mult = waveStatMultipliers(wave);
+  const waveMult = waveStatMultipliers(wave);
+
+  // Per-stage campaign scaling — stage 1 is 1.0×, grows continuously.
+  const stage = (scene.currentAct != null && scene.currentStageIdx != null)
+    ? globalStageNumber(scene.currentAct, scene.currentStageIdx)
+    : 1;
+  const stageMult = stageStatMultipliers(stage);
   
-  // Bosses are authored at wave-20 power, minion stats scale up.
+  // Bosses are authored at wave-20 power (wave scaling exempt) but still
+  // scale with campaign progress so later acts feel harder.
   if (!def.id.startsWith('boss_')) {
-    def.maxHp = Math.round(def.maxHp * mult.hp);
-    def.damage = Math.round(def.damage * mult.damage);
-    def.speed = def.speed * mult.speed;
+    def.maxHp = Math.round(def.maxHp * waveMult.hp * stageMult.hp);
+    def.damage = Math.round(def.damage * waveMult.damage * stageMult.damage);
+    def.speed = def.speed * waveMult.speed * Math.min(stageMult.speed, 1.15);
+  } else {
+    def.maxHp = Math.round(def.maxHp * stageMult.hp);
+    def.damage = Math.round(def.damage * stageMult.damage);
+    def.speed = def.speed * Math.min(stageMult.speed, 1.10);
   }
   
   const enemy = new Enemy(scene, x, y, def);

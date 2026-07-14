@@ -144,9 +144,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     name: 'Petty Corruptor',
     
     speed: 70,
-    maxHp: 45,
+    maxHp: 25,
     reward: 5,
-    damage: 6,
+    damage: 4,
     attackRateMs: 1500,
     color: 0xef4444,
   },
@@ -156,9 +156,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     
     
     speed: 130,
-    maxHp: 25,
+    maxHp: 15,
     reward: 4,
-    damage: 4,
+    damage: 3,
     attackRateMs: 900,
     color: 0xeab308,
   },
@@ -168,9 +168,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     
     
     speed: 45,
-    maxHp: 180,
+    maxHp: 100,
     reward: 15,
-    damage: 16,
+    damage: 10,
     attackRateMs: 2500,
     color: 0x7c3aed,
     sizeClass: 'miniboss',
@@ -190,9 +190,9 @@ export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
     name: 'Ghost Employee',
     
     speed: 60,
-    maxHp: 70,
+    maxHp: 40,
     reward: 8,
-    damage: 8,
+    damage: 5,
     attackRateMs: 1500,
     color: 0xffffff,
     stealth: true,
