@@ -12,6 +12,8 @@ export class Summon extends Phaser.GameObjects.Container {
    */
   public blockHalfWidth: number;
   public blockHalfHeight: number;
+  /** Collision body radius (px) — enemy-team summons are shot by projectile/pierce loops. */
+  public hitRadius: number;
   private shape: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image | Phaser.GameObjects.Sprite;
   private color: number;
   private hpBarBg: Phaser.GameObjects.Rectangle;
@@ -51,6 +53,7 @@ export class Summon extends Phaser.GameObjects.Container {
 
     this.blockHalfWidth = Math.max(30, this.shape.displayWidth / 2);
     this.blockHalfHeight = Math.max(20, this.shape.displayHeight / 2);
+    this.hitRadius = Math.max(this.blockHalfWidth, this.blockHalfHeight);
 
     // HP Bar — sized to the body so a wide wall doesn't wear a toothpick bar.
     this.barWidth = Math.max(30, Math.round(this.shape.displayWidth * 0.625));

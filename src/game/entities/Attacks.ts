@@ -8,6 +8,8 @@ import { spawnShockwaveRing } from './fx/ShockwaveRing';
 import { AreaOverlay } from './fx/AreaOverlay';
 import { LaneWave } from './fx/LaneWave';
 import { AttackSprite, popAttackIcon } from './fx/AttackSprite';
+import { circlesOverlap, segmentCircleOverlap, sweptLanceHitsCircle } from '../core/Collision';
+import { ATTACK_COLLISION, lobbedSplashRadius } from '../data/collision';
 
 /**
  * Per-hero attack art + resolved damage-type tint, passed in by the spawner
@@ -117,18 +119,20 @@ export class ProjectileAttack extends Attack {
       }
     }
     const dt = delta / 1000;
-    this.visual.setPosition(this.visual.x + this.vx * dt, this.visual.y + this.vy * dt);
+    // Sweep from the previous position so a fast homing shot can't skip a small
+    // body between frames.
+    const prevX = this.visual.x;
+    const prevY = this.visual.y;
+    this.visual.setPosition(prevX + this.vx * dt, prevY + this.vy * dt);
     this.visual.pointAlong(this.vx, this.vy);
     this.trail.update(this.visual.x, this.visual.y, this.vx, this.vy);
+    const radius = ATTACK_COLLISION.projectile.radius + this.modifiers.bonusRadius;
 
     const summons = (this.scene as any).summons as any[];
     if (summons) {
       for (const summon of summons) {
         if (summon.isEnemyTeam && !summon.isDead && !this.hitEnemies.has(summon)) {
-          const dx = summon.x - this.visual.x;
-          const dy = summon.y - this.visual.y;
-          const collisionRadius = 50 + this.modifiers.bonusRadius;
-          if (dx * dx + dy * dy < collisionRadius * collisionRadius) {
+          if (segmentCircleOverlap(prevX, prevY, this.visual.x, this.visual.y, summon.x, summon.y, radius + (summon.hitRadius ?? 30))) {
             summon.takeDamage(this.totalDamage);
             this.hitEnemies.add(summon);
             this.hitCount++;
@@ -145,10 +149,7 @@ export class ProjectileAttack extends Attack {
     if (enemies) {
       for (const enemy of enemies) {
         if (!enemy.isDead && !this.hitEnemies.has(enemy)) {
-          const dx = enemy.x - this.visual.x;
-          const dy = enemy.y - this.visual.y;
-          const collisionRadius = 50 + this.modifiers.bonusRadius;
-          if (dx * dx + dy * dy < collisionRadius * collisionRadius) {
+          if (segmentCircleOverlap(prevX, prevY, this.visual.x, this.visual.y, enemy.x, enemy.y, radius + enemy.hitRadius)) {
             enemy.takeDamage(this.totalDamage, this.damageType);
             this.hitEnemies.add(enemy);
             this.hitCount++;
@@ -184,6 +185,9 @@ export class PierceAttack extends Attack {
   private speed: number;
   private vx = 0;
   private vy = 0;
+  private ux = 1; // unit heading, snapshot at spawn
+  private uy = 0;
+  private halfLenPx: number; // lance body half-length; hits are constrained to the body
   private visual: AttackSprite;
   private hitCount = 0;
   private maxHits: number;
@@ -196,6 +200,8 @@ export class PierceAttack extends Attack {
     this.maxHits = Math.max(1, basePierce + this.modifiers.bonusPierce);
     // One long oriented lance so pierce reads as a spear, not a dot.
     this.visual = new AttackSprite(scene, { x, y, artKey: visual.artKey, tint: visual.tint, lengthPx: visual.sizePx });
+    // Hits are limited to the lance body, so collision uses half its length.
+    this.halfLenPx = (visual.sizePx || 0) / 2;
 
     // Snapshot the firing vector ONCE; the shot never curves after this.
     const dx = target.x - x;
@@ -204,8 +210,12 @@ export class PierceAttack extends Attack {
     if (dist > 0) {
       this.vx = (dx / dist) * this.speed;
       this.vy = (dy / dist) * this.speed;
+      this.ux = dx / dist;
+      this.uy = dy / dist;
     } else {
       this.vx = this.speed; // degenerate case: fire straight up-lane
+      this.ux = 1;
+      this.uy = 0;
     }
     this.visual.pointAlong(this.vx, this.vy);
   }
@@ -213,20 +223,19 @@ export class PierceAttack extends Attack {
   update(_time: number, delta: number) {
     if (this.isDead) return;
     const dt = delta / 1000;
-    this.visual.setPosition(this.visual.x + this.vx * dt, this.visual.y + this.vy * dt);
-
-    const nx = -this.vy;
-    const ny = this.vx;
-    const len = Math.sqrt(nx * nx + ny * ny) || 1;
+    // Sweep the lance body from where it was to where it is this frame, so a
+    // fast shot can't tunnel past a body between frames and — crucially — it
+    // only hits enemies the body physically overlaps, not the whole firing line.
+    const prevX = this.visual.x;
+    const prevY = this.visual.y;
+    this.visual.setPosition(prevX + this.vx * dt, prevY + this.vy * dt);
+    const halfWidth = ATTACK_COLLISION.pierce.halfWidth + this.modifiers.bonusRadius;
 
     const summons = (this.scene as any).summons as any[];
     if (summons) {
       for (const summon of summons) {
         if (summon.isEnemyTeam && !summon.isDead && !this.hitEnemies.has(summon)) {
-          const dx = summon.x - this.visual.x;
-          const dy = summon.y - this.visual.y;
-          const cross = Math.abs(dx * (ny / len) - dy * (nx / len));
-          if (cross < 40 + this.modifiers.bonusRadius) {
+          if (sweptLanceHitsCircle(prevX, prevY, this.visual.x, this.visual.y, this.ux, this.uy, this.halfLenPx, halfWidth, summon.x, summon.y, summon.hitRadius ?? 30)) {
             summon.takeDamage(this.totalDamage);
             this.hitEnemies.add(summon);
             this.hitCount++;
@@ -243,10 +252,7 @@ export class PierceAttack extends Attack {
     if (enemies) {
       for (const enemy of enemies) {
         if (!enemy.isDead && !this.hitEnemies.has(enemy)) {
-          const dx = enemy.x - this.visual.x;
-          const dy = enemy.y - this.visual.y;
-          const cross = Math.abs(dx * (ny / len) - dy * (nx / len));
-          if (cross < 40 + this.modifiers.bonusRadius) {
+          if (sweptLanceHitsCircle(prevX, prevY, this.visual.x, this.visual.y, this.ux, this.uy, this.halfLenPx, halfWidth, enemy.x, enemy.y, enemy.hitRadius)) {
             enemy.takeDamage(this.totalDamage, this.damageType);
             this.hitEnemies.add(enemy);
             this.hitCount++;
@@ -328,7 +334,8 @@ export class MeleeCleaveAttack extends Attack {
           const edx = enemy.x - x;
           const edy = enemy.y - y;
           const distSq = edx * edx + edy * edy;
-          if (distSq <= this.maxRadius * this.maxRadius) {
+          const reach = this.maxRadius + enemy.hitRadius;
+          if (distSq <= reach * reach) {
             const eAngle = Math.atan2(edy, edx);
             let diff = eAngle - angleRad;
             while (diff < -Math.PI) diff += Math.PI * 2;
@@ -430,7 +437,7 @@ export class VortexAttack extends Attack {
     this.ageMs += delta;
     this.timeSinceLastTick += delta;
 
-    const radius = 100 + this.modifiers.bonusRadius;
+    const radius = ATTACK_COLLISION.vortex.radius + this.modifiers.bonusRadius;
 
     const enemies = (this.scene as any).enemies as Enemy[];
     if (enemies) {
@@ -439,8 +446,9 @@ export class VortexAttack extends Attack {
         const dx = this.xPos - enemy.x;
         const dy = this.yPos - enemy.y;
         const distSq = dx * dx + dy * dy;
-        
-        if (distSq <= radius * radius) {
+        const reach = radius + enemy.hitRadius;
+
+        if (distSq <= reach * reach) {
           // Pull enemy (reduced force so it doesn't instantly snap them, acts like a mini gravity well)
           enemy.x += dx * 0.015;
           enemy.y += dy * 0.015;
@@ -498,7 +506,9 @@ export class VortexAttack extends Attack {
     this.flight.destroy();
     this.xPos = this.destX;
     this.yPos = this.destY;
-    const radius = 100 + this.modifiers.bonusRadius;
+    // Visual overlay radius mirrors the gameplay pull radius (enemy body size is
+    // added at the hit-test, not here).
+    const radius = ATTACK_COLLISION.vortex.radius + this.modifiers.bonusRadius;
     this.overlay = new AreaOverlay(this.scene, {
       x: this.xPos, y: this.yPos, radius,
       fillColor: this.visualCfg.tint, fillAlpha: 0.25,
@@ -586,10 +596,8 @@ export class BoomerangAttack extends Attack {
         if (enemy.isDead) continue;
         const hitSet = this.flightState === 'outward' ? this.hitEnemiesOutward : this.hitEnemiesReturning;
         if (!hitSet.has(enemy)) {
-          const edx = enemy.x - this.visual.x;
-          const edy = enemy.y - this.visual.y;
-          const collisionRadius = 50 + this.modifiers.bonusRadius;
-          if (edx * edx + edy * edy < collisionRadius * collisionRadius) {
+          const collisionRadius = ATTACK_COLLISION.boomerang.radius + this.modifiers.bonusRadius;
+          if (circlesOverlap(this.visual.x, this.visual.y, collisionRadius, enemy.x, enemy.y, enemy.hitRadius)) {
             enemy.takeDamage(this.totalDamage, this.damageType);
             hitSet.add(enemy);
           }
@@ -605,9 +613,6 @@ export class BoomerangAttack extends Attack {
     this.destroy();
   }
 }
-
-/** How far a chain bolt can jump between targets (follows the range ladder). */
-const CHAIN_BOUNCE_RANGE_PX = 420;
 
 export class ChainAttack extends Attack {
   private ageMs = 0;
@@ -646,7 +651,8 @@ export class ChainAttack extends Attack {
       currentDamage = Math.max(1, currentDamage * 0.8); // 20% damage drop per bounce
       
       let nextTarget: Enemy | null = null;
-      let minDist = CHAIN_BOUNCE_RANGE_PX * CHAIN_BOUNCE_RANGE_PX;
+      // Bounce search stays center-to-center — it's targeting, not a hit-test.
+      let minDist = ATTACK_COLLISION.chain.bounceRangePx * ATTACK_COLLISION.chain.bounceRangePx;
       if (enemies) {
         for (const e of enemies) {
           if (!e.isDead && !hitEnemies.has(e)) {
@@ -801,23 +807,15 @@ export class BeamAttack extends Attack {
     popAttackIcon(scene, startX, startY, visual.artKey, visual.tint, 40, 150);
 
     // Hit half-width grows with bonusRadius so the `radius` upgrade actually
-    // changes what the beam catches (not just its drawn thickness).
-    const hitHalfWidth = 20 + this.modifiers.bonusRadius;
-    const hitHalfWidthSq = hitHalfWidth * hitHalfWidth;
+    // changes what the beam catches (not just its drawn thickness); the enemy's
+    // body size is added per-target in the segment test below.
+    const hitHalfWidth = ATTACK_COLLISION.beam.halfWidth + this.modifiers.bonusRadius;
 
     const enemies = (scene as any).enemies as Enemy[];
     if (enemies) {
       for (const enemy of enemies) {
         if (!enemy.isDead) {
-          const l2 = range * range;
-          let t = ((enemy.x - startX) * (endX - startX) + (enemy.y - startY) * (endY - startY)) / l2;
-          t = Math.max(0, Math.min(1, t));
-          const projX = startX + t * (endX - startX);
-          const projY = startY + t * (endY - startY);
-
-          const edx = enemy.x - projX;
-          const edy = enemy.y - projY;
-          if (edx * edx + edy * edy < hitHalfWidthSq) {
+          if (segmentCircleOverlap(startX, startY, endX, endY, enemy.x, enemy.y, hitHalfWidth + enemy.hitRadius)) {
             enemy.takeDamage(this.totalDamage, this.damageType);
             popAttackIcon(scene, enemy.x, enemy.y, visual.artKey, visual.tint, 36, 150);
           }
@@ -892,14 +890,12 @@ export class LobbedAttack extends Attack {
   }
 
   private explode() {
-    const radius = 50 + this.modifiers.bonusRadius;
+    const radius = lobbedSplashRadius(this.modifiers.bonusRadius);
     const enemies = (this.scene as any).enemies as Enemy[];
     if (enemies) {
       for (const enemy of enemies) {
         if (!enemy.isDead) {
-          const dx = enemy.x - this.targetX;
-          const dy = enemy.y - this.targetY;
-          if (dx * dx + dy * dy <= radius * radius) {
+          if (circlesOverlap(this.targetX, this.targetY, radius, enemy.x, enemy.y, enemy.hitRadius)) {
             enemy.takeDamage(this.totalDamage, this.damageType);
           }
         }
@@ -966,9 +962,11 @@ export class LinearWaveAttack extends Attack {
     if (enemies) {
       for (const enemy of enemies) {
         if (!enemy.isDead && !this.hitEnemies.has(enemy)) {
-          // Expanded hit box to account for visual scale pulse
-          if (Math.abs(enemy.x - this.wave.x) < (this.wave.width * 1.15) / 2 + 15 &&
-              Math.abs(enemy.y - this.wave.y) < this.wave.height / 2 + 15) {
+          // Hit box accounts for the visual scale pulse; the enemy's own body
+          // size replaces the old flat +15 fudge.
+          const pad = ATTACK_COLLISION.linearWave.pad + enemy.hitRadius;
+          if (Math.abs(enemy.x - this.wave.x) < (this.wave.width * 1.15) / 2 + pad &&
+              Math.abs(enemy.y - this.wave.y) < this.wave.height / 2 + pad) {
             enemy.takeDamage(this.totalDamage, this.damageType);
             this.hitEnemies.add(enemy);
           }
@@ -996,7 +994,7 @@ export class TrapAttack extends Attack {
     // Small static armed-trap marker in the hero's art.
     this.visual = new AttackSprite(scene, { x: trapX, y: trapY, artKey: visual.artKey, tint: visual.tint, lengthPx: visual.sizePx });
     // A pulsing hazard ring telegraphs the armed trap's footprint.
-    const explosionRadius = 80 + this.modifiers.bonusRadius;
+    const explosionRadius = ATTACK_COLLISION.trap.explosionRadius + this.modifiers.bonusRadius;
     this.telegraph = scene.add.circle(trapX, trapY, explosionRadius, visual.tint, 0);
     this.telegraph.setStrokeStyle(2, visual.tint, 0.5);
     scene.tweens.add({
@@ -1013,16 +1011,15 @@ export class TrapAttack extends Attack {
   update(_time: number, _delta: number) {
     if (this.isDead) return;
 
-    const triggerRadius = 20;
-    const explosionRadius = 80 + this.modifiers.bonusRadius;
-    
+    const triggerRadius = ATTACK_COLLISION.trap.triggerRadius;
+    const explosionRadius = ATTACK_COLLISION.trap.explosionRadius + this.modifiers.bonusRadius;
+
     const enemies = (this.scene as any).enemies as Enemy[];
     if (enemies) {
       for (const enemy of enemies) {
         if (!enemy.isDead) {
-          const dx = enemy.x - this.visual.x;
-          const dy = enemy.y - this.visual.y;
-          if (dx * dx + dy * dy < triggerRadius * triggerRadius) {
+          // Big enemies step on the trap with their actual body, not their center.
+          if (circlesOverlap(this.visual.x, this.visual.y, triggerRadius, enemy.x, enemy.y, enemy.hitRadius)) {
             this.explode(explosionRadius);
             return;
           }
@@ -1030,15 +1027,13 @@ export class TrapAttack extends Attack {
       }
     }
   }
-  
+
   private explode(radius: number) {
     const enemies = (this.scene as any).enemies as Enemy[];
     if (enemies) {
       for (const enemy of enemies) {
         if (!enemy.isDead) {
-          const dx = enemy.x - this.visual.x;
-          const dy = enemy.y - this.visual.y;
-          if (dx * dx + dy * dy <= radius * radius) {
+          if (circlesOverlap(this.visual.x, this.visual.y, radius, enemy.x, enemy.y, enemy.hitRadius)) {
             enemy.takeDamage(this.totalDamage, this.damageType);
             if (this.damageType === 'Frost') {
               // Standard freeze: 34 stack per hit
@@ -1111,9 +1106,10 @@ export class AoeRootFieldAttack extends Attack {
     if (enemies) {
       for (const enemy of enemies) {
         if (!enemy.isDead) {
+          const reach = this.radius + enemy.hitRadius;
           const dx = enemy.x - this.xPos;
           const dy = enemy.y - this.yPos;
-          if (dx * dx + dy * dy <= this.radius * this.radius) {
+          if (dx * dx + dy * dy <= reach * reach) {
             enemy.applyAilment('root', 1, 500); // rooted icon
             enemy.applyAilment('stun', 1, 500); // completely stunned
             if (this.damage > 0) {
@@ -1172,9 +1168,10 @@ export class AoeFirePatchAttack extends Attack {
       if (enemies) {
         for (const enemy of enemies) {
           if (!enemy.isDead) {
+            const reach = this.radius + enemy.hitRadius;
             const dx = enemy.x - this.xPos;
             const dy = enemy.y - this.yPos;
-            if (dx * dx + dy * dy <= this.radius * this.radius) {
+            if (dx * dx + dy * dy <= reach * reach) {
               enemy.applyAilment('burn', 1, 1000);
               if (this.damage > 0) {
                 enemy.takeDamage(this.damage);
@@ -1255,12 +1252,12 @@ export class TornadoAttack extends Attack {
     if (this.tickMs >= 100) {
       this.tickMs -= 100;
       if (enemies) {
-        const radiusSq = this.pullRadius * this.pullRadius;
         for (const e of enemies) {
           if (e.isDead) continue;
+          const reach = this.pullRadius + e.hitRadius;
           const dx = e.x - this.xPos;
           const dy = e.y - this.yPos;
-          if (dx * dx + dy * dy <= radiusSq) {
+          if (dx * dx + dy * dy <= reach * reach) {
             e.takeDamage(this.damage / 10);
             if (!e.isDead) {
               const pullAngle = Math.atan2(this.yPos - e.y, this.xPos - e.x);
@@ -1319,12 +1316,12 @@ export class TreeOfLifeFieldAttack extends Attack {
 
       const enemies = (this.scene as any).enemies as Enemy[];
       if (enemies) {
-        const radiusSq = this.radius * this.radius;
         for (const e of enemies) {
           if (e.isDead) continue;
+          const reach = this.radius + e.hitRadius;
           const dx = e.x - this.xPos;
           const dy = e.y - this.yPos;
-          if (dx * dx + dy * dy <= radiusSq) {
+          if (dx * dx + dy * dy <= reach * reach) {
             e.applyAilment('root', 100, 1000);
             e.takeDamage(this.damage);
             const txt = this.scene.add.text(e.x, e.y - 30, 'ROOTED!', { color: '#22c55e', fontStyle: 'bold' }).setOrigin(0.5);
@@ -1406,8 +1403,8 @@ export class RollingBlackoutWaveAttack extends Attack {
     if (enemies) {
       for (const enemy of enemies) {
         if (!enemy.isDead && !this.hitEnemies.has(enemy)) {
-          // If enemy's y is close to the wave's y
-          if (Math.abs(enemy.y - this.waveGraphic.y) < 60) {
+          // Enemy's body edge crosses the wave's y line.
+          if (Math.abs(enemy.y - this.waveGraphic.y) < ATTACK_COLLISION.rollingBlackout.halfHeight + enemy.hitRadius) {
             enemy.takeDamage(this.totalDamage);
             this.hitEnemies.add(enemy);
           }
@@ -1469,7 +1466,7 @@ export class FlushWaveAttack extends Attack {
         if (!enemy.isDead && !this.hitEnemies.has(enemy)) {
           const distY = Math.abs(enemy.y - this.wave.y);
 
-          if (distY < this.wave.height / 2 + 30) {
+          if (distY < this.wave.height / 2 + ATTACK_COLLISION.flushWave.padY + enemy.hitRadius) {
             enemy.takeDamage(this.totalDamage);
             enemy.applyAilment('slow', 100, 4000);
 

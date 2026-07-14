@@ -84,6 +84,7 @@ export interface EnemyDefinition {
  * limited to `color` on EnemyDefinition (see docs/DESIGN_GUIDELINES.md).
  */
 export const ENEMY_VISUALS = {
+  // Deprecated: never read. Collision uses UNIT_HIT_RADIUS (by size tier) below.
   bodyRadius: 12,
   hpBarWidth: 24,
   hpBarHeight: 4,
@@ -114,6 +115,27 @@ export const UNIT_RENDER_SIZES: Record<UnitSizeClass, number> = {
 /** Resolve an enemy's size tier: explicit sizeClass, else boss ids, else minion. */
 export function enemySizeClass(def: EnemyDefinition): UnitSizeClass {
   return def.sizeClass ?? (def.id.startsWith('boss_') ? 'boss' : 'minion');
+}
+
+/**
+ * Collision body radius (px) per size tier — attacks add this to their own
+ * radius/half-width so every hit-test respects how big the target actually is.
+ * Deliberately NOT derived from UNIT_RENDER_SIZES: render heights include art
+ * whitespace and the boss's 800px spectacle scale, so a boss with a ~400px hit
+ * radius would be clipped by anything on its half of the screen. These are
+ * gameplay bodies — roughly the unit's torso. If bosses melt after this change,
+ * lower `boss` toward 110 before touching anything else.
+ */
+export const UNIT_HIT_RADIUS: Record<UnitSizeClass, number> = {
+  minion: 32, // 128px-tall art, body ~64px wide; keeps old flat hit numbers
+  miniboss: 50, // 180px art
+  hero: 50, // parity entry; enemy attacks on heroes are out of scope here
+  boss: 140, // 800px art, clamped hard vs the render height
+};
+
+/** Resolve an enemy's collision body radius from its size tier. */
+export function enemyHitRadius(def: EnemyDefinition): number {
+  return UNIT_HIT_RADIUS[enemySizeClass(def)];
 }
 
 export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {

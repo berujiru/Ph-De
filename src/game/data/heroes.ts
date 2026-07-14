@@ -164,7 +164,8 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackKind: 'ranged',
     attackStyle: 'pierce',
     range: 1200,
-    damage: 7, // per-hit; lands on up to basePierce+1 enemies in a line
+    damage: 8, // retuned 2026-07: collision fix (was 7) — hits only bodies the dart traverses now
+    // per-hit; lands on up to basePierce+1 enemies in a line
     attackRateMs: 1100,
     basePierce: 2,
     color: 0xf59e0b,
@@ -215,7 +216,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackKind: 'ranged',
     attackStyle: 'pierce',
     range: 1150,
-    basePierce: 1,
+    basePierce: 2, // retuned 2026-07: collision fix (was 1) — "pierce 1 additional" never worked (max(1,1+0)=1)
     damage: 16,
     attackRateMs: 2200,
     color: 0xa8a29e,
@@ -234,7 +235,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackKind: 'ranged',
     attackStyle: 'lobbed',
     range: 1050,
-    damage: 11,
+    damage: 9, // retuned 2026-07: collision fix (was 11) — splash grew ~50px->122px vs minions & stopped whiffing
     attackRateMs: 1700,
     color: 0xe2e8f0,
     purpose: 'Lobs scalding syrup that slows and splashes a small area; strips enemy speed buffs off whatever it hits.',
@@ -335,7 +336,8 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackKind: 'ranged',
     attackStyle: 'pierce',
     range: 1250,
-    damage: 9, // per-hit across up to 5 pierced enemies — group DPS is the payoff
+    damage: 10, // retuned 2026-07: collision fix (was 9) — 5 instant line-hits became real pass-throughs; rate already slowed, so only a small bump
+    // per-hit across up to 5 pierced enemies — group DPS is the payoff
     attackRateMs: 1600, // slowed 2026-07: 5-pierce line clear was OP at 1300
     basePierce: 5,
     color: 0xf43f5e,
@@ -414,7 +416,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackKind: 'ranged',
     attackStyle: 'lobbed',
     range: 1100,
-    damage: 13,
+    damage: 11, // retuned 2026-07: collision fix (was 13) — bigger splash + burn-zone passive, so slightly larger trim than Taho
     attackRateMs: 1800,
     color: 0xef4444,
     purpose: 'Lobs hot pandesal that explodes in fire splash and leaves a burning zone — sustained AoE against packed waves.',

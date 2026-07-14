@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { type EnemyDefinition } from '../data/enemies';
-import { ENEMY_VISUALS, UNIT_RENDER_SIZES, enemySizeClass } from '../data/enemies';
+import { ENEMY_VISUALS, UNIT_RENDER_SIZES, enemySizeClass, enemyHitRadius } from '../data/enemies';
 import type { MoraleShield } from './MoraleShield';
 import type { Summon } from './Summon';
 import type { ISkillEnemy } from '../core/Skills';
@@ -64,6 +64,8 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
   private attackCooldown = 0;
   /** Render height (px) from the unit's size tier — offsets hang off this. */
   public readonly sizePx: number;
+  /** Collision body radius (px) from the size tier — attacks add this to their own radius. */
+  public readonly hitRadius: number;
   private botAi?: EnemyAI;
 
   // Passives
@@ -107,6 +109,7 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
     // minion < miniboss < boss (bosses tower over heroes).
     const sizePx = UNIT_RENDER_SIZES[enemySizeClass(definition)];
     this.sizePx = sizePx;
+    this.hitRadius = enemyHitRadius(definition);
     this.model = new EnemyModel(scene, 0, 0, definition.color, definition.spriteKey ?? definition.id, sizePx, definition.visualScale);
     this.add(this.model);
 
