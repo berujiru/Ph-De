@@ -13,6 +13,7 @@
     "test:e2e": "playwright test",
     "typecheck": "tsc -b --noEmit",
     "gen:maps": "node scripts/generate-map-skins.mjs",
+    "gen:sounds": "node scripts/generate-sfx.mjs",
     "cap:sync": "cap sync",
     "cap:add:ios": "cap add ios",
     "cap:add:android": "cap add android"

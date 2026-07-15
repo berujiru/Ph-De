@@ -15,6 +15,7 @@ import { DAMAGE_TYPE_COLORS, type DamageType } from '../core/Damage';
 import { attackArtKey, resolveAttackArt, resolveAttackSize } from '../data/attackArt';
 import { resolveAttackSpeed } from '../data/attackSpeed';
 import { AudioManager } from '../core/AudioManager';
+import { heroSkillSfx } from '../data/soundRegistry';
 import {
   Attack,
   ProjectileAttack,
@@ -370,6 +371,9 @@ export function setupInternalEvents(scene: GameScene): () => void {
 
   scene.events.on('heroSkillTriggered', ({ hero, skillId }: { hero: Hero, skillId: HeroId }) => {
     cameraPunch(scene, FX.cameraShake.skillCast, true);
+    // Default skill-activation cue (per-hero foley overrides via HERO_SFX.skill),
+    // fired with the cut-in punch so the surge lands on the dramatic moment.
+    AudioManager.playSfx(heroSkillSfx(hero.definition.id));
 
     scene.comboCount++;
     const isCombo = scene.comboCount > 1;

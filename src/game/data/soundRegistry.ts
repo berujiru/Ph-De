@@ -26,6 +26,8 @@ export const SFX = {
   enemyDie: 'sfx-enemy-die',
   barrierHit: 'sfx-barrier-hit',
   barrierBreak: 'sfx-barrier-break',
+  /** Default signature-skill activation cue; per-hero foley overrides via HERO_SFX. */
+  skill: 'sfx-skill',
   heal: 'sfx-heal',
   victory: 'sfx-victory',
   defeat: 'sfx-defeat',
@@ -114,8 +116,8 @@ export function heroAttackSfx(id: HeroId): string {
   return HERO_SFX[id]?.attack ?? SFX.shoot;
 }
 
-export function heroSkillSfx(id: HeroId): string | undefined {
-  return HERO_SFX[id]?.skill;
+export function heroSkillSfx(id: HeroId): string {
+  return HERO_SFX[id]?.skill ?? SFX.skill;
 }
 
 export function heroVoice(id: HeroId): string | undefined {
@@ -145,14 +147,15 @@ export function enemySkillSfx(id: EnemyId): string | undefined {
  * real recording needs no code change (Milestone 1, step 5).
  */
 export const AUDIO_MANIFEST: Record<string, string> = {
-  [SFX.btnPress]: '/assets/sounds/btn-press.mp3',
-  [SFX.shoot]: '/assets/sounds/shoot.mp3',
-  [SFX.enemyHit]: '/assets/sounds/enemy-hit.mp3',
-  [SFX.enemyDie]: '/assets/sounds/enemy-die.mp3',
-  [SFX.barrierHit]: '/assets/sounds/barrier-hit.mp3',
-  [SFX.barrierBreak]: '/assets/sounds/barrier-break.mp3',
-  [SFX.victory]: '/assets/sounds/victory.mp3',
-  [SFX.defeat]: '/assets/sounds/defeat.mp3',
+  [SFX.btnPress]: '/assets/sounds/btn-press.wav',
+  [SFX.shoot]: '/assets/sounds/shoot.wav',
+  [SFX.enemyHit]: '/assets/sounds/enemy-hit.wav',
+  [SFX.enemyDie]: '/assets/sounds/enemy-die.wav',
+  [SFX.barrierHit]: '/assets/sounds/barrier-hit.wav',
+  [SFX.barrierBreak]: '/assets/sounds/barrier-break.wav',
+  [SFX.skill]: '/assets/sounds/skill.wav',
+  [SFX.victory]: '/assets/sounds/victory.wav',
+  [SFX.defeat]: '/assets/sounds/defeat.wav',
   // --- Pending real files: drop the .mp3 in the path shown, then uncomment. ---
   // [SFX.heal]: '/assets/sounds/heal.mp3',
   //
