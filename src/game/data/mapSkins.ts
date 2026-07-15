@@ -2,9 +2,12 @@
  * Campaign battle-map skins — data-driven parallax backdrops.
  *
  * Each skin is a set of 4 SVG layers (sky, skyline, street, foreground) that
- * replace the default `bg-*` textures in ParallaxBackground. Skins are grouped
- * by act; stages within an act cycle through their act's skins so every 3
- * stages the player sees a fresh backdrop.
+ * replace the default `bg-*` textures in ParallaxBackground. The art direction
+ * is a souls-like ruined battlefield seen top-down — scorched ground, cracked
+ * pavement, collapsed buildings and burning wreckage flanking the marching
+ * lane. Skins are grouped by act; stages within an act cycle through their
+ * act's skins so every 3 stages the player sees a fresh backdrop, and the ruin
+ * escalates from act to act (ashen dawn → smoldering → blood dusk → blackout).
  *
  * The `season` field accommodates festival/seasonal variants (Sinulog,
  * Buwan ng Wika, Ber-months) — skins with a season tag are only active during
@@ -19,19 +22,19 @@
 // ---------------------------------------------------------------------------
 
 export type MapSkinId =
-  // Act 1 — Barangay (morning)
+  // Act 1 — Barangay (ashen dawn)
   | 'brgy-eskenita'
   | 'brgy-court'
   | 'brgy-plaza'
-  // Act 2 — Bayan (mid-morning)
+  // Act 2 — Bayan (smoldering)
   | 'bayan-palengke'
   | 'bayan-terminal'
   | 'bayan-cityhall'
-  // Act 3 — Province (golden afternoon)
+  // Act 3 — Province (blood dusk)
   | 'prov-highway'
   | 'prov-port'
   | 'prov-capitol'
-  // Act 4 — National (high noon)
+  // Act 4 — National (blackened inferno)
   | 'natl-avenue'
   | 'natl-govt'
   | 'natl-palace';
@@ -50,8 +53,8 @@ export interface MapSkin {
   name: string;
   /** Which act this skin belongs to (1-4). */
   act: number;
-  /** Time-of-day mood applied via the sky layer (all daylight variants). */
-  timeOfDay: 'morning' | 'mid-morning' | 'afternoon' | 'noon';
+  /** Ruin mood applied via the palette; escalates across acts. */
+  ruinMood: 'ashen-dawn' | 'smolder' | 'blood-dusk' | 'blackout';
   /** Festival/event season. Defaults to 'default' (always active). */
   season: MapSeason;
   /**
@@ -76,14 +79,14 @@ function skin(
   id: MapSkinId,
   name: string,
   act: number,
-  timeOfDay: MapSkin['timeOfDay'],
+  ruinMood: MapSkin['ruinMood'],
   season: MapSeason = 'default',
 ): MapSkin {
   return {
     id,
     name,
     act,
-    timeOfDay,
+    ruinMood,
     season,
     layers: {
       sky: `${BASE}/${id}/sky.svg`,
@@ -99,25 +102,25 @@ function skin(
 // ---------------------------------------------------------------------------
 
 export const MAP_SKINS: MapSkin[] = [
-  // Act 1 — Barangay (bright morning)
-  skin('brgy-eskenita', 'Narrow Alley (Eskenita)',    1, 'morning'),
-  skin('brgy-court',    'Basketball Court',            1, 'morning'),
-  skin('brgy-plaza',    'Barangay Plaza',              1, 'morning'),
+  // Act 1 — Barangay (ashen dawn)
+  skin('brgy-eskenita', 'Narrow Alley (Eskenita)',    1, 'ashen-dawn'),
+  skin('brgy-court',    'Basketball Court',            1, 'ashen-dawn'),
+  skin('brgy-plaza',    'Barangay Plaza',              1, 'ashen-dawn'),
 
-  // Act 2 — Bayan / LGU (mid-morning)
-  skin('bayan-palengke',  'Public Market (Palengke)',  2, 'mid-morning'),
-  skin('bayan-terminal',  'Jeepney Terminal',          2, 'mid-morning'),
-  skin('bayan-cityhall',  'City Hall Road',            2, 'mid-morning'),
+  // Act 2 — Bayan / LGU (smoldering)
+  skin('bayan-palengke',  'Public Market (Palengke)',  2, 'smolder'),
+  skin('bayan-terminal',  'Jeepney Terminal',          2, 'smolder'),
+  skin('bayan-cityhall',  'City Hall Road',            2, 'smolder'),
 
-  // Act 3 — Province (golden afternoon)
-  skin('prov-highway', 'Provincial Highway',           3, 'afternoon'),
-  skin('prov-port',    'Coastal Port',                 3, 'afternoon'),
-  skin('prov-capitol', 'Capitol Grounds',              3, 'afternoon'),
+  // Act 3 — Province (blood dusk)
+  skin('prov-highway', 'Provincial Highway',           3, 'blood-dusk'),
+  skin('prov-port',    'Coastal Port',                 3, 'blood-dusk'),
+  skin('prov-capitol', 'Capitol Grounds',              3, 'blood-dusk'),
 
-  // Act 4 — National (clear high noon)
-  skin('natl-avenue', 'National Avenue',               4, 'noon'),
-  skin('natl-govt',   'Government District',           4, 'noon'),
-  skin('natl-palace', 'Palace Gates',                  4, 'noon'),
+  // Act 4 — National (blackened inferno)
+  skin('natl-avenue', 'National Avenue',               4, 'blackout'),
+  skin('natl-govt',   'Government District',           4, 'blackout'),
+  skin('natl-palace', 'Palace Gates',                  4, 'blackout'),
 ];
 
 /** All skins for a given act. */

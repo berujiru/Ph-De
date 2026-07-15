@@ -1,16 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="540" height="960" viewBox="0 0 540 960" preserveAspectRatio="none">
   <defs>
-    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#2f8ad8"/>
-      <stop offset="0.55" stop-color="#6ebcee"/>
-      <stop offset="1" stop-color="#c6e7fa"/>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#171214"/>
+      <stop offset="0.55" stop-color="#2a1614"/>
+      <stop offset="1" stop-color="#431a12"/>
     </linearGradient>
-    <linearGradient id="horizon" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#eaf7ff" stop-opacity="0"/>
-      <stop offset="1" stop-color="#eaf7ff" stop-opacity="0.4"/>
+    <linearGradient id="glowL" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff5a1e" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#ff5a1e" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="glowR" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#ff5a1e" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#ff5a1e" stop-opacity="0"/>
     </linearGradient>
   </defs>
-  <rect width="540" height="960" fill="url(#sky)"/>
-  <rect y="480" width="540" height="480" fill="url(#horizon)"/>
-  <circle cx="160" cy="110" r="57.2" fill="#fff3b8" opacity="0.25"/><circle cx="160" cy="110" r="37.7" fill="#fff3b8" opacity="0.4"/><circle cx="160" cy="110" r="26" fill="#ffffff"/><g fill="#ffffff" opacity="0.9"><ellipse cx="386.3" cy="572.8" rx="87.9" ry="21.2"/><ellipse cx="346.7" cy="582.3" rx="48.3" ry="17"/><ellipse cx="421.5" cy="580.2" rx="52.7" ry="18"/></g><g fill="#ffffff" opacity="0.7"><ellipse cx="305.6" cy="348" rx="86.1" ry="16.8"/><ellipse cx="266.9" cy="355.6" rx="47.4" ry="13.4"/><ellipse cx="340" cy="353.9" rx="51.7" ry="14.3"/></g><g fill="#ffffff" opacity="0.8"><ellipse cx="437.1" cy="171.1" rx="76.5" ry="17.4"/><ellipse cx="402.7" cy="178.9" rx="42.1" ry="13.9"/><ellipse cx="467.7" cy="177.2" rx="45.9" ry="14.8"/></g>
+  <rect width="540" height="960" fill="url(#ground)"/>
+  <rect x="0" y="0" width="226.8" height="960" fill="url(#glowL)"/><rect x="313.2" y="0" width="226.8" height="960" fill="url(#glowR)"/><circle cx="406.5" cy="849.7" r="4.7" fill="#ff8a3a" opacity="0.1"/><circle cx="457.9" cy="554.2" r="4.4" fill="#ff8a3a" opacity="0.1"/><circle cx="153.6" cy="250.5" r="6.3" fill="#ff8a3a" opacity="0.1"/><circle cx="193.1" cy="331" r="5.7" fill="#ff8a3a" opacity="0.1"/><circle cx="124.6" cy="815.1" r="3.2" fill="#ff8a3a" opacity="0.2"/><circle cx="7.9" cy="610.8" r="2.2" fill="#ff8a3a" opacity="0.1"/><circle cx="306" cy="835.7" r="6.7" fill="#ff8a3a" opacity="0.1"/><circle cx="175.1" cy="588.8" r="3.2" fill="#ff8a3a" opacity="0.1"/><circle cx="95.3" cy="824.3" r="3.8" fill="#ff8a3a" opacity="0.1"/><circle cx="14.1" cy="444.3" r="6.2" fill="#ff8a3a" opacity="0.1"/><circle cx="427.6" cy="892.9" r="5.4" fill="#ff8a3a" opacity="0.2"/><circle cx="142.6" cy="788.6" r="3" fill="#ff8a3a" opacity="0.1"/><circle cx="197.8" cy="459" r="6.8" fill="#ff8a3a" opacity="0.1"/><circle cx="471.4" cy="293.5" r="4.2" fill="#ff8a3a" opacity="0.1"/><circle cx="313.3" cy="61.5" r="3.6" fill="#ff8a3a" opacity="0.1"/><circle cx="20.8" cy="301.5" r="2" fill="#ff8a3a" opacity="0.1"/><circle cx="105.5" cy="8.1" r="5.4" fill="#ff8a3a" opacity="0.1"/><circle cx="397.3" cy="541.7" r="4.2" fill="#ff8a3a" opacity="0.1"/><circle cx="371.3" cy="216.1" r="6.1" fill="#ff8a3a" opacity="0.1"/><circle cx="290.6" cy="365.9" r="3.4" fill="#ff8a3a" opacity="0.1"/><circle cx="494.7" cy="86.9" r="3" fill="#ff8a3a" opacity="0.1"/><circle cx="376.3" cy="634" r="5.5" fill="#ff8a3a" opacity="0.1"/><ellipse cx="270" cy="186.8" rx="378" ry="60.3" fill="#171214" opacity="0.25"/><ellipse cx="270" cy="426.4" rx="378" ry="59.1" fill="#171214" opacity="0.25"/><ellipse cx="270" cy="668.7" rx="378" ry="62.6" fill="#171214" opacity="0.25"/>
 </svg>
