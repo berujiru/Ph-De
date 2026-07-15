@@ -342,7 +342,9 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     let foundTaunt = false;
 
     for (const enemy of enemies) {
-      if (enemy.isDead || enemy.y >= this.y) continue;
+      // Skip anything already dead OR at/below 0 HP (a corpse mid death-anim, or
+      // a lethal hit not yet flagged this frame) so heroes never swing at it.
+      if (enemy.isDead || enemy.hp <= 0 || enemy.y >= this.y) continue;
       // Ignore stealthed enemies unless this hero can see stealth.
       if (enemy.isStealthed && !this.definition.canSeeStealth) continue;
 
@@ -485,12 +487,12 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
         
         // If the original target died while the hero was swinging, try to seamlessly 
         // redirect the attack to a new valid target so the attack isn't wasted.
-        if (finalTarget.isDead || !finalTarget.active) {
+        if (finalTarget.isDead || finalTarget.hp <= 0 || !finalTarget.active) {
             const allEnemies = (this.scene as any).enemies as Enemy[];
             finalTarget = this.findTargetInRange(allEnemies) || finalTarget;
         }
 
-        if (finalTarget && finalTarget.active && !finalTarget.isDead) {
+        if (finalTarget && finalTarget.active && !finalTarget.isDead && finalTarget.hp > 0) {
           // Fake News Blindness check
           if (this.blindTimer > 0 && Math.random() < 0.5) {
             // Miss! Show visual text

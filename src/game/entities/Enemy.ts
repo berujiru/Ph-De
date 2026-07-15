@@ -352,6 +352,11 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
         this.scene.tweens.add({ targets: toFade, alpha: 0, duration: 300 });
       }
       this.model.setState('death', { onComplete: () => this.destroy() });
+      // Safety net: some death animations are exported looping (repeat:-1) or get
+      // interrupted, so their ANIMATION_COMPLETE never fires and the corpse would
+      // linger on screen forever. Force cleanup after a max death window —
+      // destroy() is idempotent (Phaser no-ops once the scene ref is cleared).
+      this.scene.time.delayedCall(1500, () => this.destroy());
     }
   }
 
