@@ -270,8 +270,11 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       startY: hero.y,
       targetX,
       targetY,
-      radius: 120 + (bonusRadius * 30),
-      damage: (hero.damage + bonusDamage * 2) * 0.5,
+      // Buffed 2026-07-15: single-patch Hot Syrup was under-scaled vs peers on a
+      // 50s cooldown. Radius 120->200 (now exceeds fishball's 180 per-patch to
+      // make up for having one patch, not a lane of 8) and tick damage 0.5->0.85.
+      radius: 200 + (bonusRadius * 30),
+      damage: (hero.damage + bonusDamage * 2) * 0.85,
       duration: 20000
     });
   } else if (skillId === 'nurse') {

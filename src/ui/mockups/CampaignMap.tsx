@@ -1,5 +1,6 @@
 import { useEffect, useReducer, useState } from 'react';
 import { theme } from '../theme';
+import { SHOW_SANDBOX } from '../../featureFlags';
 import { getStageStars, getHighestClearedStage, getPermits, subscribeMetaState } from '../../game/data/metaState';
 import { type MapSkinId, skinsForAct } from '../../game/data/mapSkins';
 import {
@@ -327,7 +328,8 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 640, margin: '0 auto', width: '100%', position: 'relative', zIndex: 3 }}>
-        {/* Sandbox Entry */}
+        {/* Sandbox Entry — gated behind the VITE_SHOW_SANDBOX feature flag. */}
+        {SHOW_SANDBOX && (
         <div
           style={{
             backgroundColor: theme.materials.corruptionEmber,
@@ -357,6 +359,7 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
             ENTER SANDBOX
           </SoulsButton>
         </div>
+        )}
 
         {/* Acts Accordion */}
         {CAMPAIGN_DATA.map((act) => {
