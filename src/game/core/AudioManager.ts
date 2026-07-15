@@ -265,6 +265,13 @@ class AudioManagerImpl {
     }
     const start = performance.now();
     const step = (now: number) => {
+      // The sound can be destroyed between frames (scene teardown / game
+      // restart), which nulls its internals — setVolume would then throw.
+      // Bail cleanly instead of crashing the rAF loop.
+      if ((sound as { pendingRemove?: boolean }).pendingRemove || !(sound as { manager?: unknown }).manager) {
+        onDone?.();
+        return;
+      }
       const t = Math.min(1, (now - start) / durationMs);
       setVol(from + (to - from) * t);
       if (t < 1) {
