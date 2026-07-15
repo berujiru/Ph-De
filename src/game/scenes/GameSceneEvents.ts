@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import type { GameScene } from './GameScene';
-import { uiToGameEvents } from '../core/GameEvents';
+import { uiToGameEvents, beginRallyLoad } from '../core/GameEvents';
 import { type HeroId, HERO_DEFINITIONS } from '../data/heroes';
 import { type EnemyId, ENEMY_DEFINITIONS } from '../data/enemies';
 import { applyDrop } from './GameSceneDrops';
@@ -62,6 +62,10 @@ export function setupUIEvents(scene: GameScene): () => void {
 
   const unsubRestart = uiToGameEvents.on('restart', (data) => {
     if (!scene.sys) return;
+    // Reset the loading latch up front (synchronously, before Phaser processes
+    // the restart) so the overlay shows loading until buildGame re-signals ready
+    // — for both the scene.restart and resetGame paths below.
+    beginRallyLoad();
     scene.isSandbox = data?.mode === 'sandbox';
     if (data?.act != null && data?.stageIdx != null) {
       scene.scene.restart(data);

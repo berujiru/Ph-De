@@ -4,7 +4,7 @@ import { Hero } from '../entities/Hero';
 import { Enemy } from '../entities/Enemy';
 import { Summon } from '../entities/Summon';
 import { Attack } from '../entities/Attacks';
-import { gameToUiEvents, type GameStateSnapshot } from '../core/GameEvents';
+import { gameToUiEvents, markRallyReady, setRallyLoadProgress, type GameStateSnapshot } from '../core/GameEvents';
 import { BARRICADE_DEFAULTS } from '../data/constants';
 import { enemySizeClass } from '../data/enemies';
 import { computeKillPool, voiceDropCost } from '../data/drops';
@@ -92,6 +92,14 @@ export class GameScene extends Phaser.Scene {
   }
 
   preload() {
+    // Relay Phaser loader progress to the rally loading overlay. Registered
+    // BEFORE any file is queued so no early progress tick is missed. On a warm
+    // restart every asset is cached and the loader may process 0 files (and
+    // thus never emit 'progress'), so 'complete' force-fills the bar — the
+    // actual reveal is gated on the build finishing (markRallyReady in create).
+    this.load.on('progress', (value: number) => setRallyLoadProgress(value));
+    this.load.once('complete', () => setRallyLoadProgress(1));
+
     // Audio: register every available sound file (data-driven, same pattern as
     // the art loops below). Keys not yet backed by a real file are simply skipped.
     preloadAudio(this);
@@ -240,11 +248,6 @@ export class GameScene extends Phaser.Scene {
       }
     });
 
-    // Relay Phaser loader progress to React so the rally loading overlay
-    // can show a real progress bar instead of a fake one.
-    this.load.on('progress', (value: number) => {
-      gameToUiEvents.emit('loadProgress', { progress: value });
-    });
   }
 
   create(): void {
@@ -265,9 +268,6 @@ export class GameScene extends Phaser.Scene {
 
     this.events.once('shutdown', cleanup);
     this.events.once('destroy', cleanup);
-
-    // Tell React the scene is fully built and ready to play.
-    gameToUiEvents.emit('sceneReady', undefined);
   }
 
   public resetGame(): void {
@@ -359,6 +359,12 @@ export class GameScene extends Phaser.Scene {
     this.rouletteHighlighter.setDepth(100);
 
     this.emitState(true);
+
+    // The rally is fully built and every asset it touched is decoded (on the
+    // scene.restart path create() — and thus this — runs only after the preload
+    // loader completes). Latch readiness so the loading overlay can reveal.
+    // Covers both build paths: fresh create() AND the sandbox resetGame().
+    markRallyReady();
   }
 
   update(_time: number, delta: number): void {

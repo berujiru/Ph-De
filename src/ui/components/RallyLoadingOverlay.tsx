@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { theme } from '../theme';
 import { MegaphoneIcon, RaisedFistIcon } from '../icons';
-import { gameToUiEvents } from '../../game/core/GameEvents';
+import { gameToUiEvents, getRallyLoadState } from '../../game/core/GameEvents';
 
 interface RallyLoadingOverlayProps {
   /** Called once assets are loaded and the scene is built — safe to reveal the game. */
@@ -24,8 +24,10 @@ const RALLY_TIPS = [
  * Fades out once everything is ready, then tells the parent via onReady().
  */
 export function RallyLoadingOverlay({ onReady }: RallyLoadingOverlayProps) {
-  const [progress, setProgress] = useState(0);
-  const [sceneReady, setSceneReady] = useState(false);
+  // Seed from the latched state so we can't miss a signal that fired between the
+  // restart request and this component mounting (see GameEvents rally latch).
+  const [progress, setProgress] = useState(() => Math.round(getRallyLoadState().progress * 100));
+  const [sceneReady, setSceneReady] = useState(() => getRallyLoadState().ready);
   const [fadingOut, setFadingOut] = useState(false);
   const onReadyRef = useRef(onReady);
   onReadyRef.current = onReady;
@@ -41,20 +43,33 @@ export function RallyLoadingOverlay({ onReady }: RallyLoadingOverlayProps) {
       setSceneReady(true);
     });
 
+    // Re-read the latch now that we're subscribed: readiness may have latched
+    // between the initial render and this effect (subscribe race).
+    const snap = getRallyLoadState();
+    setProgress(Math.round(snap.progress * 100));
+    if (snap.ready) setSceneReady(true);
+
+    // Safety net: never hard-hang the overlay if a readiness signal is somehow
+    // lost. Assets decode well under this budget on real devices.
+    const failsafe = setTimeout(() => setSceneReady(true), 15000);
+
     return () => {
       unsubProgress();
       unsubReady();
+      clearTimeout(failsafe);
     };
   }, []);
 
-  // When both conditions are met, start fade-out.
+  // Reveal once the scene has finished building. `sceneReady` only latches after
+  // buildGame() completes, which on the load path runs after every sprite +
+  // audio file is decoded — so this can't reveal a half-built rally.
   useEffect(() => {
-    if (sceneReady && progress >= 100 && !fadingOut) {
+    if (sceneReady && !fadingOut) {
       // Small pause so the "100% — Handa na!" text is visible.
       const t = setTimeout(() => setFadingOut(true), 400);
       return () => clearTimeout(t);
     }
-  }, [sceneReady, progress, fadingOut]);
+  }, [sceneReady, fadingOut]);
 
   // After fade animation, notify parent.
   useEffect(() => {
@@ -64,7 +79,8 @@ export function RallyLoadingOverlay({ onReady }: RallyLoadingOverlayProps) {
     }
   }, [fadingOut]);
 
-  const clamped = Math.min(progress, 100);
+  // Once ready, show a full bar even if a cached restart emitted no progress.
+  const clamped = sceneReady ? 100 : Math.min(progress, 100);
   // Cycle tips based on progress so the player sees multiple during a slow load.
   const tip = RALLY_TIPS[(tipIndex + Math.floor(clamped / 25)) % RALLY_TIPS.length];
 

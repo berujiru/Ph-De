@@ -118,3 +118,49 @@ export const gameToUiEvents = new TypedEmitter<GameToUiEvents>();
 
 /** Emits UI -> game (Phaser scene listens). */
 export const uiToGameEvents = new TypedEmitter<UiToGameEvents>();
+
+/**
+ * Latched rally-load state. The `loadProgress`/`sceneReady` events above are
+ * transient — a React overlay that subscribes in a `useEffect` (which runs
+ * after paint) can miss an emit that happened between render and subscribe,
+ * and warm/cached restarts may emit no `progress` at all. The overlay reads
+ * this snapshot on mount so it can never miss or hang on a readiness signal.
+ */
+export interface RallyLoadState {
+  /** Phaser loader progress for the pending rally build, 0‒1. */
+  progress: number;
+  /** True once the scene has finished building the rally (assets decoded + objects created). */
+  ready: boolean;
+}
+
+const rallyLoadState: RallyLoadState = { progress: 1, ready: true };
+
+/** Snapshot the rally-load latch. Read on overlay mount to defeat the subscribe race. */
+export function getRallyLoadState(): RallyLoadState {
+  return { ...rallyLoadState };
+}
+
+/** A rally build has started — reset the latch so the overlay shows loading. */
+export function beginRallyLoad(): void {
+  rallyLoadState.progress = 0;
+  rallyLoadState.ready = false;
+  gameToUiEvents.emit('loadProgress', { progress: 0 });
+}
+
+/** Update loader progress (0‒1) for the pending rally build. */
+export function setRallyLoadProgress(progress: number): void {
+  rallyLoadState.progress = progress;
+  gameToUiEvents.emit('loadProgress', { progress });
+}
+
+/**
+ * The rally scene is fully built and safe to reveal. Only call this once every
+ * asset the build touched is decoded (i.e. from create()/buildGame(), which
+ * Phaser runs *after* the preload loader completes).
+ */
+export function markRallyReady(): void {
+  rallyLoadState.progress = 1;
+  rallyLoadState.ready = true;
+  gameToUiEvents.emit('loadProgress', { progress: 1 });
+  gameToUiEvents.emit('sceneReady', undefined);
+}
