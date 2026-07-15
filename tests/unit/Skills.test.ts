@@ -142,17 +142,37 @@ describe('Hero Skills', () => {
     expect(ctx.visualEvents.some((evt: any) => evt.type === 'dragTo' && evt.target === e1)).toBe(true);
   });
 
-  it('construction_worker (Barrier) is temporarily disabled — spawns no wall', () => {
-    // The barrier skill is shelved for now (see Skills.ts). The hero stays
-    // deployable and the skill is a safe no-op: it must not emit a spawnBarrier.
+  it('construction_worker (Barrier) walls off the enemy front line', () => {
     const h1 = createDummyHero('construction_worker', 540, 0);
     h1.damage = 18;
+    // Frontmost enemy = largest y; the wall should land on it and span the lane.
+    const near = createDummyEnemy('near', 200, 900);
+    const far = createDummyEnemy('far', 800, 400);
+    const ctx = createDummyContext([h1], [near, far]);
+
+    applyHeroSkill('construction_worker', h1, ctx);
+
+    expect(ctx.onVisual).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'spawnBarrier',
+        startX: 540, // thrown from the hero
+        startY: 0,
+        x: 540, // lands centered on the lane (GAME_WIDTH / 2)
+        y: 900, // at the frontmost (largest-y) enemy's depth
+        widthPx: 420, // base length (no bonusRadius)
+        maxHp: 18 * 12, // base damage-scaled wall HP
+      }),
+    );
+  });
+
+  it('construction_worker (Barrier) falls back to mid-field with no enemies', () => {
+    const h1 = createDummyHero('construction_worker', 540, 0);
     const ctx = createDummyContext([h1]);
 
     applyHeroSkill('construction_worker', h1, ctx);
 
-    expect(ctx.onVisual).not.toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'spawnBarrier' }),
+    expect(ctx.onVisual).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'spawnBarrier', y: 960 }), // GAME_HEIGHT / 2
     );
   });
 

@@ -282,10 +282,28 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     onVisual({ type: 'healShield', amount: 150 });
     onVisual({ type: 'text', x: hero.x, y: hero.y - 20, text: 'HEAL!', color: '#10b981' });
   } else if (skillId === 'construction_worker') {
-    // Barrier skill temporarily DISABLED — the Construction Worker stays
-    // deployable but its wall no longer spawns. The spawnBarrier visual handler
-    // in GameSceneEvents is left intact so this is a one-line re-enable later.
-    onVisual({ type: 'text', x: hero.x, y: hero.y - 20, text: '…', color: '#d97706' });
+    // Yero Barricade: the builder HURLS a folded panel that arcs downrange (like
+    // the molotov) and unfolds into a destructible wall at the enemy front line.
+    // Deliberately a BASE-sized central wall (not lane-spanning) so the flanks
+    // stay open — Voice Drops make it longer (bonusRadius) and tougher
+    // (bonusDamage), per the skill description.
+    const bonusRadius = hero.modifiers?.bonusRadius || 0;
+    const bonusDamage = hero.modifiers?.bonusDamage || 0;
+    const living = enemies.filter(e => !e.isDead);
+    // Frontmost enemy = largest y (closest to the shield). Land the wall there;
+    // fall back to mid-field if the lane happens to be empty on cast.
+    const frontY = living.length
+      ? Math.max(...living.map(e => e.y))
+      : GAME_HEIGHT / 2;
+    onVisual({
+      type: 'spawnBarrier',
+      startX: hero.x,
+      startY: hero.y,
+      x: GAME_WIDTH / 2,
+      y: frontY,
+      widthPx: 420 + bonusRadius * 60,
+      maxHp: (hero.damage + bonusDamage * 2) * 12,
+    });
   } else if (skillId === 'farmer') {
     // Tree of Life: Summon an AoE golden tree that periodically roots and damages
     let target = null;

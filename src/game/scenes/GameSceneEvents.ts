@@ -461,18 +461,64 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
     if (evt.y !== undefined) tweenProps.y = evt.y;
     scene.tweens.add(tweenProps);
   } else if (evt.type === 'spawnBarrier') {
-    // Construction Worker's Barrier: a destructible wall Summon spanning the
-    // lane just ahead of (above) the shield front — world-anchored to the
-    // marching shield, inside the zone enemies must cross to engage it.
-    const width = evt.widthPx || 480;
+    // Construction Worker's Barrier: the builder hurls a folded panel that arcs
+    // downrange (like the molotov) and unfolds into a destructible wall where it
+    // lands — a base-sized central wall enemies must tear through to advance.
+    const width = evt.widthPx || 420;
     const height = width * (160 / 512); // barrier_wall.svg native aspect
     const y = evt.y !== undefined ? evt.y : (scene.shield.y - scene.shield.height / 2 - RALLY.engageRangePx);
+    const maxHp = evt.maxHp || 300;
+
     // tint 0xffffff = keep the art's baked colors (Summon skips the multiply).
-    const barrier = new Summon(scene, evt.x, y, evt.maxHp || 450, 0xd97706, {
-      artKey: 'barrier_wall', tint: 0xffffff,
-      displayWidth: width, displayHeight: height,
-    });
-    scene.summons.push(barrier);
+    const unfoldWall = () => {
+      const barrier = new Summon(scene, evt.x, y, maxHp, 0xd97706, {
+        artKey: 'barrier_wall', tint: 0xffffff,
+        displayWidth: width, displayHeight: height,
+      });
+      scene.summons.push(barrier);
+    };
+
+    if (evt.startX === undefined || evt.startY === undefined) {
+      unfoldWall();
+    } else {
+      // Thrown-panel arc: a small spinning barrier_wall lobs to the landing spot.
+      const panel = scene.add.image(evt.startX, evt.startY, 'barrier_wall');
+      panel.setOrigin(0.5, 0.5);
+      panel.setDisplaySize(width * 0.4, height * 0.4);
+      panel.setDepth(50);
+
+      const controlX = evt.startX + (evt.x - evt.startX) / 2;
+      const controlY = Math.min(evt.startY, y) - 200; // arc height
+      const curve = new Phaser.Curves.QuadraticBezier(
+        new Phaser.Math.Vector2(evt.startX, evt.startY),
+        new Phaser.Math.Vector2(controlX, controlY),
+        new Phaser.Math.Vector2(evt.x, y),
+      );
+
+      const pathData = { t: 0 };
+      scene.tweens.add({
+        targets: pathData,
+        t: 1,
+        duration: 550,
+        ease: 'Sine.easeIn',
+        onUpdate: () => {
+          const p = curve.getPoint(pathData.t);
+          panel.setPosition(p.x, p.y);
+          panel.rotation += 0.2;
+        },
+        onComplete: () => {
+          panel.destroy();
+          spawnShockwaveRing(scene, {
+            x: evt.x, y,
+            color: 0xd97706,
+            startRadius: 20, endRadius: width * 0.35,
+            fillAlpha: 0.4, strokeWidth: 4, durationMs: 300, ease: 'Linear',
+          });
+          cameraPunch(scene, FX.cameraShake.shieldHit);
+          unfoldWall();
+        },
+      });
+    }
   } else if (evt.type === 'spawnTrap') {
     const visual = {
       artKey: attackArtKey('ice-trap'),
