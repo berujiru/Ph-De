@@ -48,16 +48,14 @@ export function spawnEnemy(scene: GameScene, enemyId: EnemyId = 'grunt', wave: n
     : 1;
   const stageMult = stageStatMultipliers(stage);
   
-  // Bosses are authored at wave-20 power (wave scaling exempt) but still
-  // scale with campaign progress so later acts feel harder.
+  // Bosses fight at their authored full power everywhere — exempt from BOTH
+  // wave AND campaign stage scaling, so an early-act boss hits just as hard as a
+  // late-act one (they're authored at top-end power and can be replayed). Only
+  // rank-and-file enemies scale with wave and stage.
   if (!def.id.startsWith('boss_')) {
     def.maxHp = Math.round(def.maxHp * waveMult.hp * stageMult.hp);
     def.damage = Math.round(def.damage * waveMult.damage * stageMult.damage);
     def.speed = def.speed * waveMult.speed * Math.min(stageMult.speed, 1.15);
-  } else {
-    def.maxHp = Math.round(def.maxHp * stageMult.hp);
-    def.damage = Math.round(def.damage * stageMult.damage);
-    def.speed = def.speed * Math.min(stageMult.speed, 1.10);
   }
   
   const enemy = new Enemy(scene, x, y, def);

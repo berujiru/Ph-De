@@ -22,3 +22,26 @@ export function globalStageNumber(act: number, stageIdx: number): number {
 export function actForStage(stage: number): number {
   return stage >= FINALE_STAGE ? FINALE_ACT : Math.ceil(stage / STAGES_PER_ACT);
 }
+
+/**
+ * Progression prerequisite: which already-cleared stage a stage needs to become
+ * playable. Boss stages (each act's LAST stage) are OPTIONAL — clearing an act's
+ * pre-boss stage opens BOTH the boss (replayable, non-blocking) and the next
+ * act's first stage, so a boss never gates campaign progress.
+ *   - Stage 1: none (campaign start) → 0.
+ *   - First stage of an act (G % STAGES_PER_ACT === 1): the previous act's
+ *     pre-boss stage (G − 2); the boss between them (G − 1) is skippable.
+ *   - Any other stage, including a boss: the stage right before it (G − 1).
+ */
+export function stagePrerequisite(globalStage: number): number {
+  if (globalStage <= 1) return 0;
+  const isActFirst = (globalStage - 1) % STAGES_PER_ACT === 0;
+  return isActFirst ? globalStage - 2 : globalStage - 1;
+}
+
+/** Whether a stage is playable, given the set of already-cleared stage ids. */
+export function isStageUnlocked(globalStage: number, cleared: ReadonlySet<number>): boolean {
+  if (globalStage <= 1) return true;
+  if (cleared.has(globalStage)) return true; // a beaten stage stays replayable
+  return cleared.has(stagePrerequisite(globalStage));
+}

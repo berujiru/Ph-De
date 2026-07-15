@@ -1,13 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   addHeroCards,
+  getClearedStages,
   getHeroCardCount,
   getHeroCards,
   getHeroLevel,
+  getHighestClearedStage,
   getHope,
   getPermits,
   getStoreUnlockedHeroes,
+  isStageCleared,
   levelUpHero,
+  recordStageClear,
   resetMetaStateForTests,
   subscribeMetaState,
 } from '../../src/game/data/metaState';
@@ -49,6 +53,29 @@ describe('migration from a pre-cards save', () => {
     // New fields silently default.
     expect(getHeroCards()).toEqual({});
     expect(getHeroLevel('baker')).toBe(1);
+    // clearedStages back-fills from the old linear high-water mark (1..7).
+    expect(getClearedStages()).toEqual([1, 2, 3, 4, 5, 6, 7]);
+  });
+});
+
+describe('recordStageClear', () => {
+  it('tracks each beaten stage and can hold gaps (skipped bosses)', () => {
+    recordStageClear(9, 3);
+    // Skip the Act 1 boss (10), beat the Act 2 opener (11).
+    recordStageClear(11, 1);
+
+    expect(isStageCleared(9)).toBe(true);
+    expect(isStageCleared(11)).toBe(true);
+    expect(isStageCleared(10)).toBe(false); // boss stays unbeaten
+    expect(getClearedStages()).toEqual([9, 11]);
+    // Highest cleared still tracks the furthest reached (hero-unlock signal).
+    expect(getHighestClearedStage()).toBe(11);
+  });
+
+  it('does not double-record a re-cleared stage', () => {
+    recordStageClear(3, 1);
+    recordStageClear(3, 2); // replay for more stars
+    expect(getClearedStages()).toEqual([3]);
   });
 });
 

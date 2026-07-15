@@ -1,7 +1,8 @@
 import { useEffect, useReducer, useState } from 'react';
 import { theme } from '../theme';
 import { SHOW_SANDBOX } from '../../featureFlags';
-import { getStageStars, getHighestClearedStage, getPermits, subscribeMetaState } from '../../game/data/metaState';
+import { getStageStars, getHighestClearedStage, getClearedStages, getPermits, subscribeMetaState } from '../../game/data/metaState';
+import { isStageUnlocked } from '../../game/data/campaign';
 import { type MapSkinId, skinsForAct } from '../../game/data/mapSkins';
 import {
   CheckIcon,
@@ -232,7 +233,12 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
 
   const stageStars = getStageStars();
   const highestClearedStage = getHighestClearedStage();
+  const cleared = new Set(getClearedStages());
   const permits = getPermits();
+
+  // Campaign scope: total acts (incl. the finale) and how many are fully cleared.
+  const totalActs = CAMPAIGN_DATA.length;
+  const actsCleared = CAMPAIGN_DATA.filter((a) => a.stages.every((s) => cleared.has(s.id))).length;
 
   // Switch acts when player scrolls or clicks tabs
   // Find which act contains the highest cleared stage to default open it
@@ -300,6 +306,28 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
           <div style={{ color: theme.colors.textMuted, fontSize: 14, opacity: 0.7, textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
             Barangay to Bayan to the whole archipelago — one street at a time.
           </div>
+          {/* Campaign scope — total acts and how many are fully secured. */}
+          <div
+            aria-label={`${actsCleared} of ${totalActs} acts secured`}
+            style={{
+              marginTop: 10,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              fontSize: 12,
+              fontWeight: 800,
+              letterSpacing: 1,
+              textTransform: 'uppercase',
+              color: theme.colors.textSecondary,
+              border: `1px solid rgba(234,88,12,0.25)`,
+              borderRadius: 999,
+              padding: '4px 12px',
+              backgroundColor: theme.colors.surfaceGlass,
+            }}
+          >
+            <span style={{ color: theme.colors.accent, fontWeight: 900 }}>{actsCleared}</span>
+            <span style={{ opacity: 0.75 }}>/ {totalActs} Acts</span>
+          </div>
         </div>
 
         {/* Permit balance — the energy that pays for every run */}
@@ -364,12 +392,13 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
         {/* Acts Accordion */}
         {CAMPAIGN_DATA.map((act) => {
           const firstStageId = act.stages[0].id;
-          const isActUnlocked = highestClearedStage >= firstStageId - 1;
+          // An act opens once its first stage is playable — which happens after
+          // the previous act's pre-boss stage, so the prior boss can be skipped.
+          const isActUnlocked = isStageUnlocked(firstStageId, cleared);
+          // The boss anchoring this act's final stage — shown as the act's emblem.
+          const actBossId = bossForStage(act.id, act.stages.length - 1);
           const isExpanded = selectedActId === act.id;
-          const actClearedStages = Math.max(
-            0,
-            Math.min(act.stages.length, highestClearedStage - (firstStageId - 1)),
-          );
+          const actClearedStages = act.stages.filter((s) => cleared.has(s.id)).length;
 
           return (
             <div
@@ -410,21 +439,37 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                   boxShadow: isExpanded ? 'inset 0 -1px 12px rgba(234,88,12,0.08)' : 'none',
                 }}
               >
-                {/* Tier map thumbnail */}
-                <img
-                  src={act.map}
-                  alt=""
+                {/* Act boss TCG card — the act's emblem (replaces the map thumbnail) */}
+                <div
+                  aria-label={`Act boss: ${ENEMY_DEFINITIONS[actBossId]?.name ?? actBossId}`}
                   style={{
-                    width: 58,
+                    width: 62,
                     height: 88,
-                    objectFit: 'cover',
-                    borderRadius: 6,
-                    border: `2px solid ${isActUnlocked ? theme.materials.metalDark : 'rgba(63,63,70,0.4)'}`,
-                    filter: isActUnlocked ? 'saturate(0.7) brightness(0.85)' : 'grayscale(100%) brightness(0.35)',
-                    boxShadow: isActUnlocked ? '0 0 6px rgba(234,88,12,0.15)' : 'none',
                     flexShrink: 0,
+                    position: 'relative',
+                    borderRadius: 6,
+                    overflow: 'hidden',
+                    backgroundColor: '#0c0a09',
+                    border: `2px solid ${isActUnlocked ? theme.materials.metalDark : 'rgba(63,63,70,0.4)'}`,
+                    boxShadow: isActUnlocked ? '0 0 6px rgba(234,88,12,0.15)' : 'none',
+                    filter: isActUnlocked ? 'none' : 'grayscale(100%) brightness(0.4)',
                   }}
-                />
+                >
+                  <div
+                    style={{
+                      // 62 / 300 (card native width) — shows the card's portrait-
+                      // focused top, clipped to the thumbnail box.
+                      transform: 'scale(0.2067)',
+                      transformOrigin: 'top left',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    <EnemyTcgCard enemyId={actBossId} />
+                  </div>
+                </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 3 }}>
@@ -483,10 +528,13 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                 <div style={{ padding: 16, backgroundColor: 'rgba(9, 9, 11, 0.6)' }}>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     {act.stages.map((stageEntry, stageIdx) => {
-                      // State: is this stage cleared, next-to-play, or locked?
-                      const isCleared = stageEntry.id <= highestClearedStage;
-                      const isNext = stageEntry.id === highestClearedStage + 1;
-                      const isLocked = !isCleared && !isNext;
+                      // State: is this stage cleared, playable-but-unbeaten, or
+                      // locked? Multiple stages can be available at once now — a
+                      // skippable boss and the next act's opener both unlock off
+                      // the same pre-boss clear.
+                      const isCleared = cleared.has(stageEntry.id);
+                      const isLocked = !isCleared && !isStageUnlocked(stageEntry.id, cleared);
+                      const isNext = !isCleared && !isLocked;
                       const isLast = stageIdx === act.stages.length - 1;
                       const stars = stageStars[stageEntry.id] || 0;
                       // What anchors the stage's final wave (a boss only every

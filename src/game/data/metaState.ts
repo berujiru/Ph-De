@@ -12,7 +12,10 @@ const STORAGE_KEY = 'firstripple.meta';
 export interface MetaStateData {
   hope: number;
   permits: number;
+  /** Furthest stage reached — kept as the max cleared id (hero-unlock signal). */
   highestClearedStage: number;
+  /** Every stage id actually beaten. Bosses are optional, so this can have gaps. */
+  clearedStages: number[];
   stageStars: Record<number, number>;
   storeUnlockedHeroes: HeroId[];
   /** Owned Hero Cards per hero (absent key = 0). Spent to level heroes up. */
@@ -25,6 +28,7 @@ const DEFAULT_STATE: MetaStateData = {
   hope: 0,
   permits: 25,
   highestClearedStage: 0,
+  clearedStages: [],
   stageStars: {},
   storeUnlockedHeroes: [],
   heroCards: {},
@@ -36,10 +40,16 @@ function readStorage(): MetaStateData {
     const raw = globalThis.localStorage?.getItem(STORAGE_KEY);
     if (!raw) return { ...DEFAULT_STATE };
     const parsed = JSON.parse(raw) as Partial<MetaStateData>;
+    const highestClearedStage = typeof parsed.highestClearedStage === 'number' ? parsed.highestClearedStage : DEFAULT_STATE.highestClearedStage;
     return {
       hope: typeof parsed.hope === 'number' ? parsed.hope : DEFAULT_STATE.hope,
       permits: typeof parsed.permits === 'number' ? parsed.permits : DEFAULT_STATE.permits,
-      highestClearedStage: typeof parsed.highestClearedStage === 'number' ? parsed.highestClearedStage : DEFAULT_STATE.highestClearedStage,
+      highestClearedStage,
+      // Migration: pre-set-tracking saves only had highestClearedStage; back then
+      // progression was strictly linear, so every stage 1..N was cleared.
+      clearedStages: Array.isArray(parsed.clearedStages)
+        ? parsed.clearedStages.filter((n): n is number => typeof n === 'number')
+        : Array.from({ length: Math.max(0, highestClearedStage) }, (_, i) => i + 1),
       stageStars: parsed.stageStars && typeof parsed.stageStars === 'object' ? parsed.stageStars : DEFAULT_STATE.stageStars,
       storeUnlockedHeroes: Array.isArray(parsed.storeUnlockedHeroes) ? parsed.storeUnlockedHeroes : DEFAULT_STATE.storeUnlockedHeroes,
       // Migration: saves written before Hero Cards existed lack these keys and
@@ -89,6 +99,14 @@ export function getPermits(): number {
 
 export function getHighestClearedStage(): number {
   return state.highestClearedStage;
+}
+
+export function getClearedStages(): number[] {
+  return state.clearedStages;
+}
+
+export function isStageCleared(stageId: number): boolean {
+  return state.clearedStages.includes(stageId);
 }
 
 export function getStageStars(): Record<number, number> {
@@ -182,16 +200,20 @@ export function recordStageClear(stageId: number, stars: number) {
   const currentStars = state.stageStars[stageId] || 0;
   let changed = false;
   let newState = { ...state };
-  
+
   if (stars > currentStars) {
     newState.stageStars = { ...newState.stageStars, [stageId]: stars };
+    changed = true;
+  }
+  if (!state.clearedStages.includes(stageId)) {
+    newState.clearedStages = [...state.clearedStages, stageId];
     changed = true;
   }
   if (stageId > newState.highestClearedStage) {
     newState.highestClearedStage = stageId;
     changed = true;
   }
-  
+
   if (changed) {
     state = newState;
     notify();
