@@ -230,9 +230,13 @@ export class GameScene extends Phaser.Scene {
         });
       }
       
-      // Load UI portrait for mini-card (fallback handled if missing)
-      const uiPortraitKey = `${heroId}_ui_portrait`;
-      this.load.image(uiPortraitKey, `/assets/heroes/${heroId}_portrait.png`);
+      // Load UI portrait for mini-card (fallback handled if missing). Sandbox
+      // test units ship no portrait art, so skip them — otherwise Phaser's
+      // loader logs a "Failed to process file" 404 for each on every rally.
+      if (!heroId.startsWith('sandbox_')) {
+        const uiPortraitKey = `${heroId}_ui_portrait`;
+        this.load.image(uiPortraitKey, `/assets/heroes/${heroId}_portrait.png`);
+      }
     }
 
     Object.values(HERO_DEFINITIONS).forEach((hero) => {
