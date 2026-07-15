@@ -27,7 +27,14 @@ export interface WaveDefinition {
   events: WaveEvent[];
 }
 
-export const TOTAL_WAVES = 20;
+export const TOTAL_WAVES = 15;
+
+/**
+ * Opening-stage (Act 1 / Stage 1) enemy-COUNT scale. HP is already eased by the
+ * stage baseline (1.0×); this thins the crowd on the tutorial stage only so new
+ * players aren't swarmed. Applied per-spawn in buildWaveTable, min 1.
+ */
+export const OPENING_STAGE_COUNT_SCALE = 0.6;
 
 /** Breather between clearing one wave and the next one starting. */
 export const INTER_WAVE_DELAY_MS = 3500;
@@ -148,9 +155,10 @@ const delay = (durationMs: number): WaveEvent => ({ type: 'delay', durationMs })
 const warning = (alertType: 'boss' | 'swarm' | 'mini-boss', text: string, durationMs = 1500): WaveEvent => ({ type: 'warning', alertType, text, durationMs });
 
 /**
- * The 20-wave battle script (155 authored kills). Wave 20 injects the stage's
- * boss. Split/summon spawns are bonus kills on top of the authored count —
- * excluded from the drop pool on purpose (see balance.ts kill-pool doctrine).
+ * The 15-wave battle script (~101 authored kills for the null-coord table).
+ * Wave 15 injects the stage's boss. Split/summon spawns are bonus kills on top
+ * of the authored count — excluded from the drop pool on purpose (see balance.ts
+ * kill-pool doctrine).
  *
  * Pass the campaign coordinates to gate the roster: enemies that haven't
  * reached their debut stage (data/enemyUnlocks.ts) are substituted 1:1 with a
@@ -158,14 +166,23 @@ const warning = (alertType: 'boss' | 'swarm' | 'mini-boss', text: string, durati
  * kill pool. The boss itself only appears on boss stages (isBossStage);
  * other stages close on a mini-boss final push of the same spawn count.
  * Null coordinates (sandbox quick-start) run the full boss script.
+ *
+ * The opening stage (Act 1 / Stage 1) additionally thins every spawn count by
+ * OPENING_STAGE_COUNT_SCALE so newcomers aren't swarmed.
  */
 export function buildWaveTable(
   bossId: EnemyId,
   act: number | null = null,
   stageIdx: number | null = null,
 ): WaveDefinition[] {
+  const isOpener = act === 1 && stageIdx === 0;
   const spawn = (enemyId: EnemyId, count: number, intervalMs: number): WaveEvent =>
-    ({ type: 'spawn', enemyId: gateEnemyForStage(enemyId, act, stageIdx), count, intervalMs });
+    ({
+      type: 'spawn',
+      enemyId: gateEnemyForStage(enemyId, act, stageIdx),
+      count: isOpener ? Math.max(1, Math.round(count * OPENING_STAGE_COUNT_SCALE)) : count,
+      intervalMs,
+    });
   
   let finale: WaveEvent[];
   if (isBossStage(act, stageIdx)) {
@@ -191,19 +208,14 @@ export function buildWaveTable(
     { waveNumber: 12, events: [spawn('runner', 5, 700), spawn('tender_rigger', 3, 1300), spawn('epal', 1, 1000)] },
     { waveNumber: 13, events: [spawn('land_grabber', 2, 2000), spawn('grunt', 4, 1100), spawn('shell_company', 2, 1400)] },
     { waveNumber: 14, events: [spawn('bribery', 2, 2200), spawn('runner', 5, 700)] },
-    { waveNumber: 15, events: [warning('mini-boss', '⚠ MINI-BOSS INCOMING ⚠'), spawn('hoarder', 1, 1000), spawn('crony_bodyguard', 2, 2500), spawn('grunt', 4, 1100)] },
-    { waveNumber: 16, events: [warning('swarm', '⚠ SWARM INCOMING ⚠'), spawn('runner', 12, 500), spawn('kickback_courier', 2, 900)] },
-    { waveNumber: 17, events: [spawn('brute', 3, 1800), spawn('ghost_employee', 3, 1000), spawn('the_overpriced', 2, 1500)] },
-    { waveNumber: 18, events: [spawn('land_grabber', 2, 2000), spawn('shell_company', 3, 1400), spawn('tender_rigger', 3, 1300)] },
-    { waveNumber: 19, events: [warning('swarm', '⚠ SWARM INCOMING ⚠'), spawn('shell_company', 3, 1400), spawn('epal', 2, 1000), spawn('runner', 5, 700)] },
-    { waveNumber: 20, events: finale },
+    { waveNumber: 15, events: finale },
   ]);
 }
 
 /**
- * Authored kill pool = sum of all spawn counts across the table. Feeds the
- * voice-drop cadence (voiceDropCost) so a full clear yields exactly
- * targetDropsPerRun drops.
+ * Authored kill pool = sum of all spawn counts across the table. A useful
+ * balance signal for session length (the voice-drop cadence itself now derives
+ * from the wave count, not this pool — see data/drops.ts voiceDropCost).
  */
 export function authoredKillCount(waves: WaveDefinition[]): number {
   let total = 0;

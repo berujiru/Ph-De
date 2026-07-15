@@ -82,13 +82,19 @@ describe('buildWaveTable — stage-gated roster', () => {
     expect(gated).toEqual(authored);
   });
 
-  it('gating never changes the authored kill pool', () => {
+  it('gating never changes the authored kill pool (except the eased opener)', () => {
     const baseline = authoredKillCount(buildWaveTable(bossForStage(1, 0)));
     for (let act = 1; act <= 4; act++) {
       for (let stageIdx = 0; stageIdx < 10; stageIdx++) {
         const table = buildWaveTable(bossForStage(act, stageIdx), act, stageIdx);
         expect(table).toHaveLength(TOTAL_WAVES);
-        expect(authoredKillCount(table)).toBe(baseline);
+        if (act === 1 && stageIdx === 0) {
+          // Opening stage is intentionally thinned (OPENING_STAGE_COUNT_SCALE),
+          // so its pool is lighter than the gating-only baseline.
+          expect(authoredKillCount(table)).toBeLessThan(baseline);
+        } else {
+          expect(authoredKillCount(table)).toBe(baseline);
+        }
       }
     }
   });
@@ -105,7 +111,7 @@ describe('buildWaveTable — stage-gated roster', () => {
 });
 
 describe('buildWaveTable — boss cadence', () => {
-  it(`a boss anchors wave 20 only every ${BOSS_STAGE_INTERVAL}th stage (and the finale)`, () => {
+  it(`a boss anchors the final wave only every ${BOSS_STAGE_INTERVAL}th stage (and the finale)`, () => {
     for (let act = 1; act <= 4; act++) {
       for (let stageIdx = 0; stageIdx < 10; stageIdx++) {
         const globalStage = (act - 1) * 10 + stageIdx + 1;

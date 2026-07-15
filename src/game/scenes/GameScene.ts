@@ -7,7 +7,7 @@ import { Attack } from '../entities/Attacks';
 import { gameToUiEvents, markRallyReady, setRallyLoadProgress, type GameStateSnapshot } from '../core/GameEvents';
 import { BARRICADE_DEFAULTS } from '../data/constants';
 import { enemySizeClass } from '../data/enemies';
-import { computeKillPool, voiceDropCost } from '../data/drops';
+import { voiceDropCost } from '../data/drops';
 import { type HeroId, HERO_DEFINITIONS } from '../data/heroes';
 import { allAttackArtStems, attackArtKey, attackArtPath } from '../data/attackArt';
 import { preloadAudio, SFX, MUSIC, bossThemeForAct } from '../data/soundRegistry';
@@ -345,7 +345,7 @@ export class GameScene extends Phaser.Scene {
     this.waveManager = new WaveManager(buildWaveTable(bossForStage(this.currentAct, this.currentStageIdx), this.currentAct, this.currentStageIdx), INTER_WAVE_DELAY_MS);
     this.dropIndex = 0;
     this.dropRollSeed = 0;
-    this.maxVoicesCount = voiceDropCost(0, computeKillPool(this.totalWaves));
+    this.maxVoicesCount = voiceDropCost(0, this.totalWaves);
     this.isPaused = false;
     this.syncVisualPauseState();
     this.gameSpeed = 1;

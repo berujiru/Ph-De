@@ -4,18 +4,6 @@ import { HERO_DEFINITIONS } from '../../src/game/data/heroes';
 import { resolveAttackSpeed } from '../../src/game/data/attackSpeed';
 import { VOICE_DROP_TUNING, computeKillPool, voiceDropCost } from '../../src/game/data/drops';
 
-/** How many drops actually land as kills accumulate across a pool of `pool`. */
-function dropsInPool(pool: number): number {
-  let cumulative = 0;
-  let drops = 0;
-  for (let k = 0; k < 1000; k++) {
-    cumulative += voiceDropCost(k, pool);
-    if (cumulative <= pool) drops++;
-    else break;
-  }
-  return drops;
-}
-
 /**
  * Guards the invariants docs/ADDING_ENEMIES.md and docs/TESTING.md promise:
  * balance data stays internally consistent even as content is added.
@@ -74,34 +62,36 @@ describe('voice-drop cadence (docs/VOICE_DROPS.md)', () => {
   });
 
   it('the first drop costs firstDropCost', () => {
-    expect(voiceDropCost(0, 30)).toBe(VOICE_DROP_TUNING.firstDropCost);
-    expect(voiceDropCost(0, 60)).toBe(VOICE_DROP_TUNING.firstDropCost);
+    expect(voiceDropCost(0, 15)).toBe(VOICE_DROP_TUNING.firstDropCost);
+    expect(voiceDropCost(0, 20)).toBe(VOICE_DROP_TUNING.firstDropCost);
   });
 
-  it('lands ~targetDropsPerRun drops across a realistic pool (20 waves)', () => {
-    const pool = computeKillPool(20, 5); // 1050 kills
-    // Because of rounding, it might land exactly targetDropsPerRun, or off by 1
-    const drops = dropsInPool(pool);
-    expect(Math.abs(drops - VOICE_DROP_TUNING.targetDropsPerRun)).toBeLessThanOrEqual(1);
+  it('per-drop cost doubles, then holds at the wave count', () => {
+    // 15 waves: 2, 4, 8, then min(16,15)=15 and steady after.
+    expect([0, 1, 2, 3, 4, 5].map((k) => voiceDropCost(k, 15))).toEqual([2, 4, 8, 15, 15, 15]);
   });
 
-  it('re-scales to still land ~targetDropsPerRun when the pool doubles', () => {
-    const pool = computeKillPool(20, 5) * 2; // 2100 kills
-    const drops = dropsInPool(pool);
-    expect(Math.abs(drops - VOICE_DROP_TUNING.targetDropsPerRun)).toBeLessThanOrEqual(1);
+  it('cumulative kills to each drop follow 2, 6, 14, 29, 44 (15 waves)', () => {
+    const cumulative: number[] = [];
+    let total = 0;
+    for (let k = 0; k < 5; k++) {
+      total += voiceDropCost(k, 15);
+      cumulative.push(total);
+    }
+    expect(cumulative).toEqual([2, 6, 14, 29, 44]);
   });
 
   it('thresholds are monotonically non-decreasing', () => {
-    for (const pool of [100, 500, 1050]) {
+    for (const waves of [10, 15, 20]) {
       for (let k = 1; k < 12; k++) {
-        expect(voiceDropCost(k, pool)).toBeGreaterThanOrEqual(voiceDropCost(k - 1, pool));
+        expect(voiceDropCost(k, waves)).toBeGreaterThanOrEqual(voiceDropCost(k - 1, waves));
       }
     }
   });
 
-  it('never returns a non-positive threshold, even for a tiny pool', () => {
+  it('never returns a non-positive threshold, even for a tiny wave count', () => {
     for (let k = 0; k < 8; k++) {
-      expect(voiceDropCost(k, 4)).toBeGreaterThanOrEqual(1);
+      expect(voiceDropCost(k, 3)).toBeGreaterThanOrEqual(1);
     }
   });
 });

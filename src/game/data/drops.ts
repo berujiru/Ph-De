@@ -4,10 +4,9 @@ import type { HeroDefinition } from './heroes';
 // VOICE-DROP PROGRESSION  (design: docs/VOICE_DROPS.md)
 // ----------------------------------------------------------------------------
 // Kills fill the Voices meter; a full meter triggers one RNG drop, then the
-// requirement scales up. The cadence is derived from the run's TOTAL kill pool
-// so a full clear always yields ~targetDropsPerRun drops, and it re-scales for
-// free if wave counts change. Replaces the old "start at 3, +1 forever" rule,
-// which was decoupled from how many kills a run actually offers.
+// requirement scales up. The cadence DOUBLES each drop (2, 4, 8, …) so early
+// companions arrive fast, then holds at the wave count so late drops keep
+// arriving at a steady ~one-per-wave-worth pace instead of drifting far apart.
 // ============================================================================
 
 /**
@@ -19,14 +18,6 @@ export const MAX_ACTIVE_HEROES = 5;
 export const VOICE_DROP_TUNING = {
   /** Kills required for the very first drop. Small, so a companion arrives fast. */
   firstDropCost: 2,
-  /**
-   * How many drop EVENTS a full clear should yield (4 fill Eden's squad, the
-   * rest are enhancements). Must stay <= TOTAL_WAVES (data/waves.ts) — at most
-   * one drop per wave on average; tests/unit/balance.test.ts enforces it.
-   */
-  targetDropsPerRun: 20,
-  /** Floor on the per-drop increment so late drops never get cheaper than this. */
-  minIncrement: 1,
 } as const;
 
 /**
@@ -41,21 +32,22 @@ export function computeKillPool(totalWaves: number, baseWaveSize = 5): number {
 }
 
 /**
- * Incremental voices required before drop #dropIndex (0-based) fires, given
- * the run's kill pool. Linear-growth thresholds tuned so exactly
- * targetDropsPerRun drops land across the pool.
+ * Kills required before drop #dropIndex (0-based) fires. The per-drop cost
+ * DOUBLES from firstDropCost, then holds at the wave count so it never runs away:
  *
- *   step = 2 * (pool - D * firstDropCost) / (D * (D - 1))
- *   cost(k) = round(firstDropCost + k * step)
+ *   cost(k) = min(firstDropCost * 2^k, totalWaves)
+ *
+ * e.g. 15 waves → 2, 4, 8, 15, 15, 15, … (cumulative kills 2, 6, 14, 29, 44, …).
+ * The number of drops per run is separately capped at totalWaves by the meter
+ * (dropIndex >= totalWaves in GameSceneDrops.addVoices).
  *
  * Engineer: track a `dropIndex` counter in GameScene; set the next
- * `maxVoicesCount` to `voiceDropCost(dropIndex, computeKillPool(totalWaves))`
- * after each drop instead of the current `maxVoicesCount += 1`.
+ * `maxVoicesCount` to `voiceDropCost(dropIndex, totalWaves)` after each drop.
  */
-export function voiceDropCost(dropIndex: number, killPool: number): number {
-  const { firstDropCost, targetDropsPerRun: drops, minIncrement } = VOICE_DROP_TUNING;
-  const step = Math.max(minIncrement, (2 * (killPool - drops * firstDropCost)) / (drops * (drops - 1)));
-  return Math.max(1, Math.round(firstDropCost + dropIndex * step));
+export function voiceDropCost(dropIndex: number, totalWaves: number): number {
+  const { firstDropCost } = VOICE_DROP_TUNING;
+  const cap = Math.max(firstDropCost, totalWaves); // hold at the wave count
+  return Math.min(firstDropCost * 2 ** dropIndex, cap);
 }
 
 // ============================================================================

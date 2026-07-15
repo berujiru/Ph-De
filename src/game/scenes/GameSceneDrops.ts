@@ -1,5 +1,5 @@
 import type { GameScene } from './GameScene';
-import { MAX_ACTIVE_HEROES, GLOBAL_DROP_DEFS, UPGRADE_DEFS, computeKillPool, voiceDropCost, type UpgradeKind } from '../data/drops';
+import { MAX_ACTIVE_HEROES, GLOBAL_DROP_DEFS, UPGRADE_DEFS, voiceDropCost, type UpgradeKind } from '../data/drops';
 import { HERO_DEFINITIONS, type HeroId } from '../data/heroes';
 import { recruitableHeroIdsForStage } from '../data/heroUnlocks';
 import { rollDrops, makeRng, type DropContext } from '../core/Drops';
@@ -56,9 +56,9 @@ export function rollDropOptions(scene: GameScene): DropOption[] {
 }
 
 export function applyDrop(scene: GameScene, dropId: string) {
-  // Advance the drop cadence: next threshold derives from the run's kill pool.
+  // Advance the drop cadence: next threshold doubles, capped at the wave count.
   scene.dropIndex += 1;
-  scene.maxVoicesCount = voiceDropCost(scene.dropIndex, computeKillPool(scene.totalWaves));
+  scene.maxVoicesCount = voiceDropCost(scene.dropIndex, scene.totalWaves);
 
   if (dropId.startsWith('hero:')) {
     const heroId = dropId.slice('hero:'.length) as HeroId;

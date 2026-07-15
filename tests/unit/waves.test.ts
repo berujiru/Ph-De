@@ -67,9 +67,10 @@ describe('wave table invariants', () => {
   });
 
   it('authored kill pool stays inside the tuned mobile-session band', () => {
+    // 15-wave script → ~101 authored kills (down from the old 20-wave ~155).
     const pool = authoredKillCount(table);
-    expect(pool).toBeGreaterThanOrEqual(120);
-    expect(pool).toBeLessThanOrEqual(180);
+    expect(pool).toBeGreaterThanOrEqual(85);
+    expect(pool).toBeLessThanOrEqual(120);
   });
 
   it('spawn intervals and warning/delay durations are positive', () => {
@@ -107,10 +108,10 @@ describe('wave stat scaling', () => {
     expect(waveStatMultipliers(999).speed).toBe(WAVE_SCALING.speedMultCap);
   });
 
-  it('matches the documented wave-20 endpoints', () => {
-    const w20 = waveStatMultipliers(20);
-    expect(w20.hp).toBeCloseTo(2.9);
-    expect(w20.damage).toBeCloseTo(1.95);
+  it('matches the documented final-wave (15) endpoints', () => {
+    const w15 = waveStatMultipliers(TOTAL_WAVES);
+    expect(w15.hp).toBeCloseTo(2.4);
+    expect(w15.damage).toBeCloseTo(1.7);
   });
 });
 
