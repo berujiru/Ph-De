@@ -162,9 +162,10 @@ export const AUDIO_MANIFEST: Record<string, string> = {
   // Music (put files in public/assets/music/):
   // The out-of-combat ambience bed (filename has a space → %20-encoded URL).
   [MUSIC.ambience]: '/assets/music/default%20ambience.mp3',
-  [MUSIC.bossDefault]: '/assets/music/boss-default.mp3',   // default boss theme
+  // Default rally/battle bed — plays through a fight until a boss appears.
+  [MUSIC.battle]: '/assets/music/Only_the_Waning_Light.mp3',
+  [MUSIC.bossDefault]: '/assets/music/boss-default.mp3',   // boss theme, overrides battle
   // [MUSIC.prep]: '/assets/music/prep.mp3',
-  // [MUSIC.battle]: '/assets/music/battle.mp3',
   // [MUSIC.victory]: '/assets/music/victory.mp3',
   // [MUSIC.defeat]: '/assets/music/defeat.mp3',
   // [MUSIC.bossThemes[1]]: '/assets/music/boss-act1.mp3',

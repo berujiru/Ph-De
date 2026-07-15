@@ -24,8 +24,15 @@ function App() {
   const [rallyReady, setRallyReady] = useState(false);
 
   useEffect(() => {
-    if (currentView !== 'loading' && currentView !== 'battle' && currentView !== 'sandbox') {
-      AudioManager.playMusic(MUSIC.ambience, { loop: true, fadeMs: 1000 });
+    const inRally = currentView === 'battle' || currentView === 'sandbox';
+    if (!inRally) {
+      // Not in a rally → wipe any battlefield so a finished/surrendered rally
+      // can't linger behind the menus or be resumed (a new fight always goes
+      // through a fresh deploy), and bring back the ambience bed off the splash.
+      uiToGameEvents.emit('exitRally', undefined);
+      if (currentView !== 'loading') {
+        AudioManager.playMusic(MUSIC.ambience, { loop: true, fadeMs: 1000 });
+      }
     }
   }, [currentView]);
 

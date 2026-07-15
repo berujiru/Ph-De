@@ -10,7 +10,7 @@ import { enemySizeClass } from '../data/enemies';
 import { computeKillPool, voiceDropCost } from '../data/drops';
 import { type HeroId, HERO_DEFINITIONS } from '../data/heroes';
 import { allAttackArtStems, attackArtKey, attackArtPath } from '../data/attackArt';
-import { preloadAudio, SFX, bossThemeForAct } from '../data/soundRegistry';
+import { preloadAudio, SFX, MUSIC, bossThemeForAct } from '../data/soundRegistry';
 import { AudioManager } from '../core/AudioManager';
 import { GAME_HEIGHT, GAME_WIDTH, WORLD_HEIGHT, RALLY, PARALLAX } from '../data/level';
 import { getMapSkinForStage, type MapSkin } from '../data/mapSkins';
@@ -270,7 +270,9 @@ export class GameScene extends Phaser.Scene {
     this.events.once('destroy', cleanup);
   }
 
-  public resetGame(): void {
+  /** Destroy every battlefield entity + visual. Safe to call twice (empties the
+   *  arrays and Phaser's destroy() no-ops on already-destroyed objects). */
+  private teardownRally(): void {
     for (const e of this.enemies) e.destroy();
     for (const h of this.heroes) h.destroy();
     for (const a of this.attacks) a.destroy();
@@ -282,12 +284,43 @@ export class GameScene extends Phaser.Scene {
     if (this.rallyStage) this.rallyStage.destroy();
     if (this.shield) this.shield.destroy();
     if (this.rouletteHighlighter) this.rouletteHighlighter.destroy();
+    this.enemies = [];
+    this.heroes = [];
+    this.attacks = [];
+    this.summons = [];
+    this.barriers = [];
+    this.traps = [];
+    this.persistentAoe = [];
+  }
 
-    // Silence any lingering boss theme before the next battle builds.
+  public resetGame(): void {
+    this.teardownRally();
+
+    // Clear the boss flag so it re-arms; the incoming rally music (started in
+    // the restart handler) crossfades out any lingering boss theme.
     this.bossMusicActive = false;
-    AudioManager.stopMusic(0);
 
     this.buildGame();
+  }
+
+  /**
+   * Wipe the current rally and leave the battlefield empty — called when the
+   * player surrenders or exits to a menu. Nothing lingers behind the UI, and
+   * the rally can't be resumed: the only way back into a fight is a fresh
+   * deploy (restart → buildGame). Idempotent, so repeated menu navigation is
+   * safe.
+   */
+  public clearGame(): void {
+    // Freeze the update loop FIRST (its very first line bails on isPaused) so it
+    // can never touch the objects we're about to destroy. status guards too.
+    this.isPaused = true;
+    this.status = 'lost';
+    this.waveActive = false;
+    // Boss theme (if any) is crossfaded to the menu ambience by the caller
+    // (App's currentView effect), so no explicit stopMusic here — that would
+    // restart the ambience on every menu-to-menu navigation.
+    this.bossMusicActive = false;
+    this.teardownRally();
   }
 
   public healShield(amount: number): void {
@@ -529,7 +562,8 @@ export class GameScene extends Phaser.Scene {
       AudioManager.playMusic(bossThemeForAct(this.currentAct), { loop: true, fadeMs: 1200 });
     } else if (!hasBoss && this.bossMusicActive) {
       this.bossMusicActive = false;
-      AudioManager.stopMusic(1500);
+      // Boss down — fall back to the default rally bed rather than going silent.
+      AudioManager.playMusic(MUSIC.battle, { loop: true, fadeMs: 1500 });
     }
   }
 

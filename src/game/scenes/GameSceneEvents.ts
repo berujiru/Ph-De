@@ -15,7 +15,7 @@ import { DAMAGE_TYPE_COLORS, type DamageType } from '../core/Damage';
 import { attackArtKey, resolveAttackArt, resolveAttackSize } from '../data/attackArt';
 import { resolveAttackSpeed } from '../data/attackSpeed';
 import { AudioManager } from '../core/AudioManager';
-import { heroSkillSfx } from '../data/soundRegistry';
+import { heroSkillSfx, MUSIC } from '../data/soundRegistry';
 import {
   Attack,
   ProjectileAttack,
@@ -60,6 +60,13 @@ export function setupUIEvents(scene: GameScene): () => void {
     scene.emitState(true);
   });
 
+  const unsubExitRally = uiToGameEvents.on('exitRally', () => {
+    if (!scene.sys) return;
+    // Wipe the battlefield so nothing lingers behind the menus and the rally
+    // can't be resumed — a new fight always goes through a fresh restart.
+    scene.clearGame();
+  });
+
   const unsubRestart = uiToGameEvents.on('restart', (data) => {
     if (!scene.sys) return;
     // Reset the loading latch up front (synchronously, before Phaser processes
@@ -67,6 +74,11 @@ export function setupUIEvents(scene: GameScene): () => void {
     // — for both the scene.restart and resetGame paths below.
     beginRallyLoad();
     scene.isSandbox = data?.mode === 'sandbox';
+    // Default rally/battle bed. Crossfades out the menu ambience; a boss theme
+    // overrides it via GameScene.updateBossMusic and it resumes when the boss
+    // falls. Music lives on the persistent sound manager, so it survives the
+    // scene.restart below.
+    AudioManager.playMusic(MUSIC.battle, { loop: true, fadeMs: 1000 });
     if (data?.act != null && data?.stageIdx != null) {
       scene.scene.restart(data);
       return;
@@ -203,6 +215,7 @@ export function setupUIEvents(scene: GameScene): () => void {
     unsubSelectDrop();
     unsubSetSpeed();
     unsubSurrender();
+    unsubExitRally();
     unsubRestart();
     unsubDebugSpawn();
     unsubSpawnSandboxTarget();

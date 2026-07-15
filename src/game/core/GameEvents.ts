@@ -101,6 +101,8 @@ export interface UiToGameEvents extends Record<string, unknown> {
   startWave: undefined;
   setSpeed: { speed: number };
   surrender: undefined;
+  /** Leave the current rally (surrender-return / menu exit) — wipes it, no resume. */
+  exitRally: undefined;
   restart: { mode?: 'sandbox'; act?: number; stageIdx?: number } | undefined;
   selectDrop: { dropId: string };
   debugSpawn: { heroId?: string; passive?: string; skill?: string };
