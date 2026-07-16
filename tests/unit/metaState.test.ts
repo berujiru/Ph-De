@@ -1,6 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   addHeroCards,
+  adsRemainingToday,
+  AD_PERMIT_REWARD,
+  canClaimDaily,
+  claimDailyPermits,
+  DAILY_CLAIM_PERMITS,
   getClearedStages,
   getEncounteredEnemies,
   getHeroCardCount,
@@ -10,10 +15,12 @@ import {
   getHope,
   getPermits,
   getStoreUnlockedHeroes,
+  grantAdReward,
   hasEncounteredEnemy,
   isStageCleared,
   levelUpHero,
   markEnemyEncountered,
+  MAX_AD_WATCHES_PER_DAY,
   recordStageClear,
   resetMetaStateForTests,
   subscribeMetaState,
@@ -174,5 +181,100 @@ describe('corrupt storage', () => {
     resetMetaStateForTests();
     expect(getHope()).toBe(0);
     expect(getHeroCards()).toEqual({});
+  });
+});
+
+describe('daily free permit claim', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('grants the daily permits once, then blocks until the next local day', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 6, 16, 9, 0, 0)); // local noon-ish
+
+    const before = getPermits();
+    expect(canClaimDaily()).toBe(true);
+    expect(claimDailyPermits()).toBe(true);
+    expect(getPermits()).toBe(before + DAILY_CLAIM_PERMITS);
+
+    // Same day → refused, no further grant.
+    expect(canClaimDaily()).toBe(false);
+    expect(claimDailyPermits()).toBe(false);
+    expect(getPermits()).toBe(before + DAILY_CLAIM_PERMITS);
+
+    // Next local day → claimable again.
+    vi.setSystemTime(new Date(2026, 6, 17, 0, 0, 1));
+    expect(canClaimDaily()).toBe(true);
+    expect(claimDailyPermits()).toBe(true);
+    expect(getPermits()).toBe(before + DAILY_CLAIM_PERMITS * 2);
+  });
+
+  it('resets on the calendar day, not a rolling 24h window', () => {
+    vi.useFakeTimers();
+    // Claim at 23:59 local.
+    vi.setSystemTime(new Date(2026, 6, 16, 23, 59, 0));
+    expect(claimDailyPermits()).toBe(true);
+
+    // Two minutes later it is a new calendar day (00:01) — claimable, even
+    // though far less than 24h has elapsed.
+    vi.setSystemTime(new Date(2026, 6, 17, 0, 1, 0));
+    expect(canClaimDaily()).toBe(true);
+  });
+
+  it('persists the claim across a reload', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 6, 16, 12, 0, 0));
+    claimDailyPermits();
+    resetMetaStateForTests(); // re-read storage
+    expect(canClaimDaily()).toBe(false);
+  });
+});
+
+describe('rewarded-ad permits', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('grants AD_PERMIT_REWARD per watch up to the daily cap, then refuses', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 6, 16, 10, 0, 0));
+
+    const before = getPermits();
+    expect(adsRemainingToday()).toBe(MAX_AD_WATCHES_PER_DAY);
+
+    for (let i = 1; i <= MAX_AD_WATCHES_PER_DAY; i++) {
+      expect(grantAdReward()).toBe(true);
+      expect(getPermits()).toBe(before + AD_PERMIT_REWARD * i);
+      expect(adsRemainingToday()).toBe(MAX_AD_WATCHES_PER_DAY - i);
+    }
+
+    // Cap reached → refused, no more permits.
+    expect(grantAdReward()).toBe(false);
+    expect(getPermits()).toBe(before + AD_PERMIT_REWARD * MAX_AD_WATCHES_PER_DAY);
+  });
+
+  it('resets the ad counter at local midnight', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 6, 16, 10, 0, 0));
+    for (let i = 0; i < MAX_AD_WATCHES_PER_DAY; i++) grantAdReward();
+    expect(adsRemainingToday()).toBe(0);
+
+    vi.setSystemTime(new Date(2026, 6, 17, 0, 0, 5));
+    expect(adsRemainingToday()).toBe(MAX_AD_WATCHES_PER_DAY);
+    expect(grantAdReward()).toBe(true);
+    expect(adsRemainingToday()).toBe(MAX_AD_WATCHES_PER_DAY - 1);
+  });
+});
+
+describe('migration from a pre-ads save', () => {
+  it('defaults the daily/ad fields so the first claim is available', () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ hope: 10, permits: 2, highestClearedStage: 1 }),
+    );
+    resetMetaStateForTests();
+    expect(canClaimDaily()).toBe(true);
+    expect(adsRemainingToday()).toBe(MAX_AD_WATCHES_PER_DAY);
   });
 });

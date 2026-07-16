@@ -22,6 +22,9 @@ function App() {
   const [selectedStage, setSelectedStage] = useState<{ act: number; stageIdx: number } | null>(null);
   const [audioOpen, setAudioOpen] = useState(false);
   const [rallyReady, setRallyReady] = useState(false);
+  // Where the store's Back button returns to — 'prep' when reached via the
+  // out-of-permits CTA (so the player lands back on the same stage), else 'main'.
+  const [storeReturnView, setStoreReturnView] = useState<'main' | 'prep'>('main');
 
   useEffect(() => {
     const inRally = currentView === 'battle' || currentView === 'sandbox';
@@ -74,9 +77,9 @@ function App() {
         )}
 
       {currentView === 'main' && (
-        <MainMenu 
-          onPlay={handlePlay} 
-          onStore={() => setCurrentView('store')} 
+        <MainMenu
+          onPlay={handlePlay}
+          onStore={() => { setStoreReturnView('main'); setCurrentView('store'); }}
           onInventory={() => setCurrentView('inventory')}
         />
       )}
@@ -93,11 +96,12 @@ function App() {
       )}
       
       {currentView === 'prep' && (
-        <PreparationScreen 
+        <PreparationScreen
           act={selectedStage?.act}
           stageIdx={selectedStage?.stageIdx}
           onBack={() => setCurrentView('campaign')}
           onDeploy={handleStartBattle}
+          onGoToStore={() => { setStoreReturnView('prep'); setCurrentView('store'); }}
         />
       )}
 
@@ -116,7 +120,7 @@ function App() {
       )}
       
       {currentView === 'store' && (
-        <SariSariStore onBack={() => setCurrentView('main')} />
+        <SariSariStore onBack={() => setCurrentView(storeReturnView)} />
       )}
 
       {currentView === 'inventory' && (

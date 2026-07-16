@@ -28,6 +28,27 @@ export interface MetaStateData {
    * very first encounter, ever) and the Truth Codex unlock-on-encounter.
    */
   encounteredEnemies: string[];
+  /** Local calendar day ('YYYY-MM-DD') the free daily permits were last claimed. */
+  lastDailyClaimDate: string | null;
+  /** Local calendar day the rewarded-ad counter below belongs to. */
+  adWatchDate: string | null;
+  /** Rewarded ads completed on `adWatchDate` (resets when the day rolls over). */
+  adWatchCount: number;
+}
+
+/** Free permits granted by the once-a-day store claim. */
+export const DAILY_CLAIM_PERMITS = 5;
+/** Permits granted per completed rewarded ad. */
+export const AD_PERMIT_REWARD = 10;
+/** Max rewarded ads that can be redeemed for permits per local day. */
+export const MAX_AD_WATCHES_PER_DAY = 5;
+
+/** Local (not UTC) zero-padded calendar day stamp — drives midnight resets. */
+function localDateStamp(now: Date = new Date()): string {
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 const DEFAULT_STATE: MetaStateData = {
@@ -40,6 +61,9 @@ const DEFAULT_STATE: MetaStateData = {
   heroCards: {},
   heroLevels: {},
   encounteredEnemies: [],
+  lastDailyClaimDate: null,
+  adWatchDate: null,
+  adWatchCount: 0,
 };
 
 function readStorage(): MetaStateData {
@@ -68,6 +92,11 @@ function readStorage(): MetaStateData {
       encounteredEnemies: Array.isArray(parsed.encounteredEnemies)
         ? parsed.encounteredEnemies.filter((id): id is string => typeof id === 'string')
         : [...DEFAULT_STATE.encounteredEnemies],
+      // Migration: saves before daily-claim / rewarded-ads lack these — default so
+      // the first claim after updating is available and the ad counter starts fresh.
+      lastDailyClaimDate: typeof parsed.lastDailyClaimDate === 'string' ? parsed.lastDailyClaimDate : DEFAULT_STATE.lastDailyClaimDate,
+      adWatchDate: typeof parsed.adWatchDate === 'string' ? parsed.adWatchDate : DEFAULT_STATE.adWatchDate,
+      adWatchCount: typeof parsed.adWatchCount === 'number' ? parsed.adWatchCount : DEFAULT_STATE.adWatchCount,
     };
   } catch {
     return { ...DEFAULT_STATE };
@@ -176,6 +205,51 @@ export function addPermits(amount: number) {
 export function spendPermit(): boolean {
   if (state.permits <= 0) return false;
   state = { ...state, permits: state.permits - 1 };
+  notify();
+  return true;
+}
+
+// --- Daily free claim + rewarded-ad permits -----------------------------------
+// The date is re-checked at call time (not cached in the UI), so a stale screen
+// left open across local midnight can never over-grant — the guard re-evaluates
+// "today" on every claim/watch.
+
+/** Whether the free daily permits can be claimed right now (once per local day). */
+export function canClaimDaily(): boolean {
+  return state.lastDailyClaimDate !== localDateStamp();
+}
+
+/** Claim the daily free permits. Returns false if already claimed today. */
+export function claimDailyPermits(): boolean {
+  const today = localDateStamp();
+  if (state.lastDailyClaimDate === today) return false;
+  state = { ...state, permits: state.permits + DAILY_CLAIM_PERMITS, lastDailyClaimDate: today };
+  notify();
+  return true;
+}
+
+/** Rewarded ads still redeemable for permits today (resets at local midnight). */
+export function adsRemainingToday(): number {
+  const today = localDateStamp();
+  if (state.adWatchDate !== today) return MAX_AD_WATCHES_PER_DAY;
+  return Math.max(0, MAX_AD_WATCHES_PER_DAY - state.adWatchCount);
+}
+
+/**
+ * Grant the reward for one completed rewarded ad: permits += AD_PERMIT_REWARD and
+ * the daily ad counter is recorded, atomically (single notify()). Returns false
+ * if the daily cap is already reached.
+ */
+export function grantAdReward(): boolean {
+  const today = localDateStamp();
+  const watchedToday = state.adWatchDate === today ? state.adWatchCount : 0;
+  if (watchedToday >= MAX_AD_WATCHES_PER_DAY) return false;
+  state = {
+    ...state,
+    permits: state.permits + AD_PERMIT_REWARD,
+    adWatchDate: today,
+    adWatchCount: watchedToday + 1,
+  };
   notify();
   return true;
 }

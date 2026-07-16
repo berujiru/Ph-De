@@ -11,7 +11,7 @@ import { HERO_DEFINITIONS } from '../../src/game/data/heroes';
  */
 function renderScreen(onDeploy = vi.fn()) {
   // Test with Act 1, Stage 1 which has Grunts (weak to physical)
-  render(<PreparationScreen act={1} stageIdx={0} onBack={vi.fn()} onDeploy={onDeploy} />);
+  render(<PreparationScreen act={1} stageIdx={0} onBack={vi.fn()} onDeploy={onDeploy} onGoToStore={vi.fn()} />);
   return { onDeploy };
 }
 

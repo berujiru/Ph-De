@@ -7,6 +7,7 @@ import {
   PlacardIcon,
   RallyPermitIcon,
   VictoryIcon,
+  VoicesIcon,
 } from '../icons';
 import { BackButton } from '../components/BackButton';
 import { Embers } from '../components/ApocalypseScenery';
@@ -25,7 +26,15 @@ import {
   unlockHeroInStore,
   getHighestClearedStage,
   subscribeMetaState,
+  canClaimDaily,
+  claimDailyPermits,
+  adsRemainingToday,
+  grantAdReward,
+  DAILY_CLAIM_PERMITS,
+  AD_PERMIT_REWARD,
+  MAX_AD_WATCHES_PER_DAY,
 } from '../../game/data/metaState';
+import { AdsManager } from '../../game/core/AdsManager';
 
 interface SariSariStoreProps {
   onBack: () => void;
@@ -459,11 +468,128 @@ function rewardsFor(item: CatalogItem, grantedCards: HeroId[] = []): { heading: 
   }
 }
 
+/** Reveal payload for a permit grant (daily claim / rewarded ad), reusing the
+ *  shared card-flip modal. */
+function permitReveal(count: number): { heading: string; rewards: RevealReward[] } {
+  return {
+    heading: 'Permits Granted!',
+    rewards: [{
+      id: `permits-${count}`,
+      title: count === 1 ? 'Rally Permit' : `Rally Permits ×${count}`,
+      subtitle: 'Papers in order — march on!',
+      rarity: 'rare',
+      icon: <RallyPermitIcon size={44} />,
+    }],
+  };
+}
+
+/**
+ * A free "no Hope required" offer on Aling Nena's counter (daily pack / watch an
+ * ad). Cardboard-tag aesthetic, sibling to HangingGood but with a counter/claimed
+ * state and an in-flight busy state instead of a Hope price.
+ */
+function FreebieCard({
+  title,
+  description,
+  buttonLabel,
+  sublabel,
+  icon,
+  disabled,
+  busy,
+  onClick,
+}: {
+  title: string;
+  description: string;
+  buttonLabel: string;
+  sublabel?: string;
+  icon: ReactNode;
+  disabled: boolean;
+  busy: boolean;
+  onClick: () => void;
+}) {
+  const dead = disabled || busy;
+  return (
+    <div
+      style={{
+        width: 260,
+        maxWidth: '100%',
+        backgroundColor: theme.materials.cardboard,
+        backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(0,0,0,0.10) 3px, rgba(0,0,0,0.10) 6px)',
+        border: `1px solid ${theme.materials.cardboardEdge}`,
+        borderRadius: 3,
+        padding: 16,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 8,
+        textAlign: 'center',
+        boxShadow: '2px 4px 12px rgba(0,0,0,0.6), inset 0 0 18px rgba(0,0,0,0.4)',
+        transform: 'rotate(-0.6deg)',
+      }}
+    >
+      <span style={{ color: theme.colors.accent, display: 'flex', filter: 'drop-shadow(0 0 6px rgba(234,88,12,0.4))' }}>
+        {icon}
+      </span>
+      <span style={{ fontFamily: MARKER_FONT, fontWeight: 900, fontSize: 17, color: theme.materials.paper }}>
+        {title}
+      </span>
+      <span style={{ fontSize: 11, color: 'rgba(231, 229, 228, 0.85)', lineHeight: 1.35 }}>
+        {description}
+      </span>
+      {sublabel && (
+        <span style={{ fontSize: 11, fontWeight: 800, color: theme.colors.gold, letterSpacing: 0.5 }}>
+          {sublabel}
+        </span>
+      )}
+      <button
+        type="button"
+        disabled={dead}
+        onClick={() => { if (!dead) onClick(); }}
+        aria-label={buttonLabel}
+        style={{
+          marginTop: 4,
+          backgroundColor: dead ? '#44403c' : '#166534',
+          color: dead ? theme.colors.textMuted : theme.colors.textPrimary,
+          border: `1px solid ${theme.materials.rustDark}`,
+          borderRadius: 2,
+          padding: '8px 16px',
+          fontFamily: MARKER_FONT,
+          fontWeight: 900,
+          fontSize: 14,
+          cursor: dead ? 'not-allowed' : 'pointer',
+          minHeight: 44,
+          width: '100%',
+          boxShadow: 'inset 0 0 12px rgba(0,0,0,0.45)',
+          transition: 'background-color 0.15s',
+        }}
+      >
+        {busy ? 'Playing…' : buttonLabel}
+      </button>
+    </div>
+  );
+}
+
 export function SariSariStore({ onBack }: SariSariStoreProps) {
   const [reveal, setReveal] = useState<{ heading: string; rewards: RevealReward[] } | null>(null);
+  const [adBusy, setAdBusy] = useState(false);
   const [, forceUpdate] = useReducer((x) => x + 1, 0);
 
   useEffect(() => subscribeMetaState(forceUpdate), []);
+
+  // Boot the ads engine (idempotent) and re-render on ad status changes so the
+  // Watch-ad button reflects ready/unavailable.
+  useEffect(() => {
+    void AdsManager.init();
+    return AdsManager.subscribe(forceUpdate);
+  }, []);
+
+  // Refresh the freebie labels across local midnight while the store sits open.
+  // Purely cosmetic — claimDailyPermits/grantAdReward re-check the date, so this
+  // can never over-grant.
+  useEffect(() => {
+    const id = setInterval(forceUpdate, 60_000);
+    return () => clearInterval(id);
+  }, []);
 
   const hope = getHope();
   const highestStage = getHighestClearedStage();
@@ -510,6 +636,25 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
       setReveal(rewardsFor(item, grantedCards));
     }
   };
+
+  const handleDailyClaim = () => {
+    if (claimDailyPermits()) setReveal(permitReveal(DAILY_CLAIM_PERMITS));
+  };
+
+  const handleWatchAd = async () => {
+    if (adBusy || adsRemainingToday() <= 0) return;
+    setAdBusy(true);
+    try {
+      const earned = await AdsManager.showRewarded();
+      if (earned && grantAdReward()) setReveal(permitReveal(AD_PERMIT_REWARD));
+    } finally {
+      setAdBusy(false);
+    }
+  };
+
+  const dailyClaimable = canClaimDaily();
+  const adsLeft = adsRemainingToday();
+  const adsUnavailable = AdsManager.getStatus() === 'unavailable';
 
   return (
     <div
@@ -764,6 +909,57 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
             {BASE_CATALOG.map((item, i) => (
               <HangingGood key={item.id} item={item} index={i} affordable={item.cost <= hope} onBuy={handleBuy} />
             ))}
+          </div>
+        </div>
+
+        {/* Freebies — no Hope required: daily pack + watch-an-ad permits */}
+        <div style={{ marginTop: 36, position: 'relative', zIndex: 10 }}>
+          <div style={{ textAlign: 'center', marginBottom: 18 }}>
+            <span
+              style={{
+                fontFamily: MARKER_FONT,
+                fontSize: 24,
+                color: theme.materials.paper,
+                letterSpacing: 2,
+                textShadow: '2px 2px 0 rgba(0,0,0,0.6), 0 0 12px rgba(234,88,12,0.25)',
+              }}
+            >
+              Aling Nena's Freebies
+            </span>
+            <div style={{ fontSize: 11, color: theme.colors.textMuted, letterSpacing: 1, marginTop: 6 }}>
+              No Hope required — the movement provides.
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 22, justifyContent: 'center' }}>
+            <FreebieCard
+              title="Daily Ration"
+              description={`Aling Nena's gift — ${DAILY_CLAIM_PERMITS} permits, once a day.`}
+              icon={<RallyPermitIcon size={34} />}
+              disabled={!dailyClaimable}
+              busy={false}
+              buttonLabel={dailyClaimable ? `Claim ${DAILY_CLAIM_PERMITS} Free Permits` : 'Claimed — back tomorrow'}
+              onClick={handleDailyClaim}
+            />
+            <FreebieCard
+              title="Watch a Sponsor"
+              description={`Sit through a message for +${AD_PERMIT_REWARD} permits.${AdsManager.isSimulated() ? ' (simulated in dev)' : ''}`}
+              icon={<VoicesIcon size={34} />}
+              disabled={adsUnavailable || adsLeft <= 0}
+              busy={adBusy}
+              sublabel={
+                adsUnavailable
+                  ? 'Ads unavailable right now'
+                  : `${adsLeft}/${MAX_AD_WATCHES_PER_DAY} left today`
+              }
+              buttonLabel={
+                adsUnavailable
+                  ? 'Ads unavailable'
+                  : adsLeft <= 0
+                    ? 'All watched — back tomorrow'
+                    : `Watch Ad (+${AD_PERMIT_REWARD})`
+              }
+              onClick={handleWatchAd}
+            />
           </div>
         </div>
 

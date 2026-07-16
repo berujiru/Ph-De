@@ -23,6 +23,8 @@ interface PreparationScreenProps {
   stageIdx?: number;
   onBack: () => void;
   onDeploy: () => void;
+  /** Navigate to the Sari-Sari Store (shown as a CTA when out of permits). */
+  onGoToStore: () => void;
 }
 
 const TYPEWRITER_FONT = '"Courier New", Courier, monospace';
@@ -118,7 +120,7 @@ interface CompanionHint {
   counters: string[];
 }
 
-export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: PreparationScreenProps) {
+export function PreparationScreen({ act, stageIdx, onBack, onDeploy, onGoToStore }: PreparationScreenProps) {
   const [, forceUpdate] = useReducer((x) => x + 1, 0);
   const [selectedEnemy, setSelectedEnemy] = useState<EnemyId | null>(null);
 
@@ -501,6 +503,17 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
             <RallyPermitIcon size={15} />−{STAGE.permitCost}
           </span>
         </SoulsButton>
+        {!canDeploy && (
+          <SoulsButton
+            variant="secondary"
+            size="md"
+            onClick={onGoToStore}
+            aria-label="Out of permits — get more at the Sari-Sari store"
+          >
+            <RallyPermitIcon size={18} />
+            Get Permits at the Store
+          </SoulsButton>
+        )}
       </div>
 
       {/* Anomaly intel — tapping a case file opens its full TCG card. */}
