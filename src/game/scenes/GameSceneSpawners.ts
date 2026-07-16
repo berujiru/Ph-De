@@ -26,6 +26,7 @@ import { DAMAGE_TYPE_COLORS, type DamageType } from '../core/Damage';
 import { attackArtKey, resolveAttackArt, resolveAttackSize } from '../data/attackArt';
 import { resolveAttackSpeed } from '../data/attackSpeed';
 import { gameToUiEvents } from '../core/GameEvents';
+import { markEnemyEncountered } from '../data/metaState';
 import { AudioManager } from '../core/AudioManager';
 import { heroAttackSfx } from '../data/soundRegistry';
 import { globalStageNumber } from '../data/campaign';
@@ -61,8 +62,9 @@ export function spawnEnemy(scene: GameScene, enemyId: EnemyId = 'grunt', wave: n
   const enemy = new Enemy(scene, x, y, def);
   scene.enemies.push(enemy);
 
-  if (!scene.seenEnemies.has(enemyId)) {
-    scene.seenEnemies.add(enemyId);
+  // Reveal the anomaly's TCG card only on the FIRST time it's ever faced (across
+  // all games) — markEnemyEncountered persists it and returns true only when new.
+  if (markEnemyEncountered(enemyId)) {
     gameToUiEvents.emit('enemyEncountered', { enemyId });
   }
 }

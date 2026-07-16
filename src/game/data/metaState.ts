@@ -22,6 +22,12 @@ export interface MetaStateData {
   heroCards: Partial<Record<HeroId, number>>;
   /** Permanent hero level per hero (absent key = level 1). */
   heroLevels: Partial<Record<HeroId, number>>;
+  /**
+   * Enemy ids the player has ever faced in a campaign battle. Drives the
+   * one-time "new anomaly" TCG reveal in the rally screen (pops only on the
+   * very first encounter, ever) and the Truth Codex unlock-on-encounter.
+   */
+  encounteredEnemies: string[];
 }
 
 const DEFAULT_STATE: MetaStateData = {
@@ -33,6 +39,7 @@ const DEFAULT_STATE: MetaStateData = {
   storeUnlockedHeroes: [],
   heroCards: {},
   heroLevels: {},
+  encounteredEnemies: [],
 };
 
 function readStorage(): MetaStateData {
@@ -56,6 +63,11 @@ function readStorage(): MetaStateData {
       // silently default (new keys are additive; old code ignores them too).
       heroCards: parsed.heroCards && typeof parsed.heroCards === 'object' ? parsed.heroCards : { ...DEFAULT_STATE.heroCards },
       heroLevels: parsed.heroLevels && typeof parsed.heroLevels === 'object' ? parsed.heroLevels : { ...DEFAULT_STATE.heroLevels },
+      // Migration: saves before encounter-tracking lack this — default to empty
+      // so the first anomaly seen after updating still gets its reveal.
+      encounteredEnemies: Array.isArray(parsed.encounteredEnemies)
+        ? parsed.encounteredEnemies.filter((id): id is string => typeof id === 'string')
+        : [...DEFAULT_STATE.encounteredEnemies],
     };
   } catch {
     return { ...DEFAULT_STATE };
@@ -133,6 +145,14 @@ export function getHeroLevel(heroId: HeroId): number {
   return state.heroLevels[heroId] ?? 1;
 }
 
+export function getEncounteredEnemies(): string[] {
+  return state.encounteredEnemies;
+}
+
+export function hasEncounteredEnemy(enemyId: string): boolean {
+  return state.encounteredEnemies.includes(enemyId);
+}
+
 // Setters / Actions
 export function addHope(amount: number) {
   if (amount <= 0) return;
@@ -186,6 +206,14 @@ export function levelUpHero(heroId: HeroId): boolean {
     heroCards: { ...state.heroCards, [heroId]: (state.heroCards[heroId] ?? 0) - cost },
     heroLevels: { ...state.heroLevels, [heroId]: level + 1 },
   };
+  notify();
+  return true;
+}
+
+/** Record a first-ever enemy encounter. Returns true only if it was new. */
+export function markEnemyEncountered(enemyId: string): boolean {
+  if (state.encounteredEnemies.includes(enemyId)) return false;
+  state = { ...state, encounteredEnemies: [...state.encounteredEnemies, enemyId] };
   notify();
   return true;
 }

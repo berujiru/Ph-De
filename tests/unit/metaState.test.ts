@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   addHeroCards,
   getClearedStages,
+  getEncounteredEnemies,
   getHeroCardCount,
   getHeroCards,
   getHeroLevel,
@@ -9,8 +10,10 @@ import {
   getHope,
   getPermits,
   getStoreUnlockedHeroes,
+  hasEncounteredEnemy,
   isStageCleared,
   levelUpHero,
+  markEnemyEncountered,
   recordStageClear,
   resetMetaStateForTests,
   subscribeMetaState,
@@ -129,6 +132,38 @@ describe('levelUpHero', () => {
     expect(spy).toHaveBeenCalledTimes(1);
     levelUpHero('student');
     expect(spy).toHaveBeenCalledTimes(2);
+    unsub();
+  });
+});
+
+describe('markEnemyEncountered', () => {
+  it('records only the first-ever encounter and persists it', () => {
+    expect(hasEncounteredEnemy('grunt')).toBe(false);
+    // First sighting is new — drives the one-time rally TCG reveal.
+    expect(markEnemyEncountered('grunt')).toBe(true);
+    expect(hasEncounteredEnemy('grunt')).toBe(true);
+    // Every subsequent sighting (same battle or a later game) is a no-op.
+    expect(markEnemyEncountered('grunt')).toBe(false);
+    expect(getEncounteredEnemies()).toEqual(['grunt']);
+
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
+    expect(saved.encounteredEnemies).toEqual(['grunt']);
+  });
+
+  it('remembers encounters across a reload (persistent, not per-game)', () => {
+    markEnemyEncountered('runner');
+    resetMetaStateForTests(); // simulate a fresh app load reading storage
+    expect(hasEncounteredEnemy('runner')).toBe(true);
+    expect(markEnemyEncountered('runner')).toBe(false);
+  });
+
+  it('notifies subscribers only when a new enemy is recorded', () => {
+    const spy = vi.fn();
+    const unsub = subscribeMetaState(spy);
+    markEnemyEncountered('brute');
+    expect(spy).toHaveBeenCalledTimes(1);
+    markEnemyEncountered('brute'); // already known — no state change, no notify
+    expect(spy).toHaveBeenCalledTimes(1);
     unsub();
   });
 });

@@ -9,7 +9,7 @@ import {
 } from '../icons';
 import { BackButton } from '../components/BackButton';
 import { Embers, SoulsButton } from '../components/ApocalypseScenery';
-import { EnemyCaseCard, HeroPolaroidCard, SkinPortrait, hexColor } from '../components/ArchiveCards';
+import { HeroPolaroidCard, SkinPortrait } from '../components/ArchiveCards';
 import { EnemyTcgCard } from '../components/EnemyTcgCard';
 import { getSelectedSkin } from '../../game/data/skinSelection';
 import { HERO_DEFINITIONS, type HeroDefinition, type HeroId } from '../../game/data/heroes';
@@ -25,7 +25,6 @@ interface PreparationScreenProps {
   onDeploy: () => void;
 }
 
-const MARKER_FONT = '"Segoe Print", "Bradley Hand", "Comic Sans MS", cursive';
 const TYPEWRITER_FONT = '"Courier New", Courier, monospace';
 
 // ---------------------------------------------------------------- mock data
@@ -249,58 +248,81 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy }: Preparati
             boxShadow: '0 24px 80px rgba(0,0,0,0.75), 0 8px 24px rgba(0,0,0,0.5), inset 0 0 60px rgba(234, 88, 12, 0.05), inset 0 1px 0 rgba(255,255,255,0.03)',
           }}
         >
-          <SectionLabel>On the table — stage intel</SectionLabel>
-          <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap' }}>
-            {/* Enemy intel — the same pinned case-file cards as the Archive */}
-            <div
-              style={{
-                flex: 1,
-                minWidth: 220,
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 1fr))',
-                gap: '10px 8px',
-                alignContent: 'start',
-                padding: '6px 2px',
-              }}
-            >
-              {ENEMY_INTEL.map((intel, i) => (
-                <EnemyCaseCard
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
+            <SectionLabel>On the table — stage intel</SectionLabel>
+            {ENEMY_INTEL.length > 1 && (
+              <span style={{ fontSize: 11, color: theme.colors.textMuted, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                {ENEMY_INTEL.length} types · swipe →
+              </span>
+            )}
+          </div>
+          {/* Enemy intel — full TCG cards kept at their natural size. Laid out
+              as a single horizontal swipe strip so a stage with many anomalies
+              scrolls sideways instead of making the whole screen tall. Tap a
+              card to open the same card centered for a closer read. */}
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'nowrap',
+              gap: 16,
+              overflowX: 'auto',
+              overflowY: 'hidden',
+              scrollSnapType: 'x mandatory',
+              WebkitOverflowScrolling: 'touch',
+              // Top room so the corner headcount badge isn't clipped by the
+              // scroll container; bottom room for the scrollbar.
+              padding: '12px 2px 10px',
+              scrollbarWidth: 'thin',
+            }}
+          >
+            {ENEMY_INTEL.map((intel) => {
+              const enemyId = intel.id as EnemyId;
+              return (
+                <div
                   key={intel.name}
-                  name={intel.name}
-                  enemyId={intel.id}
-                  colorHex={hexColor(intel.color)}
-                  tag={{ label: intel.count, color: theme.materials.tarpRed }}
-                  rotation={(i % 2 === 0 ? 1 : -1) * (1 + (i % 2))}
-                  onClick={() => setSelectedEnemy(intel.id as EnemyId)}
-                  ariaLabel={`Open anomaly intel: ${intel.name}`}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Open anomaly intel: ${intel.name}`}
+                  onClick={() => setSelectedEnemy(enemyId)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelectedEnemy(enemyId);
+                    }
+                  }}
+                  style={{
+                    position: 'relative',
+                    flex: '0 0 300px',
+                    maxWidth: '85vw',
+                    scrollSnapAlign: 'center',
+                    cursor: 'pointer',
+                  }}
                 >
+                  <EnemyTcgCard enemyId={enemyId} style={{ width: '100%' }} />
+                  {/* Stage headcount — the one bit of intel the card itself
+                      doesn't carry, pinned to the card corner. */}
                   <div
                     style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 3,
-                      marginTop: 3,
+                      position: 'absolute',
+                      top: -8,
+                      right: -8,
+                      zIndex: 60,
+                      fontSize: 12,
                       fontWeight: 900,
-                      fontSize: 8,
-                      color: theme.materials.tarpRed,
-                      border: `1px solid ${theme.materials.tarpRed}`,
-                      borderRadius: 3,
-                      padding: '2px 4px',
-                      whiteSpace: 'nowrap',
+                      letterSpacing: 0.5,
+                      color: '#fff',
+                      backgroundColor: theme.materials.tarpRed,
+                      border: '2px solid rgba(0,0,0,0.4)',
+                      borderRadius: 999,
+                      padding: '3px 9px',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.6)',
                     }}
                   >
-                    {(() => {
-                      const Icon = damageTypeIcons[intel.weakTo];
-                      return Icon ? <Icon size={10} /> : null;
-                    })()}
-                    WEAK: {intel.weakTo.toUpperCase()}
+                    {intel.count}
                   </div>
-                  <div style={{ fontFamily: MARKER_FONT, fontSize: 8.5, marginTop: 3, lineHeight: 1.25, color: '#44403c' }}>
-                    {intel.note}
-                  </div>
-                </EnemyCaseCard>
-              ))}
-            </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 

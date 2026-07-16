@@ -35,8 +35,7 @@ export class GameScene extends Phaser.Scene {
   public currentAct: number | null = null;
   public currentStageIdx: number | null = null;
   public enemies: Enemy[] = [];
-  public seenEnemies: Set<string> = new Set();
-  
+
   public budgetCutTargetHero: Hero | null = null;
   public heroes: Hero[] = [];
   public attacks: Attack[] = [];
