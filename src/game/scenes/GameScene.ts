@@ -258,6 +258,19 @@ export class GameScene extends Phaser.Scene {
     setupGameAnimations(this);
     this.buildGame();
 
+    // The initial boot builds the battlefield only as a static backdrop behind
+    // the menus — it arrives with no stage data, so currentAct is null. Freeze
+    // it, otherwise update() auto-starts a wave and the heroes open fire,
+    // leaking the basic-attack SFX out behind the main menu before the player
+    // has deployed. A real campaign deploy reaches create() via scene.restart
+    // WITH stage data (currentAct set) and stays live; sandbox/default deploys
+    // never hit create() — they rebuild through resetGame(), which unfreezes by
+    // setting isPaused = false.
+    if (this.currentAct == null) {
+      this.isPaused = true;
+      this.syncVisualPauseState();
+    }
+
     this.cleanupUIEvents = setupUIEvents(this);
     const cleanupInternalEvents = setupInternalEvents(this);
 

@@ -160,8 +160,8 @@ export const AUDIO_MANIFEST: Record<string, string> = {
   // [SFX.heal]: '/assets/sounds/heal.mp3',
   //
   // Music (put files in public/assets/music/):
-  // The out-of-combat ambience bed (filename has a space → %20-encoded URL).
-  [MUSIC.ambience]: '/assets/music/default%20ambience.mp3',
+  // The out-of-combat ambience bed.
+  [MUSIC.ambience]: '/assets/music/default-ambience.mp3',
   // Default rally/battle bed — plays through a fight until a boss appears.
   [MUSIC.battle]: '/assets/music/Only_the_Waning_Light.mp3',
   [MUSIC.bossDefault]: '/assets/music/boss-default.mp3',   // boss theme, overrides battle
