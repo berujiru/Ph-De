@@ -1,6 +1,8 @@
 import { useEffect, useReducer } from 'react';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { theme } from '../theme';
+import { defaultSkin, type HeroSkin } from '../../game/data/skins';
+import type { HeroId } from '../../game/data/heroes';
 import {
   ChestIcon,
   HeroCardIcon,
@@ -19,6 +21,191 @@ interface MainMenuProps {
 import { getHope, getPermits, subscribeMetaState } from '../../game/data/metaState';
 
 const MARKER_FONT = '"Segoe Print", "Bradley Hand", "Comic Sans MS", cursive';
+
+/**
+ * Crops a single frame out of one of the game's 256px, 8-column sprite sheets
+ * with pure CSS (no canvas) so the menu can reuse the existing battle art. Cells
+ * are square, so the rendered box is `size × size`.
+ */
+function SpriteCell({
+  sheet,
+  columns,
+  rows,
+  frame,
+  size,
+  style,
+}: {
+  sheet: string;
+  columns: number;
+  rows: number;
+  frame: number;
+  size: number;
+  style?: CSSProperties;
+}) {
+  const col = frame % columns;
+  const row = Math.floor(frame / columns);
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        width: size,
+        height: size,
+        backgroundImage: `url("${sheet}")`,
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: `${columns * 100}% ${rows * 100}%`,
+        backgroundPosition: `${columns > 1 ? (col / (columns - 1)) * 100 : 0}% ${
+          rows > 1 ? (row / (rows - 1)) * 100 : 0
+        }%`,
+        ...style,
+      }}
+    />
+  );
+}
+
+/** A resting cell for a hero skin — its idle start, else the portrait cell. */
+function restingFrame(skin: HeroSkin): number {
+  return skin.states.idle?.from ?? skin.portraitFrame ?? 0;
+}
+
+interface HeroFigureProps {
+  id: HeroId;
+  /** On-screen height in px (cells are square). */
+  size: number;
+  /** Mirror horizontally for variety across the line. */
+  flip?: boolean;
+  /** Cooler, dimmer figure standing a step back from the flames. */
+  dim?: boolean;
+}
+
+/**
+ * A head-and-torso closeup of a sprite cell: renders the full cell at `width`,
+ * then clips to the top portion and fades the cut edge into shadow so the figure
+ * reads as a bust emerging from the dark rather than a hard-cropped rectangle.
+ */
+function SpriteBust({
+  sheet,
+  columns,
+  rows,
+  frame,
+  width,
+  flip,
+  filter,
+  opacity = 1,
+  /** Fraction of the (square) cell height kept — the bust window. */
+  showFrac = 0.52,
+  /** Fraction of empty headroom trimmed off the top of the cell. */
+  topTrim = 0.1,
+}: {
+  sheet: string;
+  columns: number;
+  rows: number;
+  frame: number;
+  width: number;
+  flip?: boolean;
+  filter?: string;
+  opacity?: number;
+  showFrac?: number;
+  topTrim?: number;
+}) {
+  return (
+    <div style={{ filter }}>
+      <div
+        style={{
+          width,
+          height: width * showFrac,
+          overflow: 'hidden',
+          position: 'relative',
+          WebkitMaskImage: 'linear-gradient(to bottom, #000 72%, transparent 100%)',
+          maskImage: 'linear-gradient(to bottom, #000 72%, transparent 100%)',
+        }}
+      >
+        <SpriteCell
+          sheet={sheet}
+          columns={columns}
+          rows={rows}
+          frame={frame}
+          size={width}
+          style={{
+            position: 'absolute',
+            top: -width * topTrim,
+            left: 0,
+            opacity,
+            transform: flip ? 'scaleX(-1)' : undefined,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * A companion at the bonfire, drawn as a torso-up closeup of a resting frame of
+ * their battle skin. Heroes are authored facing AWAY from the camera, so here
+ * they read as the squad gathered close at the fire, backs to us, facing the dark.
+ */
+function HeroFigure({ id, size, flip, dim }: HeroFigureProps) {
+  const skin = defaultSkin(id);
+  if (!skin) return null;
+  const rows = Math.ceil(skin.totalFrames / skin.columns);
+  return (
+    <SpriteBust
+      sheet={skin.sheet}
+      columns={skin.columns}
+      rows={rows}
+      frame={restingFrame(skin)}
+      width={size}
+      flip={flip}
+      opacity={dim ? 0.9 : 1}
+      filter={
+        dim
+          ? 'brightness(0.55) saturate(0.75)'
+          : 'drop-shadow(0 0 18px rgba(234, 88, 12, 0.35))'
+      }
+    />
+  );
+}
+
+/**
+ * Who stands at the bonfire. The outer pair are lit by the fire (warm glow);
+ * the inner pair stand back in cooler shadow. Eden anchors the left flank, the
+ * jeepney-driver bruiser the right.
+ */
+const HERO_LINE: { left: HeroFigureProps[]; right: HeroFigureProps[] } = {
+  left: [
+    { id: 'eden', size: 206 },
+    { id: 'teacher', size: 158, flip: true, dim: true },
+  ],
+  right: [
+    { id: 'nurse', size: 158, dim: true },
+    { id: 'jeepney_driver', size: 206, flip: true },
+  ],
+};
+
+/**
+ * The distant horde massing on the horizon — reused enemy sheets (front-facing,
+ * so they bear down toward us). Rendered small, dark, and desaturated on a
+ * slow-drifting parallax layer far behind the rally. All are 8-col/256px sheets.
+ */
+const ENEMY_HORDE: { sheet: string; rows: number; size: number; flip?: boolean }[] = [
+  { sheet: '/assets/enemies/minion_grunt_sprite.png', rows: 9, size: 78 },
+  { sheet: '/assets/enemies/epal_sprite.png', rows: 10, size: 86, flip: true },
+  { sheet: '/assets/enemies/crony_sprite.png', rows: 9, size: 80 },
+  { sheet: '/assets/enemies/brute_sheet.png', rows: 8, size: 96 },
+  { sheet: '/assets/enemies/ghost_employee_sprite.png', rows: 10, size: 74, flip: true },
+  { sheet: '/assets/enemies/minion_runner_sprite.png', rows: 9, size: 76 },
+];
+
+/**
+ * Ang Sistema — the finale boss (`boss_ang_sistema`, "The System"). Looms as a
+ * large front-facing bust behind the horde, the final threat the rally marches
+ * toward. Its 8-col/256px sheet is `sistema_sprite.png` (10 rows).
+ */
+const ANG_SISTEMA_BOSS = {
+  sheet: '/assets/enemies/sistema_sprite.png',
+  columns: 8,
+  rows: 10,
+  frame: 0,
+};
 
 /** The crowd at the bottom edge: survivors, charred placards, and the squad. */
 function RallyCrowd() {
@@ -74,6 +261,39 @@ function RallyCrowd() {
         </g>
       </svg>
 
+      {/* Far parallax layer: the enemy horde massing on the horizon, small and
+          dark, drifting uneasily behind the rally (front-facing = bearing down). */}
+      <div
+        className="menu-horde"
+        style={{
+          position: 'absolute',
+          top: '4%',
+          left: '-3%',
+          width: '106%',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
+          padding: '0 3%',
+          zIndex: 0,
+        }}
+      >
+        {ENEMY_HORDE.map((e, i) => (
+          <SpriteCell
+            key={i}
+            sheet={e.sheet}
+            columns={8}
+            rows={e.rows}
+            frame={0}
+            size={e.size}
+            style={{
+              transform: e.flip ? 'scaleX(-1)' : undefined,
+              opacity: 0.6,
+              filter: 'brightness(0.32) saturate(0.55) contrast(1.05)',
+            }}
+          />
+        ))}
+      </div>
+
       {/* Bonfire — the movement's safe-point, survivors gather around it */}
       <div
         style={{
@@ -87,8 +307,8 @@ function RallyCrowd() {
         <Bonfire size={150} />
       </div>
 
-      {/* Heroes rallying at the sides */}
-      {/* Left flank */}
+      {/* Near layer: the squad standing watch at the fire, drawn from resting
+          frames of their battle skins (backs to us, facing the dark). */}
       <div
         style={{
           position: 'absolute',
@@ -97,21 +317,14 @@ function RallyCrowd() {
           display: 'flex',
           alignItems: 'flex-end',
           gap: 4,
+          zIndex: 2,
         }}
       >
-        <img
-          src="/assets/heroes/hero-placeholder.svg"
-          alt=""
-          style={{ width: 160, height: 160, filter: 'drop-shadow(0 0 16px rgba(234, 88, 12, 0.3))' }}
-        />
-        <img
-          src="/assets/heroes/hero-placeholder.svg"
-          alt=""
-          style={{ width: 120, height: 120, opacity: 0.9, transform: 'scaleX(-1)', filter: 'brightness(0.6) sepia(0.5) hue-rotate(-20deg)' }}
-        />
+        {HERO_LINE.left.map((h) => (
+          <HeroFigure key={h.id} {...h} />
+        ))}
       </div>
 
-      {/* Right flank */}
       <div
         style={{
           position: 'absolute',
@@ -120,18 +333,12 @@ function RallyCrowd() {
           display: 'flex',
           alignItems: 'flex-end',
           gap: 4,
+          zIndex: 2,
         }}
       >
-        <img
-          src="/assets/heroes/hero-placeholder.svg"
-          alt=""
-          style={{ width: 120, height: 120, opacity: 0.9, filter: 'brightness(0.6) sepia(0.5) hue-rotate(-20deg)' }}
-        />
-        <img
-          src="/assets/heroes/hero-placeholder.svg"
-          alt=""
-          style={{ width: 160, height: 160, filter: 'drop-shadow(0 0 16px rgba(234, 88, 12, 0.3))', transform: 'scaleX(-1)' }}
-        />
+        {HERO_LINE.right.map((h) => (
+          <HeroFigure key={h.id} {...h} />
+        ))}
       </div>
     </div>
   );
@@ -237,6 +444,33 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
           );
         })}
       </svg>
+
+      {/* Ang Sistema — the finale boss, rendered GIGANTIC and deliberately
+          overflowing the frame: anchored at the bottom and scaled up so it towers
+          behind the rally, head/shoulders cut off by the screen edges. Sits behind
+          the crowd (earlier in the DOM) so the heroes read in front of it. */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          bottom: '22%',
+          left: '50%',
+          transform: 'translateX(-50%) scale(2.7)',
+          transformOrigin: 'bottom center',
+          pointerEvents: 'none',
+        }}
+      >
+        <SpriteBust
+          sheet={ANG_SISTEMA_BOSS.sheet}
+          columns={ANG_SISTEMA_BOSS.columns}
+          rows={ANG_SISTEMA_BOSS.rows}
+          frame={ANG_SISTEMA_BOSS.frame}
+          width={260}
+          showFrac={0.62}
+          opacity={0.8}
+          filter="brightness(0.4) saturate(0.85) contrast(1.05) drop-shadow(0 0 30px rgba(220, 38, 38, 0.4))"
+        />
+      </div>
 
       <RallyCrowd />
 

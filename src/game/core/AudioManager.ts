@@ -241,7 +241,17 @@ class AudioManagerImpl {
   }
 
   private getSoundVolume(sound: Phaser.Sound.BaseSound): number {
-    return (sound as { volume?: number }).volume ?? 0;
+    // A destroyed/removed WebAudioSound nulls its gain node, so reading `.volume`
+    // throws ("Cannot read properties of null"). Treat anything mid-teardown as
+    // silent rather than let a crossfade crash.
+    if ((sound as { pendingRemove?: boolean }).pendingRemove || !(sound as { manager?: unknown }).manager) {
+      return 0;
+    }
+    try {
+      return (sound as { volume?: number }).volume ?? 0;
+    } catch {
+      return 0;
+    }
   }
 
   /** rAF-based volume ramp — decoupled from any Phaser scene's tween manager. */

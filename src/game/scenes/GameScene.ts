@@ -266,9 +266,12 @@ export class GameScene extends Phaser.Scene {
     // WITH stage data (currentAct set) and stays live; sandbox/default deploys
     // never hit create() — they rebuild through resetGame(), which unfreezes by
     // setting isPaused = false.
+    // Only `isPaused` — update() bails on it, which is all we need to keep the
+    // backdrop silent and still. Do NOT syncVisualPauseState() here: that calls
+    // game.sound.pauseAll(), which would pause the menu ambience the moment it
+    // starts and desync AudioManager's music crossfade.
     if (this.currentAct == null) {
       this.isPaused = true;
-      this.syncVisualPauseState();
     }
 
     this.cleanupUIEvents = setupUIEvents(this);

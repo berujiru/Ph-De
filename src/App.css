@@ -270,6 +270,15 @@
 /* Souls-inspired post-apocalypse atmosphere (shared across meta screens) */
 /* ------------------------------------------------------------------ */
 
+/* Distant enemy horde on the main menu — a slow, uneasy shamble sideways. */
+@keyframes menu-horde-drift {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(16px); }
+}
+.menu-horde {
+  animation: menu-horde-drift 11s ease-in-out infinite;
+}
+
 /* Slow drift of the corruption miasma layered on a screen's background. */
 @keyframes miasma-drift {
   0%   { background-position: 0% 50%, 100% 50%, 50% 100%; }
@@ -330,6 +339,7 @@
   .rally-flicker,
   .reward-card,
   .ember-particle,
+  .menu-horde,
   .rally-screen {
     animation: none;
   }
