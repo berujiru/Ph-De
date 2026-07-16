@@ -279,6 +279,33 @@
   animation: menu-horde-drift 11s ease-in-out infinite;
 }
 
+/* The squad at the bonfire breathing slowly — stagger with animation-delay. */
+@keyframes menu-breathe {
+  from { transform: translateY(0); }
+  to   { transform: translateY(4px); }
+}
+.menu-breathe {
+  animation: menu-breathe 4.4s ease-in-out infinite alternate;
+}
+
+/* Main-menu CTA — the brightest ember on screen: scale + glow flare so it
+   reads as lit by the bonfire behind it. */
+@keyframes menu-cta-flare {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 22px rgba(234, 88, 12, 0.5), 0 0 54px rgba(234, 88, 12, 0.22),
+      inset 0 0 16px rgba(234, 88, 12, 0.2);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 34px rgba(234, 88, 12, 0.75), 0 0 80px rgba(234, 88, 12, 0.32),
+      inset 0 0 20px rgba(234, 88, 12, 0.28);
+  }
+}
+.menu-cta {
+  animation: menu-cta-flare 2.6s ease-in-out infinite;
+}
+
 /* Slow drift of the corruption miasma layered on a screen's background. */
 @keyframes miasma-drift {
   0%   { background-position: 0% 50%, 100% 50%, 50% 100%; }
@@ -340,8 +367,15 @@
   .reward-card,
   .ember-particle,
   .menu-horde,
+  .menu-breathe,
+  .menu-cta,
   .rally-screen {
     animation: none;
+  }
+  /* Static fallback so the CTA keeps its ember prominence without motion. */
+  .menu-cta {
+    box-shadow: 0 0 26px rgba(234, 88, 12, 0.6), 0 0 60px rgba(234, 88, 12, 0.25),
+      inset 0 0 16px rgba(234, 88, 12, 0.22);
   }
   .ember-particle {
     opacity: 0.5;

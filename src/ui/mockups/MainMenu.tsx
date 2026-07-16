@@ -156,10 +156,12 @@ function HeroFigure({ id, size, flip, dim }: HeroFigureProps) {
       width={size}
       flip={flip}
       opacity={dim ? 0.9 : 1}
+      // Even the fire-lit pair stays a step darker than the CTA — the squad
+      // frames the terminal focus, it doesn't compete with it.
       filter={
         dim
-          ? 'brightness(0.55) saturate(0.75)'
-          : 'drop-shadow(0 0 18px rgba(234, 88, 12, 0.35))'
+          ? 'brightness(0.5) saturate(0.7)'
+          : 'brightness(0.82) drop-shadow(0 0 14px rgba(234, 88, 12, 0.25))'
       }
     />
   );
@@ -172,12 +174,12 @@ function HeroFigure({ id, size, flip, dim }: HeroFigureProps) {
  */
 const HERO_LINE: { left: HeroFigureProps[]; right: HeroFigureProps[] } = {
   left: [
-    { id: 'eden', size: 206 },
-    { id: 'teacher', size: 158, flip: true, dim: true },
+    { id: 'eden', size: 178 },
+    { id: 'teacher', size: 138, flip: true, dim: true },
   ],
   right: [
-    { id: 'nurse', size: 158, dim: true },
-    { id: 'jeepney_driver', size: 206, flip: true },
+    { id: 'nurse', size: 138, dim: true },
+    { id: 'jeepney_driver', size: 178, flip: true },
   ],
 };
 
@@ -287,24 +289,29 @@ function RallyCrowd() {
             size={e.size}
             style={{
               transform: e.flip ? 'scaleX(-1)' : undefined,
-              opacity: 0.6,
-              filter: 'brightness(0.32) saturate(0.55) contrast(1.05)',
+              opacity: 0.75,
+              // Bright enough to read as distinct silhouettes (not mush), with a
+              // faint fire-lit rim so they sit in the same light as the scene.
+              filter:
+                'brightness(0.46) saturate(0.6) contrast(1.12) drop-shadow(0 0 5px rgba(234,88,12,0.22))',
             }}
           />
         ))}
       </div>
 
-      {/* Bonfire — the movement's safe-point, survivors gather around it */}
+      {/* Bonfire — the movement's safe-point and the eye's landing zone: raised
+          so its flame crowns just above the CTA and backlights it, welding the
+          fire and "Start the Rally" into one terminal focus. */}
       <div
         style={{
           position: 'absolute',
-          bottom: 0,
+          bottom: 'clamp(92px, 15vh, 150px)',
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 1,
         }}
       >
-        <Bonfire size={150} />
+        <Bonfire size={160} />
       </div>
 
       {/* Near layer: the squad standing watch at the fire, drawn from resting
@@ -312,7 +319,7 @@ function RallyCrowd() {
       <div
         style={{
           position: 'absolute',
-          bottom: -10,
+          bottom: -14,
           left: '2%',
           display: 'flex',
           alignItems: 'flex-end',
@@ -320,15 +327,17 @@ function RallyCrowd() {
           zIndex: 2,
         }}
       >
-        {HERO_LINE.left.map((h) => (
-          <HeroFigure key={h.id} {...h} />
+        {HERO_LINE.left.map((h, i) => (
+          <div key={h.id} className="menu-breathe" style={{ animationDelay: `${i * 1.3}s` }}>
+            <HeroFigure {...h} />
+          </div>
         ))}
       </div>
 
       <div
         style={{
           position: 'absolute',
-          bottom: -10,
+          bottom: -14,
           right: '2%',
           display: 'flex',
           alignItems: 'flex-end',
@@ -336,8 +345,10 @@ function RallyCrowd() {
           zIndex: 2,
         }}
       >
-        {HERO_LINE.right.map((h) => (
-          <HeroFigure key={h.id} {...h} />
+        {HERO_LINE.right.map((h, i) => (
+          <div key={h.id} className="menu-breathe" style={{ animationDelay: `${0.7 + i * 1.3}s` }}>
+            <HeroFigure {...h} />
+          </div>
         ))}
       </div>
     </div>
@@ -359,10 +370,11 @@ function BalancePill({ icon, label, value, valueColor }: {
         gap: 8,
         minHeight: 44,
         padding: '6px 14px',
-        backgroundColor: theme.colors.surfaceGlass,
+        // Opaque (not glass) so the busy ruin scene can never bleed through
+        // the numbers — these two pills must stay instantly readable.
+        backgroundColor: theme.colors.surface,
         border: `1px solid ${theme.colors.borderGlass}`,
         borderRadius: 999,
-        backdropFilter: 'blur(12px)',
         boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
       }}
     >
@@ -424,12 +436,14 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
       <FireVignette />
       <Embers count={14} />
 
-      {/* strung-up street wire with bulbs — half of them dead/dark */}
+      {/* strung-up street wire with bulbs — half of them dead/dark. Hung in the
+          mid-scene (below the title tarp, above the horde) so it never crosses
+          the status pills; the tarp reads as strung from this wire. */}
       <svg
         viewBox="0 0 800 90"
         preserveAspectRatio="none"
         aria-hidden="true"
-        style={{ position: 'absolute', top: 64, left: 0, width: '100%', height: 90, pointerEvents: 'none' }}
+        style={{ position: 'absolute', top: '26%', left: 0, width: '100%', height: 90, pointerEvents: 'none', opacity: 0.9 }}
       >
         <path d="M-10 12 Q 200 66 400 34 T 810 22" fill="none" stroke={theme.materials.metalDark} strokeWidth="2" />
         {[90, 230, 390, 545, 700].map((x, i) => {
@@ -445,18 +459,19 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
         })}
       </svg>
 
-      {/* Ang Sistema — the finale boss, rendered GIGANTIC and deliberately
-          overflowing the frame: anchored at the bottom and scaled up so it towers
-          behind the rally, head/shoulders cut off by the screen edges. Sits behind
-          the crowd (earlier in the DOM) so the heroes read in front of it. */}
+      {/* Ang Sistema — the finale boss, looming as ATMOSPHERE, not a focal
+          subject: anchored to the middle third (head clear of the title tarp),
+          overflowing the frame sideways, dimmed to a half-seen shape whose feet
+          sink behind the crowd. Its red rim glow is kept faint so it never
+          competes with the CTA's ember-orange at the bottom of the eye path. */}
       <div
         aria-hidden="true"
         style={{
           position: 'absolute',
-          bottom: '22%',
+          top: '34%',
           left: '50%',
-          transform: 'translateX(-50%) scale(2.7)',
-          transformOrigin: 'bottom center',
+          transform: 'translateX(-50%) scale(2.2)',
+          transformOrigin: 'top center',
           pointerEvents: 'none',
         }}
       >
@@ -467,8 +482,8 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
           frame={ANG_SISTEMA_BOSS.frame}
           width={260}
           showFrac={0.62}
-          opacity={0.8}
-          filter="brightness(0.4) saturate(0.85) contrast(1.05) drop-shadow(0 0 30px rgba(220, 38, 38, 0.4))"
+          opacity={0.6}
+          filter="brightness(0.32) saturate(0.7) contrast(1.08) drop-shadow(0 0 24px rgba(220, 38, 38, 0.22))"
         />
       </div>
 
@@ -500,8 +515,9 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
         />
       </div>
 
-      {/* Title tarp */}
-      <div style={{ position: 'relative', zIndex: 10, display: 'flex', justifyContent: 'center', padding: '4vh 16px 0' }}>
+      {/* Title tarp — anchored high, right under the status strip, so the eye
+          path reads top-to-bottom: title → scene → bonfire-lit CTA. */}
+      <div style={{ position: 'relative', zIndex: 10, display: 'flex', justifyContent: 'center', padding: '1vh 16px 0' }}>
         <div
           style={{
             position: 'relative',
@@ -551,16 +567,50 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
           >
             First Ripple
           </h1>
+          {/* Tagline — a protest chant hand-painted on the tarp: the wake-up
+              call against the corruption. */}
           <div
             style={{
-              marginTop: 6,
-              fontFamily: MARKER_FONT,
-              fontSize: 'clamp(12px, 2.4vw, 17px)',
-              color: '#fecaca',
-              letterSpacing: 2,
+              marginTop: 8,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 1,
             }}
           >
-            mula sa isang boses, isang alon
+            <span
+              style={{
+                fontFamily: MARKER_FONT,
+                fontSize: 'clamp(14px, 3.2vw, 19px)',
+                color: theme.materials.paper,
+                letterSpacing: 1,
+                textShadow: '0 2px 6px rgba(0,0,0,0.8), 0 0 12px rgba(234,88,12,0.3)',
+              }}
+            >
+              Gising na, Bayan!
+            </span>
+            {/* hand-painted underline stroke */}
+            <svg width="156" height="8" viewBox="0 0 156 8" aria-hidden="true">
+              <path
+                d="M4 5 Q 42 1 78 4 T 152 3"
+                fill="none"
+                stroke={theme.colors.accent}
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                opacity="0.7"
+              />
+            </svg>
+            <span
+              style={{
+                fontSize: 10,
+                letterSpacing: 3,
+                textTransform: 'uppercase',
+                fontWeight: 700,
+                color: theme.colors.textSecondary,
+              }}
+            >
+              the awakening begins
+            </span>
           </div>
         </div>
       </div>
@@ -578,7 +628,7 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
           padding: '0 16px calc(24px + 6vh)',
         }}
       >
-        <SoulsButton variant="primary" size="lg" onClick={onPlay} className="rally-pulse">
+        <SoulsButton variant="primary" size="lg" onClick={onPlay} className="menu-cta">
           <MegaphoneIcon size={30} />
           Start the Rally
         </SoulsButton>
