@@ -135,7 +135,8 @@ function App() {
           style={{
             position: 'absolute',
             top: 12,
-            left: 12,
+            // Keep clear of the stage-crop on narrow screens (see .portrait-stage).
+            left: 'calc(12px + var(--stage-crop, 0px))',
             zIndex: 150,
             width: 40,
             height: 40,

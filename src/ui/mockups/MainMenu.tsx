@@ -489,7 +489,9 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
 
       <RallyCrowd />
 
-      {/* Top status strip: Hope + Permits */}
+      {/* Top status strip: Hope + Permits. Horizontal padding grows by the
+          stage-crop so the pills stay on screen when the 9:16 stage overflows
+          a narrower viewport (see .portrait-stage in App.css). */}
       <div
         style={{
           position: 'relative',
@@ -497,7 +499,7 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
           display: 'flex',
           justifyContent: 'flex-end',
           gap: 10,
-          padding: '14px 16px',
+          padding: '14px calc(16px + var(--stage-crop, 0px))',
           flexWrap: 'wrap',
         }}
       >

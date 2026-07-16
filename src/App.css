@@ -27,6 +27,10 @@
      On screens taller than 16:9 (like iPhone 12/14), the width will overflow
      symmetrically on the left and right, ensuring no black bars on top/bottom. */
   width: calc(100dvh * 9 / 16);
+  /* How much of each side the viewport crops off the stage on narrow screens.
+     Edge-anchored UI (status pills, audio button) pads by this so it never
+     gets cut; centered content needs nothing. */
+  --stage-crop: max(0px, calc((100dvh * 9 / 16 - 100vw) / 2));
   height: 100dvh;
   max-width: none;
   max-height: none;
