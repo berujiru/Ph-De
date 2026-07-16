@@ -200,7 +200,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
       </div>
 
       {/* Tabs: Roster vs Truth Codex */}
-      <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap', zIndex: 10 }}>
+      <div style={{ display: 'flex', gap: 10, marginBottom: 22, flexWrap: 'wrap', zIndex: 10 }}>
         {([
           { id: 'heroes' as const, label: 'The Roster', count: `${roster.length} workers` },
           { id: 'codex' as const, label: 'The Truth Codex', count: `${facedCount}/${CODEX_ENEMIES.length} debunked` },
@@ -231,7 +231,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
 
       {/* HEROES: Grid of Polaroid Cards */}
       {tab === 'heroes' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(68px, 1fr))', gap: '8px 6px', padding: '6px 2px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(84px, 1fr))', gap: '18px 14px', padding: '10px 4px' }}>
           {roster.map((hero, idx) => {
             // Unlock path comes from the campaign schedule (data/heroUnlocks.ts);
             // level + card counts are real, from metaState.
@@ -301,7 +301,7 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
             <InfoIcon size={16} />
             Every anomaly you face in the field is filed here — a lie debunked.
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(72px, 1fr))', gap: '8px 6px', padding: '4px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 1fr))', gap: '18px 14px', padding: '8px 4px' }}>
             {CODEX_ENEMIES.map((def, idx) => {
               const faced = FACED_ENEMY_IDS.has(def.id);
               const tier = enemyTier(def);

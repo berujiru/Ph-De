@@ -10,6 +10,7 @@ import {
 } from '../icons';
 import { BackButton } from '../components/BackButton';
 import { Embers } from '../components/ApocalypseScenery';
+import { HeroTcgCard } from '../components/HeroTcgCard';
 import { RewardReveal, type RevealReward } from '../components/RewardReveal';
 import type { DropRarity } from '../../game/core/GameEvents';
 import { HERO_DEFINITIONS, type HeroId } from '../../game/data/heroes';
@@ -251,7 +252,7 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
           marginRight: -6,
           minHeight: 38,
           minWidth: 72,
-          backgroundColor: theme.materials.cardboard,
+          backgroundColor: affordable ? theme.materials.cardboard : '#7f1d1d',
           backgroundImage:
             'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px)',
           color: theme.colors.textPrimary,
@@ -323,15 +324,97 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
             <HopeCoinIcon size={18} />
           </span>
         </span>
-        {!affordable && (
-          <span style={{ fontSize: 10, fontFamily: 'inherit', fontWeight: 700 }}>wala pang Hope!</span>
-        )}
       </button>
     </div>
   );
 }
 
-const HERO_PLACEHOLDER_SRC = '/assets/heroes/hero-placeholder.svg';
+/**
+ * A locked hero on the Recruitment Board — shown as their full Hero TCG card so
+ * the player sees exactly who they're hiring, with a cardboard "Recruit" tag as
+ * the buy button.
+ */
+function RecruitCard({ item, heroId, affordable, onBuy }: { item: CatalogItem; heroId: HeroId; affordable: boolean; onBuy: (item: CatalogItem) => void }) {
+  const heroName = item.title.replace(/^Recruit:\s*/, '');
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, width: 300, maxWidth: '100%' }}>
+      <div
+        style={{
+          position: 'relative',
+          opacity: affordable ? 1 : 0.72,
+          filter: affordable ? 'none' : 'grayscale(0.5)',
+          transition: 'opacity 0.2s, filter 0.2s',
+        }}
+      >
+        <HeroTcgCard heroId={heroId} />
+        {/* "not yet recruited" ribbon slapped across the card */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            top: 16,
+            left: -6,
+            zIndex: 60,
+            backgroundColor: theme.colors.danger,
+            color: theme.colors.textPrimary,
+            fontFamily: MARKER_FONT,
+            fontWeight: 700,
+            fontSize: 12,
+            letterSpacing: 2,
+            textTransform: 'uppercase',
+            padding: '4px 12px',
+            transform: 'rotate(-6deg)',
+            boxShadow: '2px 2px 8px rgba(0,0,0,0.7)',
+          }}
+        >
+          Not yet recruited
+        </div>
+      </div>
+
+      <button
+        disabled={!affordable}
+        onClick={() => affordable && onBuy(item)}
+        aria-label={
+          affordable
+            ? `Recruit ${heroName} for ${item.cost} Hope Points`
+            : `Recruit ${heroName} costs ${item.cost} Hope Points — not enough Hope`
+        }
+        style={{
+          backgroundColor: affordable ? theme.materials.cardboard : '#7f1d1d',
+          backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px)',
+          color: theme.colors.textPrimary,
+          border: `1px solid ${theme.materials.rustDark}`,
+          borderRadius: 2,
+          padding: '8px 18px',
+          fontFamily: MARKER_FONT,
+          fontWeight: 900,
+          fontSize: 15,
+          cursor: affordable ? 'pointer' : 'not-allowed',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          minHeight: 44,
+          boxShadow: '2px 4px 10px rgba(0,0,0,0.6), inset 0 0 14px rgba(0,0,0,0.5)',
+          transform: 'rotate(-1.5deg)',
+          opacity: affordable ? 1 : 0.85,
+          transition: 'transform 0.1s, box-shadow 0.15s',
+        }}
+        onMouseOver={(e) => {
+          if (affordable) e.currentTarget.style.boxShadow = '2px 4px 10px rgba(0,0,0,0.6), inset 0 0 14px rgba(0,0,0,0.5), 0 0 16px rgba(234,88,12,0.5)';
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.boxShadow = '2px 4px 10px rgba(0,0,0,0.6), inset 0 0 14px rgba(0,0,0,0.5)';
+        }}
+      >
+        Recruit — {item.cost.toLocaleString()}
+        <span style={{ color: theme.colors.gold, display: 'flex', filter: 'drop-shadow(0 0 4px rgba(250, 204, 21, 0.4))' }}>
+          <HopeCoinIcon size={20} />
+        </span>
+      </button>
+    </div>
+  );
+}
+
 const CARD_RARITIES: DropRarity[] = ['common', 'common', 'rare', 'common', 'epic', 'rare'];
 
 /** Build the reveal payload for a purchase — hero unlocks and card packs
@@ -339,7 +422,8 @@ const CARD_RARITIES: DropRarity[] = ['common', 'common', 'rare', 'common', 'epic
  *  actual heroes the pack rolled, so the reveal names who leveled up. */
 function rewardsFor(item: CatalogItem, grantedCards: HeroId[] = []): { heading: string; rewards: RevealReward[] } {
   switch (item.category) {
-    case 'Hero Unlocks':
+    case 'Hero Unlocks': {
+      const heroId = item.id.replace('unlock_', '') as HeroId;
       return {
         heading: 'A Worker Joins!',
         rewards: [{
@@ -347,9 +431,10 @@ function rewardsFor(item: CatalogItem, grantedCards: HeroId[] = []): { heading: 
           title: item.title.replace(/^Recruit:\s*/, ''),
           subtitle: 'Answered the call — stationed in the roster.',
           rarity: 'epic',
-          portraitSrc: HERO_PLACEHOLDER_SRC,
+          portraitSrc: `/assets/heroes/${heroId}_portrait.png`,
         }],
       };
+    }
     case 'Hero Cards': {
       const rewards: RevealReward[] = grantedCards.map((heroId, i) => ({
         id: `${item.id}-${i}`,
@@ -390,26 +475,19 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
     return unlockStage > highestStage && !storeUnlocked.includes(id);
   });
 
-  const catalog = [
-    ...BASE_CATALOG,
-    ...lockedHeroes.map((heroId) => {
-      const def = HERO_DEFINITIONS[heroId];
-      return {
-        id: `unlock_${heroId}`,
-        category: 'Hero Unlocks' as CatalogCategory,
-        title: `Recruit: ${def.name}`,
-        description: `Hire ${def.name} early for the movement!`,
-        cost: 5000,
-        icon: (
-          <img
-            src={HERO_PLACEHOLDER_SRC}
-            alt=""
-            style={{ width: 34, height: 34, filter: 'brightness(0.4)' }}
-          />
-        ),
-      };
-    }),
-  ];
+  // Locked heroes get their own Recruitment Board (full Hero TCG cards); the
+  // hanging wire only carries the consumable/cosmetic goods.
+  const recruitItems: CatalogItem[] = lockedHeroes.map((heroId) => {
+    const def = HERO_DEFINITIONS[heroId];
+    return {
+      id: `unlock_${heroId}`,
+      category: 'Hero Unlocks' as CatalogCategory,
+      title: `Recruit: ${def.name}`,
+      description: `Hire ${def.name} early for the movement!`,
+      cost: 5000,
+      icon: <HeroCardIcon size={30} />,
+    };
+  });
 
   const handleBuy = (item: CatalogItem) => {
     if (spendHope(item.cost)) {
@@ -676,18 +754,51 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
             style={{
               display: 'flex',
               flexWrap: 'wrap',
-              gap: '4px 6px',
+              gap: '34px 22px',
               justifyContent: 'center',
-              padding: '0 0 20px',
+              padding: '8px 0 28px',
               position: 'relative',
               zIndex: 10,
             }}
           >
-            {catalog.map((item, i) => (
+            {BASE_CATALOG.map((item, i) => (
               <HangingGood key={item.id} item={item} index={i} affordable={item.cost <= hope} onBuy={handleBuy} />
             ))}
           </div>
         </div>
+
+        {/* Recruitment Board — locked heroes shown as full Hero TCG cards */}
+        {recruitItems.length > 0 && (
+          <div style={{ marginTop: 40, position: 'relative', zIndex: 10 }}>
+            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+              <span
+                style={{
+                  fontFamily: MARKER_FONT,
+                  fontSize: 24,
+                  color: theme.materials.paper,
+                  letterSpacing: 2,
+                  textShadow: '2px 2px 0 rgba(0,0,0,0.6), 0 0 12px rgba(234,88,12,0.25)',
+                }}
+              >
+                Recruitment Board
+              </span>
+              <div style={{ fontSize: 11, color: theme.colors.textMuted, letterSpacing: 1, marginTop: 6 }}>
+                Hire a worker early — they join the roster and start dropping in battle.
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 28, justifyContent: 'center' }}>
+              {recruitItems.map((item) => (
+                <RecruitCard
+                  key={item.id}
+                  item={item}
+                  heroId={item.id.replace('unlock_', '') as HeroId}
+                  affordable={item.cost <= hope}
+                  onBuy={handleBuy}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Shelf silhouettes at the bottom */}
         <div
