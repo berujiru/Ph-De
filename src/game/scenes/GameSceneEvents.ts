@@ -721,7 +721,7 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
       depth: evt.y + 50
     });
   } else if (evt.type === 'spawnFirePatch') {
-    const attack = new AoeFirePatchAttack(scene, evt.x, evt.y, evt.radius, evt.duration, evt.damage);
+    const attack = new AoeFirePatchAttack(scene, evt.x, evt.y, evt.radius, evt.duration, evt.damage, evt.flavor ?? 'spicy');
     scene.attacks.push(attack);
   } else if (evt.type === 'spawnMolotovPatch') {
     // 1. Arc animation

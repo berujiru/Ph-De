@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { theme } from '../theme';
 import { defaultSkin, type HeroSkin } from '../../game/data/skins';
@@ -206,10 +206,43 @@ const ANG_SISTEMA_BOSS = {
   sheet: '/assets/enemies/sistema_sprite.png',
   columns: 8,
   rows: 10,
-  frame: 0,
+  // The battle's `boss_ang_sistema-march` anim (GameSceneAnimations.ts):
+  // frames 0–25 at 10fps, looping.
+  march: { from: 0, to: 25, fps: 10 },
 };
 
-/** The crowd at the bottom edge: survivors, charred placards, and the squad. */
+/** Loops a frame index over [from, to] at `fps`, like a Phaser repeat:-1 anim. */
+function useFrameLoop(from: number, to: number, fps: number): number {
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 1000 / fps);
+    return () => clearInterval(id);
+  }, [fps]);
+  return from + (tick % (to - from + 1));
+}
+
+/**
+ * The looming boss bust, split into its own component so the 10fps march
+ * ticks only re-render this sprite, not the whole menu.
+ */
+function AngSistemaFigure() {
+  const { march } = ANG_SISTEMA_BOSS;
+  const frame = useFrameLoop(march.from, march.to, march.fps);
+  return (
+    <SpriteBust
+      sheet={ANG_SISTEMA_BOSS.sheet}
+      columns={ANG_SISTEMA_BOSS.columns}
+      rows={ANG_SISTEMA_BOSS.rows}
+      frame={frame}
+      width={260}
+      showFrac={0.62}
+      opacity={0.72}
+      filter="brightness(0.45) saturate(0.85) contrast(1.1) drop-shadow(0 0 18px rgba(220, 38, 38, 0.55)) drop-shadow(0 0 44px rgba(220, 38, 38, 0.3))"
+    />
+  );
+}
+
+/** The crowd at the bottom edge: survivors with raised fists, and the squad. */
 function RallyCrowd() {
   return (
     <div
@@ -225,7 +258,7 @@ function RallyCrowd() {
         overflow: 'hidden',
       }}
     >
-      {/* placard + fist silhouettes behind the heroes */}
+      {/* crowd + raised-fist silhouettes behind the heroes */}
       <svg
         viewBox="0 0 800 260"
         preserveAspectRatio="xMidYMax slice"
@@ -234,17 +267,6 @@ function RallyCrowd() {
         <g fill="#0c0a09">
           {/* rolling heads of the crowd */}
           <path d="M0 260V190q30-24 60-10t60-6 62 10 58-14 62 8 60-10 62 12 58-12 62 10 60-8 62 12 58-10 62 8 54-6v66z" />
-          {/* placards on sticks */}
-          <g>
-            <rect x="70" y="60" width="90" height="58" rx="4" />
-            <rect x="112" y="118" width="6" height="70" />
-            <rect x="250" y="30" width="104" height="64" rx="4" transform="rotate(-6 302 62)" />
-            <rect x="298" y="92" width="6" height="86" transform="rotate(-6 301 135)" />
-            <rect x="470" y="52" width="96" height="60" rx="4" transform="rotate(5 518 82)" />
-            <rect x="514" y="110" width="6" height="76" transform="rotate(5 517 148)" />
-            <rect x="650" y="42" width="88" height="56" rx="4" transform="rotate(-4 694 70)" />
-            <rect x="690" y="96" width="6" height="80" transform="rotate(-4 693 136)" />
-          </g>
           {/* raised fists */}
           <g>
             <rect x="185" y="120" width="14" height="60" rx="7" />
@@ -254,12 +276,6 @@ function RallyCrowd() {
             <rect x="596" y="126" width="14" height="56" rx="7" />
             <rect x="587" y="104" width="32" height="30" rx="10" />
           </g>
-        </g>
-        {/* placard slogans, barely readable strokes */}
-        <g stroke="#3f3f46" strokeWidth="5" strokeLinecap="round" opacity="0.6">
-          <path d="M86 80h58M86 96h38" />
-          <path d="M268 52h64M268 68h44" transform="rotate(-6 302 62)" />
-          <path d="M486 72h58M486 88h36" transform="rotate(5 518 82)" />
         </g>
       </svg>
 
@@ -459,11 +475,11 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
         })}
       </svg>
 
-      {/* Ang Sistema — the finale boss, looming as ATMOSPHERE, not a focal
-          subject: anchored to the middle third (head clear of the title tarp),
-          overflowing the frame sideways, dimmed to a half-seen shape whose feet
-          sink behind the crowd. Its red rim glow is kept faint so it never
-          competes with the CTA's ember-orange at the bottom of the eye path. */}
+      {/* Ang Sistema — the finale boss, looming behind the horde: anchored to
+          the middle third (head clear of the title tarp), overflowing the frame
+          sideways, feet sinking behind the crowd. Brightened just enough to be
+          legible, with a strong RED rim glow — cold menace, distinct from the
+          CTA's ember-orange, so the eye path to "Start the Rally" still wins. */}
       <div
         aria-hidden="true"
         style={{
@@ -475,16 +491,7 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
           pointerEvents: 'none',
         }}
       >
-        <SpriteBust
-          sheet={ANG_SISTEMA_BOSS.sheet}
-          columns={ANG_SISTEMA_BOSS.columns}
-          rows={ANG_SISTEMA_BOSS.rows}
-          frame={ANG_SISTEMA_BOSS.frame}
-          width={260}
-          showFrac={0.62}
-          opacity={0.6}
-          filter="brightness(0.32) saturate(0.7) contrast(1.08) drop-shadow(0 0 24px rgba(220, 38, 38, 0.22))"
-        />
+        <AngSistemaFigure />
       </div>
 
       <RallyCrowd />

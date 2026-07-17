@@ -1044,21 +1044,41 @@ export class TrapAttack extends Attack {
       }
     }
     
+    // Frost traps burst icy-blue with a lingering rime patch; other trap
+    // damage types keep the original red shockwave.
+    const frost = this.damageType === 'Frost';
+    const palette = frost
+      ? { fill: 0x38bdf8, ring: 0x7dd3fc, ringStroke: 0xe0f2fe, spark: 0xbae6fd }
+      : { fill: 0xff0000, ring: 0xff0000, ringStroke: 0xfca5a5, spark: 0xfca5a5 };
+
     spawnShockwaveRing(this.scene, {
       x: this.visual.x, y: this.visual.y,
-      color: 0xff0000,
+      color: palette.fill,
       startRadius: radius, endRadius: radius,
       fillAlpha: 0.5, strokeWidth: 0,
       durationMs: 200, ease: 'Linear',
     });
     spawnShockwaveRing(this.scene, {
       x: this.visual.x, y: this.visual.y,
-      color: 0xff0000,
+      color: palette.ring,
       startRadius: radius * 0.5, endRadius: radius,
-      strokeWidth: 3, strokeColor: 0xfca5a5, strokeAlpha: 0.9,
+      strokeWidth: 3, strokeColor: palette.ringStroke, strokeAlpha: 0.9,
       durationMs: 260,
     });
-    spawnHitSpark(this.scene, this.visual.x, this.visual.y, 0xfca5a5);
+    spawnHitSpark(this.scene, this.visual.x, this.visual.y, palette.spark);
+
+    if (frost) {
+      // Self-expiring rime patch left behind (TrapAttack destroys itself
+      // synchronously below, so the overlay owns its own fade-out lifetime).
+      new AreaOverlay(this.scene, {
+        x: this.visual.x, y: this.visual.y, radius,
+        svgKey: 'frost_burst',
+        svgScale: radius / 100,
+        svgOriginY: 0.73,
+        enter: { durationMs: 150, ease: 'Back.out', fromScale: 0.5 },
+        exit: { mode: 'fade', durationMs: 900, delayMs: 400 },
+      });
+    }
 
     this.isDead = true;
     this.scene.tweens.killTweensOf(this.telegraph);
@@ -1083,12 +1103,18 @@ export class AoeRootFieldAttack extends Attack {
     this.radius = radius;
     this.durationMs = duration;
 
+    // Gold "on hold" ring with a standing coiled-cord + handset flourish rooted
+    // at center (replaces the old ⚡ placeholder icon). svgScale = radius/100
+    // keeps the art footprint matched to the pulsing telegraph ring.
     this.overlay = new AreaOverlay(scene, {
       x, y, radius,
       strokeColor: 0xeab308, strokeWidth: 6, strokeAlpha: 0.8,
       innerRings: { fractions: [0.4, 0.8], color: 0xfef08a, width: 2, alpha: 0.6 },
       pulse: { scale: 1.15, alphaTo: 0.3, durationMs: 800 },
-      centerIcon: { text: '⚡', fontSize: '42px' },
+      svgKey: 'hold_field',
+      svgScale: radius / 100,
+      svgOriginY: 1,
+      enter: { durationMs: 300, ease: 'Back.out', fromScale: 0.6 },
     });
   }
 
@@ -1124,6 +1150,16 @@ export class AoeRootFieldAttack extends Attack {
   }
 }
 
+/** Per-flavor look for fire patches — a charred disc under a standing flame SVG. */
+const FIRE_PATCH_STYLES = {
+  // Fishball "Spicy Sauce": red-orange flames, deep ember scorch.
+  spicy: { svgKey: 'fire_patch_spicy', fillColor: 0x7c2d12, strokeColor: 0x431407 },
+  // Taho "Hot Syrup": amber/gold flames, warm caramel scorch.
+  syrup: { svgKey: 'fire_patch_syrup', fillColor: 0x92400e, strokeColor: 0x78350f },
+} as const;
+
+export type FirePatchFlavor = keyof typeof FIRE_PATCH_STYLES;
+
 export class AoeFirePatchAttack extends Attack {
   private durationMs: number;
   private ageMs = 0;
@@ -1133,19 +1169,27 @@ export class AoeFirePatchAttack extends Attack {
   private yPos: number;
   private overlay: AreaOverlay;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, radius: number, duration: number, damage: number) {
+  constructor(scene: Phaser.Scene, x: number, y: number, radius: number, duration: number, damage: number, flavor: FirePatchFlavor = 'spicy') {
     super(scene, 'AoeFirePatchAttack', damage);
     this.xPos = x;
     this.yPos = y;
     this.radius = radius;
     this.durationMs = duration;
 
-    // Very subtle border, mostly a glowing puddle
+    const style = FIRE_PATCH_STYLES[flavor] ?? FIRE_PATCH_STYLES.spicy;
+    // Charred ember disc (the hitbox telegraph) with a standing flame flourish
+    // rooted at its center. svgScale = radius/100 locks the art to the disc so
+    // it tracks bonusRadius; svgOriginY:1 plants the flames' base on the ground.
     this.overlay = new AreaOverlay(scene, {
       x, y, radius,
-      fillColor: 0xff4500, fillAlpha: 0.25,
-      strokeColor: 0xffa500, strokeWidth: 2, strokeAlpha: 0.15,
-      pulse: { scale: 1.05, alphaTo: 0.6, durationMs: 1000 },
+      fillColor: style.fillColor, fillAlpha: 0.3,
+      strokeColor: style.strokeColor, strokeWidth: 3, strokeAlpha: 0.5,
+      pulse: { scale: 1.08, alphaTo: 0.55, durationMs: 900 },
+      svgKey: style.svgKey,
+      svgScale: radius / 100,
+      svgOriginY: 1,
+      svgPulse: true,
+      enter: { durationMs: 250, ease: 'Back.out', fromScale: 0.5 },
     });
   }
 
@@ -1164,6 +1208,8 @@ export class AoeFirePatchAttack extends Attack {
     // Apply DoT every 1 second
     if (this.lastTickMs >= 1000) {
       this.lastTickMs -= 1000;
+      // Flames surge on each burn tick (mirrors TreeOfLifeFieldAttack's pulse).
+      this.overlay.pulseOnce();
       const enemies = (this.scene as any).enemies as Enemy[];
       if (enemies) {
         for (const enemy of enemies) {

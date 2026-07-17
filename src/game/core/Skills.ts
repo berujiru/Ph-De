@@ -275,7 +275,8 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       // make up for having one patch, not a lane of 8) and tick damage 0.5->0.85.
       radius: 200 + (bonusRadius * 30),
       damage: (hero.damage + bonusDamage * 2) * 0.85,
-      duration: 20000
+      duration: 20000,
+      flavor: 'syrup'
     });
   } else if (skillId === 'nurse') {
     // Heal: Restores barrier HP and shows a green aura
@@ -350,7 +351,8 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
         y: patchY,
         radius,
         duration: 15000,
-        damage
+        damage,
+        flavor: 'spicy'
       });
     }
   } else if (skillId === 'sales_lady') {

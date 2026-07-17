@@ -213,6 +213,10 @@ export class GameScene extends Phaser.Scene {
     this.load.image('tree_of_life', '/assets/fx/tree_of_life.svg');
     this.load.image('boss_aura', '/assets/fx/boss_aura.svg');
     this.load.image('barrier_wall', '/assets/fx/barrier_wall.svg');
+    this.load.image('fire_patch_spicy', '/assets/fx/fire_patch_spicy.svg');
+    this.load.image('fire_patch_syrup', '/assets/fx/fire_patch_syrup.svg');
+    this.load.image('hold_field', '/assets/fx/hold_field.svg');
+    this.load.image('frost_burst', '/assets/fx/frost_burst.svg');
 
     // Basic-attack art: white/grayscale SVGs tinted by damage type at runtime.
     // The list is derived from hero data + style defaults (attackArt.ts).

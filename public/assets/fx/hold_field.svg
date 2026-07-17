@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="cord-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#a16207" />
+      <stop offset="50%" stop-color="#facc15" />
+      <stop offset="100%" stop-color="#a16207" />
+    </linearGradient>
+    <filter id="hold-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Faint clock face behind the cord — the eternal wait -->
+  <g opacity="0.3">
+    <circle cx="146" cy="150" r="16" fill="none" stroke="#fef9c3" stroke-width="2" />
+    <line x1="146" y1="150" x2="146" y2="139" stroke="#fef9c3" stroke-width="2" stroke-linecap="round" />
+    <line x1="146" y1="150" x2="154" y2="153" stroke="#fef9c3" stroke-width="2" stroke-linecap="round" />
+  </g>
+
+  <!-- Coiled telephone cord rising from the base (depth pass, offset) -->
+  <g fill="none" stroke="#a16207" stroke-width="6" opacity="0.5">
+    <ellipse cx="104" cy="180" rx="24" ry="9" />
+    <ellipse cx="98" cy="163" rx="23" ry="9" />
+    <ellipse cx="104" cy="146" rx="21" ry="8" />
+    <ellipse cx="98" cy="129" rx="20" ry="8" />
+    <ellipse cx="104" cy="112" rx="18" ry="7" />
+    <ellipse cx="98" cy="96" rx="17" ry="7" />
+    <ellipse cx="103" cy="80" rx="15" ry="6" />
+    <ellipse cx="99" cy="65" rx="14" ry="6" />
+  </g>
+  <!-- Coil (front pass) -->
+  <g fill="none" stroke="url(#cord-grad)" stroke-width="6" stroke-linecap="round">
+    <ellipse cx="102" cy="178" rx="24" ry="9" />
+    <ellipse cx="96" cy="161" rx="23" ry="9" />
+    <ellipse cx="102" cy="144" rx="21" ry="8" />
+    <ellipse cx="96" cy="127" rx="20" ry="8" />
+    <ellipse cx="102" cy="110" rx="18" ry="7" />
+    <ellipse cx="96" cy="94" rx="17" ry="7" />
+    <ellipse cx="101" cy="78" rx="15" ry="6" />
+    <ellipse cx="97" cy="63" rx="14" ry="6" />
+  </g>
+
+  <!-- Handset at the top of the cord -->
+  <g transform="rotate(-20 100 46)" filter="url(#hold-glow)">
+    <path d="M 74 44 C 70 36 78 30 86 34 L 118 50 C 126 54 124 64 116 64 C 110 62 108 54 102 51 L 90 45 C 86 43 80 48 78 52 C 74 52 72 48 74 44 Z" fill="#eab308" stroke="#713f12" stroke-width="2.5" stroke-linejoin="round" />
+  </g>
+
+  <!-- Hold-music notes floating up -->
+  <g fill="#fef08a" opacity="0.85" filter="url(#hold-glow)">
+    <g transform="translate(52 122)">
+      <ellipse cx="0" cy="6" rx="5" ry="4" transform="rotate(-20 0 6)" />
+      <rect x="4" y="-14" width="2.5" height="20" />
+      <path d="M 6.5 -14 C 12 -12 13 -6 10 -3 C 12 -8 9 -11 6.5 -10 Z" />
+    </g>
+    <g transform="translate(150 92) scale(0.85)" opacity="0.8">
+      <ellipse cx="0" cy="6" rx="5" ry="4" transform="rotate(-20 0 6)" />
+      <rect x="4" y="-14" width="2.5" height="20" />
+      <path d="M 6.5 -14 C 12 -12 13 -6 10 -3 C 12 -8 9 -11 6.5 -10 Z" />
+    </g>
+    <g transform="translate(70 58) scale(0.75)" opacity="0.7">
+      <ellipse cx="0" cy="6" rx="5" ry="4" transform="rotate(-20 0 6)" />
+      <rect x="4" y="-14" width="2.5" height="20" />
+      <path d="M 6.5 -14 C 12 -12 13 -6 10 -3 C 12 -8 9 -11 6.5 -10 Z" />
+    </g>
+  </g>
+</svg>

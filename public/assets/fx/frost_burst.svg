@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260" width="200" height="260">
+  <defs>
+    <radialGradient id="rime-grad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.6" />
+      <stop offset="55%" stop-color="#7dd3fc" stop-opacity="0.28" />
+      <stop offset="100%" stop-color="#7dd3fc" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="shard-grad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="60%" stop-color="#7dd3fc" />
+      <stop offset="100%" stop-color="#e0f2fe" />
+    </linearGradient>
+    <filter id="frost-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Rime patch spreading on the ground -->
+  <ellipse cx="100" cy="190" rx="95" ry="52" fill="url(#rime-grad)" />
+
+  <!-- Flat frost shards radiating outward across the rime -->
+  <g fill="#bae6fd" opacity="0.6">
+    <polygon points="100,190 60,168 96,182" />
+    <polygon points="100,190 140,168 104,182" />
+    <polygon points="100,190 40,196 92,192" />
+    <polygon points="100,190 160,196 108,192" />
+    <polygon points="100,190 72,214 96,198" />
+    <polygon points="100,190 128,214 104,198" />
+    <polygon points="100,190 100,224 100,200" opacity="0.5" />
+  </g>
+
+  <!-- Upright crystal spikes rising from the blast point -->
+  <g filter="url(#frost-glow)">
+    <polygon points="100,80 88,178 112,178" fill="url(#shard-grad)" />
+    <polygon points="100,80 100,178 112,178" fill="#38bdf8" opacity="0.7" />
+    <polygon points="100,80 94,150 100,178" fill="#ffffff" opacity="0.85" />
+
+    <polygon points="66,128 56,186 78,186" fill="url(#shard-grad)" />
+    <polygon points="66,128 66,186 78,186" fill="#38bdf8" opacity="0.7" />
+    <polygon points="66,128 62,164 66,186" fill="#ffffff" opacity="0.8" />
+
+    <polygon points="136,120 126,188 148,188" fill="url(#shard-grad)" />
+    <polygon points="136,120 136,188 148,188" fill="#38bdf8" opacity="0.7" />
+    <polygon points="136,120 132,160 136,188" fill="#ffffff" opacity="0.8" />
+  </g>
+
+  <!-- Ice glints -->
+  <circle cx="100" cy="96" r="2" fill="#ffffff" filter="url(#frost-glow)" />
+  <circle cx="66" cy="140" r="1.5" fill="#ffffff" filter="url(#frost-glow)" />
+  <circle cx="136" cy="132" r="1.5" fill="#ffffff" filter="url(#frost-glow)" />
+  <circle cx="48" cy="188" r="1.5" fill="#e0f2fe" filter="url(#frost-glow)" />
+  <circle cx="152" cy="190" r="1.5" fill="#e0f2fe" filter="url(#frost-glow)" />
+</svg>

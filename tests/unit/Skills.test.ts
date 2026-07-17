@@ -176,6 +176,36 @@ describe('Hero Skills', () => {
     );
   });
 
+  it('fishball_vendor (Spicy Sauce) lays a lane of spicy fire patches', () => {
+    // y high enough that all 8 patches clear the off-screen guard (patchY < -100).
+    const h1 = createDummyHero('fishball_vendor', 300, 3000);
+    const ctx = createDummyContext([h1]);
+
+    applyHeroSkill('fishball_vendor', h1, ctx);
+
+    const patches = (ctx.onVisual as any).mock.calls
+      .map((c: any[]) => c[0])
+      .filter((e: any) => e.type === 'spawnFirePatch');
+    expect(patches).toHaveLength(8);
+    for (const p of patches) {
+      expect(p).toEqual(expect.objectContaining({ flavor: 'spicy', radius: 180, duration: 15000 }));
+    }
+    // Patches march up the lane (ascending distance from the hero => decreasing y).
+    const ys = patches.map((p: any) => p.y);
+    expect(ys).toEqual([...ys].sort((a, b) => b - a));
+  });
+
+  it('taho_vendor (Hot Syrup) throws a syrup-flavored molotov patch', () => {
+    const h1 = createDummyHero('taho_vendor', 300, 1500);
+    const ctx = createDummyContext([h1]);
+
+    applyHeroSkill('taho_vendor', h1, ctx);
+
+    expect(ctx.onVisual).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'spawnMolotovPatch', flavor: 'syrup', radius: 200, duration: 20000 }),
+    );
+  });
+
   it('sales_lady (Closing Sale) executes low HP enemies', () => {
     const h1 = createDummyHero('sales_lady');
     const e1 = createDummyEnemy('e1', 0, 0, 100);
