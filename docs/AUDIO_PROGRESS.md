@@ -85,7 +85,7 @@ Tagalog lines are canonical in `ART_AND_AUDIO_GUIDELINES.md §5`.
 | Eden | Rally | fallback | ⬜ | `voice-eden-rally` | 🟡 |
 | Teacher | Recess! | fallback | ⬜ | `voice-teacher-recess` | 🟡 |
 | Student | Cramming | fallback | ⬜ | `voice-student-cramming` | 🟡 |
-| Jeepney Driver | Barya Lang Po | fallback | ⬜ | `voice-jeepney-barya` | 🟡 |
+| Jeepney Driver | Barya Lang Po | `sfx-jeepney-wrench` ✅ | `sfx-jeepney-barya` ✅ | `voice-jeepney-barya` | 🟡 |
 | Fisherfolk | Lambat | fallback | ⬜ | `voice-fisherfolk-lambat` | 🟡 |
 | Street Sweeper | Dust Storm | fallback | ⬜ | `voice-sweeper-duststorm` | 🟡 |
 | Taho Vendor | Hot Syrup | fallback | ⬜ | `voice-taho-hotsyrup` | 🟡 |
@@ -124,7 +124,7 @@ reserved for their channel/wind-up.
 
 | Key | File | Used for | Status |
 |---|---|---|---|
-| `music-boss-default` | `music/boss-default.mp3` | **Default boss theme** (trigger wired) | 🟡 needs file |
+| `music-boss-default` | `music/and ` | **Default boss theme** (trigger wired) | 🟡 needs file |
 | `music-boss-act1..4` | `music/boss-act1..4.mp3` | Per-act boss themes (optional) | ⬜ |
 | `music-boss-finale` | `music/boss-finale.mp3` | `boss_ang_sistema` signature theme | ⬜ |
 

@@ -81,7 +81,11 @@ export const HERO_SFX: Partial<Record<HeroId, HeroSound>> = {
   eden: { voice: 'voice-eden-rally' },
   teacher: { voice: 'voice-teacher-recess' },
   student: { voice: 'voice-student-cramming' },
-  jeepney_driver: { voice: 'voice-jeepney-barya' },
+  // NOTE: the coin-shotgun blast foley (sfx-jeepney-barya) is intentionally NOT wired
+  // as `skill` here — `skill` is the cut-in cue and fires when the cut-in STARTS, but
+  // the coins don't erupt until the cut-in finishes. The blast sound is played from the
+  // coinShrapnelCone visual handler instead, so it lands with the actual eruption.
+  jeepney_driver: { attack: 'sfx-jeepney-wrench', voice: 'voice-jeepney-barya' },
   fisherfolk: { voice: 'voice-fisherfolk-lambat' },
   street_sweeper: { voice: 'voice-sweeper-duststorm' },
   taho_vendor: { voice: 'voice-taho-hotsyrup' },
@@ -154,6 +158,9 @@ export const AUDIO_MANIFEST: Record<string, string> = {
   [SFX.barrierHit]: '/assets/sounds/barrier-hit.wav',
   [SFX.barrierBreak]: '/assets/sounds/barrier-break.wav',
   [SFX.skill]: '/assets/sounds/skill.wav',
+  // Jeepney Driver foley: wrench-swing whoosh (basic attack) + coin-shotgun blast (Barya).
+  'sfx-jeepney-wrench': '/assets/sounds/jeepney-wrench.wav',
+  'sfx-jeepney-barya': '/assets/sounds/jeepney-barya-blast.wav',
   [SFX.victory]: '/assets/sounds/victory.wav',
   [SFX.defeat]: '/assets/sounds/defeat.wav',
   // --- Pending real files: drop the .mp3 in the path shown, then uncomment. ---

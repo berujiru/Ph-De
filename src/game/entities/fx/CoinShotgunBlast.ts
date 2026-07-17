@@ -44,33 +44,26 @@ export function spawnCoinShotgunBlast(scene: Phaser.Scene, cfg: CoinShotgunBlast
   const dispLen = Math.min(160, length * 0.4);
   dispenser.setScale(dispLen / dispenser.width);
   const baseScale = dispenser.scaleX;
-  dispenser.setScale(baseScale * 0.6);
-  // Draw: scale-in snap.
+  // The weapon is already raised: it recoils on the same frame the coins erupt (and the
+  // blast SFX fires), so the kick, crack and shrapnel all land together. A tiny scale
+  // overshoot on the recoil sells the punch without delaying the blast.
   scene.tweens.add({
     targets: dispenser,
-    scaleX: baseScale,
-    scaleY: baseScale,
-    duration: 90,
-    ease: 'Back.out',
-    onComplete: () => {
-      // Recoil kick backward along -aim, then settle and fade.
-      scene.tweens.add({
-        targets: dispenser,
-        x: x - cos * 18,
-        y: y - sin * 18,
-        rotation: angle - 0.12,
-        duration: 70,
-        yoyo: true,
-        ease: 'Quad.easeOut',
-      });
-      scene.tweens.add({
-        targets: dispenser,
-        alpha: 0,
-        delay: 260,
-        duration: 220,
-        onComplete: () => dispenser.destroy(),
-      });
-    },
+    x: x - cos * 18,
+    y: y - sin * 18,
+    rotation: angle - 0.12,
+    scaleX: baseScale * 1.06,
+    scaleY: baseScale * 1.06,
+    duration: 70,
+    yoyo: true,
+    ease: 'Quad.easeOut',
+  });
+  scene.tweens.add({
+    targets: dispenser,
+    alpha: 0,
+    delay: 260,
+    duration: 220,
+    onComplete: () => dispenser.destroy(),
   });
 
   // --- Ground cone flash: warm gold fill under the wind, matches the hit cone ---

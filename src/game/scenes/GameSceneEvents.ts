@@ -649,6 +649,9 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
   } else if (evt.type === 'coinShrapnelCone') {
     // Barya Lang Po: coin-shotgun blast — dispenser + muzzle flash + wind gust +
     // spinning coin shrapnel + recoil shake, all handled by the shared fx component.
+    // The blast foley is fired HERE (not via HERO_SFX.skill, which is the cut-in cue)
+    // so the shotgun crack lands exactly as the coins erupt, not at cut-in start.
+    AudioManager.playSfx('sfx-jeepney-barya');
     spawnCoinShotgunBlast(scene, {
       x: evt.hero.x, y: evt.hero.y,
       angle: evt.angle, length: evt.length,
