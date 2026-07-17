@@ -30,6 +30,7 @@ import {
 } from '../entities/Attacks';
 import { TrafficLight } from '../entities/fx/TrafficLight';
 import { spawnShockwaveRing } from '../entities/fx/ShockwaveRing';
+import { spawnHitSpark } from '../entities/fx/ImpactFx';
 import { spawnConeFlash } from '../entities/fx/ConeFlash';
 import { spawnCoinShotgunBlast } from '../entities/fx/CoinShotgunBlast';
 import { AreaOverlay } from '../entities/fx/AreaOverlay';
@@ -743,8 +744,57 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
     const attack = new TornadoAttack(scene, evt.x, evt.y, evt.damage, evt.pullRadius, evt.duration, evt.speed);
     scene.attacks.push(attack);
   } else if (evt.type === 'spawnTreeOfLife') {
-    const attack = new TreeOfLifeFieldAttack(scene, evt.x, evt.y, evt.radius, evt.duration, evt.damage);
-    scene.attacks.push(attack);
+    const plantTree = () => {
+      // Landing: dirt kicks up, a golden shockwave marks the planting spot, the
+      // growth rumble plays (timed to the eruption, not the cut-in), and the
+      // tree surges out of the ground.
+      spawnHitSpark(scene, evt.x, evt.y, 0x92400e);
+      spawnShockwaveRing(scene, {
+        x: evt.x, y: evt.y,
+        color: 0xfde047,
+        startRadius: 12, endRadius: evt.radius,
+        durationMs: 450,
+        strokeWidth: 5, strokeAlpha: 0.8,
+        fillAlpha: 0.15,
+        blendMode: Phaser.BlendModes.ADD,
+      });
+      AudioManager.playSfx('sfx-farmer-tree-grow');
+      const attack = new TreeOfLifeFieldAttack(scene, evt.x, evt.y, evt.radius, evt.duration, evt.damage);
+      scene.attacks.push(attack);
+    };
+
+    if (evt.startX !== undefined && evt.startY !== undefined) {
+      // The Farmer lobs a glowing seed that arcs downrange (same flight as the
+      // molotov) and plants the tree where it lands.
+      const seed = scene.add.image(evt.startX, evt.startY, 'golden_seed');
+      seed.setScale(0.9);
+      const dx = evt.x - evt.startX;
+      const controlX = evt.startX + dx / 2;
+      const controlY = Math.min(evt.startY, evt.y) - 150; // arc height
+      const curve = new Phaser.Curves.QuadraticBezier(
+        new Phaser.Math.Vector2(evt.startX, evt.startY),
+        new Phaser.Math.Vector2(controlX, controlY),
+        new Phaser.Math.Vector2(evt.x, evt.y),
+      );
+      const pathData = { t: 0 };
+      scene.tweens.add({
+        targets: pathData,
+        t: 1,
+        duration: 600,
+        ease: 'Sine.easeIn',
+        onUpdate: () => {
+          const p = curve.getPoint(pathData.t);
+          seed.setPosition(p.x, p.y);
+          seed.rotation += 0.15;
+        },
+        onComplete: () => {
+          seed.destroy();
+          plantTree();
+        },
+      });
+    } else {
+      plantTree(); // no throw origin — grow in place
+    }
   } else if (evt.type === 'spawnLambatVortex') {
     // Hold size for pullDelay, then shrink to 0 over pullDuration.
     new AreaOverlay(scene, {

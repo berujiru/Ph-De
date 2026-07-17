@@ -55,6 +55,12 @@ export interface HeroDefinition {
    */
   attackArt?: string;
   /**
+   * Chain heroes only: how the arc between strike points is drawn.
+   * 'crackle' (default) is the jagged electric zigzag (Electrician);
+   * 'vine' is a smooth bowed tendril with leaves (Farmer's root lash).
+   */
+  chainArt?: 'crackle' | 'vine';
+  /**
    * Flight speed of this hero's basic-attack projectile in px/s (flight
    * styles only: projectile/pierce/boomerang/lobbed/linear-wave). Omit to use
    * the style default in src/game/data/attackSpeed.ts. Heavy projectiles
@@ -331,6 +337,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     signatureSkill: { name: 'Tree of Life', description: 'Summons a Golden Tree that periodically Roots and damages nearby enemies.' },
     passive: { name: 'Deep Roots', description: 'Attacks have a 20% chance to Root (freeze) enemies.' },
     attackArt: 'root-burst',
+    chainArt: 'vine', // root tendril lash, not electric crackle
   },
   fishball_vendor: {
     id: 'fishball_vendor',

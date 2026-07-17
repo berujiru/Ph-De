@@ -241,6 +241,28 @@ describe('Hero Skills', () => {
     );
   });
 
+  it('farmer (Tree of Life) throws the seed from the hero to the target', () => {
+    const h1 = createDummyHero('farmer', 540, 1800);
+    // Highest-score target: biggest maxHp wins (all else equal).
+    const big = createDummyEnemy('big', 300, 900, 500);
+    const small = createDummyEnemy('small', 700, 1000, 50);
+    const ctx = createDummyContext([h1], [big, small]);
+
+    applyHeroSkill('farmer', h1, ctx);
+
+    expect(ctx.onVisual).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'spawnTreeOfLife',
+        startX: 540, // seed lobbed from the hero
+        startY: 1800,
+        x: 300, // lands on the toughest enemy
+        y: 900,
+        radius: 150,
+        duration: 30000,
+      }),
+    );
+  });
+
   it('sales_lady (Closing Sale) executes low HP enemies', () => {
     const h1 = createDummyHero('sales_lady');
     const e1 = createDummyEnemy('e1', 0, 0, 100);

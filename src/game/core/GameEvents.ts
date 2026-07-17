@@ -93,7 +93,7 @@ export type SkillVisualEvent =
   | { type: 'spawnLambatVortex', x: number, y: number, pullDelay: number, pullDuration: number, scale?: number }
   | { type: 'applyAilment', target: any, ailment: string, amount: number, duration: number, delay?: number }
   | { type: 'aoeRoot', x: number, y: number, radius: number, duration: number, damage: number }
-  | { type: 'spawnTreeOfLife', x: number, y: number, radius: number, duration: number, damage: number }
+  | { type: 'spawnTreeOfLife', x: number, y: number, radius: number, duration: number, damage: number, startX?: number, startY?: number }
   | { type: 'spawnDoughBarrier', duration: number }
   | { type: 'fireColumn', x: number, y: number, width: number, height: number, duration: number };
 

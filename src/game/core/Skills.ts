@@ -344,6 +344,10 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
 
     onVisual({
       type: 'spawnTreeOfLife',
+      // Throw origin: the Farmer lobs a golden seed from his position; the
+      // tree grows where it lands (handler falls back to in-place growth).
+      startX: hero.x,
+      startY: hero.y,
       x: tx,
       y: ty,
       radius: 150,

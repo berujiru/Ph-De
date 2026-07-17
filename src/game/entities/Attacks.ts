@@ -10,6 +10,7 @@ import { LaneWave } from './fx/LaneWave';
 import { AttackSprite, popAttackIcon } from './fx/AttackSprite';
 import { circlesOverlap, segmentCircleOverlap, sweptLanceHitsCircle } from '../core/Collision';
 import { ATTACK_COLLISION, lobbedSplashRadius } from '../data/collision';
+import { AudioManager } from '../core/AudioManager';
 
 /**
  * Per-hero attack art + resolved damage-type tint, passed in by the spawner
@@ -22,6 +23,8 @@ export interface AttackVisual {
   tint: number;
   /** In-flight sprite length px (resolveAttackSize); 0 for styles that size by gameplay. */
   sizePx: number;
+  /** Chain heroes only: arc rendering flavor (HeroDefinition.chainArt). */
+  chainStyle?: 'crackle' | 'vine';
 }
 
 export interface AttackModifiers {
@@ -618,9 +621,14 @@ export class BoomerangAttack extends Attack {
 export class ChainAttack extends Attack {
   private ageMs = 0;
   private lines: Phaser.GameObjects.Line[] = [];
+  private leaves: Phaser.GameObjects.Ellipse[] = [];
+  // Vine lashes linger a touch longer than the electric snap — organic, not instant.
+  private fadeMs: number;
 
   constructor(scene: Phaser.Scene, startX: number, startY: number, target: Enemy, damage: number, visual: AttackVisual, baseChain: number, modifiers?: Partial<AttackModifiers>, damageType: string = 'Physical') {
     super(scene, 'ChainAttack', damage, modifiers, damageType);
+    const isVine = visual.chainStyle === 'vine';
+    this.fadeMs = isVine ? 260 : 150;
 
     let currentTarget = target;
     let currentX = startX;
@@ -632,17 +640,24 @@ export class ChainAttack extends Attack {
     const hitEnemies = new Set<Enemy>();
     const enemies = (scene as any).enemies as Enemy[];
     let currentDamage = this.totalDamage;
-    
+
     while (currentTarget && jumps < maxJumps) {
       currentTarget.takeDamage(currentDamage, this.damageType);
       hitEnemies.add(currentTarget);
 
-      // Crackling multi-segment arc between the two points, with a wider soft
-      // glow underneath and a bright white core over it. The per-hero art pops
-      // at each strike point (procedural lightning stays — it reads better in
-      // motion than any static texture).
-      this.drawCrackle(scene, currentX, currentY, currentTarget.x, currentTarget.y, visual.tint, 14, 0.4);
-      this.drawCrackle(scene, currentX, currentY, currentTarget.x, currentTarget.y, 0xffffff, 5, 1);
+      if (isVine) {
+        // Farmer's root lash: a smooth bowed tendril (dark underlay, green body,
+        // pale core) with leaf sprigs along it, plus a dirt burst at the strike.
+        this.drawVine(scene, currentX, currentY, currentTarget.x, currentTarget.y);
+        spawnHitSpark(scene, currentTarget.x, currentTarget.y, 0x92400e);
+      } else {
+        // Crackling multi-segment arc between the two points, with a wider soft
+        // glow underneath and a bright white core over it. The per-hero art pops
+        // at each strike point (procedural lightning stays — it reads better in
+        // motion than any static texture).
+        this.drawCrackle(scene, currentX, currentY, currentTarget.x, currentTarget.y, visual.tint, 14, 0.4);
+        this.drawCrackle(scene, currentX, currentY, currentTarget.x, currentTarget.y, 0xffffff, 5, 1);
+      }
       popAttackIcon(scene, currentTarget.x, currentTarget.y, visual.artKey, visual.tint, 48, 150);
 
       currentX = currentTarget.x;
@@ -669,6 +684,55 @@ export class ChainAttack extends Attack {
       }
       if (!nextTarget) break;
       currentTarget = nextTarget;
+    }
+  }
+
+  /**
+   * Draw a smooth vine tendril from (x1,y1) to (x2,y2): a quadratic curve bowed
+   * to one side, layered dark-to-light like the crackle's glow/core pair, with
+   * a few leaf sprigs planted along the curve.
+   */
+  private drawVine(scene: Phaser.Scene, x1: number, y1: number, x2: number, y2: number) {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const len = Math.sqrt(dx * dx + dy * dy) || 1;
+    // Bow perpendicular to the lash, alternating side at random per jump.
+    const side = Math.random() > 0.5 ? 1 : -1;
+    const bow = Math.min(60, len * 0.22) * side;
+    const px = (-dy / len) * bow;
+    const py = (dx / len) * bow;
+    const curve = new Phaser.Curves.QuadraticBezier(
+      new Phaser.Math.Vector2(x1, y1),
+      new Phaser.Math.Vector2(x1 + dx / 2 + px, y1 + dy / 2 + py),
+      new Phaser.Math.Vector2(x2, y2),
+    );
+
+    // Sample the curve into short line segments and draw three layered strokes:
+    // dark soil-green underlay, vine-green body, pale sap core.
+    const layers: Array<{ color: number; width: number; alpha: number }> = [
+      { color: 0x14532d, width: 12, alpha: 0.45 },
+      { color: 0x16a34a, width: 6, alpha: 0.95 },
+      { color: 0xbbf7d0, width: 2.5, alpha: 0.9 },
+    ];
+    const segments = 12;
+    const pts = curve.getPoints(segments);
+    for (const layer of layers) {
+      for (let i = 1; i < pts.length; i++) {
+        const line = scene.add.line(0, 0, pts[i - 1].x, pts[i - 1].y, pts[i].x, pts[i].y, layer.color, layer.alpha).setOrigin(0, 0);
+        line.setLineWidth(layer.width);
+        this.lines.push(line);
+      }
+    }
+
+    // Leaf sprigs: small ellipses angled off the curve's tangent.
+    const leafCount = 2 + Math.floor(Math.random() * 2);
+    for (let i = 0; i < leafCount; i++) {
+      const t = 0.25 + Math.random() * 0.5;
+      const p = curve.getPoint(t);
+      const tan = curve.getTangent(t);
+      const leaf = scene.add.ellipse(p.x, p.y, 16, 7, 0x22c55e, 0.9);
+      leaf.setRotation(Math.atan2(tan.y, tan.x) + (Math.random() > 0.5 ? 0.7 : -0.7));
+      this.leaves.push(leaf);
     }
   }
 
@@ -699,12 +763,13 @@ export class ChainAttack extends Attack {
   update(_time: number, delta: number) {
     if (this.isDead) return;
     this.ageMs += delta;
-    for (const line of this.lines) {
-      line.setAlpha(1 - this.ageMs / 150);
-    }
-    if (this.ageMs >= 150) {
+    const fade = 1 - this.ageMs / this.fadeMs;
+    for (const line of this.lines) line.setAlpha(fade);
+    for (const leaf of this.leaves) leaf.setAlpha(fade);
+    if (this.ageMs >= this.fadeMs) {
       this.isDead = true;
       for (const line of this.lines) line.destroy();
+      for (const leaf of this.leaves) leaf.destroy();
       this.destroy();
     }
   }
@@ -1340,6 +1405,7 @@ export class TreeOfLifeFieldAttack extends Attack {
   private xPos: number;
   private yPos: number;
   private overlay: AreaOverlay;
+  private leaves: AreaOverlay;
 
   constructor(scene: Phaser.Scene, x: number, y: number, radius: number, duration: number, damage: number) {
     super(scene, 'TreeOfLifeFieldAttack', damage);
@@ -1356,7 +1422,18 @@ export class TreeOfLifeFieldAttack extends Attack {
       svgOriginY: 1,
       svgPulse: true,
       svgAlpha: 0.7, // enemies rooted under the canopy stay visible
-      enter: { durationMs: 500, ease: 'Back.out', fromScale: 0.5 },
+      // The seed's landing burst covers the spawn moment; the tree itself
+      // surges out of the ground with an overshooting grow.
+      enter: { durationMs: 700, ease: 'Back.out', fromScale: 0.15 },
+    });
+    // Golden leaves shed by the canopy: roaming scattered copies that sink and
+    // sway while visible (driftPx), flickering across the whole root field.
+    this.leaves = new AreaOverlay(scene, {
+      x, y, radius,
+      svgKey: 'golden_leaf',
+      svgScale: 0.9,
+      svgAlpha: 0.85,
+      svgScatter: { count: 6, minScale: 0.5, maxScale: 1, roam: true, driftPx: 46 },
     });
   }
 
@@ -1366,6 +1443,7 @@ export class TreeOfLifeFieldAttack extends Attack {
     if (this.ageMs >= this.durationMs) {
       this.isDead = true;
       this.overlay.fadeOutAndDestroy(1000);
+      this.leaves.fadeOutAndDestroy(1000);
       this.destroy();
       return;
     }
@@ -1375,6 +1453,19 @@ export class TreeOfLifeFieldAttack extends Attack {
     if (this.tickMs >= 2000) {
       this.tickMs -= 2000;
       this.overlay.pulseOnce();
+      AudioManager.playSfx('sfx-farmer-tree-pulse');
+
+      // One golden shockwave sweeping the root field — the shared "everyone in
+      // here just got rooted" cue, replacing per-enemy floating-text spam.
+      spawnShockwaveRing(this.scene, {
+        x: this.xPos, y: this.yPos,
+        color: 0xfde047,
+        startRadius: this.radius * 0.25,
+        endRadius: this.radius,
+        durationMs: 550,
+        strokeWidth: 4, strokeAlpha: 0.7,
+        blendMode: Phaser.BlendModes.ADD,
+      });
 
       const enemies = (this.scene as any).enemies as Enemy[];
       if (enemies) {
@@ -1386,8 +1477,8 @@ export class TreeOfLifeFieldAttack extends Attack {
           if (dx * dx + dy * dy <= reach * reach) {
             e.applyAilment('root', 100, 1000);
             e.takeDamage(this.damage);
-            const txt = this.scene.add.text(e.x, e.y - 30, 'ROOTED!', { color: '#22c55e', fontStyle: 'bold' }).setOrigin(0.5);
-            this.scene.tweens.add({ targets: txt, y: e.y - 60, alpha: 0, duration: 1000, onComplete: () => txt.destroy() });
+            // Roots burst out of the ground under each snared enemy.
+            popAttackIcon(this.scene, e.x, e.y, 'atk-root-burst', 0x22c55e, 56, 400);
           }
         }
       }

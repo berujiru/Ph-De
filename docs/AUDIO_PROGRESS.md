@@ -93,7 +93,7 @@ Tagalog lines are canonical in `ART_AND_AUDIO_GUIDELINES.md §5`.
 | Construction Worker | Yero Barricade | fallback | ⬜ | `voice-construction-barricade` | 🟡 |
 | Call Center Agent | Escalate | fallback | ⬜ | `voice-callcenter-escalate` | 🟡 |
 | Security Guard | Flashlight | fallback | ⬜ | `voice-security-flashlight` | 🟡 |
-| Farmer | Harvest | fallback | ⬜ | `voice-farmer-harvest` | 🟡 |
+| Farmer | Harvest | `sfx-farmer-vine` ✅ | `sfx-farmer-tree-grow` + `sfx-farmer-tree-pulse` ✅ | `voice-farmer-harvest` | 🟡 |
 | Fishball Vendor | Spicy Sauce | fallback | ⬜ | `voice-fishball-spicy` | 🟡 |
 | Sales Lady | Closing Sale | fallback | ⬜ | `voice-saleslady-closing` | 🟡 |
 | Sorbetes Vendor | Dirty Ice Cream | fallback | ⬜ | `voice-sorbetes-dirty` | 🟡 |

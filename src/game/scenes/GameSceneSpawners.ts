@@ -99,7 +99,7 @@ export function spawnHero(scene: GameScene, id: HeroId, passiveOverride?: string
     // Tint = damage-type color; art = the hero's attackArt (or style default),
     // authored white/grayscale so the tint colors it cleanly.
     const tint = overrideColor ?? DAMAGE_TYPE_COLORS[damageType as DamageType];
-    const visual = { artKey: attackArtKey(resolveAttackArt(h.definition)), tint, sizePx: resolveAttackSize(h.definition) };
+    const visual = { artKey: attackArtKey(resolveAttackArt(h.definition)), tint, sizePx: resolveAttackSize(h.definition), chainStyle: h.definition.chainArt };
     // Per-hero projectile flight speed (style default when unset).
     const speed = resolveAttackSpeed(h.definition);
     // Persisted per-hero upgrade mods land on every Attack this hero spawns.

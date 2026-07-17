@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <!-- Falling golden leaf shed by the Tree of Life. Baked colors, soft glow;
+       drawn tilted so drifting copies read as tumbling, not stamped. -->
+  <defs>
+    <linearGradient id="leaf-body" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fef08a"/>
+      <stop offset="0.55" stop-color="#fde047"/>
+      <stop offset="1" stop-color="#ca8a04"/>
+    </linearGradient>
+    <radialGradient id="leaf-glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fef9c3" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#fde047" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="24" cy="24" r="22" fill="url(#leaf-glow)"/>
+  <!-- leaf blade, tilted -->
+  <path d="M 12 34 C 12 20 22 10 36 12 C 36 26 28 36 14 36 Z"
+        fill="url(#leaf-body)" stroke="#a16207" stroke-width="2" stroke-linejoin="round"/>
+  <!-- midrib + veins -->
+  <path d="M 14 34 C 20 26 28 18 34 14" fill="none" stroke="#a16207" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M 21 27 l 5 4 M 26 22 l 5 3" fill="none" stroke="#a16207" stroke-width="1.2" stroke-linecap="round" stroke-opacity="0.7"/>
+</svg>

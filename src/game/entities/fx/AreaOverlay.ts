@@ -54,8 +54,11 @@ export interface AreaOverlayConfig {
    * With `roam` each copy lives a short cycle instead of standing still:
    * fade in (~200ms) at a random spot → hold → fade out → reappear elsewhere
    * inside the disc, staggered per copy so the area flickers organically.
+   * `driftPx` (roam only) slides each copy that many px downward (+ a slight
+   * random sway) over its visible phase — falling-leaf motion instead of a
+   * static flicker.
    */
-  svgScatter?: { count: number; minScale?: number; maxScale?: number; roam?: boolean };
+  svgScatter?: { count: number; minScale?: number; maxScale?: number; roam?: boolean; driftPx?: number };
   centerIcon?: { text: string; fontSize?: string };
   blendMode?: Phaser.BlendModes;
   depth?: number;
@@ -261,6 +264,19 @@ export class AreaOverlay extends Phaser.GameObjects.Container {
       );
       img.setPosition(p.x, p.y);
       img.setScale(p.scale);
+      const hold = 300 + Math.random() * 400; // hold at the spot for a beat
+      const drift = cfg.svgScatter?.driftPx;
+      if (drift) {
+        // Sink + sway across the whole visible phase (falling-leaf motion).
+        this.scene.tweens.add({
+          targets: img,
+          y: p.y + drift,
+          x: p.x + (Math.random() - 0.5) * drift * 0.6,
+          angle: (Math.random() - 0.5) * 60,
+          duration: FADE_MS * 2 + hold,
+          ease: 'Sine.easeIn',
+        });
+      }
       this.scene.tweens.add({
         targets: img,
         alpha: targetAlpha,
@@ -271,7 +287,7 @@ export class AreaOverlay extends Phaser.GameObjects.Container {
             targets: img,
             alpha: 0,
             duration: FADE_MS,
-            delay: 300 + Math.random() * 400, // hold at the spot for a beat
+            delay: hold,
             onComplete: cycle,
           });
         },

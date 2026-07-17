@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Tree of Life seed: a glowing golden kernel the Farmer lobs downrange.
+       Baked colors (FX art, not tinted); soft halo so it reads in flight. -->
+  <defs>
+    <radialGradient id="seed-halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fef08a" stop-opacity="0.9"/>
+      <stop offset="0.6" stop-color="#fde047" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#fde047" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="seed-body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fef9c3"/>
+      <stop offset="0.5" stop-color="#eab308"/>
+      <stop offset="1" stop-color="#854d0e"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="url(#seed-halo)"/>
+  <!-- teardrop kernel -->
+  <path d="M 32 10 C 44 22 46 34 40 44 C 36 50 28 50 24 44 C 18 34 20 22 32 10 Z"
+        fill="url(#seed-body)" stroke="#78350f" stroke-width="3"/>
+  <!-- sprout crack of light -->
+  <path d="M 32 18 C 33 28 31 36 32 44" fill="none" stroke="#fef9c3" stroke-width="3"
+        stroke-linecap="round" stroke-opacity="0.9"/>
+  <!-- specular -->
+  <ellipse cx="27" cy="22" rx="4" ry="6" fill="#ffffff" fill-opacity="0.7" transform="rotate(-20 27 22)"/>
+</svg>

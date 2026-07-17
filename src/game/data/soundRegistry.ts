@@ -93,7 +93,10 @@ export const HERO_SFX: Partial<Record<HeroId, HeroSound>> = {
   construction_worker: { voice: 'voice-construction-barricade' },
   call_center_agent: { voice: 'voice-callcenter-escalate' },
   security_guard: { voice: 'voice-security-flashlight' },
-  farmer: { voice: 'voice-farmer-harvest' },
+  // Tree of Life foley (sfx-farmer-tree-grow / -pulse) is played at the actual
+  // moments (seed landing, each root tick) — not via `skill`, which is the
+  // cut-in cue and would fire before the tree exists (see the jeepney note).
+  farmer: { attack: 'sfx-farmer-vine', voice: 'voice-farmer-harvest' },
   fishball_vendor: { voice: 'voice-fishball-spicy' },
   sales_lady: { voice: 'voice-saleslady-closing' },
   sorbetes_vendor: { voice: 'voice-sorbetes-dirty' },
@@ -161,6 +164,11 @@ export const AUDIO_MANIFEST: Record<string, string> = {
   // Jeepney Driver foley: wrench-swing whoosh (basic attack) + coin-shotgun blast (Barya).
   'sfx-jeepney-wrench': '/assets/sounds/jeepney-wrench.wav',
   'sfx-jeepney-barya': '/assets/sounds/jeepney-barya-blast.wav',
+  // Farmer foley: vine-whip lash (basic attack), tree growth (seed landing),
+  // soft root-pulse chime (every 2s tick of the field).
+  'sfx-farmer-vine': '/assets/sounds/farmer-vine.wav',
+  'sfx-farmer-tree-grow': '/assets/sounds/farmer-tree-grow.wav',
+  'sfx-farmer-tree-pulse': '/assets/sounds/farmer-tree-pulse.wav',
   [SFX.victory]: '/assets/sounds/victory.wav',
   [SFX.defeat]: '/assets/sounds/defeat.wav',
   // --- Pending real files: drop the .mp3 in the path shown, then uncomment. ---
