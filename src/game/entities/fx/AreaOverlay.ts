@@ -41,6 +41,21 @@ export interface AreaOverlayConfig {
   svgSpin?: number;
   /** Scale-bump the SVG on each pulseOnce() call (tree). */
   svgPulse?: boolean;
+  /**
+   * Render-time alpha for the SVG layer (the file itself stays opaque) so
+   * ground fx never hide enemies standing inside the area.
+   */
+  svgAlpha?: number;
+  /**
+   * Instead of one centered instance, plant `count` smaller copies scattered
+   * at random spots across the disc — from the top-down camera a wide AOE
+   * reads as "the whole area burns", not one column at its center. Per-copy
+   * scale is random between `minScale`..`maxScale` (fractions of `svgScale`).
+   * With `roam` each copy lives a short cycle instead of standing still:
+   * fade in (~200ms) at a random spot → hold → fade out → reappear elsewhere
+   * inside the disc, staggered per copy so the area flickers organically.
+   */
+  svgScatter?: { count: number; minScale?: number; maxScale?: number; roam?: boolean };
   centerIcon?: { text: string; fontSize?: string };
   blendMode?: Phaser.BlendModes;
   depth?: number;
@@ -51,10 +66,47 @@ export interface AreaOverlayConfig {
   onExpire?: () => void;
 }
 
+/** One random spot inside the disc, uniform over its area, with a random scale. */
+function randomDiscPlacement(
+  radius: number,
+  squash: number,
+  minFrac: number,
+  maxFrac: number,
+  baseScale: number,
+): { x: number; y: number; scale: number } {
+  const a = Math.random() * Math.PI * 2;
+  // sqrt() = uniform coverage over the disc area; 0.72 keeps bases inside the rim.
+  const d = radius * 0.72 * Math.sqrt(Math.random());
+  return {
+    x: Math.cos(a) * d,
+    y: Math.sin(a) * d * squash,
+    scale: baseScale * (minFrac + Math.random() * (maxFrac - minFrac)),
+  };
+}
+
+/** Fully random static layout inside the disc — organic, no repeating pattern. */
+function scatterPlacements(
+  radius: number,
+  squash: number,
+  count: number,
+  minFrac: number,
+  maxFrac: number,
+  baseScale: number,
+): { x: number; y: number; scale: number }[] {
+  const pts: { x: number; y: number; scale: number }[] = [];
+  for (let i = 0; i < count; i++) {
+    pts.push(randomDiscPlacement(radius, squash, minFrac, maxFrac, baseScale));
+  }
+  // Painter's order: farther (smaller y) copies first so near ones overlap them.
+  pts.sort((p, q) => p.y - q.y);
+  return pts;
+}
+
 export class AreaOverlay extends Phaser.GameObjects.Container {
   private disc?: Phaser.GameObjects.Arc;
   private rings?: Phaser.GameObjects.Graphics;
-  private svg?: Phaser.GameObjects.Image;
+  private svgs: Phaser.GameObjects.Image[] = [];
+  private svgBaseScales: number[] = [];
   private icon?: Phaser.GameObjects.Text;
   private baseFillAlpha = 0;
   private baseSvgScale = 1;
@@ -89,19 +141,42 @@ export class AreaOverlay extends Phaser.GameObjects.Container {
 
     if (cfg.svgKey) {
       this.baseSvgScale = cfg.svgScale ?? 1;
-      this.svg = scene.add.image(0, 0, cfg.svgKey);
-      this.svg.setOrigin(0.5, cfg.svgOriginY ?? 0.5);
-      this.svg.setScale(this.baseSvgScale);
-      if (cfg.svgTint !== undefined) this.svg.setTint(cfg.svgTint);
-      this.add(this.svg);
-      if (cfg.svgSpin) {
-        scene.tweens.add({
-          targets: this.svg,
-          angle: 360,
-          duration: (360 / cfg.svgSpin) * 1000,
-          repeat: -1,
-        });
-      }
+      const svgAlpha = cfg.svgAlpha ?? 1;
+      const scatter = cfg.svgScatter;
+      const placements = scatter
+        ? scatterPlacements(
+            cfg.radius,
+            squash,
+            scatter.count,
+            scatter.minScale ?? 0.4,
+            scatter.maxScale ?? 0.65,
+            this.baseSvgScale,
+          )
+        : [{ x: 0, y: 0, scale: this.baseSvgScale }];
+      placements.forEach((p, i) => {
+        const img = scene.add.image(p.x, p.y, cfg.svgKey!);
+        img.setOrigin(0.5, cfg.svgOriginY ?? 0.5);
+        img.setScale(p.scale);
+        if (svgAlpha < 1) img.setAlpha(svgAlpha);
+        if (cfg.svgTint !== undefined) img.setTint(cfg.svgTint);
+        this.add(img);
+        this.svgs.push(img);
+        this.svgBaseScales.push(p.scale);
+        if (cfg.svgSpin) {
+          scene.tweens.add({
+            targets: img,
+            angle: 360,
+            duration: (360 / cfg.svgSpin) * 1000,
+            repeat: -1,
+          });
+        }
+        if (scatter?.roam) {
+          // Living copy: starts invisible, then cycles fade-in → hold →
+          // fade-out → reappear at a new random spot. Staggered per copy.
+          img.setAlpha(0);
+          this.startRoam(img, cfg, squash, svgAlpha, i);
+        }
+      });
     }
 
     if (cfg.centerIcon) {
@@ -162,16 +237,62 @@ export class AreaOverlay extends Phaser.GameObjects.Container {
     }
   }
 
+  /**
+   * Roam cycle for one scattered copy: jump to a random spot in the disc,
+   * fade in (~200ms), hold a beat, fade out (~200ms), repeat elsewhere.
+   * Guards on `img.active` end the chain once the overlay is destroyed.
+   */
+  private startRoam(
+    img: Phaser.GameObjects.Image,
+    cfg: AreaOverlayConfig,
+    squash: number,
+    targetAlpha: number,
+    index: number,
+  ): void {
+    const FADE_MS = 200;
+    const cycle = () => {
+      if (!this.scene || !img.active) return;
+      const p = randomDiscPlacement(
+        cfg.radius,
+        squash,
+        cfg.svgScatter?.minScale ?? 0.4,
+        cfg.svgScatter?.maxScale ?? 0.65,
+        this.baseSvgScale,
+      );
+      img.setPosition(p.x, p.y);
+      img.setScale(p.scale);
+      this.scene.tweens.add({
+        targets: img,
+        alpha: targetAlpha,
+        duration: FADE_MS,
+        onComplete: () => {
+          if (!this.scene || !img.active) return;
+          this.scene.tweens.add({
+            targets: img,
+            alpha: 0,
+            duration: FADE_MS,
+            delay: 300 + Math.random() * 400, // hold at the spot for a beat
+            onComplete: cycle,
+          });
+        },
+      });
+    };
+    // Stagger starts so the copies flicker out of sync from the first frame.
+    this.scene.time.delayedCall(index * 150 + Math.random() * 200, cycle);
+  }
+
   /** One-shot pulse for tick-based fields (tree of life root pulse). */
   pulseOnce(): void {
-    if (this.svg) {
+    this.svgs.forEach((img, i) => {
       this.scene.tweens.add({
-        targets: this.svg,
-        scale: this.baseSvgScale * 1.1,
+        targets: img,
+        scale: this.svgBaseScales[i] * 1.1,
         duration: 200,
         yoyo: true,
+        // Slight stagger so scattered copies flare organically, not in lockstep.
+        delay: i * 50,
       });
-    }
+    });
     if (this.disc && this.baseFillAlpha > 0) {
       this.scene.tweens.add({
         targets: this.disc,
@@ -198,7 +319,7 @@ export class AreaOverlay extends Phaser.GameObjects.Container {
       const targets: Phaser.GameObjects.GameObject[] = [this];
       if (this.disc) targets.push(this.disc);
       if (this.rings) targets.push(this.rings);
-      if (this.svg) targets.push(this.svg);
+      targets.push(...this.svgs);
       if (this.icon) targets.push(this.icon);
       for (const t of targets) this.scene.tweens.killTweensOf(t);
     }

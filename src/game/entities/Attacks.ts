@@ -516,6 +516,7 @@ export class VortexAttack extends Attack {
       svgKey: this.visualCfg.artKey, svgTint: this.visualCfg.tint,
       svgScale: (radius * 2) / 128, // art is authored at 128px, cover the disc
       svgSpin: 90,
+      svgAlpha: 0.7, // dragged enemies stay visible under the net
       enter: { durationMs: 200 },
     });
   }
@@ -1075,6 +1076,7 @@ export class TrapAttack extends Attack {
         svgKey: 'frost_burst',
         svgScale: radius / 100,
         svgOriginY: 0.73,
+        svgAlpha: 0.65, // frozen enemies stay visible through the rime
         enter: { durationMs: 150, ease: 'Back.out', fromScale: 0.5 },
         exit: { mode: 'fade', durationMs: 900, delayMs: 400 },
       });
@@ -1114,6 +1116,7 @@ export class AoeRootFieldAttack extends Attack {
       svgKey: 'hold_field',
       svgScale: radius / 100,
       svgOriginY: 1,
+      svgAlpha: 0.6, // rooted enemies stay visible under the cord
       enter: { durationMs: 300, ease: 'Back.out', fromScale: 0.6 },
     });
   }
@@ -1177,9 +1180,11 @@ export class AoeFirePatchAttack extends Attack {
     this.durationMs = duration;
 
     const style = FIRE_PATCH_STYLES[flavor] ?? FIRE_PATCH_STYLES.spicy;
-    // Charred ember disc (the hitbox telegraph) with a standing flame flourish
-    // rooted at its center. svgScale = radius/100 locks the art to the disc so
-    // it tracks bonusRadius; svgOriginY:1 plants the flames' base on the ground.
+    // Charred ember disc (the hitbox telegraph) under several smaller flame
+    // clusters scattered across it — one centered column reads wrong from the
+    // top-down camera on a wide AOE. svgScale = radius/100 keeps the art
+    // tracking bonusRadius; svgOriginY:1 plants each cluster's base on the
+    // ground; svgAlpha keeps enemies burning inside visible through the art.
     this.overlay = new AreaOverlay(scene, {
       x, y, radius,
       fillColor: style.fillColor, fillAlpha: 0.3,
@@ -1189,6 +1194,15 @@ export class AoeFirePatchAttack extends Attack {
       svgScale: radius / 100,
       svgOriginY: 1,
       svgPulse: true,
+      svgAlpha: 0.55,
+      svgScatter: {
+        count: Math.min(7, Math.max(4, Math.round(radius / 36))),
+        minScale: 0.38,
+        maxScale: 0.62,
+        // Copies roam: fade in at a spot, hold, fade ~200ms, reappear elsewhere
+        // — the patch flickers alive instead of holding one frozen layout.
+        roam: true,
+      },
       enter: { durationMs: 250, ease: 'Back.out', fromScale: 0.5 },
     });
   }
@@ -1254,6 +1268,7 @@ export class TornadoAttack extends Attack {
       svgKey: 'tornado',
       svgScale: Math.max(0.5, pullRadius / 50),
       svgSpin: 360,
+      svgAlpha: 0.7, // enemies caught in the funnel stay visible
       enter: { durationMs: 300 },
     });
   }
@@ -1340,6 +1355,7 @@ export class TreeOfLifeFieldAttack extends Attack {
       svgKey: 'tree_of_life',
       svgOriginY: 1,
       svgPulse: true,
+      svgAlpha: 0.7, // enemies rooted under the canopy stay visible
       enter: { durationMs: 500, ease: 'Back.out', fromScale: 0.5 },
     });
   }

@@ -783,6 +783,7 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
       radius: 0, // pure SVG overlay, no disc
       svgKey: 'lambat_vortex',
       svgScale: evt.scale || 2.5,
+      svgAlpha: 0.7, // netted enemies stay visible while dragged
       exit: { mode: 'shrink', durationMs: evt.pullDuration, delayMs: evt.pullDelay, ease: 'Sine.easeIn' },
     });
   } else if (evt.type === 'spawnDoughBarrier') {
