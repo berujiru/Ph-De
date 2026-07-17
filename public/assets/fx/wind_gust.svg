@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="592" viewBox="0 0 512 592">
+  <!-- Muzzle gust for "Barya Lang Po": a 60-degree cone of curved wind streaks blasting
+       right from the apex at (0,296). Pure white/translucent, no outlines, authored for
+       ADD blend. The fx component roots it at the muzzle (origin 0,0.5), rotates it to the
+       aim and scales width to the cone length; the streaks fill the +/-30 deg spread. -->
+  <defs>
+    <linearGradient id="gust-body" gradientUnits="userSpaceOnUse" x1="0" y1="296" x2="512" y2="296">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.85"/>
+      <stop offset="0.4" stop-color="#ffffff" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="gust-streak" gradientUnits="userSpaceOnUse" x1="0" y1="296" x2="512" y2="296">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0.25" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="0.75" stop-color="#f0fdfa" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- soft cone body: bright blast core feathering out to nothing -->
+  <path d="M 0 296 L 512 8 L 512 584 Z" fill="url(#gust-body)"/>
+
+  <!-- curved wind streaks fanning across the cone, bowed to read as moving air -->
+  <g fill="none" stroke="url(#gust-streak)" stroke-linecap="round">
+    <path d="M 24 296 Q 300 260 508 40" stroke-width="10"/>
+    <path d="M 24 296 Q 300 332 508 552" stroke-width="10"/>
+    <path d="M 30 296 Q 320 288 500 150" stroke-width="8"/>
+    <path d="M 30 296 Q 320 304 500 442" stroke-width="8"/>
+    <path d="M 36 296 Q 340 296 480 296" stroke-width="12"/>
+    <path d="M 60 288 Q 300 240 470 100" stroke-width="5" stroke-opacity="0.7"/>
+    <path d="M 60 304 Q 300 352 470 492" stroke-width="5" stroke-opacity="0.7"/>
+    <path d="M 90 296 Q 320 316 452 380" stroke-width="4" stroke-opacity="0.55"/>
+    <path d="M 90 296 Q 320 276 452 212" stroke-width="4" stroke-opacity="0.55"/>
+  </g>
+
+  <!-- little debris/dust flecks caught in the blast -->
+  <g fill="#ffffff">
+    <circle cx="300" cy="170" r="4" fill-opacity="0.7"/>
+    <circle cx="360" cy="410" r="5" fill-opacity="0.6"/>
+    <circle cx="430" cy="250" r="3.5" fill-opacity="0.5"/>
+    <circle cx="250" cy="360" r="3.5" fill-opacity="0.6"/>
+    <circle cx="410" cy="336" r="3" fill-opacity="0.45"/>
+  </g>
+</svg>

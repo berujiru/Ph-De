@@ -29,7 +29,12 @@ function createDummyEnemy(id = 'enemy', x = 0, y = 0, hp = 100): ISkillEnemy {
     takeDamage: function(amount: number) {
       this.hp -= amount;
       if (this.hp <= 0) this.isDead = true;
-    }
+    },
+    silenceTimer: 0,
+    applyAilment: function(type: string, amount: number, _durationMs: number) {
+      this.activeAilments[type] = amount;
+    },
+    revealStealth: function() {},
   };
 }
 
@@ -114,8 +119,8 @@ describe('Hero Skills', () => {
     const eInside = createDummyEnemy('eInside', 50, -200, 50); 
     // eOutside is within 400 range but outside the 60 degree cone (e.g. to the right)
     const eOutside = createDummyEnemy('eOutside', 200, -100, 50); 
-    // eFar is inside the cone angle but too far (>400 range)
-    const eFar = createDummyEnemy('eFar', 0, -500, 50);
+    // eFar is inside the cone angle but beyond the 550px cone length
+    const eFar = createDummyEnemy('eFar', 0, -600, 50);
 
     const ctx = createDummyContext([h1], [eTarget, eInside, eOutside, eFar]);
 
@@ -127,6 +132,36 @@ describe('Hero Skills', () => {
     expect(eOutside.hp).toBe(50); // Misses outside cone angle
     expect(eFar.hp).toBe(50); // Misses too far
     expect(ctx.onVisual).toHaveBeenCalledWith(expect.objectContaining({ type: 'coinShrapnelCone' }));
+  });
+
+  it('jeepney_driver (Barya) knocks in-cone enemies back and freezes their AI', () => {
+    // Realistic geometry: hero near the bottom of the lane, enemies marching down
+    // from above (smaller y). The gust shoves them back up-lane, away from the hero.
+    const h1 = createDummyHero('jeepney_driver', 540, 1800);
+    // Most-advanced enemy (highest y) sets the aim; eTarget pins it straight up.
+    const eTarget = createDummyEnemy('eTarget', 540, 1750, 50);
+    const eInside = createDummyEnemy('eInside', 560, 1600, 50); // inside the cone
+    const eOutside = createDummyEnemy('eOutside', 900, 1700, 50); // outside the cone angle
+
+    const ctx = createDummyContext([h1], [eTarget, eInside, eOutside]);
+
+    const distFromHero = (x: number, y: number) => Math.hypot(x - h1.x, y - h1.y);
+    const beforeDist = distFromHero(eInside.x, eInside.y);
+
+    applyHeroSkill('jeepney_driver', h1, ctx);
+
+    // In-cone enemy: a dragTo pushing it FARTHER from the hero, plus the 'dragged' freeze.
+    const drags = (ctx.onVisual as any).mock.calls
+      .map((c: any[]) => c[0])
+      .filter((e: any) => e.type === 'dragTo');
+    const inDrag = drags.find((d: any) => d.target === eInside);
+    expect(inDrag).toBeDefined();
+    expect(distFromHero(inDrag.x, inDrag.y)).toBeGreaterThan(beforeDist);
+    expect(eInside.activeAilments['dragged']).toBe(1);
+
+    // Out-of-cone enemy: no knockback at all.
+    expect(drags.some((d: any) => d.target === eOutside)).toBe(false);
+    expect(eOutside.activeAilments['dragged']).toBeUndefined();
   });
   
   it('fisherfolk (Lambat) drags enemies to GAME_WIDTH / 2', () => {

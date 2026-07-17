@@ -190,7 +190,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 1400, // slowed 2026-07: 17.6 DPS busted the bruiser band
     color: 0x10b981,
     purpose: 'Frontline cleaver — revs into clustered enemies and hits Bosses extra hard. A durable bruiser, not a sniper.',
-    signatureSkill: { name: 'Barya Lang Po', shortName: 'Barya', description: 'Tosses coin shrapnel for massive shotgun AoE damage.' },
+    signatureSkill: { name: 'Barya Lang Po', shortName: 'Barya', description: 'Blasts his coin dispenser like a shotgun — a cone of peso shrapnel deals massive AoE damage and the muzzle gust knocks enemies back.' },
     passive: { name: 'Hari ng Kalsada', description: 'Deals bonus damage to Bosses.' },
     attackArt: 'wrench',
   },

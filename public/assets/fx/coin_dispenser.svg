@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Jeepney Driver's barya (coin) dispenser, held like a sawed-off shotgun: grip/trigger
+       at the pivot (x=0 end), the coin-tube "barrel" cluster aiming right so the open tube
+       mouths at the far edge are the muzzle. Authored horizontal like the attack art; the
+       fx component roots it at the hero (origin 0,0.5) and rotates it toward the aim. -->
+  <defs>
+    <linearGradient id="disp-body" gradientUnits="userSpaceOnUse" x1="0" y1="176" x2="0" y2="336">
+      <stop offset="0" stop-color="#5eead4"/>
+      <stop offset="0.45" stop-color="#14b8a6"/>
+      <stop offset="1" stop-color="#0f766e"/>
+    </linearGradient>
+    <linearGradient id="disp-tube" gradientUnits="userSpaceOnUse" x1="0" y1="196" x2="0" y2="252">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="0.5" stop-color="#cbd5e1"/>
+      <stop offset="1" stop-color="#64748b"/>
+    </linearGradient>
+    <linearGradient id="disp-grip" gradientUnits="userSpaceOnUse" x1="0" y1="256" x2="0" y2="404">
+      <stop offset="0" stop-color="#334155"/>
+      <stop offset="1" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="disp-coin" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fde68a"/>
+      <stop offset="0.5" stop-color="#facc15"/>
+      <stop offset="1" stop-color="#b45309"/>
+    </linearGradient>
+    <radialGradient id="disp-muzzle" cx="0.5" cy="0.5" r="0.6">
+      <stop offset="0" stop-color="#fef9c3"/>
+      <stop offset="1" stop-color="#a16207"/>
+    </radialGradient>
+  </defs>
+
+  <!-- angled pistol grip at the pivot end -->
+  <path d="M 40 262 L 118 262 L 96 404 Q 92 420 70 418 Q 46 416 44 396 Z"
+        fill="url(#disp-grip)" stroke="#0f172a" stroke-width="12" stroke-linejoin="round"/>
+  <!-- knurl lines on the grip -->
+  <path d="M 62 300 l 40 -4" fill="none" stroke="#475569" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 60 328 l 38 -4" fill="none" stroke="#475569" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 58 356 l 36 -4" fill="none" stroke="#475569" stroke-width="5" stroke-linecap="round"/>
+  <!-- trigger guard + trigger -->
+  <path d="M 118 300 Q 156 300 156 340 Q 156 372 126 372" fill="none"
+        stroke="#0f172a" stroke-width="12" stroke-linecap="round"/>
+  <path d="M 132 316 q 14 10 6 34" fill="none" stroke="#334155" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- main dispenser body (the coin box) -->
+  <rect x="96" y="176" width="196" height="160" rx="26" fill="url(#disp-body)"
+        stroke="#0f172a" stroke-width="14"/>
+  <!-- body specular strip -->
+  <rect x="118" y="192" width="150" height="12" rx="6" fill="#ffffff" fill-opacity="0.55"/>
+  <!-- coin-slot window showing a stack of barya inside -->
+  <rect x="128" y="230" width="120" height="82" rx="10" fill="#0f172a" fill-opacity="0.55"/>
+  <circle cx="158" cy="272" r="21" fill="url(#disp-coin)" stroke="#78350f" stroke-width="4"/>
+  <circle cx="196" cy="272" r="21" fill="url(#disp-coin)" stroke="#78350f" stroke-width="4"/>
+  <circle cx="220" cy="272" r="21" fill="url(#disp-coin)" stroke="#78350f" stroke-width="4"/>
+  <text x="158" y="281" font-family="Georgia, serif" font-size="24" font-weight="bold"
+        fill="#78350f" text-anchor="middle">&#8369;</text>
+
+  <!-- coin-tube barrel cluster aiming right; open mouths at the far edge -->
+  <g stroke="#0f172a" stroke-width="12">
+    <rect x="284" y="200" width="196" height="44" rx="22" fill="url(#disp-tube)"/>
+    <rect x="284" y="256" width="196" height="44" rx="22" fill="url(#disp-tube)"/>
+  </g>
+  <!-- tube specular streaks -->
+  <rect x="300" y="208" width="150" height="7" rx="3.5" fill="#ffffff" fill-opacity="0.85"/>
+  <rect x="300" y="264" width="150" height="7" rx="3.5" fill="#ffffff" fill-opacity="0.7"/>
+  <!-- muzzle mouths (open barrel ends) -->
+  <ellipse cx="474" cy="222" rx="15" ry="21" fill="url(#disp-muzzle)" stroke="#0f172a" stroke-width="10"/>
+  <ellipse cx="474" cy="278" rx="15" ry="21" fill="url(#disp-muzzle)" stroke="#0f172a" stroke-width="10"/>
+  <!-- a coin peeking at each muzzle, ready to fire -->
+  <circle cx="470" cy="222" r="9" fill="url(#disp-coin)"/>
+  <circle cx="470" cy="278" r="9" fill="url(#disp-coin)"/>
+</svg>

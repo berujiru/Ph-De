@@ -180,11 +180,29 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     
     // Dispatch visual event
     onVisual({ type: 'coinShrapnelCone', hero, length: coneLength, angle: targetAngle });
-    
-    // Apply damage to enemies in the cone
+
+    // Apply damage + wind knockback to enemies in the cone. The muzzle gust shoves
+    // each enemy directly away from the hero — hardest at point-blank (~140px),
+    // tapering to ~60px at the cone's edge — matching the Wind damage type. The
+    // 'dragged' ailment freezes their AI so they don't walk against the shove
+    // (same pattern as Lambat's forced movement).
+    const KB_MS = 250;
     for (const e of validEnemies) {
       if (isPointInCone(e.x, e.y, hero.x, hero.y, targetAngle, SKILL_CONE_HALF_ANGLE, coneLength)) {
         e.takeDamage(hero.damage * 3);
+
+        const dx = e.x - hero.x;
+        const dy = e.y - hero.y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d > 0) {
+          const frac = Math.min(1, d / coneLength);
+          const push = 140 - 80 * frac;
+          // Clamp inside the world so a point-blank shove can't fling enemies off-screen.
+          const newX = Math.max(20, Math.min(GAME_WIDTH - 20, e.x + (dx / d) * push));
+          const newY = Math.max(20, e.y + (dy / d) * push);
+          onVisual({ type: 'dragTo', target: e, x: newX, y: newY, duration: KB_MS, ease: 'Power2' });
+          e.applyAilment('dragged', 1, KB_MS);
+        }
       }
     }
   } else if (skillId === 'fisherfolk') {

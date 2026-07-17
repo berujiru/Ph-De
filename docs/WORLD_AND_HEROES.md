@@ -132,7 +132,7 @@ squad math stays healthy in 5 slots). Damage types per
 | **Eden** | Community organizer | Physical | Projectile | Throwing megaphones | Skill: Rally — brief squad-wide buff |
 | **Teacher** | Public school teacher | Physical | Boomerang | Tossing a wooden *Pamalo* (ruler) | Marks enemies for bonus damage |
 | **Student** | Working student | Physical | Pierce | Slingshot with pebbles | Passive: Enhancement drops apply at increased potency |
-| **Jeepney Driver** | Driver | Wind | Cone | Revving smog-spewing *Tambutso* | Skill: *Barya* — tosses coins like shrapnel for AoE damage |
+| **Jeepney Driver** | Driver | Wind | Cone | Revving smog-spewing *Tambutso* | Skill: *Barya* — coin-dispenser shotgun blasts a cone of shrapnel for AoE damage and knocks enemies back on a gust of wind |
 | **Fisherfolk** | Fisher | Water | Vortex | Net throw (*Lambat*) | Clumps enemies and applies Wet |
 | **Street Sweeper** | Barangay sweeper | Earth | Linear-Wave | Sweeping *Walis Tingting* | Sends a wave of dust/debris that hits the frontline |
 | **Taho Vendor** | Street vendor | Frost | Splash | Lobs scalding *Arnibal* (Syrup) | Sticky syrup slows and damages in a circle |

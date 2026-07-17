@@ -31,6 +31,7 @@ import {
 import { TrafficLight } from '../entities/fx/TrafficLight';
 import { spawnShockwaveRing } from '../entities/fx/ShockwaveRing';
 import { spawnConeFlash } from '../entities/fx/ConeFlash';
+import { spawnCoinShotgunBlast } from '../entities/fx/CoinShotgunBlast';
 import { AreaOverlay } from '../entities/fx/AreaOverlay';
 
 export function setupUIEvents(scene: GameScene): () => void {
@@ -646,47 +647,12 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
       new TrafficLight(scene, GAME_WIDTH - 30, y, evt.duration);
     }
   } else if (evt.type === 'coinShrapnelCone') {
-    const hero = evt.hero;
-    const length = evt.length;
-    const angle = evt.angle;
-    const spreadAngle = Math.PI / 6;
-
-    spawnConeFlash(scene, {
-      x: hero.x, y: hero.y,
-      angle, length,
-      color: 0x10b981, alpha: 0.1,
-      fadeMs: 300, ease: 'Power2',
+    // Barya Lang Po: coin-shotgun blast — dispenser + muzzle flash + wind gust +
+    // spinning coin shrapnel + recoil shake, all handled by the shared fx component.
+    spawnCoinShotgunBlast(scene, {
+      x: evt.hero.x, y: evt.hero.y,
+      angle: evt.angle, length: evt.length,
     });
-
-    // Coin shrapnel scattering inside the cone — unique to this skill.
-    const startX = hero.x + Math.cos(angle) * 20;
-    const startY = hero.y + Math.sin(angle) * 20;
-    for (let i = 0; i < 12; i++) {
-      const pAngle = angle + (Math.random() * spreadAngle * 2) - spreadAngle;
-      const travelDuration = 250 + Math.random() * 150; 
-      const lingerDuration = 2000 + Math.random() * 1000;
-      const distanceMultiplier = 0.4 + Math.random() * 0.6; 
-      const isGold = Math.random() > 0.5;
-      
-      const coin = scene.add.circle(startX, startY, 6, isGold ? 0xfacc15 : 0x94a3b8);
-      
-      scene.tweens.add({
-        targets: coin,
-        x: startX + Math.cos(pAngle) * (length * distanceMultiplier),
-        y: startY + Math.sin(pAngle) * (length * distanceMultiplier),
-        duration: travelDuration,
-        ease: 'Cubic.easeOut',
-        onComplete: () => {
-          scene.tweens.add({
-            targets: coin,
-            alpha: 0,
-            duration: 500,
-            delay: lingerDuration,
-            onComplete: () => coin.destroy()
-          });
-        }
-      });
-    }
   } else if (evt.type === 'flashlightCone') {
     spawnConeFlash(scene, {
       x: evt.hero.x, y: evt.hero.y,

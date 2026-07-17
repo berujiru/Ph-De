@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Single peso coin fired as shrapnel by "Barya Lang Po". Authored grayscale/white so
+       the fx component can tint each copy gold or silver at runtime (Phaser setTint), the
+       same way the basic-attack art is damage-tinted. -->
+  <defs>
+    <radialGradient id="coin-face" cx="0.38" cy="0.34" r="0.75">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.6" stop-color="#e2e8f0"/>
+      <stop offset="1" stop-color="#94a3b8"/>
+    </radialGradient>
+  </defs>
+  <!-- outer rim -->
+  <circle cx="32" cy="32" r="28" fill="#cbd5e1" stroke="#64748b" stroke-width="4"/>
+  <!-- milled edge ticks -->
+  <g stroke="#94a3b8" stroke-width="2">
+    <path d="M32 5 v5"/><path d="M32 54 v5"/><path d="M5 32 h5"/><path d="M54 32 h5"/>
+    <path d="M13 13 l3.5 3.5"/><path d="M47.5 47.5 l3.5 3.5"/>
+    <path d="M51 13 l-3.5 3.5"/><path d="M16.5 47.5 l-3.5 3.5"/>
+  </g>
+  <!-- coin face -->
+  <circle cx="32" cy="32" r="22" fill="url(#coin-face)" stroke="#b8c2cf" stroke-width="2"/>
+  <!-- embossed peso sign -->
+  <text x="32" y="42" font-family="Georgia, serif" font-size="30" font-weight="bold"
+        fill="#8b97a6" text-anchor="middle">&#8369;</text>
+  <!-- specular glint -->
+  <ellipse cx="24" cy="22" rx="7" ry="4.5" fill="#ffffff" fill-opacity="0.85"
+           transform="rotate(-35 24 22)"/>
+</svg>
