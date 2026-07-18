@@ -14,6 +14,7 @@ import { theme } from './ui/theme';
 import { uiToGameEvents } from './game/core/GameEvents';
 import { spendPermit } from './game/data/metaState';
 import { AudioManager } from './game/core/AudioManager';
+import { IapManager } from './game/core/IapManager';
 import { MUSIC } from './game/data/soundRegistry';
 import './App.css';
 
@@ -25,6 +26,13 @@ function App() {
   // Where the store's Back button returns to — 'prep' when reached via the
   // out-of-permits CTA (so the player lands back on the same stage), else 'main'.
   const [storeReturnView, setStoreReturnView] = useState<'main' | 'prep'>('main');
+
+  // Boot the IAP engine once on mount (idempotent). This runs the store's
+  // startup replay of any consumable purchase that was approved but not yet
+  // granted last session — even if the player never opens the store this run.
+  useEffect(() => {
+    void IapManager.init();
+  }, []);
 
   useEffect(() => {
     const inRally = currentView === 'battle' || currentView === 'sandbox';

@@ -17,10 +17,13 @@ import {
   getStoreUnlockedHeroes,
   grantAdReward,
   hasEncounteredEnemy,
+  hasProcessedIapTx,
   isStageCleared,
   levelUpHero,
   markEnemyEncountered,
   MAX_AD_WATCHES_PER_DAY,
+  MAX_IAP_TX_HISTORY,
+  recordIapGrant,
   recordStageClear,
   resetMetaStateForTests,
   subscribeMetaState,
@@ -276,5 +279,61 @@ describe('migration from a pre-ads save', () => {
     resetMetaStateForTests();
     expect(canClaimDaily()).toBe(true);
     expect(adsRemainingToday()).toBe(MAX_AD_WATCHES_PER_DAY);
+  });
+});
+
+describe('recordIapGrant', () => {
+  it('grants the currency and records the transaction once', () => {
+    expect(getHope()).toBe(0);
+    expect(recordIapGrant('txn-1', 'hope', 500)).toBe(true);
+    expect(getHope()).toBe(500);
+    expect(hasProcessedIapTx('txn-1')).toBe(true);
+
+    expect(recordIapGrant('txn-2', 'permits', 40)).toBe(true);
+    expect(getPermits()).toBe(25 + 40); // 25 = starting permits
+  });
+
+  it('is idempotent — a replayed transaction id never double-grants', () => {
+    expect(recordIapGrant('txn-dup', 'hope', 500)).toBe(true);
+    expect(getHope()).toBe(500);
+    // Same id again (store replays `approved` until finished) → no-op.
+    expect(recordIapGrant('txn-dup', 'hope', 500)).toBe(false);
+    expect(getHope()).toBe(500);
+  });
+
+  it('rejects non-positive amounts and empty ids', () => {
+    expect(recordIapGrant('txn-x', 'hope', 0)).toBe(false);
+    expect(recordIapGrant('txn-x', 'hope', -100)).toBe(false);
+    expect(recordIapGrant('', 'hope', 500)).toBe(false);
+    expect(getHope()).toBe(0);
+  });
+
+  it('caps the retained transaction history but keeps granting', () => {
+    for (let i = 0; i < MAX_IAP_TX_HISTORY + 10; i++) {
+      expect(recordIapGrant(`txn-${i}`, 'hope', 1)).toBe(true);
+    }
+    expect(getHope()).toBe(MAX_IAP_TX_HISTORY + 10);
+    // Oldest ids are evicted from the ledger; only the most recent are retained.
+    expect(hasProcessedIapTx('txn-0')).toBe(false);
+    expect(hasProcessedIapTx(`txn-${MAX_IAP_TX_HISTORY + 9}`)).toBe(true);
+  });
+
+  it('persists the grant + ledger across a reload', () => {
+    recordIapGrant('txn-persist', 'permits', 40);
+    resetMetaStateForTests(); // re-read storage
+    expect(getPermits()).toBe(25 + 40);
+    expect(hasProcessedIapTx('txn-persist')).toBe(true);
+    // A replay after reload is still deduped.
+    expect(recordIapGrant('txn-persist', 'permits', 40)).toBe(false);
+  });
+
+  it('defaults the ledger to empty for a pre-IAP save', () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ hope: 10, permits: 2, highestClearedStage: 1 }),
+    );
+    resetMetaStateForTests();
+    expect(hasProcessedIapTx('anything')).toBe(false);
+    expect(recordIapGrant('txn-new', 'hope', 500)).toBe(true);
   });
 });

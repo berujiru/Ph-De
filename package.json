@@ -23,6 +23,7 @@
     "@capacitor/android": "^8.4.1",
     "@capacitor/core": "^8.4.1",
     "@capacitor/ios": "^8.4.1",
+    "cordova-plugin-purchase": "^13.18.0",
     "phaser": "^4.2.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"

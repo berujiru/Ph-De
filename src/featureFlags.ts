@@ -22,3 +22,14 @@ export const SHOW_SANDBOX: boolean = envBool(
   import.meta.env.VITE_SHOW_SANDBOX,
   import.meta.env.DEV,
 );
+
+/**
+ * Whether to surface the real-money "Puhunan Counter" (Hope/Permit top-ups) on
+ * WEB builds, where purchases are simulated. Native builds always show it — this
+ * flag only gates the web-simulated UI, so it's visible in dev for testing and
+ * hidden on production web deploys. Set VITE_SHOW_IAP_WEB_SIM to force on/off.
+ */
+export const SHOW_IAP_WEB_SIM: boolean = envBool(
+  import.meta.env.VITE_SHOW_IAP_WEB_SIM,
+  import.meta.env.DEV,
+);

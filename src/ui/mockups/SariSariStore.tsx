@@ -35,6 +35,9 @@ import {
   MAX_AD_WATCHES_PER_DAY,
 } from '../../game/data/metaState';
 import { AdsManager } from '../../game/core/AdsManager';
+import { IapManager } from '../../game/core/IapManager';
+import { IAP_PRODUCTS, type IapProductDef, type IapProductId } from '../../iapConfig';
+import { SHOW_IAP_WEB_SIM } from '../../featureFlags';
 
 interface SariSariStoreProps {
   onBack: () => void;
@@ -569,9 +572,112 @@ function FreebieCard({
   );
 }
 
+/** Reveal payload for a real-money currency pack, reusing the shared modal. */
+function iapReveal(def: IapProductDef): { heading: string; rewards: RevealReward[] } {
+  const isHope = def.currency === 'hope';
+  return {
+    heading: 'Salamat sa Suporta!',
+    rewards: [{
+      id: `iap-${def.id}`,
+      title: isHope ? `${def.amount} Hope Points` : `Rally Permits ×${def.amount}`,
+      subtitle: 'Your load fuels the movement. Maraming salamat!',
+      rarity: 'epic',
+      icon: isHope ? <HopeCoinIcon size={44} /> : <RallyPermitIcon size={44} />,
+    }],
+  };
+}
+
+/**
+ * A real-money "load your wallet" pack on Aling Nena's counter. Cardboard-tag
+ * aesthetic (sibling of FreebieCard), but the button shows the store price and
+ * the grant amount instead of a Hope cost or a claim label.
+ */
+function CashPackCard({
+  def,
+  price,
+  busy,
+  disabled,
+  simulated,
+  onBuy,
+}: {
+  def: IapProductDef;
+  price: string | null;
+  busy: boolean;
+  disabled: boolean;
+  simulated: boolean;
+  onBuy: (def: IapProductDef) => void;
+}) {
+  const isHope = def.currency === 'hope';
+  const dead = disabled || busy;
+  return (
+    <div
+      style={{
+        width: 260,
+        maxWidth: '100%',
+        backgroundColor: theme.materials.cardboard,
+        backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(0,0,0,0.10) 3px, rgba(0,0,0,0.10) 6px)',
+        border: `1px solid ${theme.materials.cardboardEdge}`,
+        borderRadius: 3,
+        padding: 16,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 8,
+        textAlign: 'center',
+        boxShadow: '2px 4px 12px rgba(0,0,0,0.6), inset 0 0 18px rgba(0,0,0,0.4)',
+        transform: 'rotate(0.5deg)',
+      }}
+    >
+      <span style={{ color: theme.colors.gold, display: 'flex', filter: 'drop-shadow(0 0 6px rgba(250,204,21,0.4))' }}>
+        {isHope ? <HopeCoinIcon size={34} /> : <RallyPermitIcon size={34} />}
+      </span>
+      <span style={{ fontFamily: MARKER_FONT, fontWeight: 900, fontSize: 17, color: theme.materials.paper }}>
+        {def.title}
+      </span>
+      <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 15, fontWeight: 900, color: theme.colors.gold }}>
+        +{def.amount.toLocaleString()}
+        {isHope ? <HopeCoinIcon size={18} /> : <RallyPermitIcon size={18} />}
+      </span>
+      <span style={{ fontSize: 11, color: 'rgba(231, 229, 228, 0.85)', lineHeight: 1.35 }}>
+        {def.description}
+      </span>
+      {simulated && (
+        <span style={{ fontSize: 10, fontWeight: 800, color: theme.colors.textMuted, letterSpacing: 0.5 }}>
+          (simulated in dev)
+        </span>
+      )}
+      <button
+        type="button"
+        disabled={dead}
+        onClick={() => { if (!dead) onBuy(def); }}
+        aria-label={`Buy ${def.title} for ${price ?? 'the listed price'}`}
+        style={{
+          marginTop: 4,
+          backgroundColor: dead ? '#44403c' : '#7c2d12',
+          color: dead ? theme.colors.textMuted : theme.colors.textPrimary,
+          border: `1px solid ${theme.materials.rustDark}`,
+          borderRadius: 2,
+          padding: '8px 16px',
+          fontFamily: MARKER_FONT,
+          fontWeight: 900,
+          fontSize: 14,
+          cursor: dead ? 'not-allowed' : 'pointer',
+          minHeight: 44,
+          width: '100%',
+          boxShadow: 'inset 0 0 12px rgba(0,0,0,0.45)',
+          transition: 'background-color 0.15s',
+        }}
+      >
+        {busy ? 'Processing…' : disabled ? 'Store unavailable' : (price ?? '…')}
+      </button>
+    </div>
+  );
+}
+
 export function SariSariStore({ onBack }: SariSariStoreProps) {
   const [reveal, setReveal] = useState<{ heading: string; rewards: RevealReward[] } | null>(null);
   const [adBusy, setAdBusy] = useState(false);
+  const [iapBusy, setIapBusy] = useState<IapProductId | null>(null);
   const [, forceUpdate] = useReducer((x) => x + 1, 0);
 
   useEffect(() => subscribeMetaState(forceUpdate), []);
@@ -581,6 +687,13 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
   useEffect(() => {
     void AdsManager.init();
     return AdsManager.subscribe(forceUpdate);
+  }, []);
+
+  // Boot the IAP engine (idempotent) and re-render on status/price changes so
+  // the cash-pack tiles reflect ready/unavailable and show live store prices.
+  useEffect(() => {
+    void IapManager.init();
+    return IapManager.subscribe(forceUpdate);
   }, []);
 
   // Refresh the freebie labels across local midnight while the store sits open.
@@ -652,9 +765,23 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
     }
   };
 
+  const handleBuyPack = async (def: IapProductDef) => {
+    if (iapBusy) return;
+    setIapBusy(def.id);
+    try {
+      const granted = await IapManager.purchase(def.id);
+      if (granted) setReveal(iapReveal(def));
+    } finally {
+      setIapBusy(null);
+    }
+  };
+
   const dailyClaimable = canClaimDaily();
   const adsLeft = adsRemainingToday();
   const adsUnavailable = AdsManager.getStatus() === 'unavailable';
+  // Native always shows the counter; web shows it only when the sim flag is on.
+  const showIap = !IapManager.isSimulated() || SHOW_IAP_WEB_SIM;
+  const iapUnavailable = IapManager.getStatus() === 'unavailable';
 
   return (
     <div
@@ -911,6 +1038,41 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
             ))}
           </div>
         </div>
+
+        {/* Puhunan Counter — real-money currency top-ups (Play Store / App Store) */}
+        {showIap && (
+          <div style={{ marginTop: 36, position: 'relative', zIndex: 10 }}>
+            <div style={{ textAlign: 'center', marginBottom: 18 }}>
+              <span
+                style={{
+                  fontFamily: MARKER_FONT,
+                  fontSize: 24,
+                  color: theme.materials.paper,
+                  letterSpacing: 2,
+                  textShadow: '2px 2px 0 rgba(0,0,0,0.6), 0 0 12px rgba(234,88,12,0.25)',
+                }}
+              >
+                Puhunan Counter
+              </span>
+              <div style={{ fontSize: 11, color: theme.colors.textMuted, letterSpacing: 1, marginTop: 6 }}>
+                Load up with real support — supplies only, never heroes.
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 22, justifyContent: 'center' }}>
+              {IAP_PRODUCTS.map((def) => (
+                <CashPackCard
+                  key={def.id}
+                  def={def}
+                  price={IapManager.getPrice(def.id)}
+                  busy={iapBusy === def.id}
+                  disabled={iapUnavailable || (iapBusy !== null && iapBusy !== def.id)}
+                  simulated={IapManager.isSimulated()}
+                  onBuy={handleBuyPack}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Freebies — no Hope required: daily pack + watch-an-ad permits */}
         <div style={{ marginTop: 36, position: 'relative', zIndex: 10 }}>

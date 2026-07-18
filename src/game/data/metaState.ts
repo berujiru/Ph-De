@@ -34,6 +34,13 @@ export interface MetaStateData {
   adWatchDate: string | null;
   /** Rewarded ads completed on `adWatchDate` (resets when the day rolls over). */
   adWatchCount: number;
+  /**
+   * Store transaction ids for IAP grants already applied. With no backend this
+   * is the dedup ledger that turns the store's at-least-once delivery (an
+   * approved purchase can be replayed on every launch until finished) into
+   * exactly-once currency grants. Capped to the most recent entries.
+   */
+  iapProcessedTxIds: string[];
 }
 
 /** Free permits granted by the once-a-day store claim. */
@@ -42,6 +49,12 @@ export const DAILY_CLAIM_PERMITS = 5;
 export const AD_PERMIT_REWARD = 10;
 /** Max rewarded ads that can be redeemed for permits per local day. */
 export const MAX_AD_WATCHES_PER_DAY = 5;
+/**
+ * How many recent IAP transaction ids to retain for dedup. A transaction stops
+ * being replayed by the store once it's finished, so the ledger only needs to
+ * cover the short finished-but-replayed race window — not all purchases ever.
+ */
+export const MAX_IAP_TX_HISTORY = 50;
 
 /** Local (not UTC) zero-padded calendar day stamp — drives midnight resets. */
 function localDateStamp(now: Date = new Date()): string {
@@ -64,6 +77,7 @@ const DEFAULT_STATE: MetaStateData = {
   lastDailyClaimDate: null,
   adWatchDate: null,
   adWatchCount: 0,
+  iapProcessedTxIds: [],
 };
 
 function readStorage(): MetaStateData {
@@ -97,6 +111,11 @@ function readStorage(): MetaStateData {
       lastDailyClaimDate: typeof parsed.lastDailyClaimDate === 'string' ? parsed.lastDailyClaimDate : DEFAULT_STATE.lastDailyClaimDate,
       adWatchDate: typeof parsed.adWatchDate === 'string' ? parsed.adWatchDate : DEFAULT_STATE.adWatchDate,
       adWatchCount: typeof parsed.adWatchCount === 'number' ? parsed.adWatchCount : DEFAULT_STATE.adWatchCount,
+      // Migration: saves before IAP lack this — default to empty so a fresh
+      // grant ledger starts clean (old saves never had unfinished IAP txns).
+      iapProcessedTxIds: Array.isArray(parsed.iapProcessedTxIds)
+        ? parsed.iapProcessedTxIds.filter((id): id is string => typeof id === 'string')
+        : [...DEFAULT_STATE.iapProcessedTxIds],
     };
   } catch {
     return { ...DEFAULT_STATE };
@@ -249,6 +268,31 @@ export function grantAdReward(): boolean {
     permits: state.permits + AD_PERMIT_REWARD,
     adWatchDate: today,
     adWatchCount: watchedToday + 1,
+  };
+  notify();
+  return true;
+}
+
+/** Whether an IAP store transaction has already been granted. */
+export function hasProcessedIapTx(txId: string): boolean {
+  return state.iapProcessedTxIds.includes(txId);
+}
+
+/**
+ * Grant a paid currency pack exactly once per store transaction id. The grant
+ * and the "processed" record are one atomic state write (single notify()), so a
+ * crash can't leave currency added without the txId recorded (or vice versa).
+ * Returns false (no-op) when the amount is invalid or the txId was already
+ * processed — making it safe to call on every replayed `approved` event, this
+ * session or on a later app launch.
+ */
+export function recordIapGrant(txId: string, currency: 'hope' | 'permits', amount: number): boolean {
+  if (!txId || amount <= 0 || state.iapProcessedTxIds.includes(txId)) return false;
+  state = {
+    ...state,
+    hope: currency === 'hope' ? state.hope + amount : state.hope,
+    permits: currency === 'permits' ? state.permits + amount : state.permits,
+    iapProcessedTxIds: [...state.iapProcessedTxIds, txId].slice(-MAX_IAP_TX_HISTORY),
   };
   notify();
   return true;
