@@ -230,6 +230,25 @@ describe('Hero Skills', () => {
     expect(ys).toEqual([...ys].sort((a, b) => b - a));
   });
 
+  it('sorbetes_vendor (Dirty Ice Cream) fan-throws 3 bombs from the hero with a stagger', () => {
+    const h1 = createDummyHero('sorbetes_vendor', 540, 1800);
+    const ctx = createDummyContext([h1]);
+
+    applyHeroSkill('sorbetes_vendor', h1, ctx);
+
+    const throws = (ctx.onVisual as any).mock.calls
+      .map((c: any[]) => c[0])
+      .filter((e: any) => e.type === 'spawnTrap');
+    expect(throws).toHaveLength(3);
+    // Every bomb is lobbed from the hero's position...
+    for (const t of throws) {
+      expect(t.startX).toBe(540);
+      expect(t.startY).toBe(1800);
+    }
+    // ...and the throws fan out on ascending delays (0, 120, 240).
+    expect(throws.map((t: any) => t.delay)).toEqual([0, 120, 240]);
+  });
+
   it('taho_vendor (Hot Syrup) throws a syrup-flavored molotov patch', () => {
     const h1 = createDummyHero('taho_vendor', 300, 1500);
     const ctx = createDummyContext([h1]);

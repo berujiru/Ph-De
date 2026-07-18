@@ -143,7 +143,7 @@ squad math stays healthy in 5 slots). Damage types per
 | **Farmer (Magsasaka)** | Farmer | Earth | Melee-Cleave | Swings a *Karit* (Scythe) | Passive: Roots enemies to the ground periodically |
 | **Fishball Vendor** | Street Vendor | Physical | Pierce | Throws *Tuhog* (Barbecue Skewers) | Skewers pierce through multiple enemies |
 | **Sales Lady** | Department Store Worker | Wind | Hitscan | "Ma'am/Sir!" Megaphone Pitch | Relentless, high-speed verbal pitching |
-| **Sorbetes Vendor** | Ice Cream Vendor | Frost | Trap | Drops sticky ice cream puddles | Freezes enemies that step on the trap |
+| **Sorbetes Vendor** | Ice Cream Vendor | Frost | Trap | Lobs explosive ice-cream bombs that arm on landing | Fan-throws 3 bombs that freeze enemies tripping the ring |
 | **Electrician** | Lineman | Lightning | Chain | Jumper Cables | Zaps enemies and arcs electricity |
 | **Baker (Panadero)** | Local Baker | Fire | Splash | Lobs hot *Pandesal* bags | Bags explode for fire splash damage |
 | **Traffic Enforcer** | Traffic Enforcer | Physical | Vortex | Blows a whistle and raises "STOP" | Magnetically pulls enemies into a clump |

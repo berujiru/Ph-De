@@ -131,7 +131,9 @@ export function spawnHero(scene: GameScene, id: HeroId, passiveOverride?: string
     } else if (h.definition.attackStyle === 'linear-wave') {
       attack = new LinearWaveAttack(scene, target.x, h.muzzleY, h.damage, visual, speed, h.range, mods, damageType);
     } else if (h.definition.attackStyle === 'trap') {
-      attack = new TrapAttack(scene, h.x, h.y, target, h.damage, visual, mods, damageType);
+      // Lobbed bomb: tumbles from the muzzle and plants where it lands.
+      attack = new TrapAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, mods, damageType);
+      h.playProjectileLaunch();
     } else if (h.definition.attackStyle === 'pierce') {
       // Non-homing straight-line shot; pass-throughs = basePierce + bonusPierce.
       attack = new PierceAttack(scene, h.muzzleX, h.muzzleY, target, h.damage, visual, speed, h.definition.basePierce ?? 1, mods, damageType);

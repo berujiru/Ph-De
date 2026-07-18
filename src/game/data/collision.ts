@@ -16,7 +16,10 @@ export const ATTACK_COLLISION = {
   beam: { halfWidth: 8 }, // 8 + 32 = 40 vs minions (was flat 20)
   vortex: { radius: 100 }, // unchanged base; now + hitRadius
   linearWave: { pad: 0 }, // enemy hitRadius replaces the old flat +15 fudge
-  trap: { triggerRadius: 10, explosionRadius: 80 }, // trigger was flat 20; explode was 80
+  // Trigger 48 + minion 32 = 80 — exactly the telegraph ring the player sees, so
+  // "what you see is what detonates" (was 10: enemies walked through the drawn
+  // ring without setting the bomb off).
+  trap: { triggerRadius: 48, explosionRadius: 80 },
   chain: { bounceRangePx: 420 }, // moved from CHAIN_BOUNCE_RANGE_PX in Attacks.ts
   rollingBlackout: { halfHeight: 40 }, // was flat 60
   flushWave: { padY: 10 }, // was flat +30 on height/2

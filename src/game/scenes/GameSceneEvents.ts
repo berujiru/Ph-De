@@ -527,12 +527,22 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
       tint: parseInt((evt.color || '#f472b6').replace('#', '0x')),
       sizePx: 80,
     };
-    
-    // We pass a dummy target since TrapAttack offset applies a +80 y position.
+
+    // Dummy target compensates for TrapAttack's +80 path-lead offset so the
+    // bomb lands exactly on (evt.x, evt.y).
     const dummyTarget = { x: evt.x, y: evt.y - 80 } as any;
-    
-    const attack = new TrapAttack(scene, evt.x, evt.y, dummyTarget, evt.damage || 12, visual, evt.modifiers || {}, 'Frost');
-    scene.attacks.push(attack);
+    // Throw origin (the casting hero); fall back to the landing spot for
+    // legacy events, which degrades to a near-zero-length flight.
+    const startX = evt.startX ?? evt.x;
+    const startY = evt.startY ?? evt.y;
+    const throwBomb = () => {
+      if (!scene.sys) return; // scene may have shut down during the stagger
+      const attack = new TrapAttack(scene, startX, startY, dummyTarget, evt.damage || 12, visual, evt.modifiers || {}, 'Frost');
+      scene.attacks.push(attack);
+    };
+    // Fan the volley: each bomb leaves the vendor's hands on its own beat.
+    if (evt.delay) scene.time.delayedCall(evt.delay, throwBomb);
+    else throwBomb();
   } else if (evt.type === 'screenFlash') {
     const blackout = scene.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, parseInt((evt.color || '#000').replace('#', '0x')), evt.alpha || 0.5).setScrollFactor(0);
     scene.time.delayedCall(evt.duration || 3000, () => blackout.destroy());

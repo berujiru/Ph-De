@@ -393,13 +393,18 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       onVisual({ type: 'screenFlash', color: '#ec4899', alpha: 0.3, duration: 400 });
     }
   } else if (skillId === 'sorbetes_vendor') {
-    // Dirty Ice Cream: drop traps spread across the lane, just above the bottom front line.
+    // Dirty Ice Cream: fan-throw 3 bombs spread across the lane, just above the
+    // bottom front line — each lobbed from the vendor with a small stagger so
+    // the volley reads as three throws, not a simultaneous stamp.
     for(let i=0; i<3; i++) {
-      onVisual({ 
-        type: 'spawnTrap', 
-        x: GAME_WIDTH / 2 + (i-1)*150 + (Math.random()-0.5)*40, 
+      onVisual({
+        type: 'spawnTrap',
+        startX: hero.x,
+        startY: hero.y,
+        delay: i * 120,
+        x: GAME_WIDTH / 2 + (i-1)*150 + (Math.random()-0.5)*40,
         y: hero.y - 350 - (Math.random() * 80), // Spawn up the lane in the path of incoming enemies
-        color: '#f472b6', 
+        color: '#f472b6',
         damage: hero.damage * 3,
         modifiers: hero.modifiers
       });

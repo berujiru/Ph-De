@@ -1049,52 +1049,163 @@ export class LinearWaveAttack extends Attack {
 }
 
 export class TrapAttack extends Attack {
+  // Two-phase, mirroring VortexAttack: the vendor LOBS the bomb (tumbling arc
+  // from the muzzle, like the molotov), and it plants where it lands. A short
+  // arming beat follows the landing, then the armed bomb blinks its fuse light
+  // — slow when idle, fast when an enemy is close — until a body enters the
+  // trigger ring and it detonates.
+  private phase: 'flight' | 'arming' | 'armed' = 'flight';
   private visual: AttackSprite;
-  private telegraph: Phaser.GameObjects.Arc;
+  private telegraph: Phaser.GameObjects.Arc | null = null;
+  private fuseLight: Phaser.GameObjects.Arc | null = null;
+  private trapX: number;
+  private trapY: number;
+  private visualCfg: AttackVisual;
+  // Fuse blink state: driven manually in update() so the rate can shift the
+  // moment an enemy gets close (a tween's timeScale can't retime its yoyo).
+  private blinkClockMs = 0;
+  private blinkFast = false;
+  // Last-frame enemy positions for the swept trigger: enemies don't expose a
+  // prev position, so the trap remembers where each body was and checks the
+  // whole segment it moved along — a fast enemy can't tunnel over the bomb.
+  private lastSeen = new Map<Enemy, { x: number; y: number }>();
+  private static readonly FLIGHT_MS = 450;
+  private static readonly ARMING_MS = 250;
+  private static readonly BLINK_SLOW_MS = 600;
+  private static readonly BLINK_FAST_MS = 180;
 
-  constructor(scene: Phaser.Scene, _x: number, _y: number, target: Enemy, damage: number, visual: AttackVisual, modifiers?: Partial<AttackModifiers>, damageType: string = 'Physical') {
+  constructor(scene: Phaser.Scene, startX: number, startY: number, target: Enemy | { x: number, y: number }, damage: number, visual: AttackVisual, modifiers?: Partial<AttackModifiers>, damageType: string = 'Physical') {
     super(scene, 'TrapAttack', damage, modifiers, damageType);
-    const trapX = target.x;
+    this.visualCfg = visual;
+    this.trapX = target.x;
     // Place trap ahead of the enemy's downward path
-    const trapY = target.y + 80;
-    // Small static armed-trap marker in the hero's art.
-    this.visual = new AttackSprite(scene, { x: trapX, y: trapY, artKey: visual.artKey, tint: visual.tint, lengthPx: visual.sizePx });
-    // A pulsing hazard ring telegraphs the armed trap's footprint.
-    const explosionRadius = ATTACK_COLLISION.trap.explosionRadius + this.modifiers.bonusRadius;
-    this.telegraph = scene.add.circle(trapX, trapY, explosionRadius, visual.tint, 0);
-    this.telegraph.setStrokeStyle(2, visual.tint, 0.5);
+    this.trapY = target.y + 80;
+
+    // Flight: the bomb rides a lobbed arc from the muzzle to the spot, staying
+    // upright the whole way (no tumble — a spinning ice cream reads as silly).
+    this.visual = new AttackSprite(scene, { x: startX, y: startY, artKey: visual.artKey, tint: visual.tint, lengthPx: visual.sizePx });
+    const curve = new Phaser.Curves.QuadraticBezier(
+      new Phaser.Math.Vector2(startX, startY),
+      new Phaser.Math.Vector2(startX + (this.trapX - startX) / 2, Math.min(startY, this.trapY) - 140),
+      new Phaser.Math.Vector2(this.trapX, this.trapY),
+    );
+    const pathData = { t: 0 };
     scene.tweens.add({
-      targets: this.telegraph,
-      alpha: { from: 0.6, to: 0.15 },
-      scale: { from: 0.9, to: 1 },
-      yoyo: true,
-      repeat: -1,
-      duration: 600,
-      ease: 'Sine.easeInOut',
+      targets: pathData,
+      t: 1,
+      duration: TrapAttack.FLIGHT_MS,
+      ease: 'Sine.easeIn',
+      onUpdate: () => {
+        const p = curve.getPoint(pathData.t);
+        this.visual.setPosition(p.x, p.y);
+        // Rise-and-fall scale sells the arc height from the top-down camera.
+        this.visual.flightScale(1 + Math.sin(Math.PI * pathData.t) * 0.35);
+      },
+      onComplete: () => this.land(),
     });
   }
 
-  update(_time: number, _delta: number) {
+  /** The bomb hits the ground: splat, squash-settle, then start arming. */
+  private land() {
     if (this.isDead) return;
+    this.phase = 'arming';
+    const scene = this.scene;
+    this.visual.setPosition(this.trapX, this.trapY);
+    AudioManager.playSfx('sfx-sorbetes-plant');
+    spawnHitSpark(scene, this.trapX, this.trapY, this.visualCfg.tint);
+    // Squash-settle bounce.
+    scene.tweens.add({
+      targets: this.visual.image,
+      scaleY: this.visual.image.scaleY * 0.7,
+      duration: 90,
+      yoyo: true,
+      ease: 'Quad.easeOut',
+    });
+
+    // The hazard ring fades in during arming. With trigger 48 + minion body 32
+    // its reach equals the drawn explosion ring — what you see is what detonates.
+    const explosionRadius = ATTACK_COLLISION.trap.explosionRadius + this.modifiers.bonusRadius;
+    this.telegraph = scene.add.circle(this.trapX, this.trapY, explosionRadius, this.visualCfg.tint, 0);
+    this.telegraph.setStrokeStyle(2, this.visualCfg.tint, 0.5);
+    this.telegraph.setAlpha(0);
+    scene.tweens.add({
+      targets: this.telegraph,
+      alpha: 1,
+      duration: TrapAttack.ARMING_MS,
+      onComplete: () => {
+        if (this.isDead || !this.telegraph) return;
+        this.phase = 'armed';
+        scene.tweens.add({
+          targets: this.telegraph,
+          alpha: { from: 0.6, to: 0.15 },
+          scale: { from: 0.9, to: 1 },
+          yoyo: true,
+          repeat: -1,
+          duration: 600,
+          ease: 'Sine.easeInOut',
+        });
+      },
+    });
+
+    // Fuse light: a small bead above the bomb, blinked manually in update().
+    this.fuseLight = scene.add.circle(this.trapX + 10, this.trapY - this.visualCfg.sizePx * 0.45, 5, 0xffffff, 1);
+    this.fuseLight.setStrokeStyle(2, this.visualCfg.tint, 0.9);
+  }
+
+  update(_time: number, delta: number) {
+    if (this.isDead) return;
+    if (this.phase !== 'armed') return;
 
     const triggerRadius = ATTACK_COLLISION.trap.triggerRadius;
     const explosionRadius = ATTACK_COLLISION.trap.explosionRadius + this.modifiers.bonusRadius;
-
     const enemies = (this.scene as any).enemies as Enemy[];
+    let anyNear = false;
+
     if (enemies) {
       for (const enemy of enemies) {
-        if (!enemy.isDead) {
-          // Big enemies step on the trap with their actual body, not their center.
-          if (circlesOverlap(this.visual.x, this.visual.y, triggerRadius, enemy.x, enemy.y, enemy.hitRadius)) {
-            this.explode(explosionRadius);
-            return;
-          }
+        if (enemy.isDead) {
+          this.lastSeen.delete(enemy);
+          continue;
+        }
+        const last = this.lastSeen.get(enemy);
+        this.lastSeen.set(enemy, { x: enemy.x, y: enemy.y });
+        const reach = triggerRadius + enemy.hitRadius;
+        // Sweep the segment the body moved along this frame so fast enemies
+        // can't step over the bomb between frames; first sighting falls back
+        // to the plain overlap check.
+        const tripped = last
+          ? segmentCircleOverlap(last.x, last.y, enemy.x, enemy.y, this.trapX, this.trapY, reach)
+          : circlesOverlap(this.trapX, this.trapY, triggerRadius, enemy.x, enemy.y, enemy.hitRadius);
+        if (tripped) {
+          this.explode(explosionRadius);
+          return;
+        }
+        if (!anyNear && circlesOverlap(this.trapX, this.trapY, triggerRadius * 1.5, enemy.x, enemy.y, enemy.hitRadius)) {
+          anyNear = true;
         }
       }
+    }
+
+    // Fuse blink: slow idle pulse, fast when someone is inside 1.5x the trigger
+    // reach — with a beep on each fast-cycle flash so the tension is audible.
+    if (this.fuseLight) {
+      const cycleMs = anyNear ? TrapAttack.BLINK_FAST_MS : TrapAttack.BLINK_SLOW_MS;
+      if (anyNear !== this.blinkFast) {
+        this.blinkFast = anyNear;
+        this.blinkClockMs = 0; // restart the cycle at the new rate
+      }
+      this.blinkClockMs += delta;
+      if (this.blinkClockMs >= cycleMs) {
+        this.blinkClockMs -= cycleMs;
+        if (this.blinkFast) AudioManager.playSfx('sfx-sorbetes-beep');
+      }
+      // On-half of the cycle bright, off-half dim.
+      this.fuseLight.setAlpha(this.blinkClockMs < cycleMs / 2 ? 1 : 0.25);
     }
   }
 
   private explode(radius: number) {
+    AudioManager.playSfx('sfx-sorbetes-burst');
     const enemies = (this.scene as any).enemies as Enemy[];
     if (enemies) {
       for (const enemy of enemies) {
@@ -1109,7 +1220,7 @@ export class TrapAttack extends Attack {
         }
       }
     }
-    
+
     // Frost traps burst icy-blue with a lingering rime patch; other trap
     // damage types keep the original red shockwave.
     const frost = this.damageType === 'Frost';
@@ -1148,8 +1259,11 @@ export class TrapAttack extends Attack {
     }
 
     this.isDead = true;
-    this.scene.tweens.killTweensOf(this.telegraph);
-    this.telegraph.destroy();
+    if (this.telegraph) {
+      this.scene.tweens.killTweensOf(this.telegraph);
+      this.telegraph.destroy();
+    }
+    this.fuseLight?.destroy();
     this.visual.destroy();
     this.destroy();
   }

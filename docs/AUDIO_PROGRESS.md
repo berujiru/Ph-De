@@ -96,7 +96,7 @@ Tagalog lines are canonical in `ART_AND_AUDIO_GUIDELINES.md §5`.
 | Farmer | Harvest | `sfx-farmer-vine` ✅ | `sfx-farmer-tree-grow` + `sfx-farmer-tree-pulse` ✅ | `voice-farmer-harvest` | 🟡 |
 | Fishball Vendor | Spicy Sauce | fallback | ⬜ | `voice-fishball-spicy` | 🟡 |
 | Sales Lady | Closing Sale | fallback | ⬜ | `voice-saleslady-closing` | 🟡 |
-| Sorbetes Vendor | Dirty Ice Cream | fallback | ⬜ | `voice-sorbetes-dirty` | 🟡 |
+| Sorbetes Vendor | Dirty Ice Cream | `sfx-sorbetes-throw` ✅ | `sfx-sorbetes-plant/-beep/-burst` ✅ | `voice-sorbetes-dirty` | 🟡 |
 | Electrician | Rolling Blackout | fallback | ⬜ | `voice-electrician-blackout` | 🟡 |
 | Baker | Dough Knead | fallback | ⬜ | `voice-baker-dough` | 🟡 |
 | Traffic Enforcer | STOP! | fallback | ⬜ | `voice-traffic-stop` | 🟡 |

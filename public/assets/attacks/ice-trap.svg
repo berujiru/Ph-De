@@ -1,11 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
-  <!-- Sorbetes Vendor: dropped scoop on a freezing puddle with ice crystals. -->
-  <ellipse cx="64" cy="96" rx="54" ry="18" fill="#e6e6e6" fill-opacity="0.8" stroke="#0f172a" stroke-width="4"/>
-  <ellipse cx="64" cy="94" rx="38" ry="11" fill="#ffffff" fill-opacity="0.7"/>
-  <path d="M26 84 L34 62 L44 84 Z" fill="#ffffff" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M88 86 L100 58 L112 86 Z" fill="#ffffff" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
-  <circle cx="64" cy="66" r="22" fill="#ffffff" stroke="#0f172a" stroke-width="5"/>
-  <circle cx="56" cy="60" r="4" fill="#cccccc"/>
-  <circle cx="70" cy="70" r="4" fill="#cccccc"/>
-  <circle cx="66" cy="56" r="3" fill="#cccccc"/>
+  <!-- Sorbetes Vendor: thrown ice-cream BOMB — a scoop stacked on a toppled cone,
+       sitting on a freezing puddle, with a short fuse and a fuse-light dot up top.
+       White/grayscale like all attack art; tinted at runtime. -->
+  <!-- freezing puddle footprint -->
+  <ellipse cx="64" cy="104" rx="52" ry="16" fill="#e6e6e6" fill-opacity="0.8" stroke="#0f172a" stroke-width="4"/>
+  <ellipse cx="64" cy="102" rx="36" ry="10" fill="#ffffff" fill-opacity="0.7"/>
+  <!-- ice shards frozen up from the puddle rim -->
+  <path d="M22 94 L30 74 L38 94 Z" fill="#ffffff" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M92 96 L102 72 L112 96 Z" fill="#ffffff" stroke="#0f172a" stroke-width="4" stroke-linejoin="round"/>
+  <!-- toppled wafer cone (base of the bomb) -->
+  <path d="M42 100 L64 52 L86 100 Z" fill="#e6e6e6" stroke="#0f172a" stroke-width="5" stroke-linejoin="round"/>
+  <!-- waffle cross-hatch -->
+  <path d="M50 94 L74 66 M58 98 L80 74 M54 82 L74 94 M60 70 L84 88" fill="none"
+        stroke="#999999" stroke-width="3" stroke-linecap="round"/>
+  <!-- scoop (the bomb body) sitting in the cone mouth -->
+  <circle cx="64" cy="46" r="24" fill="#ffffff" stroke="#0f172a" stroke-width="5"/>
+  <!-- scoop dimples -->
+  <circle cx="55" cy="41" r="4" fill="#cccccc"/>
+  <circle cx="71" cy="52" r="4" fill="#cccccc"/>
+  <circle cx="67" cy="37" r="3" fill="#cccccc"/>
+  <circle cx="56" cy="53" r="3" fill="#d9d9d9"/>
+  <!-- short fuse curling off the top -->
+  <path d="M66 24 Q70 14 80 12" fill="none" stroke="#0f172a" stroke-width="4.5" stroke-linecap="round"/>
+  <!-- fuse-light dot: bright bead at the fuse tip (the runtime blink anchors here) -->
+  <circle cx="83" cy="11" r="6" fill="#ffffff" stroke="#0f172a" stroke-width="3.5"/>
+  <circle cx="83" cy="11" r="2.5" fill="#999999"/>
 </svg>

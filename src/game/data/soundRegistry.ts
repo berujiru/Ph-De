@@ -99,7 +99,10 @@ export const HERO_SFX: Partial<Record<HeroId, HeroSound>> = {
   farmer: { attack: 'sfx-farmer-vine', voice: 'voice-farmer-harvest' },
   fishball_vendor: { voice: 'voice-fishball-spicy' },
   sales_lady: { voice: 'voice-saleslady-closing' },
-  sorbetes_vendor: { voice: 'voice-sorbetes-dirty' },
+  // Bomb foley (plant / beep / burst) is played from TrapAttack at each moment;
+  // `skill` stays unwired because it fires at cut-in start, before the bombs land
+  // (same reasoning as the jeepney/farmer notes above).
+  sorbetes_vendor: { attack: 'sfx-sorbetes-throw', voice: 'voice-sorbetes-dirty' },
   electrician: { voice: 'voice-electrician-blackout' },
   baker: { voice: 'voice-baker-dough' },
   traffic_enforcer: { voice: 'voice-traffic-stop' },
@@ -169,6 +172,12 @@ export const AUDIO_MANIFEST: Record<string, string> = {
   'sfx-farmer-vine': '/assets/sounds/farmer-vine.wav',
   'sfx-farmer-tree-grow': '/assets/sounds/farmer-tree-grow.wav',
   'sfx-farmer-tree-pulse': '/assets/sounds/farmer-tree-pulse.wav',
+  // Sorbetes foley: lob throw (basic attack), squishy plant (landing), fuse beep
+  // (armed + enemy near), icy shatter (detonation).
+  'sfx-sorbetes-throw': '/assets/sounds/sorbetes-throw.wav',
+  'sfx-sorbetes-plant': '/assets/sounds/sorbetes-plant.wav',
+  'sfx-sorbetes-beep': '/assets/sounds/sorbetes-beep.wav',
+  'sfx-sorbetes-burst': '/assets/sounds/sorbetes-burst.wav',
   [SFX.victory]: '/assets/sounds/victory.wav',
   [SFX.defeat]: '/assets/sounds/defeat.wav',
   // --- Pending real files: drop the .mp3 in the path shown, then uncomment. ---
