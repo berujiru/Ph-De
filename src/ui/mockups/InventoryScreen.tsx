@@ -6,14 +6,11 @@ import { HopeCoinIcon, RallyPermitIcon, LockIcon, InfoIcon } from '../icons';
 import { BackButton } from '../components/BackButton';
 import { Embers, SoulsButton } from '../components/ApocalypseScenery';
 import {
-  HeroPolaroidCard,
   PORTRAIT_BG,
   TIER_COLOR,
   TYPEWRITER_FONT,
   enemyTier,
-  hexColor,
   SkinPortrait,
-  EnemyCaseCard,
 } from '../components/ArchiveCards';
 import { EnemyTcgCard } from '../components/EnemyTcgCard';
 import { HeroTcgCard } from '../components/HeroTcgCard';
@@ -246,16 +243,55 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
             const rotation = (idx % 2 === 0 ? 1 : -1) * (2 + (idx % 3)); // slight, stable rotation
 
             return (
-              <HeroPolaroidCard
-                key={hero.id}
-                name={hero.name}
-                subtitle={isUnlocked ? hero.profession : `A ${hero.profession.toLowerCase()} waits for the movement to reach them…`}
-                unlocked={isUnlocked}
-                level={level}
-                rotation={rotation}
-                skin={getSelectedSkin(hero.id)}
-                onClick={() => setSelectedHero(hero)}
-                lockedHint={
+              <div key={hero.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                <div style={{ width: '100%', filter: isUnlocked ? 'none' : 'grayscale(100%)', opacity: isUnlocked ? 1 : 0.7 }}>
+                  <HeroTcgCard
+                    variant="compact"
+                    heroId={hero.id}
+                    rotation={rotation}
+                    onClick={isUnlocked ? () => setSelectedHero(hero) : undefined}
+                    ariaLabel={`Open dossier: ${hero.name}`}
+                  >
+                    {isUnlocked ? (
+                      <div style={{
+                        position: 'absolute',
+                        top: 6,
+                        right: 6,
+                        backgroundColor: theme.materials.cautionYellow,
+                        color: '#000',
+                        fontWeight: 900,
+                        padding: '1px 4px',
+                        fontSize: 8,
+                        border: '1px solid #000',
+                        transform: 'rotate(-5deg)'
+                      }}>
+                        LVL {level}
+                      </div>
+                    ) : (
+                      <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#94a3b8', display: 'flex' }}>
+                        <LockIcon size={22} />
+                      </span>
+                    )}
+                  </HeroTcgCard>
+                </div>
+                {isUnlocked ? (
+                  <>
+                    <span style={{ fontSize: '7px', padding: '1px 4px', backgroundColor: 'rgba(0,0,0,0.4)', color: theme.colors.textSecondary, border: `1px solid ${theme.colors.border}`, fontWeight: 'bold' }}>
+                      {hero.damageType.toUpperCase()}
+                    </span>
+                    <div style={{
+                      fontSize: '7.5px',
+                      fontWeight: 'bold',
+                      color: canPromote ? theme.colors.accent : theme.colors.textMuted,
+                      backgroundColor: canPromote ? 'rgba(234, 88, 12, 0.15)' : 'rgba(0,0,0,0.6)',
+                      border: canPromote ? `1px solid ${theme.colors.accent}` : `1px solid ${theme.colors.border}`,
+                      padding: '1px 5px',
+                      borderRadius: '10px'
+                    }}>
+                      {atCap ? `CARDS: ${cards} · MAX` : `CARDS: ${cards} / ${cardsNeeded}`}
+                    </div>
+                  </>
+                ) : (
                   <div style={{
                     fontSize: '7.5px',
                     fontWeight: 'bold',
@@ -267,23 +303,8 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
                   }}>
                     JOINS: ACT {unlockAct} · STAGE {unlockStage}
                   </div>
-                }
-              >
-                <span style={{ fontSize: '7px', padding: '1px 4px', backgroundColor: 'rgba(0,0,0,0.4)', color: theme.colors.textSecondary, border: `1px solid ${theme.colors.border}`, fontWeight: 'bold' }}>
-                  {hero.damageType.toUpperCase()}
-                </span>
-                <div style={{
-                  fontSize: '7.5px',
-                  fontWeight: 'bold',
-                  color: canPromote ? theme.colors.accent : theme.colors.textMuted,
-                  backgroundColor: canPromote ? 'rgba(234, 88, 12, 0.15)' : 'rgba(0,0,0,0.6)',
-                  border: canPromote ? `1px solid ${theme.colors.accent}` : `1px solid ${theme.colors.border}`,
-                  padding: '1px 5px',
-                  borderRadius: '10px'
-                }}>
-                  {atCap ? `CARDS: ${cards} · MAX` : `CARDS: ${cards} / ${cardsNeeded}`}
-                </div>
-              </HeroPolaroidCard>
+                )}
+              </div>
             );
           })}
         </div>
@@ -307,26 +328,37 @@ export function InventoryScreen({ onBack }: InventoryScreenProps) {
               const tier = enemyTier(def);
               const rotation = (idx % 2 === 0 ? -1 : 1) * (1 + (idx % 2));
               return (
-                <EnemyCaseCard
-                  key={def.id}
-                  name={def.name}
-                  enemyId={def.id}
-                  colorHex={hexColor(def.color)}
-                  tag={{ label: tier, color: TIER_COLOR[tier] }}
-                  faced={faced}
-                  rotation={rotation}
-                  onClick={() => setSelectedEnemy(def)}
-                >
+                <div key={def.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                  <EnemyTcgCard
+                    variant="compact"
+                    enemyId={def.id}
+                    isFacedUp={faced}
+                    rotation={rotation}
+                    onClick={() => setSelectedEnemy(def)}
+                    ariaLabel={`Open case file: ${def.name}`}
+                  />
+                  <span style={{
+                    fontSize: 7,
+                    fontWeight: 900,
+                    letterSpacing: 0.5,
+                    textTransform: 'uppercase',
+                    padding: '2px 5px',
+                    borderRadius: 4,
+                    color: '#fff',
+                    backgroundColor: TIER_COLOR[tier]
+                  }}>
+                    {tier}
+                  </span>
                   {faced ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 4, color: theme.colors.accent, fontSize: 7.5, fontWeight: 800, letterSpacing: 0.3, textTransform: 'uppercase' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 3, color: theme.colors.accent, fontSize: 7.5, fontWeight: 800, letterSpacing: 0.3, textTransform: 'uppercase' }}>
                       <InfoIcon size={9} /> Tap to open
                     </div>
                   ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4, color: '#e2e8f0', fontSize: 8, fontWeight: 700 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#e2e8f0', fontSize: 8, fontWeight: 700 }}>
                       <LockIcon size={10} /> SEALED
                     </div>
                   )}
-                </EnemyCaseCard>
+                </div>
               );
             })}
           </div>

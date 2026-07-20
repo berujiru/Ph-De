@@ -444,31 +444,11 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                   aria-label={`Act boss: ${ENEMY_DEFINITIONS[actBossId]?.name ?? actBossId}`}
                   style={{
                     width: 62,
-                    height: 88,
                     flexShrink: 0,
-                    position: 'relative',
-                    borderRadius: 6,
-                    overflow: 'hidden',
-                    backgroundColor: '#0c0a09',
-                    border: `2px solid ${isActUnlocked ? theme.materials.metalDark : 'rgba(63,63,70,0.4)'}`,
-                    boxShadow: isActUnlocked ? '0 0 6px rgba(234,88,12,0.15)' : 'none',
                     filter: isActUnlocked ? 'none' : 'grayscale(100%) brightness(0.4)',
                   }}
                 >
-                  <div
-                    style={{
-                      // 62 / 300 (card native width) — shows the card's portrait-
-                      // focused top, clipped to the thumbnail box.
-                      transform: 'scale(0.2067)',
-                      transformOrigin: 'top left',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      pointerEvents: 'none',
-                    }}
-                  >
-                    <EnemyTcgCard enemyId={actBossId} />
-                  </div>
+                  <EnemyTcgCard variant="compact" enemyId={actBossId} style={{ pointerEvents: 'none' }} />
                 </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -615,20 +595,24 @@ export function CampaignMap({ onBack, onPrepareBattle, onStartSandbox }: Campaig
                                   STAGE {stageEntry.id}
                                 </span>
                                 {hasBoss && (
-                                  <div style={{ position: 'relative', width: 30, height: 42, flexShrink: 0, marginLeft: 4 }}>
-                                    <div style={{ transform: 'scale(0.1)', transformOrigin: 'top left', position: 'absolute', pointerEvents: 'none' }}>
-                                      <EnemyTcgCard enemyId={bossForStage(act.id, stageIdx)} />
-                                    </div>
+                                  <div style={{ position: 'relative', width: 30, flexShrink: 0, marginLeft: 4 }}>
+                                    <EnemyTcgCard
+                                      variant="compact"
+                                      enemyId={bossForStage(act.id, stageIdx)}
+                                      style={{ pointerEvents: 'none', padding: 2, border: '1px solid #312e81', borderRadius: 5 }}
+                                    />
                                     <div style={{ position: 'absolute', bottom: -4, left: '50%', transform: 'translateX(-50%)', backgroundColor: '#ef4444', color: '#fff', fontSize: 7, fontWeight: 900, padding: '1px 4px', borderRadius: 2, boxShadow: '0 1px 2px rgba(0,0,0,0.5)', zIndex: 10, letterSpacing: 0.5 }}>
                                       BOSS
                                     </div>
                                   </div>
                                 )}
                                 {minibossDebuts.map((id) => (
-                                  <div key={id} style={{ position: 'relative', width: 30, height: 42, flexShrink: 0, marginLeft: 4 }}>
-                                    <div style={{ transform: 'scale(0.1)', transformOrigin: 'top left', position: 'absolute', pointerEvents: 'none' }}>
-                                      <EnemyTcgCard enemyId={id} />
-                                    </div>
+                                  <div key={id} style={{ position: 'relative', width: 30, flexShrink: 0, marginLeft: 4 }}>
+                                    <EnemyTcgCard
+                                      variant="compact"
+                                      enemyId={id}
+                                      style={{ pointerEvents: 'none', padding: 2, border: '1px solid #312e81', borderRadius: 5 }}
+                                    />
                                     <div style={{ position: 'absolute', bottom: -4, left: '50%', transform: 'translateX(-50%)', backgroundColor: '#f59e0b', color: '#fff', fontSize: 7, fontWeight: 900, padding: '1px 4px', borderRadius: 2, boxShadow: '0 1px 2px rgba(0,0,0,0.5)', zIndex: 10, letterSpacing: 0.5 }}>
                                       NEW
                                     </div>

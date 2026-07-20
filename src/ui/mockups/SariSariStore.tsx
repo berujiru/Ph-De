@@ -341,46 +341,64 @@ function HangingGood({ item, index, affordable, onBuy }: { item: CatalogItem; in
   );
 }
 
+/** The "not yet recruited" ribbon slapped across a recruit card. `small` fits the compact grid card. */
+function NotRecruitedRibbon({ small }: { small?: boolean }) {
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        top: small ? 8 : 16,
+        left: small ? -4 : -6,
+        zIndex: 60,
+        backgroundColor: theme.colors.danger,
+        color: theme.colors.textPrimary,
+        fontFamily: MARKER_FONT,
+        fontWeight: 700,
+        fontSize: small ? 7 : 12,
+        letterSpacing: small ? 1 : 2,
+        textTransform: 'uppercase',
+        padding: small ? '2px 6px' : '4px 12px',
+        transform: 'rotate(-6deg)',
+        boxShadow: '2px 2px 8px rgba(0,0,0,0.7)',
+      }}
+    >
+      Not yet recruited
+    </div>
+  );
+}
+
 /**
- * A locked hero on the Recruitment Board — shown as their full Hero TCG card so
- * the player sees exactly who they're hiring, with a cardboard "Recruit" tag as
- * the buy button.
+ * A locked hero on the Recruitment Board — a compact Hero TCG card in the grid.
+ * Tapping the card opens the full-card preview; the cardboard price tag below
+ * is the buy button.
  */
-function RecruitCard({ item, heroId, affordable, onBuy }: { item: CatalogItem; heroId: HeroId; affordable: boolean; onBuy: (item: CatalogItem) => void }) {
+function RecruitCard({ item, heroId, affordable, onBuy, onPreview }: {
+  item: CatalogItem;
+  heroId: HeroId;
+  affordable: boolean;
+  onBuy: (item: CatalogItem) => void;
+  onPreview: (heroId: HeroId, item: CatalogItem) => void;
+}) {
   const heroName = item.title.replace(/^Recruit:\s*/, '');
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, width: 300, maxWidth: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: '100%' }}>
       <div
         style={{
-          position: 'relative',
+          width: '100%',
           opacity: affordable ? 1 : 0.72,
           filter: affordable ? 'none' : 'grayscale(0.5)',
           transition: 'opacity 0.2s, filter 0.2s',
         }}
       >
-        <HeroTcgCard heroId={heroId} />
-        {/* "not yet recruited" ribbon slapped across the card */}
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            top: 16,
-            left: -6,
-            zIndex: 60,
-            backgroundColor: theme.colors.danger,
-            color: theme.colors.textPrimary,
-            fontFamily: MARKER_FONT,
-            fontWeight: 700,
-            fontSize: 12,
-            letterSpacing: 2,
-            textTransform: 'uppercase',
-            padding: '4px 12px',
-            transform: 'rotate(-6deg)',
-            boxShadow: '2px 2px 8px rgba(0,0,0,0.7)',
-          }}
+        <HeroTcgCard
+          variant="compact"
+          heroId={heroId}
+          onClick={() => onPreview(heroId, item)}
+          ariaLabel={`Preview recruit: ${heroName}`}
         >
-          Not yet recruited
-        </div>
+          <NotRecruitedRibbon small />
+        </HeroTcgCard>
       </div>
 
       <button
@@ -397,15 +415,15 @@ function RecruitCard({ item, heroId, affordable, onBuy }: { item: CatalogItem; h
           color: theme.colors.textPrimary,
           border: `1px solid ${theme.materials.rustDark}`,
           borderRadius: 2,
-          padding: '8px 18px',
+          padding: '5px 8px',
           fontFamily: MARKER_FONT,
           fontWeight: 900,
-          fontSize: 15,
+          fontSize: 11,
           cursor: affordable ? 'pointer' : 'not-allowed',
           display: 'flex',
           alignItems: 'center',
-          gap: 8,
-          minHeight: 44,
+          gap: 5,
+          minHeight: 38,
           boxShadow: '2px 4px 10px rgba(0,0,0,0.6), inset 0 0 14px rgba(0,0,0,0.5)',
           transform: 'rotate(-1.5deg)',
           opacity: affordable ? 1 : 0.85,
@@ -418,9 +436,9 @@ function RecruitCard({ item, heroId, affordable, onBuy }: { item: CatalogItem; h
           e.currentTarget.style.boxShadow = '2px 4px 10px rgba(0,0,0,0.6), inset 0 0 14px rgba(0,0,0,0.5)';
         }}
       >
-        Recruit — {item.cost.toLocaleString()}
+        {item.cost.toLocaleString()}
         <span style={{ color: theme.colors.gold, display: 'flex', filter: 'drop-shadow(0 0 4px rgba(250, 204, 21, 0.4))' }}>
-          <HopeCoinIcon size={20} />
+          <HopeCoinIcon size={14} />
         </span>
       </button>
     </div>
@@ -676,6 +694,7 @@ function CashPackCard({
 
 export function SariSariStore({ onBack }: SariSariStoreProps) {
   const [reveal, setReveal] = useState<{ heading: string; rewards: RevealReward[] } | null>(null);
+  const [previewHero, setPreviewHero] = useState<{ heroId: HeroId; item: CatalogItem } | null>(null);
   const [adBusy, setAdBusy] = useState(false);
   const [iapBusy, setIapBusy] = useState<IapProductId | null>(null);
   const [, forceUpdate] = useReducer((x) => x + 1, 0);
@@ -1144,7 +1163,7 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
                 Hire a worker early — they join the roster and start dropping in battle.
               </div>
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 28, justifyContent: 'center' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '18px 14px', maxWidth: 640, margin: '0 auto' }}>
               {recruitItems.map((item) => (
                 <RecruitCard
                   key={item.id}
@@ -1152,6 +1171,7 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
                   heroId={item.id.replace('unlock_', '') as HeroId}
                   affordable={item.cost <= hope}
                   onBuy={handleBuy}
+                  onPreview={(heroId, previewItem) => setPreviewHero({ heroId, item: previewItem })}
                 />
               ))}
             </div>
@@ -1189,6 +1209,103 @@ export function SariSariStore({ onBack }: SariSariStoreProps) {
           Heroes are never sold for money — only Hope, earned on the streets.
         </div>
       </div>
+
+      {/* Recruit preview — the full Hero TCG card for a compact grid entry */}
+      {previewHero && (() => {
+        const { heroId, item } = previewHero;
+        const heroName = item.title.replace(/^Recruit:\s*/, '');
+        const affordable = item.cost <= hope;
+        return (
+          <div
+            onClick={() => setPreviewHero(null)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'rgba(0,0,0,0.9)',
+              display: 'flex',
+              zIndex: 1000,
+              backdropFilter: 'blur(5px)',
+              padding: '48px 20px',
+              overflowY: 'auto',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+              <button
+                onClick={() => setPreviewHero(null)}
+                aria-label="Close recruit preview"
+                style={{
+                  position: 'absolute',
+                  top: '-40px',
+                  right: '0',
+                  background: '#991b1b',
+                  border: `2px solid ${theme.colors.border}`,
+                  color: theme.colors.textPrimary,
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  width: '32px',
+                  height: '32px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  boxShadow: '2px 2px 0 rgba(0,0,0,0.5)',
+                  lineHeight: 1,
+                  zIndex: 10,
+                  borderRadius: '50%',
+                }}
+              >
+                ×
+              </button>
+
+              <div style={{ position: 'relative' }}>
+                <HeroTcgCard heroId={heroId} />
+                <NotRecruitedRibbon />
+              </div>
+
+              <button
+                disabled={!affordable}
+                onClick={() => {
+                  if (!affordable) return;
+                  handleBuy(item);
+                  setPreviewHero(null);
+                }}
+                aria-label={
+                  affordable
+                    ? `Recruit ${heroName} for ${item.cost} Hope Points`
+                    : `Recruit ${heroName} costs ${item.cost} Hope Points — not enough Hope`
+                }
+                style={{
+                  backgroundColor: affordable ? theme.materials.cardboard : '#7f1d1d',
+                  backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px)',
+                  color: theme.colors.textPrimary,
+                  border: `1px solid ${theme.materials.rustDark}`,
+                  borderRadius: 2,
+                  padding: '8px 18px',
+                  fontFamily: MARKER_FONT,
+                  fontWeight: 900,
+                  fontSize: 15,
+                  cursor: affordable ? 'pointer' : 'not-allowed',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  minHeight: 44,
+                  boxShadow: '2px 4px 10px rgba(0,0,0,0.6), inset 0 0 14px rgba(0,0,0,0.5)',
+                  transform: 'rotate(-1.5deg)',
+                  opacity: affordable ? 1 : 0.85,
+                }}
+              >
+                Recruit — {item.cost.toLocaleString()}
+                <span style={{ color: theme.colors.gold, display: 'flex', filter: 'drop-shadow(0 0 4px rgba(250, 204, 21, 0.4))' }}>
+                  <HopeCoinIcon size={20} />
+                </span>
+              </button>
+            </div>
+          </div>
+        );
+      })()}
 
       {reveal && (
         <RewardReveal

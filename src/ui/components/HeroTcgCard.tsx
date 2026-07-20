@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { HERO_DEFINITIONS, type HeroId, ATTACK_STYLE_BADGES } from '../../game/data/heroes';
 import { metersLabel } from '../../game/data/constants';
 import { hexColor, SkinPortrait } from './ArchiveCards';
@@ -10,9 +10,26 @@ interface HeroTcgCardProps {
   rotation?: number;
   /** Level-scaled damage to show instead of the base (metaState hero level). */
   damageOverride?: number;
+  /** 'full' (default) = the complete info card; 'compact' = art + name strip for grids. */
+  variant?: 'full' | 'compact';
+  /** Compact only: makes the card clickable with button semantics. */
+  onClick?: () => void;
+  /** Compact only: accessible label when clickable. */
+  ariaLabel?: string;
+  /** Compact only: absolute overlay slot (badges, ribbons) rendered above the foil. */
+  children?: ReactNode;
 }
 
-export function HeroTcgCard({ heroId, style, rotation = 0, damageOverride }: HeroTcgCardProps) {
+export function HeroTcgCard({
+  heroId,
+  style,
+  rotation = 0,
+  damageOverride,
+  variant = 'full',
+  onClick,
+  ariaLabel,
+  children,
+}: HeroTcgCardProps) {
   const def = HERO_DEFINITIONS[heroId];
   if (!def) return null;
   const shownDamage = damageOverride ?? def.damage;
@@ -20,6 +37,102 @@ export function HeroTcgCard({ heroId, style, rotation = 0, damageOverride }: Her
   const color = hexColor(def.color);
   const skin = getSelectedSkin(def.id);
   const attackBadge = ATTACK_STYLE_BADGES[def.attackStyle];
+
+  if (variant === 'compact') {
+    const interactive = !!onClick;
+    return (
+      <div
+        onClick={() => interactive && onClick!()}
+        role={interactive ? 'button' : undefined}
+        tabIndex={interactive ? 0 : undefined}
+        aria-label={interactive ? ariaLabel ?? `View ${def.name}` : undefined}
+        onKeyDown={(e) => {
+          if (interactive && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            onClick!();
+          }
+        }}
+        style={{
+          width: '100%',
+          aspectRatio: '63 / 88',
+          boxSizing: 'border-box',
+          borderRadius: 10,
+          padding: 4,
+          background: 'linear-gradient(145deg, #1c1917, #09090b)',
+          border: '2px solid #3f3f46',
+          boxShadow: `0 6px 14px rgba(0,0,0,0.7), 0 0 8px ${color}40`,
+          display: 'flex',
+          position: 'relative',
+          overflow: 'hidden',
+          transform: `rotate(${rotation}deg)`,
+          color: '#fafaf9',
+          fontFamily: '"Inter", "Roboto", system-ui, sans-serif',
+          cursor: interactive ? 'pointer' : 'default',
+          transition: 'transform 0.15s, box-shadow 0.15s',
+          ...style,
+        }}
+        onMouseOver={(e) => {
+          if (interactive) {
+            e.currentTarget.style.transform = 'scale(1.05) rotate(0deg)';
+            e.currentTarget.style.zIndex = '10';
+          }
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.transform = `scale(1) rotate(${rotation}deg)`;
+          e.currentTarget.style.zIndex = '1';
+        }}
+      >
+        {/* Art fills the frame — center crop so the subject stays in view at grid size. */}
+        <div
+          style={{
+            flex: 1,
+            borderRadius: 6,
+            overflow: 'hidden',
+            position: 'relative',
+            background: `radial-gradient(circle at 50% 30%, ${color}40 0%, #09090b 80%)`,
+          }}
+        >
+          <SkinPortrait skin={skin} alt={def.name} style={{ objectFit: 'cover', objectPosition: 'center' }} />
+          {/* Name strip */}
+          <div
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              padding: '12px 4px 3px',
+              background: 'linear-gradient(180deg, transparent, rgba(0,0,0,0.88) 45%)',
+              fontSize: 9,
+              fontWeight: 900,
+              textTransform: 'uppercase',
+              letterSpacing: 0.3,
+              textAlign: 'center',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              zIndex: 10,
+            }}
+          >
+            {def.name}
+          </div>
+        </div>
+        {/* Foil Overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(115deg, transparent 20%, rgba(234,88,12,0.15) 35%, rgba(234,88,12,0.05) 45%, transparent 60%)',
+            pointerEvents: 'none',
+            zIndex: 50,
+            mixBlendMode: 'screen',
+          }}
+        />
+        {children && (
+          <div style={{ position: 'absolute', inset: 0, zIndex: 60, pointerEvents: 'none' }}>{children}</div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div

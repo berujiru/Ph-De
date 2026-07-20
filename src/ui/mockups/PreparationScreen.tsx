@@ -9,8 +9,9 @@ import {
 } from '../icons';
 import { BackButton } from '../components/BackButton';
 import { Embers, SoulsButton } from '../components/ApocalypseScenery';
-import { HeroPolaroidCard, SkinPortrait } from '../components/ArchiveCards';
+import { SkinPortrait } from '../components/ArchiveCards';
 import { EnemyTcgCard } from '../components/EnemyTcgCard';
+import { HeroTcgCard } from '../components/HeroTcgCard';
 import { getSelectedSkin } from '../../game/data/skinSelection';
 import { HERO_DEFINITIONS, type HeroDefinition, type HeroId } from '../../game/data/heroes';
 import { buildWaveTable, bossForStage } from '../../game/data/waves';
@@ -254,75 +255,52 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy, onGoToStore
             <SectionLabel>On the table — stage intel</SectionLabel>
             {ENEMY_INTEL.length > 1 && (
               <span style={{ fontSize: 11, color: theme.colors.textMuted, whiteSpace: 'nowrap', flexShrink: 0 }}>
-                {ENEMY_INTEL.length} types · swipe →
+                {ENEMY_INTEL.length} types · tap for intel
               </span>
             )}
           </div>
-          {/* Enemy intel — full TCG cards kept at their natural size. Laid out
-              as a single horizontal swipe strip so a stage with many anomalies
-              scrolls sideways instead of making the whole screen tall. Tap a
-              card to open the same card centered for a closer read. */}
+          {/* Enemy intel — compact TCG cards in a grid so a stage with many
+              anomalies stays short. Tap a card to open its full card for a
+              closer read. */}
           <div
             style={{
-              display: 'flex',
-              flexWrap: 'nowrap',
-              gap: 16,
-              overflowX: 'auto',
-              overflowY: 'hidden',
-              scrollSnapType: 'x mandatory',
-              WebkitOverflowScrolling: 'touch',
-              // Top room so the corner headcount badge isn't clipped by the
-              // scroll container; bottom room for the scrollbar.
-              padding: '12px 2px 10px',
-              scrollbarWidth: 'thin',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 1fr))',
+              gap: '14px 10px',
+              padding: '8px 2px 4px',
             }}
           >
             {ENEMY_INTEL.map((intel) => {
               const enemyId = intel.id as EnemyId;
               return (
-                <div
+                <EnemyTcgCard
                   key={intel.name}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`Open anomaly intel: ${intel.name}`}
+                  variant="compact"
+                  enemyId={enemyId}
                   onClick={() => setSelectedEnemy(enemyId)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      setSelectedEnemy(enemyId);
-                    }
-                  }}
-                  style={{
-                    position: 'relative',
-                    flex: '0 0 300px',
-                    maxWidth: '85vw',
-                    scrollSnapAlign: 'center',
-                    cursor: 'pointer',
-                  }}
+                  ariaLabel={`Open anomaly intel: ${intel.name}`}
                 >
-                  <EnemyTcgCard enemyId={enemyId} style={{ width: '100%' }} />
                   {/* Stage headcount — the one bit of intel the card itself
                       doesn't carry, pinned to the card corner. */}
                   <div
                     style={{
                       position: 'absolute',
-                      top: -8,
-                      right: -8,
-                      zIndex: 60,
-                      fontSize: 12,
+                      top: 3,
+                      left: 3,
+                      fontSize: 9,
                       fontWeight: 900,
                       letterSpacing: 0.5,
                       color: '#fff',
                       backgroundColor: theme.materials.tarpRed,
-                      border: '2px solid rgba(0,0,0,0.4)',
+                      border: '1px solid rgba(0,0,0,0.4)',
                       borderRadius: 999,
-                      padding: '3px 9px',
+                      padding: '1px 6px',
                       boxShadow: '0 2px 8px rgba(0,0,0,0.6)',
                     }}
                   >
                     {intel.count}
                   </div>
-                </div>
+                </EnemyTcgCard>
               );
             })}
           </div>
@@ -387,7 +365,7 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy, onGoToStore
             Hope for these recruited workers from your drops — they counter this stage:
           </div>
 
-          {/* Recommended companion hints — same pinned polaroid as the Archive */}
+          {/* Recommended companion hints — same compact TCG cards as the Archive */}
           <div
             style={{
               display: 'grid',
@@ -397,20 +375,19 @@ export function PreparationScreen({ act, stageIdx, onBack, onDeploy, onGoToStore
             }}
           >
             {recommended.map(({ hero, counters }, i) => (
-              <HeroPolaroidCard
-                key={hero.id}
-                name={hero.name}
-                subtitle={hero.profession}
-                rotation={(i % 2 === 0 ? 1 : -1) * (2 + (i % 3))}
-                skin={getSelectedSkin(hero.id)}
-              >
+              <div key={hero.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                <HeroTcgCard
+                  variant="compact"
+                  heroId={hero.id}
+                  rotation={(i % 2 === 0 ? 1 : -1) * (2 + (i % 3))}
+                />
                 <span style={{ fontSize: '7px', padding: '1px 4px', backgroundColor: '#dbeafe', color: '#1e3a8a', border: '1px solid #93c5fd', fontWeight: 'bold' }}>
                   {hero.damageType.toUpperCase()}
                 </span>
-                <div style={{ fontSize: '7.5px', fontWeight: 800, color: '#166534', backgroundColor: '#bbf7d0', padding: '1px 5px', borderRadius: 10, lineHeight: 1.2 }}>
+                <div style={{ fontSize: '7.5px', fontWeight: 800, color: '#166534', backgroundColor: '#bbf7d0', padding: '1px 5px', borderRadius: 10, lineHeight: 1.2, textAlign: 'center' }}>
                   Counters {counters.join(', ')}
                 </div>
-              </HeroPolaroidCard>
+              </div>
             ))}
           </div>
 

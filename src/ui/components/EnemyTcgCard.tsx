@@ -1,7 +1,7 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { SkullIcon } from '../icons';
 import { ENEMY_DEFINITIONS, type EnemyDefinition, type EnemyId } from '../../game/data/enemies';
-import { enemyTier, TIER_COLOR, hexColor } from './ArchiveCards';
+import { enemyTier, TIER_COLOR, hexColor, TYPEWRITER_FONT } from './ArchiveCards';
 import { metersPerSecondLabel } from '../../game/data/constants';
 
 function getPassivesText(def: EnemyDefinition): string[] {
@@ -46,22 +46,186 @@ interface EnemyTcgCardProps {
   enemyId: EnemyId;
   style?: CSSProperties;
   rotation?: number;
-  /** Whether the card is facing up. For flip animations if needed. */
+  /** Sealed codex entries (`false`) render the redacted card back — no art, no name. */
   isFacedUp?: boolean;
+  /** 'full' (default) = the complete info card; 'compact' = art + name strip for grids. */
+  variant?: 'full' | 'compact';
+  /** Compact only: makes the card clickable with button semantics (ignored while sealed). */
+  onClick?: () => void;
+  /** Compact only: accessible label when clickable. */
+  ariaLabel?: string;
+  /** Compact only: absolute overlay slot rendered above the foil. */
+  children?: ReactNode;
 }
 
-export function EnemyTcgCard({ enemyId, style, rotation = 0 }: EnemyTcgCardProps) {
+export function EnemyTcgCard({
+  enemyId,
+  style,
+  rotation = 0,
+  isFacedUp = true,
+  variant = 'full',
+  onClick,
+  ariaLabel,
+  children,
+}: EnemyTcgCardProps) {
   const def = ENEMY_DEFINITIONS[enemyId];
   if (!def) return null;
 
   const tier = enemyTier(def);
   const color = hexColor(def.color);
   const tierColor = TIER_COLOR[tier];
-  
+
   const rank = tier === 'Boss' ? 'S' : tier === 'Mini-Boss' ? 'A' : (def.maxHp >= 60 ? 'B' : 'C');
 
   // In the future, this might point to a generated portrait image like `/assets/enemies/${enemyId}_portrait.png`
   const portraitUrl = `/assets/enemies/${enemyId}_portrait.png`;
+
+  if (variant === 'compact') {
+    const interactive = isFacedUp && !!onClick;
+    return (
+      <div
+        onClick={() => interactive && onClick!()}
+        role={interactive ? 'button' : undefined}
+        tabIndex={interactive ? 0 : undefined}
+        aria-label={interactive ? ariaLabel ?? `View ${def.name}` : undefined}
+        onKeyDown={(e) => {
+          if (interactive && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            onClick!();
+          }
+        }}
+        style={{
+          width: '100%',
+          aspectRatio: '63 / 88',
+          boxSizing: 'border-box',
+          borderRadius: 10,
+          padding: 4,
+          background: 'linear-gradient(145deg, #1e1b4b, #0c0a09)',
+          border: '2px solid #312e81',
+          boxShadow: isFacedUp
+            ? `0 6px 14px rgba(0,0,0,0.7), 0 0 8px ${color}40`
+            : '0 6px 14px rgba(0,0,0,0.7)',
+          display: 'flex',
+          position: 'relative',
+          overflow: 'hidden',
+          transform: `rotate(${rotation}deg)`,
+          color: '#f8fafc',
+          fontFamily: '"Inter", "Roboto", system-ui, sans-serif',
+          cursor: interactive ? 'pointer' : 'default',
+          transition: 'transform 0.15s, box-shadow 0.15s',
+          ...style,
+        }}
+        onMouseOver={(e) => {
+          if (interactive) {
+            e.currentTarget.style.transform = 'scale(1.05) rotate(0deg)';
+            e.currentTarget.style.zIndex = '10';
+          }
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.transform = `scale(1) rotate(${rotation}deg)`;
+          e.currentTarget.style.zIndex = '1';
+        }}
+      >
+        {/* Art fills the frame — center crop; sealed entries show the redacted back. */}
+        <div
+          style={{
+            flex: 1,
+            borderRadius: 6,
+            overflow: 'hidden',
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: isFacedUp
+              ? `radial-gradient(circle at 50% 40%, ${color} 0%, #020617 80%)`
+              : 'radial-gradient(circle at 50% 40%, #334155 0%, #0c0a09 80%)',
+          }}
+        >
+          {isFacedUp ? (
+            <>
+              <img
+                src={portraitUrl}
+                alt={def.name}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  if (e.currentTarget.nextSibling) {
+                    (e.currentTarget.nextSibling as HTMLElement).style.display = 'flex';
+                  }
+                }}
+              />
+              {/* Fallback Icon */}
+              <div style={{ display: 'none', color: '#e2e8f0', filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.5))' }}>
+                <SkullIcon size={32} />
+              </div>
+              {/* Rank chip */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 3,
+                  right: 3,
+                  width: 14,
+                  height: 14,
+                  borderRadius: '50%',
+                  backgroundColor: tierColor,
+                  border: '1px solid #cbd5e1',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 8,
+                  fontWeight: 900,
+                  color: '#fff',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.6)',
+                  zIndex: 10,
+                }}
+              >
+                {rank}
+              </div>
+            </>
+          ) : (
+            <span style={{ fontFamily: TYPEWRITER_FONT, fontSize: 24, fontWeight: 900, color: '#94a3b8' }}>?</span>
+          )}
+          {/* Name strip */}
+          <div
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              padding: '12px 4px 3px',
+              background: 'linear-gradient(180deg, transparent, rgba(0,0,0,0.88) 45%)',
+              fontSize: 9,
+              fontWeight: 900,
+              textTransform: 'uppercase',
+              letterSpacing: 0.3,
+              textAlign: 'center',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              zIndex: 10,
+            }}
+          >
+            {isFacedUp ? def.name : '██████'}
+          </div>
+        </div>
+        {/* Glossy Foil Overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(115deg, transparent 20%, rgba(139,92,246,0.15) 35%, rgba(139,92,246,0.05) 45%, transparent 60%)',
+            pointerEvents: 'none',
+            zIndex: 50,
+            mixBlendMode: 'screen',
+          }}
+        />
+        {children && (
+          <div style={{ position: 'absolute', inset: 0, zIndex: 60, pointerEvents: 'none' }}>{children}</div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div
