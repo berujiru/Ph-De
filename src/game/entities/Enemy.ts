@@ -80,6 +80,11 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
   public silenceTimer = 0;
   private mutedIcon: Phaser.GameObjects.Text | null = null;
 
+  /** Structural adapter so Enemy satisfies Targeting's TargetCandidate. */
+  get hasTauntAura(): boolean {
+    return !!this.definition.tauntAura;
+  }
+
   // Ailment Tracking
   private ailmentBuildups: Record<string, number> = {};
   public activeAilments: Record<string, number> = {}; // Remaining ms

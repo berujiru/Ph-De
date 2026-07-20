@@ -17,6 +17,24 @@ export const WORLD_HEIGHT = GAME_HEIGHT * 4;
 export const ENEMY_SPAWN_Y_OFFSET = 50;
 
 /**
+ * Rally Volley — tap/click the battlefield and every hero overrides its target
+ * to fire one shot at the enemy nearest the tap, then reverts. A deliberate
+ * player command, so it ignores normal range; retapping is free (debounced).
+ */
+export const FOCUS_FIRE = {
+  /** Swallow double-fire jitter and cap how fast volleys can be spammed. */
+  debounceMs: 250,
+  /** Reserved for balance; 0 = free retap. */
+  cooldownMs: 0,
+  /** How long the reticle marker holds before it fades (ms). */
+  markerMs: 350,
+  /** Radius (world px) of the tap ping ring + reticle marker. */
+  markerRadiusPx: 120,
+  /** Rally gold — ping ring + marker tint. */
+  color: 0xfacc15,
+};
+
+/**
  * The marching-rally formation. The morale shield is the FRONT of the crowd;
  * everything else (heroes, camera, enemy spawns) is positioned relative to it.
  * The rally advances UP the world (toward smaller y / the enemy spawns at the

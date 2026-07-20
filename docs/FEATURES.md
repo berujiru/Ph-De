@@ -18,6 +18,14 @@ built" vs. "what's planned," not the commit history.
 - [x] React HUD: gold/lives/wave display, tower selection, start wave, restart
 - [x] Responsive canvas (Phaser `FIT` scale mode), mobile-sized touch targets
 - [x] Capacitor config in place (native projects not yet generated)
+- [x] **Rally Volley** — tap/click the battlefield to command the rally: every
+      hero overrides its current target and fires one shot at the enemy nearest
+      the tap (ignoring normal range), then reverts to auto-targeting. A gold
+      ping + brief reticle mark the spot. Retap freely (debounced) to volley
+      again. Tunables in `FOCUS_FIRE` (`data/level.ts`); the tap handler +
+      `issueVolley` live in `GameScene`, the one-shot override in
+      `Hero.commandVolley`; normal auto-targeting rules are in
+      `core/Targeting.ts` (`selectRallyTarget`)
 
 ## Near-term (fleshes out the core loop)
 

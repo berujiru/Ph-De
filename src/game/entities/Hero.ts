@@ -6,6 +6,7 @@ import { type HeroDefinition } from '../data/heroes';
 import { type UpgradeKind } from '../data/drops';
 import { RALLY } from '../data/level';
 import { formationTargetY, stepTowardFormation } from '../core/RallyMarch';
+import { selectRallyTarget } from '../core/Targeting';
 import { applyHeroPassive, type ISkillHero } from '../core/Skills';
 import { leveledDamage } from '../data/heroProgression';
 import { getHeroLevel } from '../data/metaState';
@@ -29,6 +30,12 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
 
   public activeBuffs: Record<string, number> = {};
   public hasRallyBuff?: boolean;
+
+  /**
+   * A one-shot Rally Volley target set by GameScene when the player taps the
+   * field. Overrides normal targeting/range for a single attack, then clears.
+   */
+  private forcedTarget: Enemy | null = null;
 
   /**
    * Persistent behavior mods from Voice-drop upgrades (bonusPierce/bonusChain/
@@ -331,37 +338,30 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   }
 
   /**
-   * The frontmost enemy this hero should shoot AND is within range of, or null.
-   * Taunting enemies in range take priority; otherwise the most-advanced enemy
-   * ahead is chosen and only returned if it's actually within range. Called
-   * every frame so an engaged hero holds a ready idle rather than walking.
+   * The enemy this hero should shoot AND is within range of, or null.
+   * Taunting enemies take priority; otherwise the most-advanced enemy ahead is
+   * chosen. Called every frame so an engaged hero holds a ready idle rather
+   * than walking. Selection rules live in core/Targeting.selectRallyTarget.
    */
   private findTargetInRange(enemies: Enemy[]): Enemy | null {
-    let target: Enemy | null = null;
-    let maxEnemyY = -Infinity;
-    let foundTaunt = false;
+    return selectRallyTarget(
+      this.y,
+      this.range,
+      !!this.definition.canSeeStealth,
+      enemies,
+    );
+  }
 
-    for (const enemy of enemies) {
-      // Skip anything already dead OR at/below 0 HP (a corpse mid death-anim, or
-      // a lethal hit not yet flagged this frame) so heroes never swing at it.
-      if (enemy.isDead || enemy.hp <= 0 || enemy.y >= this.y) continue;
-      // Ignore stealthed enemies unless this hero can see stealth.
-      if (enemy.isStealthed && !this.definition.canSeeStealth) continue;
-
-      if (enemy.definition.tauntAura && enemy.silenceTimer <= 0 && this.y - enemy.y <= this.range) {
-        // A taunting enemy in range is prioritized; pick the most-advanced one.
-        if (!foundTaunt || enemy.y > maxEnemyY) {
-          maxEnemyY = enemy.y;
-          target = enemy;
-          foundTaunt = true;
-        }
-      } else if (!foundTaunt && enemy.y > maxEnemyY) {
-        maxEnemyY = enemy.y;
-        target = enemy;
-      }
-    }
-
-    return target && this.y - target.y <= this.range ? target : null;
+  /**
+   * Rally Volley command: the player tapped the field, so this hero overrides
+   * its current target and fires ONE shot at `target` — ignoring normal range —
+   * on the next update, then reverts to auto-targeting. The reset cooldown lets
+   * every commanded hero loose a synchronized volley the instant it's issued.
+   */
+  commandVolley(target: Enemy): void {
+    if (this.isEvicted || this.stunTimer > 0) return;
+    this.forcedTarget = target;
+    this.attackCooldown = 0;
   }
 
   getEffectiveAttackRateMs(): number {
@@ -426,9 +426,15 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
 
     this.attackCooldown = Math.max(0, this.attackCooldown - delta);
 
-    // The enemy this hero is engaging (frontmost, in range) — computed every
-    // frame so it drives both locomotion and attacking.
-    const target = this.findTargetInRange(enemies);
+    // Drop a stale volley target (died before this hero got to fire).
+    if (this.forcedTarget && (this.forcedTarget.isDead || this.forcedTarget.hp <= 0 || !this.forcedTarget.active)) {
+      this.forcedTarget = null;
+    }
+
+    // The enemy this hero is engaging — a Rally Volley target overrides normal
+    // range-limited targeting; otherwise the frontmost in-range enemy. Computed
+    // every frame so it drives both locomotion and attacking.
+    const target = this.forcedTarget ?? this.findTargetInRange(enemies);
 
     // Smoothly rotate the HeroModel to face the target, or face forward (up) if no target
     if (target) {
@@ -475,6 +481,10 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
         delayMs: effectiveRate * 0.45,
         originalTarget: target,
       });
+
+      // A volley is a single commanded shot — consume it so the hero reverts to
+      // auto-targeting next frame.
+      this.forcedTarget = null;
     }
 
     // Process pending attacks (mechanical projectile launch)

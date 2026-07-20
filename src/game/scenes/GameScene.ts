@@ -12,12 +12,14 @@ import { type HeroId, HERO_DEFINITIONS } from '../data/heroes';
 import { allAttackArtStems, attackArtKey, attackArtPath } from '../data/attackArt';
 import { preloadAudio, SFX, MUSIC, bossThemeForAct } from '../data/soundRegistry';
 import { AudioManager } from '../core/AudioManager';
-import { GAME_HEIGHT, GAME_WIDTH, WORLD_HEIGHT, RALLY, PARALLAX } from '../data/level';
+import { FOCUS_FIRE, GAME_HEIGHT, GAME_WIDTH, WORLD_HEIGHT, RALLY, PARALLAX } from '../data/level';
 import { getMapSkinForStage, type MapSkin } from '../data/mapSkins';
 import { WaveManager } from '../core/WaveManager';
 import { TOTAL_WAVES, INTER_WAVE_DELAY_MS, buildWaveTable, bossForStage } from '../data/waves';
 import { nextShieldY } from '../core/RallyMarch';
 import { SkillCutIn } from '../entities/fx/SkillCutIn';
+import { AreaOverlay } from '../entities/fx/AreaOverlay';
+import { spawnShockwaveRing } from '../entities/fx/ShockwaveRing';
 import { ParallaxBackground } from '../entities/fx/ParallaxBackground';
 
 // Helper imports
@@ -68,6 +70,14 @@ export class GameScene extends Phaser.Scene {
   public comboQueue: Hero[] = [];
   public isProcessingCombo = false;
   public comboCount = 0;
+
+  /**
+   * Rally Volley — a battlefield tap makes every hero override its target and
+   * fire one shot at the enemy nearest the tap. Debounced; volleyCount is a
+   * lightweight signal for tests/telemetry.
+   */
+  private lastFocusTapAt = 0;
+  public volleyCount = 0;
 
   /** True while a boss theme is playing — flips the boss-only BGM on/off. */
   private bossMusicActive = false;
@@ -220,6 +230,7 @@ export class GameScene extends Phaser.Scene {
     this.load.image('coin_dispenser', '/assets/fx/coin_dispenser.svg');
     this.load.image('coin', '/assets/fx/coin.svg');
     this.load.image('wind_gust', '/assets/fx/wind_gust.svg');
+    this.load.image('focus_marker', '/assets/fx/focus_marker.svg');
     this.load.image('golden_seed', '/assets/fx/golden_seed.svg');
     this.load.image('golden_leaf', '/assets/fx/golden_leaf.svg');
 
@@ -283,6 +294,18 @@ export class GameScene extends Phaser.Scene {
       this.isPaused = true;
     }
 
+    // Rally Volley: a tap/click on the battlefield makes every hero override its
+    // target and fire one shot at the enemy nearest the tap. Taps on interactive
+    // objects (heroes, coins, draggable sandbox enemies) arrive with a non-empty
+    // currentlyOver list and stay theirs.
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {
+      if (currentlyOver.length > 0) return;
+      if (this.status !== 'playing' || this.isPaused || this.gameSpeed === 0) return;
+      if (pointer.downTime - this.lastFocusTapAt < FOCUS_FIRE.debounceMs) return;
+      this.lastFocusTapAt = pointer.downTime;
+      this.issueVolley(pointer.worldX, pointer.worldY);
+    });
+
     this.cleanupUIEvents = setupUIEvents(this);
     const cleanupInternalEvents = setupInternalEvents(this);
 
@@ -296,6 +319,64 @@ export class GameScene extends Phaser.Scene {
 
     this.events.once('shutdown', cleanup);
     this.events.once('destroy', cleanup);
+  }
+
+  /** The living enemy nearest to (x, y) anywhere on the field, or null. */
+  private nearestEnemyTo(x: number, y: number): Enemy | null {
+    let best: Enemy | null = null;
+    let bestDistSq = Infinity;
+    for (const enemy of this.enemies) {
+      if (enemy.isDead || enemy.hp <= 0) continue;
+      const dx = enemy.x - x;
+      const dy = enemy.y - y;
+      const distSq = dx * dx + dy * dy;
+      if (distSq < bestDistSq) {
+        bestDistSq = distSq;
+        best = enemy;
+      }
+    }
+    return best;
+  }
+
+  /**
+   * Rally Volley: every hero overrides its current target and fires one shot at
+   * the enemy nearest the tapped point. A ping ring and a brief reticle mark the
+   * spot; with no enemies on the field the tap just pings. Fire-and-forget — the
+   * marker self-expires, so there's no per-frame state to tick or clean up.
+   */
+  private issueVolley(x: number, y: number): void {
+    this.volleyCount++;
+    const target = this.nearestEnemyTo(x, y);
+    // Snap the feedback onto the enemy being hit when there is one.
+    const fx = target ? target.x : x;
+    const fy = target ? target.y : y;
+
+    spawnShockwaveRing(this, {
+      x: fx, y: fy,
+      color: FOCUS_FIRE.color,
+      endRadius: FOCUS_FIRE.markerRadiusPx,
+      rings: 2,
+      durationMs: 350,
+    });
+
+    new AreaOverlay(this, {
+      x: fx, y: fy,
+      radius: FOCUS_FIRE.markerRadiusPx,
+      strokeColor: FOCUS_FIRE.color,
+      strokeWidth: 2,
+      strokeAlpha: 0.5,
+      squash: 0.5,
+      svgKey: 'focus_marker',
+      svgScale: 0.55,
+      depth: -1, // ground telegraph: above the rally stage, below every unit
+      enter: { durationMs: 120, fromScale: 0.6 },
+      exit: { mode: 'fade', durationMs: 300, delayMs: FOCUS_FIRE.markerMs },
+    });
+
+    if (!target) return;
+    for (const hero of this.heroes) {
+      hero.commandVolley(target);
+    }
   }
 
   /** Destroy every battlefield entity + visual. Safe to call twice (empties the
