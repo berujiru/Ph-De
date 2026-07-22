@@ -51,9 +51,22 @@ export function setupUIEvents(scene: GameScene): () => void {
 
   const unsubSetSpeed = uiToGameEvents.on('setSpeed', ({ speed }) => {
     if (!scene.sys) return;
+    // Targeting owns the freeze; ignore HUD speed changes so they can't desync
+    // the pause (the restored speed on confirm/cancel is what takes effect).
+    if (scene.isTargeting) return;
     scene.gameSpeed = speed;
     scene.syncVisualPauseState();
     scene.emitState(true);
+  });
+
+  const unsubConfirmSkillTarget = uiToGameEvents.on('confirmSkillTarget', () => {
+    if (!scene.sys) return;
+    scene.confirmSkillTarget();
+  });
+
+  const unsubCancelSkillTarget = uiToGameEvents.on('cancelSkillTarget', () => {
+    if (!scene.sys) return;
+    scene.cancelSkillTarget();
   });
 
   const unsubSurrender = uiToGameEvents.on('surrender', () => {
@@ -216,6 +229,8 @@ export function setupUIEvents(scene: GameScene): () => void {
     unsubStart();
     unsubSelectDrop();
     unsubSetSpeed();
+    unsubConfirmSkillTarget();
+    unsubCancelSkillTarget();
     unsubSurrender();
     unsubExitRally();
     unsubRestart();
@@ -412,17 +427,25 @@ export function setupInternalEvents(scene: GameScene): () => void {
       onComplete: () => {
         if (!scene.sys) return;
         hero.playCast();
-        
+
+        // Player-chosen aim from targeting mode (undefined for auto-cast skills);
+        // read once here, then cleared so a later auto-cast isn't affected.
+        const manual = hero.pendingSkillTarget;
+        hero.pendingSkillTarget = null;
+
         applyHeroSkill(skillId, hero, {
           GAME_WIDTH,
           GAME_HEIGHT: scene.cameras.main.scrollY + GAME_HEIGHT,
           heroes: scene.heroes,
           enemies: scene.enemies,
+          targetX: manual?.x,
+          targetY: manual?.y,
+          targetEnemy: manual?.enemy,
           onVisual: (evt: SkillVisualEvent) => {
             handleSkillVisualEffect(scene, evt);
           }
         });
-        
+
         scene.processComboQueue();
       },
     });
@@ -559,7 +582,10 @@ export function handleSkillVisualEffect(scene: GameScene, evt: SkillVisualEvent)
     scene.time.delayedCall(evt.delay || 500, () => {
       scene.tweens.add({
         targets: rider,
-        y: evt.targetY,
+        // Charge toward the aimed destination when provided; else straight up
+        // the lane (destX absent ⇒ keep the spawn X).
+        x: evt.destX ?? rider.x,
+        y: evt.destY ?? evt.targetY,
         duration: evt.duration || 1000,
         ease: 'Linear',
         onUpdate: () => {

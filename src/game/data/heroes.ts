@@ -41,6 +41,18 @@ export interface HeroDefinition {
     name: string;
     shortName?: string;
     description: string;
+    /**
+     * How the player aims this skill. Omitted/`'auto'` casts instantly with the
+     * skill's own internal target selection (today's behavior). The others pause
+     * the game and enter a place-then-commit targeting mode:
+     * `'area'` drops an AOE at a chosen point, `'summon'` places a static object
+     * at a chosen point, `'unit'` picks a single enemy, `'aim'` points a cone at
+     * the tapped spot, and `'line'` sends a column/sweep toward it. `'aim'` and
+     * `'line'` take the same single ground tap as `'area'`. See docs/VOICE_DROPS.md.
+     */
+    targetType?: 'auto' | 'area' | 'unit' | 'summon' | 'aim' | 'line';
+    /** Reticle radius in px for `'area'`/`'summon'` skills; ignored otherwise. */
+    targetRadius?: number;
   };
   passive?: {
     name: string;
@@ -196,7 +208,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 1400, // slowed 2026-07: 17.6 DPS busted the bruiser band
     color: 0x10b981,
     purpose: 'Frontline cleaver — revs into clustered enemies and hits Bosses extra hard. A durable bruiser, not a sniper.',
-    signatureSkill: { name: 'Barya Lang Po', shortName: 'Barya', description: 'Blasts his coin dispenser like a shotgun — a cone of peso shrapnel deals massive AoE damage and the muzzle gust knocks enemies back.' },
+    signatureSkill: { name: 'Barya Lang Po', shortName: 'Barya', description: 'Blasts his coin dispenser like a shotgun — a cone of peso shrapnel deals massive AoE damage and the muzzle gust knocks enemies back.', targetType: 'aim' },
     passive: { name: 'Hari ng Kalsada', description: 'Deals bonus damage to Bosses.' },
     attackArt: 'wrench',
   },
@@ -212,7 +224,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 3500,
     color: 0x0ea5e9,
     purpose: 'Support net — clumps enemies and soaks them Wet, setting up Lightning and Freeze combos. Low direct damage by design.',
-    signatureSkill: { name: 'Lambat', shortName: 'Lambat', description: 'Casts a net dragging enemies from off-lanes into the center.' },
+    signatureSkill: { name: 'Lambat', shortName: 'Lambat', description: 'Casts a net dragging enemies from off-lanes into the center.', targetType: 'area', targetRadius: 400 },
     passive: { name: 'Deep Water', description: 'Attacks apply Wet (amplifies lightning damage).' },
     attackArt: 'net',
   },
@@ -248,7 +260,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     skillCooldownMs: 50000,
     color: 0xe2e8f0,
     purpose: 'Lobs scalding syrup that slows and splashes a small area; strips enemy speed buffs off whatever it hits.',
-    signatureSkill: { name: 'Hot Syrup', shortName: 'Syrup', description: 'Throws a Molotov creating a 20s AoE fire patch that deals DoT.' },
+    signatureSkill: { name: 'Hot Syrup', shortName: 'Syrup', description: 'Throws a Molotov creating a 20s AoE fire patch that deals DoT.', targetType: 'area', targetRadius: 200 },
     passive: { name: 'Sweet Tooth', description: 'Drops 1 extra Voice when killing an Elite/Boss.' },
     attackArt: 'taho-cup',
     projectileSpeed: 450,
@@ -283,7 +295,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 5000,
     color: 0xd97706,
     purpose: 'Builds Yero barricades that body-block the path (wall HP scales with his damage). Buys time, not damage.',
-    signatureSkill: { name: 'Barrier', description: 'Builds a wide destructible wall ahead of the shield that blocks enemies until it breaks. Voice Drop enhancements make it longer and tougher.' },
+    signatureSkill: { name: 'Barrier', description: 'Builds a wide destructible wall ahead of the shield that blocks enemies until it breaks. Voice Drop enhancements make it longer and tougher.', targetType: 'summon', targetRadius: 210 },
     passive: { name: 'Heavy Stance', description: 'Completely immune to knockback effects.' },
     attackArt: 'yero-panel',
   },
@@ -301,7 +313,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackArt: 'headset-wave',
     projectileSpeed: 800,
     purpose: 'Headset feedback shoots projectile attacks at distant enemies and can target Stealth.',
-    signatureSkill: { name: 'Put-on-hold', description: 'Deals damage and applies a 5s Root in a small AoE.' },
+    signatureSkill: { name: 'Put-on-hold', description: 'Deals damage and applies a 5s Root in a small AoE.', targetType: 'unit' },
     passive: { name: 'Graveyard Shift', description: 'Can see and directly target Stealthed enemies.' },
   },
   security_guard: {
@@ -317,7 +329,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     color: 0x1e3a8a,
     purpose: 'Batuta bruiser who holds the frontline and cleaves enemies in front; deals double damage to Stealth anomalies.',
     canSeeStealth: true,
-    signatureSkill: { name: 'Flash', description: 'Casts a wide cone that heavily slows all enemies.' },
+    signatureSkill: { name: 'Flash', description: 'Casts a wide cone that heavily slows all enemies.', targetType: 'aim' },
     passive: { name: 'Night Watch', description: 'Deals double damage to Stealthed enemies.' },
     attackArt: 'batuta',
   },
@@ -334,7 +346,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     skillCooldownMs: 60000,
     color: 0x15803d,
     purpose: 'Chain-lightning ranged attacker whose Tree of Life periodically roots and lightly damages enemies in a large AoE.',
-    signatureSkill: { name: 'Tree of Life', description: 'Summons a Golden Tree that periodically Roots and damages nearby enemies.' },
+    signatureSkill: { name: 'Tree of Life', description: 'Summons a Golden Tree that periodically Roots and damages nearby enemies.', targetType: 'area', targetRadius: 150 },
     passive: { name: 'Deep Roots', description: 'Attacks have a 20% chance to Root (freeze) enemies.' },
     attackArt: 'root-burst',
     chainArt: 'vine', // root tendril lash, not electric crackle
@@ -354,7 +366,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     basePierce: 5,
     color: 0xf43f5e,
     purpose: 'Skewers a whole line — one Tuhog throw pierces up to 5 anomalies. The squad\'s premier line-clearer.',
-    signatureSkill: { name: 'Spicy Sauce', description: 'Ignites all pierced enemies, causing panic.' },
+    signatureSkill: { name: 'Spicy Sauce', description: 'Ignites all pierced enemies, causing panic.', targetType: 'line' },
     passive: { name: 'Tuhog', description: 'Attacks pierce up to 5 enemies in a line.' },
     attackArt: 'skewer',
     projectileSpeed: 750,
@@ -399,7 +411,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 3000,
     color: 0xf472b6,
     purpose: 'Lobs explosive ice-cream bombs that arm and freeze whatever trips the ring — zone control that punishes tight lanes.',
-    signatureSkill: { name: 'Dirty Ice Cream', description: 'Fan-throws 3 explosive ice cream bombs onto the path.' },
+    signatureSkill: { name: 'Dirty Ice Cream', description: 'Fan-throws 3 explosive ice cream bombs onto the path.', targetType: 'area', targetRadius: 200 },
     passive: { name: 'Brain Freeze', description: 'Attacks apply stacking Freeze.' },
     attackArt: 'ice-trap',
   },
@@ -482,7 +494,7 @@ export const HERO_DEFINITIONS: Record<HeroId, HeroDefinition> = {
     attackRateMs: 1500,
     color: 0x22c55e,
     purpose: 'Returning parcels hit twice and ramp up the longer they focus one target — a single-target melter that grows mid-fight.',
-    signatureSkill: { name: 'Dine & Dash', description: 'Summons 3 riders that rev up before sweeping the lane, leaving a trail, dealing heavy damage, and knocking enemies back.' },
+    signatureSkill: { name: 'Dine & Dash', description: 'Summons 3 riders that rev up before sweeping the lane, leaving a trail, dealing heavy damage, and knocking enemies back.', targetType: 'line' },
     passive: { name: 'Rush Hour', description: 'Attack speed ramps up the longer they attack the same target.' },
     attackArt: 'parcel',
     projectileSpeed: 400,

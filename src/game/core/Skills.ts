@@ -50,6 +50,14 @@ export interface SkillContext {
   heroes: ISkillHero[];
   enemies: ISkillEnemy[];
   onVisual: (event: SkillVisualEvent) => void;
+  /**
+   * Player-chosen aim for manually-targeted skills (signatureSkill.targetType
+   * of 'area'/'summon'/'unit'). Undefined for auto-cast skills — each branch
+   * falls back to its own internal target selection when these are absent.
+   */
+  targetX?: number;
+  targetY?: number;
+  targetEnemy?: ISkillEnemy | null;
 }
 
 export function applyHeroPassive(passiveId: string, _source: ISkillHero, target: ISkillEnemy, ctx: SkillContext) {
@@ -103,8 +111,10 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     validEnemies.sort((a, b) => b.y - a.y);
     const target = validEnemies[0];
     
-    // Calculate angle towards target, default to straight UP (-Math.PI / 2)
-    const targetAngle = target ? Math.atan2(target.y - hero.y, target.x - hero.x) : -Math.PI / 2;
+    // Player aim (tap point) wins; else the frontmost enemy; else straight UP.
+    const targetAngle = ctx.targetX != null
+      ? Math.atan2((ctx.targetY ?? hero.y) - hero.y, ctx.targetX - hero.x)
+      : target ? Math.atan2(target.y - hero.y, target.x - hero.x) : -Math.PI / 2;
     
     // Dispatch visual event
     onVisual({ type: 'flashlightCone', hero, length: coneLength, duration: slowDuration, angle: targetAngle });
@@ -122,12 +132,12 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     const rootDuration = 5000; // 5s persistent field
     const burstDamage = 2; // tiny damage just to tag them, focused on CC not burst
     
-    // Find target in range
+    // Player-picked enemy (unit targeting) wins; otherwise the first enemy in range.
     const range = 1400; // call center agent range
-    let target = enemies.find(e => !e.isDead && (hero.y - e.y <= range));
+    let target = ctx.targetEnemy ?? enemies.find(e => !e.isDead && (hero.y - e.y <= range));
     let targetX = hero.x;
     let targetY = hero.y - range;
-    
+
     if (target) {
       targetX = target.x;
       targetY = target.y;
@@ -175,8 +185,10 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     validEnemies.sort((a, b) => b.y - a.y);
     const target = validEnemies[0];
     
-    // Calculate angle towards target, default to straight UP (-Math.PI / 2)
-    const targetAngle = target ? Math.atan2(target.y - hero.y, target.x - hero.x) : -Math.PI / 2;
+    // Player aim (tap point) wins; else the frontmost enemy; else straight UP.
+    const targetAngle = ctx.targetX != null
+      ? Math.atan2((ctx.targetY ?? hero.y) - hero.y, ctx.targetX - hero.x)
+      : target ? Math.atan2(target.y - hero.y, target.x - hero.x) : -Math.PI / 2;
     
     // Dispatch visual event
     onVisual({ type: 'coinShrapnelCone', hero, length: coneLength, angle: targetAngle });
@@ -208,11 +220,15 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
   } else if (skillId === 'fisherfolk') {
     // Lambat: Drag enemies to the lane's horizontal center.
     // The visual vortex lasts 1500ms, and drag starts at 1000ms.
-    const centerX = GAME_WIDTH / 2;
+    // Player-placed vortex center (area targeting) wins; else the lane center /
+    // first-enemy depth.
+    const centerX = ctx.targetX ?? GAME_WIDTH / 2;
     const aliveEnemies = enemies.filter(e => !e.isDead);
     let targetY = GAME_HEIGHT / 2;
-    
-    if (aliveEnemies.length > 0) {
+
+    if (ctx.targetY != null) {
+      targetY = ctx.targetY;
+    } else if (aliveEnemies.length > 0) {
       // Target the Y of the first alive enemy
       targetY = aliveEnemies[0].y;
     } else {
@@ -280,6 +296,9 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       targetX = target.x;
       targetY = target.y;
     }
+    // Player-placed lob point (area targeting) overrides the auto pick.
+    targetX = ctx.targetX ?? targetX;
+    targetY = ctx.targetY ?? targetY;
     const bonusRadius = hero.modifiers?.bonusRadius || 0;
     const bonusDamage = hero.modifiers?.bonusDamage || 0;
     onVisual({
@@ -318,8 +337,9 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       type: 'spawnBarrier',
       startX: hero.x,
       startY: hero.y,
-      x: GAME_WIDTH / 2,
-      y: frontY,
+      // Player-placed spot (summon targeting) wins; else the frontmost enemy line.
+      x: ctx.targetX ?? GAME_WIDTH / 2,
+      y: ctx.targetY ?? frontY,
       widthPx: 420 + bonusRadius * 60,
       maxHp: (hero.damage + bonusDamage * 2) * 12,
     });
@@ -339,8 +359,9 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
       }
     }
 
-    const tx = target ? target.x : GAME_WIDTH / 2;
-    const ty = target ? target.y : GAME_HEIGHT / 2;
+    // Player-placed spot (area targeting) wins; else the beefiest enemy.
+    const tx = ctx.targetX ?? (target ? target.x : GAME_WIDTH / 2);
+    const ty = ctx.targetY ?? (target ? target.y : GAME_HEIGHT / 2);
 
     onVisual({
       type: 'spawnTreeOfLife',
@@ -363,13 +384,22 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     const radius = 180 + (bonusRadius * 25);
     const damage = (hero.damage + bonusDamage * 2) * 0.5;
 
+    // Player aim (tap) sets the column direction; else straight up the lane.
+    const angle = ctx.targetX != null
+      ? Math.atan2((ctx.targetY ?? hero.y) - hero.y, ctx.targetX - hero.x)
+      : -Math.PI / 2;
+    const stepX = Math.cos(angle) * spacing;
+    const stepY = Math.sin(angle) * spacing;
+
     for (let i = 1; i <= numPatches; i++) {
-      const patchY = hero.y - (i * spacing);
-      if (patchY < -100) break;
+      const patchX = hero.x + stepX * i;
+      const patchY = hero.y + stepY * i;
+      // Stop once the column leaves the world (top or either side).
+      if (patchY < -100 || patchX < -100 || patchX > GAME_WIDTH + 100) break;
 
       onVisual({
         type: 'spawnFirePatch',
-        x: hero.x,
+        x: patchX,
         y: patchY,
         radius,
         duration: 15000,
@@ -396,14 +426,17 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     // Dirty Ice Cream: fan-throw 3 bombs spread across the lane, just above the
     // bottom front line — each lobbed from the vendor with a small stagger so
     // the volley reads as three throws, not a simultaneous stamp.
+    // Player-placed fan center (area targeting) wins; else lane center, up-lane.
+    const fanX = ctx.targetX ?? GAME_WIDTH / 2;
+    const fanY = ctx.targetY ?? (hero.y - 350);
     for(let i=0; i<3; i++) {
       onVisual({
         type: 'spawnTrap',
         startX: hero.x,
         startY: hero.y,
         delay: i * 120,
-        x: GAME_WIDTH / 2 + (i-1)*150 + (Math.random()-0.5)*40,
-        y: hero.y - 350 - (Math.random() * 80), // Spawn up the lane in the path of incoming enemies
+        x: fanX + (i-1)*150 + (Math.random()-0.5)*40,
+        y: fanY - (Math.random() * 80), // slight scatter around the target
         color: '#f472b6',
         damage: hero.damage * 3,
         modifiers: hero.modifiers
@@ -442,8 +475,25 @@ export function applyHeroSkill(skillId: string, hero: ISkillHero, ctx: SkillCont
     const knockback = 200 + bonusPierce * 50;
     const damage = (hero.damage + bonusDamage) * 4;
 
+    const RANGE = 1500;
+    const SPREAD = 200;
+    // Player aim (tap) sets the charge direction; else straight up the lane.
+    const angle = ctx.targetX != null
+      ? Math.atan2((ctx.targetY ?? hero.y) - hero.y, ctx.targetX - hero.x)
+      : -Math.PI / 2;
+    const dirX = Math.cos(angle);
+    const dirY = Math.sin(angle);
+    // Perpendicular unit vector spreads the 3 riders across the charge line.
+    const perpX = -dirY;
+    const perpY = dirX;
+
     for(let i=0; i<3; i++) {
-      onVisual({ type: 'spawnRider', x: hero.x + (i-1)*200, y: hero.y, targetY: hero.y - 1500, duration: 1000, damage, delay: 500, knockback, hitRadius });
+      const offset = (i - 1) * SPREAD;
+      const sx = hero.x + perpX * offset;
+      const sy = hero.y + perpY * offset;
+      const destX = sx + dirX * RANGE;
+      const destY = sy + dirY * RANGE;
+      onVisual({ type: 'spawnRider', x: sx, y: sy, targetY: destY, destX, destY, duration: 1000, damage, delay: 500, knockback, hitRadius });
     }
   }
 }

@@ -79,6 +79,29 @@ export interface GameToUiEvents extends Record<string, unknown> {
   loadProgress: { progress: number };
   /** Fired once at the end of create() when all game objects are built. */
   sceneReady: undefined;
+  /**
+   * Manual skill-targeting mode drives the HUD banner. `active:false` closes it.
+   * While active the sim is frozen; `placed` gates the Confirm button (a target
+   * must be placed/selected before it commits).
+   */
+  skillTargeting: {
+    active: boolean;
+    targetType?: 'area' | 'unit' | 'summon' | 'aim' | 'line';
+    heroName?: string;
+    placed?: boolean;
+  };
+  /**
+   * A once-in-a-lifetime achievement was just earned. Drives the non-blocking
+   * unlock toast. Fired once per achievement, ever (the metaState ledger dedups).
+   */
+  achievementUnlocked: {
+    id: string;
+    title: string;
+    description: string;
+    /** Emoji emblem for the toast. */
+    icon: string;
+    reward: { permits?: number; hope?: number };
+  };
 }
 
 export type SkillVisualEvent = 
@@ -108,6 +131,10 @@ export interface UiToGameEvents extends Record<string, unknown> {
   debugSpawn: { heroId?: string; passive?: string; skill?: string };
   triggerHeroSkill: { skill?: string };
   queueHeroSkill: { heroId: string };
+  /** Commit the currently-placed target and cast the armed skill. */
+  confirmSkillTarget: undefined;
+  /** Abort targeting mode without casting (skill stays ready). */
+  cancelSkillTarget: undefined;
   spawnSandboxTarget: undefined;
   spawnSpecificEnemy: { enemyId: string, passive?: string, skill?: string };
   triggerEnemySkill: undefined;

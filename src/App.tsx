@@ -6,20 +6,25 @@ import { CampaignMap } from './ui/mockups/CampaignMap';
 import { SariSariStore } from './ui/mockups/SariSariStore';
 import { LoadingScreen } from './ui/mockups/LoadingScreen';
 import { InventoryScreen } from './ui/mockups/InventoryScreen';
+import { AchievementsScreen } from './ui/mockups/AchievementsScreen';
 import { PreparationScreen } from './ui/mockups/PreparationScreen';
 import { SandboxHUD } from './ui/mockups/SandboxHUD';
 import { AudioSettings } from './ui/components/AudioSettings';
+import { AchievementToast } from './ui/components/AchievementToast';
 import { RallyLoadingOverlay } from './ui/components/RallyLoadingOverlay';
 import { theme } from './ui/theme';
 import { uiToGameEvents } from './game/core/GameEvents';
 import { spendPermit } from './game/data/metaState';
+// Side-effect import: registers the achievement evaluator on the meta-state
+// store so unlocks are checked from app boot, even before the screen is opened.
+import './game/data/achievements';
 import { AudioManager } from './game/core/AudioManager';
 import { IapManager } from './game/core/IapManager';
 import { MUSIC } from './game/data/soundRegistry';
 import './App.css';
 
 function App() {
-  const [currentView, setCurrentView] = useState<'loading' | 'main' | 'campaign' | 'prep' | 'battle' | 'sandbox' | 'store' | 'inventory'>('loading');
+  const [currentView, setCurrentView] = useState<'loading' | 'main' | 'campaign' | 'prep' | 'battle' | 'sandbox' | 'store' | 'inventory' | 'achievements'>('loading');
   const [selectedStage, setSelectedStage] = useState<{ act: number; stageIdx: number } | null>(null);
   const [audioOpen, setAudioOpen] = useState(false);
   const [rallyReady, setRallyReady] = useState(false);
@@ -89,6 +94,7 @@ function App() {
           onPlay={handlePlay}
           onStore={() => { setStoreReturnView('main'); setCurrentView('store'); }}
           onInventory={() => setCurrentView('inventory')}
+          onAchievements={() => setCurrentView('achievements')}
         />
       )}
       
@@ -135,6 +141,10 @@ function App() {
         <InventoryScreen onBack={() => setCurrentView('main')} />
       )}
 
+      {currentView === 'achievements' && (
+        <AchievementsScreen onBack={() => setCurrentView('main')} />
+      )}
+
       {/* Global audio settings — reachable from any screen (loading excepted). */}
       {currentView !== 'loading' && (
         <button
@@ -164,6 +174,9 @@ function App() {
       )}
 
       {audioOpen && <AudioSettings onClose={() => setAudioOpen(false)} />}
+
+      {/* Global achievement-unlock toast — non-blocking, over every screen. */}
+      <AchievementToast />
       </div>
     </div>
   );

@@ -41,6 +41,26 @@ export interface MetaStateData {
    * exactly-once currency grants. Capped to the most recent entries.
    */
   iapProcessedTxIds: string[];
+  /**
+   * Achievement ids the player has permanently earned. Achievements are
+   * once-in-a-lifetime: an id present here is never re-granted. See
+   * `achievements.ts` for the catalog + evaluator.
+   */
+  unlockedAchievements: string[];
+  /** Lifetime battles that reached an end (win or loss). */
+  battlesPlayed: number;
+  /** Lifetime battles won. */
+  battlesWon: number;
+  /** Lifetime wins with no barrier breach (a "flawless" defense). */
+  flawlessWins: number;
+  /** Lifetime bosses defeated across all battles. */
+  bossesDefeated: number;
+  /** Lifetime hero drops picked up mid-battle. */
+  heroDrops: number;
+  /** Lifetime Hope earned (never decremented — Hope spending doesn't lower it). */
+  lifetimeHope: number;
+  /** Lifetime Hero Cards earned (never decremented by leveling spend). */
+  lifetimeCards: number;
 }
 
 /** Free permits granted by the once-a-day store claim. */
@@ -78,6 +98,14 @@ const DEFAULT_STATE: MetaStateData = {
   adWatchDate: null,
   adWatchCount: 0,
   iapProcessedTxIds: [],
+  unlockedAchievements: [],
+  battlesPlayed: 0,
+  battlesWon: 0,
+  flawlessWins: 0,
+  bossesDefeated: 0,
+  heroDrops: 0,
+  lifetimeHope: 0,
+  lifetimeCards: 0,
 };
 
 function readStorage(): MetaStateData {
@@ -116,6 +144,20 @@ function readStorage(): MetaStateData {
       iapProcessedTxIds: Array.isArray(parsed.iapProcessedTxIds)
         ? parsed.iapProcessedTxIds.filter((id): id is string => typeof id === 'string')
         : [...DEFAULT_STATE.iapProcessedTxIds],
+      // Migration: saves before achievements lack these — default so nothing is
+      // pre-unlocked and every lifetime counter starts fresh. (Pre-existing
+      // progress like cleared stages / encounters still counts toward
+      // predicates evaluated against those existing fields on the next change.)
+      unlockedAchievements: Array.isArray(parsed.unlockedAchievements)
+        ? parsed.unlockedAchievements.filter((id): id is string => typeof id === 'string')
+        : [...DEFAULT_STATE.unlockedAchievements],
+      battlesPlayed: typeof parsed.battlesPlayed === 'number' ? parsed.battlesPlayed : DEFAULT_STATE.battlesPlayed,
+      battlesWon: typeof parsed.battlesWon === 'number' ? parsed.battlesWon : DEFAULT_STATE.battlesWon,
+      flawlessWins: typeof parsed.flawlessWins === 'number' ? parsed.flawlessWins : DEFAULT_STATE.flawlessWins,
+      bossesDefeated: typeof parsed.bossesDefeated === 'number' ? parsed.bossesDefeated : DEFAULT_STATE.bossesDefeated,
+      heroDrops: typeof parsed.heroDrops === 'number' ? parsed.heroDrops : DEFAULT_STATE.heroDrops,
+      lifetimeHope: typeof parsed.lifetimeHope === 'number' ? parsed.lifetimeHope : DEFAULT_STATE.lifetimeHope,
+      lifetimeCards: typeof parsed.lifetimeCards === 'number' ? parsed.lifetimeCards : DEFAULT_STATE.lifetimeCards,
     };
   } catch {
     return { ...DEFAULT_STATE };
@@ -201,10 +243,20 @@ export function hasEncounteredEnemy(enemyId: string): boolean {
   return state.encounteredEnemies.includes(enemyId);
 }
 
+export function getUnlockedAchievements(): string[] {
+  return state.unlockedAchievements;
+}
+
+export function isAchievementUnlocked(id: string): boolean {
+  return state.unlockedAchievements.includes(id);
+}
+
 // Setters / Actions
 export function addHope(amount: number) {
   if (amount <= 0) return;
-  state = { ...state, hope: state.hope + amount };
+  // lifetimeHope tracks total Hope ever earned — it never drops when Hope is
+  // spent, so Hope-milestone achievements can't relock after a store purchase.
+  state = { ...state, hope: state.hope + amount, lifetimeHope: state.lifetimeHope + amount };
   notify();
 }
 
@@ -306,9 +358,12 @@ export function unlockHeroInStore(heroId: HeroId) {
 
 export function addHeroCards(heroId: HeroId, amount: number) {
   if (amount <= 0) return;
+  // lifetimeCards tracks total cards ever earned — unaffected by the leveling
+  // spend, so card-collection achievements stay unlocked after spending.
   state = {
     ...state,
     heroCards: { ...state.heroCards, [heroId]: (state.heroCards[heroId] ?? 0) + amount },
+    lifetimeCards: state.lifetimeCards + amount,
   };
   notify();
 }
@@ -364,6 +419,55 @@ export function recordStageClear(stageId: number, stars: number) {
     state = newState;
     notify();
   }
+}
+
+// --- Achievements --------------------------------------------------------------
+// Achievement conditions are pure predicates over MetaStateData (see
+// achievements.ts). The mutators below feed those predicates; the evaluator runs
+// off subscribeMetaState, so a plain counter bump is all a gameplay hook needs.
+
+/**
+ * Atomically record newly earned achievements and pay out their combined reward
+ * in a single state write. Ids already present are ignored (idempotent), so a
+ * re-evaluation can never double-grant. Currency is added directly here rather
+ * than via addHope(), so achievement payouts don't inflate lifetimeHope.
+ */
+export function applyAchievementUnlocks(ids: string[], permits: number, hope: number): void {
+  const fresh = ids.filter((id) => !state.unlockedAchievements.includes(id));
+  if (fresh.length === 0) return;
+  state = {
+    ...state,
+    unlockedAchievements: [...state.unlockedAchievements, ...fresh],
+    permits: state.permits + Math.max(0, permits),
+    hope: state.hope + Math.max(0, hope),
+  };
+  notify();
+}
+
+/** Record a boss defeat (increments the lifetime boss counter). */
+export function recordBossDefeated(): void {
+  state = { ...state, bossesDefeated: state.bossesDefeated + 1 };
+  notify();
+}
+
+/** Record a mid-battle hero drop pickup (increments the lifetime drop counter). */
+export function recordHeroDrop(): void {
+  state = { ...state, heroDrops: state.heroDrops + 1 };
+  notify();
+}
+
+/**
+ * Record a completed battle outcome for lifetime combat counters. `flawless` is
+ * a win with no barrier breach. One state write per battle end.
+ */
+export function recordBattleOutcome(won: boolean, flawless: boolean): void {
+  state = {
+    ...state,
+    battlesPlayed: state.battlesPlayed + 1,
+    battlesWon: won ? state.battlesWon + 1 : state.battlesWon,
+    flawlessWins: won && flawless ? state.flawlessWins + 1 : state.flawlessWins,
+  };
+  notify();
 }
 
 /** Test hook — reset in-memory state (and re-read storage). */

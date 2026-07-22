@@ -9,6 +9,7 @@ import {
   HopeCoinIcon,
   MegaphoneIcon,
   RallyPermitIcon,
+  StarIcon,
 } from '../icons';
 import { Embers, FireVignette, RuinedSkyline, Bonfire, SoulsButton } from '../components/ApocalypseScenery';
 
@@ -16,6 +17,7 @@ interface MainMenuProps {
   onPlay: () => void;
   onStore: () => void;
   onInventory: () => void;
+  onAchievements: () => void;
 }
 
 import { getHope, getPermits, subscribeMetaState } from '../../game/data/metaState';
@@ -427,7 +429,7 @@ function PlacardButton({ icon, label, sublabel, tilt, onClick }: {
   );
 }
 
-export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
+export function MainMenu({ onPlay, onStore, onInventory, onAchievements }: MainMenuProps) {
   const [, forceUpdate] = useReducer((x) => x + 1, 0);
   useEffect(() => subscribeMetaState(forceUpdate), []);
   
@@ -656,6 +658,13 @@ export function MainMenu({ onPlay, onStore, onInventory }: MainMenuProps) {
             sublabel="Roster & Truth Codex"
             tilt={1.5}
             onClick={onInventory}
+          />
+          <PlacardButton
+            icon={<StarIcon size={26} />}
+            label="Hall of Deeds"
+            sublabel="Achievements & rewards"
+            tilt={-1}
+            onClick={onAchievements}
           />
         </div>
       </div>

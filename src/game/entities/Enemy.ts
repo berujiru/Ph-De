@@ -14,6 +14,7 @@ import { FX } from '../data/level';
 import { EnemyAI } from '../core/EnemyAI';
 import { AudioManager } from '../core/AudioManager';
 import { enemyHitSfx, enemyDeathSfx } from '../data/soundRegistry';
+import { recordBossDefeated } from '../data/metaState';
 
 export type AilmentType = 'burn' | 'slow' | 'wet' | 'freeze' | 'stun' | 'poison' | 'bleed' | 'rot' | 'sleep' | 'curse' | 'knockback' | 'armorShred' | 'muted' | 'root' | 'dragged';
 
@@ -335,6 +336,17 @@ export class Enemy extends Phaser.GameObjects.Container implements ISkillEnemy {
       cameraPunch(this.scene, FX.cameraShake.enemyDeath);
       this.hpBarBg.setVisible(false);
       this.hpBarFill.setVisible(false);
+
+      // Count a genuine boss defeat once (achievements). A multi-phase boss only
+      // truly dies on its final phase — intermediate phases carry nextPhaseEnemyId
+      // and transform instead. Sandbox kills don't count toward progression.
+      if (
+        this.definition.id.startsWith('boss_') &&
+        !this.definition.nextPhaseEnemyId &&
+        !(this.scene as any).isSandbox
+      ) {
+        recordBossDefeated();
+      }
 
       // Hook death events
       if (this.definition.nextPhaseEnemyId) {

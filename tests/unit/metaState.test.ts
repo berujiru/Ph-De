@@ -1,8 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   addHeroCards,
+  addHope,
   adsRemainingToday,
   AD_PERMIT_REWARD,
+  applyAchievementUnlocks,
   canClaimDaily,
   claimDailyPermits,
   DAILY_CLAIM_PERMITS,
@@ -13,16 +15,22 @@ import {
   getHeroLevel,
   getHighestClearedStage,
   getHope,
+  getMetaState,
   getPermits,
   getStoreUnlockedHeroes,
+  getUnlockedAchievements,
   grantAdReward,
   hasEncounteredEnemy,
   hasProcessedIapTx,
+  isAchievementUnlocked,
   isStageCleared,
   levelUpHero,
   markEnemyEncountered,
   MAX_AD_WATCHES_PER_DAY,
   MAX_IAP_TX_HISTORY,
+  recordBattleOutcome,
+  recordBossDefeated,
+  recordHeroDrop,
   recordIapGrant,
   recordStageClear,
   resetMetaStateForTests,
@@ -175,6 +183,86 @@ describe('markEnemyEncountered', () => {
     markEnemyEncountered('brute'); // already known — no state change, no notify
     expect(spy).toHaveBeenCalledTimes(1);
     unsub();
+  });
+});
+
+describe('achievement state', () => {
+  it('starts with no achievements and zeroed lifetime counters', () => {
+    expect(getUnlockedAchievements()).toEqual([]);
+    const s = getMetaState();
+    expect([s.battlesPlayed, s.battlesWon, s.flawlessWins, s.bossesDefeated, s.heroDrops, s.lifetimeHope, s.lifetimeCards])
+      .toEqual([0, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('defaults the new fields on a pre-achievements save', () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ hope: 50, permits: 10, highestClearedStage: 3 }),
+    );
+    resetMetaStateForTests();
+    expect(getUnlockedAchievements()).toEqual([]);
+    expect(getMetaState().bossesDefeated).toBe(0);
+    expect(getMetaState().lifetimeHope).toBe(0);
+    // Old fields still preserved.
+    expect(getHope()).toBe(50);
+    expect(getPermits()).toBe(10);
+  });
+
+  it('applyAchievementUnlocks grants currency and records ids atomically, once', () => {
+    applyAchievementUnlocks(['first_win', 'win_5'], 10, 750);
+    expect(getUnlockedAchievements()).toEqual(['first_win', 'win_5']);
+    expect(getPermits()).toBe(25 + 10);
+    expect(getHope()).toBe(750);
+
+    // Re-applying an already-unlocked id is a no-op (no double grant).
+    applyAchievementUnlocks(['first_win'], 10, 750);
+    expect(getUnlockedAchievements()).toEqual(['first_win', 'win_5']);
+    expect(getPermits()).toBe(35);
+    expect(getHope()).toBe(750);
+  });
+
+  it('applyAchievementUnlocks does not inflate lifetimeHope', () => {
+    applyAchievementUnlocks(['first_win'], 0, 500);
+    expect(getHope()).toBe(500);
+    expect(getMetaState().lifetimeHope).toBe(0); // reward hope is not "earned" hope
+  });
+
+  it('addHope tracks lifetimeHope even after spending', () => {
+    addHope(300);
+    addHope(200);
+    expect(getMetaState().lifetimeHope).toBe(500);
+    expect(getHope()).toBe(500);
+  });
+
+  it('addHeroCards tracks lifetimeCards', () => {
+    addHeroCards('student', 5);
+    addHeroCards('teacher', 3);
+    expect(getMetaState().lifetimeCards).toBe(8);
+  });
+
+  it('recordBattleOutcome tallies plays, wins and flawless wins', () => {
+    recordBattleOutcome(true, true);
+    recordBattleOutcome(true, false);
+    recordBattleOutcome(false, false);
+    const s = getMetaState();
+    expect(s.battlesPlayed).toBe(3);
+    expect(s.battlesWon).toBe(2);
+    expect(s.flawlessWins).toBe(1);
+  });
+
+  it('recordBossDefeated and recordHeroDrop increment their counters', () => {
+    recordBossDefeated();
+    recordBossDefeated();
+    recordHeroDrop();
+    expect(getMetaState().bossesDefeated).toBe(2);
+    expect(getMetaState().heroDrops).toBe(1);
+  });
+
+  it('isAchievementUnlocked reflects the ledger and persists across reload', () => {
+    applyAchievementUnlocks(['first_boss'], 6, 300);
+    expect(isAchievementUnlocked('first_boss')).toBe(true);
+    resetMetaStateForTests();
+    expect(isAchievementUnlocked('first_boss')).toBe(true);
   });
 });
 

@@ -1,6 +1,6 @@
 import type { HeroId } from './heroes';
 import { globalStageNumber } from './campaign';
-import { addHope, addHeroCards, recordStageClear } from './metaState';
+import { addHope, addHeroCards, recordStageClear, recordBattleOutcome } from './metaState';
 
 // End-of-run spoils: Hope Points + RNG Hero Card drops, awarded on BOTH victory
 // and defeat ("a failed defense still wakes people up"). Pure compute is split
@@ -45,11 +45,14 @@ export function computeBattleRewards(
 /** Persist computed rewards to metaState. On victory, also record the stage clear. */
 export function applyBattleRewards(
   rewards: BattleRewards,
-  ctx: { won: boolean; starsEarned: number; stage: { act: number; stageIdx: number } | null },
+  ctx: { won: boolean; starsEarned: number; flawless: boolean; stage: { act: number; stageIdx: number } | null },
 ): void {
   addHope(rewards.hope);
   for (const heroId of rewards.cardDrops) addHeroCards(heroId, 1);
   if (ctx.won && ctx.stage) {
     recordStageClear(globalStageNumber(ctx.stage.act, ctx.stage.stageIdx), ctx.starsEarned);
   }
+  // Lifetime combat counters feed the achievement predicates (battlesWon,
+  // flawlessWins, …). Recorded on both win and loss.
+  recordBattleOutcome(ctx.won, ctx.flawless);
 }

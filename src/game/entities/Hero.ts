@@ -38,6 +38,13 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
   private forcedTarget: Enemy | null = null;
 
   /**
+   * Player-chosen aim for a manually-targeted skill (targetType area/summon/
+   * unit), set by GameScene when targeting is confirmed and read once when the
+   * skill resolves in GameSceneEvents (then cleared). Null for auto-cast skills.
+   */
+  public pendingSkillTarget: { x: number; y: number; enemy: Enemy | null } | null = null;
+
+  /**
    * Persistent behavior mods from Voice-drop upgrades (bonusPierce/bonusChain/
    * bonusRadius). Passed into every Attack this hero spawns so pierce/chain/
    * radius upgrades reach future shots. Starts at zero. See docs/VOICE_DROPS.md.
@@ -118,11 +125,25 @@ export class Hero extends Phaser.GameObjects.Container implements ISkillHero {
     this.setInteractive({ useHandCursor: true });
     this.on('pointerdown', () => {
       const gs = this.scene as any;
+      // While targeting is armed the scene owns battlefield taps; re-tapping the
+      // armed hero cancels (any other hero tap is ignored). Order-independent vs.
+      // the scene's global handler, which only places on empty-ground taps.
+      if (gs.isTargeting) {
+        if (gs.pendingTarget?.hero === this) gs.cancelSkillTarget();
+        return;
+      }
       if (gs.isPaused || gs.gameSpeed === 0) return;
       // A lit portrait (skill ready) casts via the combo queue — same path the
       // old HUD skill button used; otherwise a tap just shows the range ring.
       if (this.isSkillReady && !this.isEvicted) {
-        uiToGameEvents.emit('queueHeroSkill', { heroId: this.id });
+        // Skills that need a player-chosen target enter targeting mode instead
+        // of auto-casting; auto/undefined skills cast immediately as before.
+        const targetType = this.definition.signatureSkill.targetType;
+        if (targetType && targetType !== 'auto') {
+          gs.beginSkillTargeting(this);
+        } else {
+          uiToGameEvents.emit('queueHeroSkill', { heroId: this.id });
+        }
       } else {
         this.showRange();
       }

@@ -5,6 +5,7 @@ import { recruitableHeroIdsForStage } from '../data/heroUnlocks';
 import { rollDrops, makeRng, type DropContext } from '../core/Drops';
 import { gameToUiEvents, type DropOption } from '../core/GameEvents';
 import { spawnHero } from './GameSceneSpawners';
+import { recordHeroDrop } from '../data/metaState';
 
 export function addVoices(scene: GameScene, amount: number) {
   if (scene.isSandbox || scene.status !== 'playing') return;
@@ -63,6 +64,8 @@ export function applyDrop(scene: GameScene, dropId: string) {
   if (dropId.startsWith('hero:')) {
     const heroId = dropId.slice('hero:'.length) as HeroId;
     spawnHero(scene, heroId);
+    // Count the recruit toward achievements (sandbox picks don't progress).
+    if (!scene.isSandbox) recordHeroDrop();
   } else if (dropId === 'global:moraleHeal') {
     scene.shield.heal(GLOBAL_DROP_DEFS.moraleHeal.magnitude);
   } else if (dropId.startsWith('upgrade:')) {

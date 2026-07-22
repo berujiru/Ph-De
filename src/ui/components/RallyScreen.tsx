@@ -420,6 +420,12 @@ export function RallyScreen({ stage, onReturnToMenu }: RallyScreenProps) {
   const [introducedEnemy, setIntroducedEnemy] = useState<string | null>(null);
   const [spoils, setSpoils] = useState<BattleRewards | null>(null);
   const [tcgCutIn, setTcgCutIn] = useState<{ heroId: string } | null>(null);
+  const [targeting, setTargeting] = useState<{
+    active: boolean;
+    targetType?: 'area' | 'unit' | 'summon' | 'aim' | 'line';
+    heroName?: string;
+    placed?: boolean;
+  }>({ active: false });
   const lastSpeedRef = useRef(1);
   /** True only when the Intel modal itself paused the game (vs. the user's pause button). */
   const intelPausedGameRef = useRef(false);
@@ -437,13 +443,30 @@ export function RallyScreen({ stage, onReturnToMenu }: RallyScreenProps) {
       setTcgCutIn({ heroId });
       setTimeout(() => setTcgCutIn(null), durationMs);
     });
+    const unsubTargeting = gameToUiEvents.on('skillTargeting', (payload) => {
+      setTargeting(payload.active ? payload : { active: false });
+    });
     return () => {
       unsubState();
       unsubVoices();
       unsubEncounter();
       unsubTcgCutIn();
+      unsubTargeting();
     };
   }, []);
+
+  // Escape cancels targeting mode (no keyboard handling exists elsewhere yet).
+  useEffect(() => {
+    if (!targeting.active) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        uiToGameEvents.emit('cancelSkillTarget', undefined);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [targeting.active]);
 
   const playBtnSound = () => uiToGameEvents.emit('playSound', { key: 'sfx-btn-press' });
   const handleSetSpeed = (speed: number) => uiToGameEvents.emit('setSpeed', { speed });
@@ -514,11 +537,12 @@ export function RallyScreen({ stage, onReturnToMenu }: RallyScreenProps) {
     if (!gameOver || rewardsAppliedRef.current) return;
     rewardsAppliedRef.current = true;
     const starsEarned = won ? stars.filter((s) => s.earned).length : 0;
+    const flawless = won && stars[0].earned; // stars[0] === 'No breach'
     // Read the owned roster BEFORE applyBattleRewards' recordStageClear bumps
     // highestClearedStage — otherwise a freshly unlocked hero could be dropped.
     const roster = availableHeroIds(getHighestClearedStage(), getStoreUnlockedHeroes());
     const rewards = computeBattleRewards({ won, wavesCleared }, roster, Math.random);
-    applyBattleRewards(rewards, { won, starsEarned, stage });
+    applyBattleRewards(rewards, { won, starsEarned, flawless, stage });
     setSpoils(rewards);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- state is frozen once gameOver flips true
   }, [gameOver]);
@@ -681,6 +705,119 @@ export function RallyScreen({ stage, onReturnToMenu }: RallyScreenProps) {
           </button>
         </div>
       </div>
+
+      {/* ---------- Skill Targeting Banner ---------- */}
+      {targeting.active && !gameOver && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 140,
+            display: 'flex',
+            justifyContent: 'center',
+            padding: '12px 16px',
+            // Let battlefield taps fall through to the canvas so the player can
+            // place the target; only the pill below re-enables pointer events.
+            pointerEvents: 'none',
+            animation: 'placard-drop 0.25s ease both',
+          }}
+        >
+          <div
+            role="dialog"
+            aria-label="Skill targeting"
+            style={{
+              ...glassPanel,
+              pointerEvents: 'auto',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              padding: '5px 6px 5px 14px',
+              borderRadius: 999,
+              border: `1px solid ${withAlpha(theme.colors.accent, 0.45)}`,
+              boxShadow: `0 4px 18px ${withAlpha(theme.colors.background, 0.55)}`,
+              maxWidth: 'min(440px, 94vw)',
+            }}
+          >
+            <span
+              role="status"
+              style={{
+                color: theme.colors.textSecondary,
+                fontWeight: 600,
+                fontSize: 12,
+                letterSpacing: '0.02em',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {targeting.targetType === 'unit'
+                ? 'Tap an enemy'
+                : targeting.targetType === 'aim' || targeting.targetType === 'line'
+                  ? 'Tap to aim'
+                  : 'Tap to place'}
+              {targeting.heroName ? (
+                <span style={{ color: theme.colors.textPrimary, fontWeight: 700 }}> · {targeting.heroName}</span>
+              ) : null}
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
+              <button
+                type="button"
+                onClick={() => {
+                  playBtnSound();
+                  uiToGameEvents.emit('confirmSkillTarget', undefined);
+                }}
+                disabled={!targeting.placed}
+                aria-label="Confirm target"
+                title="Confirm target"
+                style={{
+                  width: 34,
+                  height: 34,
+                  display: 'grid',
+                  placeItems: 'center',
+                  padding: 0,
+                  border: 'none',
+                  borderRadius: 999,
+                  background: 'transparent',
+                  fontSize: 22,
+                  lineHeight: 1,
+                  fontWeight: 700,
+                  color: targeting.placed ? theme.colors.accent : withAlpha(theme.colors.textPrimary, 0.28),
+                  cursor: targeting.placed ? 'pointer' : 'not-allowed',
+                  animation: targeting.placed ? 'pulse-glow 1.4s ease-in-out infinite' : 'none',
+                }}
+              >
+                ✓
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  playBtnSound();
+                  uiToGameEvents.emit('cancelSkillTarget', undefined);
+                }}
+                aria-label="Cancel targeting"
+                title="Cancel targeting (Esc)"
+                style={{
+                  width: 34,
+                  height: 34,
+                  display: 'grid',
+                  placeItems: 'center',
+                  padding: 0,
+                  border: 'none',
+                  borderRadius: 999,
+                  background: 'transparent',
+                  fontSize: 18,
+                  lineHeight: 1,
+                  fontWeight: 700,
+                  color: theme.colors.textSecondary,
+                  cursor: 'pointer',
+                }}
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ---------- Abandon Rally Confirmation ---------- */}
       {surrenderConfirmOpen && !gameOver && (

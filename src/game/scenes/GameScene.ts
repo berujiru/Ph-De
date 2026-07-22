@@ -79,6 +79,25 @@ export class GameScene extends Phaser.Scene {
   private lastFocusTapAt = 0;
   public volleyCount = 0;
 
+  /**
+   * Manual skill targeting (signatureSkill.targetType area/summon/unit). While
+   * `isTargeting` is set the sim is frozen (gameSpeed 0), a live reticle tracks
+   * the placed point/enemy, and the HUD shows the targeting banner. Committing
+   * writes the chosen target onto the hero and runs the normal cast chain.
+   */
+  public isTargeting = false;
+  public pendingTarget: {
+    hero: Hero;
+    targetType: 'area' | 'unit' | 'summon' | 'aim' | 'line';
+    radius: number;
+    x: number;
+    y: number;
+    enemy: Enemy | null;
+    placed: boolean;
+  } | null = null;
+  private targetReticle?: AreaOverlay;
+  private speedBeforeTargeting = 1;
+
   /** True while a boss theme is playing — flips the boss-only BGM on/off. */
   private bossMusicActive = false;
 
@@ -299,6 +318,13 @@ export class GameScene extends Phaser.Scene {
     // objects (heroes, coins, draggable sandbox enemies) arrive with a non-empty
     // currentlyOver list and stay theirs.
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {
+      // Skill targeting takes precedence over Rally Volley. Taps on interactive
+      // objects (the armed hero, coins) stay theirs — the hero's own handler
+      // owns cancel-on-re-tap — so only empty-ground taps place the target.
+      if (this.isTargeting) {
+        if (currentlyOver.length === 0) this.placeSkillTarget(pointer.worldX, pointer.worldY);
+        return;
+      }
       if (currentlyOver.length > 0) return;
       if (this.status !== 'playing' || this.isPaused || this.gameSpeed === 0) return;
       if (pointer.downTime - this.lastFocusTapAt < FOCUS_FIRE.debounceMs) return;
@@ -379,6 +405,124 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  /**
+   * Enter place-then-commit targeting for a hero's manually-aimed skill. Freezes
+   * the sim (remembering the live speed to restore), spawns a live ground
+   * reticle at the hero, and tells the HUD to show the targeting banner. No
+   * target is placed yet, so Confirm stays disabled until the first tap.
+   */
+  public beginSkillTargeting(hero: Hero): void {
+    if (this.isTargeting || this.status !== 'playing') return;
+    const targetType = hero.definition.signatureSkill.targetType;
+    if (!targetType || targetType === 'auto') return;
+    const radius = hero.definition.signatureSkill.targetRadius ?? 150;
+
+    this.pendingTarget = { hero, targetType, radius, x: hero.x, y: hero.y, enemy: null, placed: false };
+    this.isTargeting = true;
+
+    // Freeze exactly like the HUD pause lever so update() AND camera auto-scroll
+    // both stop, keeping the reticle stable under the pointer.
+    this.speedBeforeTargeting = this.gameSpeed || 1;
+    this.gameSpeed = 0;
+    this.syncVisualPauseState();
+    this.emitState(true);
+
+    // theme.colors.accent (#ea580c) — matches the React targeting banner so the
+    // reticle and the HUD read as one system, distinct from the gold volley ping.
+    const ACCENT = 0xea580c;
+    this.targetReticle = new AreaOverlay(this, {
+      x: hero.x,
+      y: hero.y,
+      // area/summon show the true effect radius; unit/aim/line are point/
+      // direction markers, so a small fixed reticle reads better.
+      radius: targetType === 'area' || targetType === 'summon' ? radius : 90,
+      fillColor: ACCENT,
+      fillAlpha: 0.12,
+      strokeColor: ACCENT,
+      strokeWidth: 3,
+      strokeAlpha: 0.9,
+      squash: 0.5,
+      innerRings: { fractions: [0.5], color: ACCENT, width: 2, alpha: 0.5 },
+      pulse: { scale: 1.06, durationMs: 700 },
+      depth: -1, // ground telegraph: above the rally stage, below every unit
+      enter: { durationMs: 150, fromScale: 0.6 },
+    });
+
+    gameToUiEvents.emit('skillTargeting', { active: true, targetType, heroName: hero.definition.name, placed: false });
+  }
+
+  /**
+   * Place (or move) the pending target. For area/summon this is the tapped
+   * ground point; for unit it snaps to the enemy nearest the tap (a tap with no
+   * enemy to lock onto is ignored). The first placement enables Confirm.
+   */
+  public placeSkillTarget(x: number, y: number): void {
+    const pt = this.pendingTarget;
+    if (!pt || !this.targetReticle) return;
+
+    if (pt.targetType === 'unit') {
+      const enemy = this.nearestEnemyTo(x, y);
+      if (!enemy) return;
+      pt.enemy = enemy;
+      pt.x = enemy.x;
+      pt.y = enemy.y;
+    } else {
+      pt.enemy = null;
+      pt.x = x;
+      pt.y = y;
+    }
+    this.targetReticle.setPosition(pt.x, pt.y);
+
+    if (!pt.placed) {
+      pt.placed = true;
+      gameToUiEvents.emit('skillTargeting', { active: true, targetType: pt.targetType, heroName: pt.hero.definition.name, placed: true });
+    }
+  }
+
+  /**
+   * Commit the placed target: hand it to the hero, exit targeting, then run the
+   * normal cast kickoff (same as the queueHeroSkill handler). No-op if nothing
+   * has been placed yet.
+   */
+  public confirmSkillTarget(): void {
+    const pt = this.pendingTarget;
+    if (!pt || !pt.placed) return;
+    const hero = pt.hero;
+
+    // GameSceneEvents reads this when the skill resolves after the cut-in, then
+    // clears it — so an auto-cast on a later cooldown isn't affected.
+    hero.pendingSkillTarget = { x: pt.x, y: pt.y, enemy: pt.enemy };
+
+    this.exitTargeting();
+
+    if (hero.isSkillReady && !hero.isEvicted && hero !== this.budgetCutTargetHero && !this.comboQueue.includes(hero)) {
+      this.comboQueue.push(hero);
+      this.emitState(true);
+      if (!this.isProcessingCombo) {
+        this.comboCount = 0;
+        this.processComboQueue();
+      }
+    }
+  }
+
+  /** Abort targeting without casting — the skill stays ready (cooldown unspent). */
+  public cancelSkillTarget(): void {
+    if (!this.isTargeting) return;
+    this.exitTargeting();
+  }
+
+  /** Shared teardown: drop the reticle, unfreeze, and close the HUD banner. */
+  private exitTargeting(): void {
+    this.isTargeting = false;
+    this.pendingTarget = null;
+    this.targetReticle?.destroy();
+    this.targetReticle = undefined;
+    this.gameSpeed = this.speedBeforeTargeting || 1;
+    this.syncVisualPauseState();
+    this.emitState(true);
+    gameToUiEvents.emit('skillTargeting', { active: false });
+  }
+
   /** Destroy every battlefield entity + visual. Safe to call twice (empties the
    *  arrays and Phaser's destroy() no-ops on already-destroyed objects). */
   private teardownRally(): void {
@@ -389,6 +533,13 @@ export class GameScene extends Phaser.Scene {
     for (const b of this.barriers) b.destroy();
     for (const t of this.traps) t.destroy();
     for (const aoe of this.persistentAoe) aoe.destroy();
+    // Drop any in-progress targeting reticle/state and close the HUD banner, in
+    // case a rally is torn down (restart/exit) mid-selection.
+    if (this.isTargeting) gameToUiEvents.emit('skillTargeting', { active: false });
+    this.targetReticle?.destroy();
+    this.targetReticle = undefined;
+    this.isTargeting = false;
+    this.pendingTarget = null;
     if (this.parallax) this.parallax.destroy();
     if (this.rallyStage) this.rallyStage.destroy();
     if (this.shield) this.shield.destroy();

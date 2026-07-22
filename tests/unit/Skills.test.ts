@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { applyHeroSkill, applyHeroPassive, ISkillHero, ISkillEnemy, SkillContext } from '../../src/game/core/Skills';
+import { HERO_DEFINITIONS } from '../../src/game/data/heroes';
 
 function createDummyHero(id = 'dummy', x = 0, y = 0): ISkillHero {
   return {
@@ -288,11 +289,167 @@ describe('Hero Skills', () => {
     e1.hp = 14; // 14% HP (less than 15%)
     const e2 = createDummyEnemy('e2', 0, 0, 100);
     e2.hp = 20; // 20% HP
-    
+
     const ctx = createDummyContext([h1], [e1, e2]);
     applyHeroSkill('sales_lady', h1, ctx);
-    
+
     expect(e1.isDead).toBe(true);
     expect(e2.isDead).toBe(false);
+  });
+});
+
+describe('Manual skill targeting', () => {
+  it('farmer (area) drops the tree on the player-placed point, ignoring the auto-picked enemy', () => {
+    const h1 = createDummyHero('farmer', 540, 1800);
+    const auto = createDummyEnemy('auto', 300, 900, 500); // would win auto-targeting
+    const ctx = { ...createDummyContext([h1], [auto]), targetX: 700, targetY: 400 };
+
+    applyHeroSkill('farmer', h1, ctx);
+
+    expect(ctx.onVisual).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'spawnTreeOfLife', x: 700, y: 400 }),
+    );
+  });
+
+  it('construction_worker (summon) places the wall at the player-chosen spot', () => {
+    const h1 = createDummyHero('construction_worker', 540, 0);
+    const front = createDummyEnemy('front', 200, 900); // would set the auto landing spot
+    const ctx = { ...createDummyContext([h1], [front]), targetX: 815, targetY: 1200 };
+
+    applyHeroSkill('construction_worker', h1, ctx);
+
+    expect(ctx.onVisual).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'spawnBarrier', x: 815, y: 1200 }),
+    );
+  });
+
+  it('call_center_agent (unit) centers the root on the player-chosen enemy', () => {
+    const h1 = createDummyHero('call_center_agent', 540, 2000);
+    const nearest = createDummyEnemy('nearest', 100, 1900); // first-in-range auto pick
+    const chosen = createDummyEnemy('chosen', 880, 1400);
+    const ctx = { ...createDummyContext([h1], [nearest, chosen]), targetEnemy: chosen };
+
+    applyHeroSkill('call_center_agent', h1, ctx);
+
+    expect(ctx.onVisual).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'aoeRoot', x: 880, y: 1400 }),
+    );
+  });
+
+  it('falls back to internal targeting when no manual target is supplied', () => {
+    const h1 = createDummyHero('farmer', 540, 1800);
+    const auto = createDummyEnemy('auto', 300, 900, 500);
+    const ctx = createDummyContext([h1], [auto]); // no targetX/targetY
+
+    applyHeroSkill('farmer', h1, ctx);
+
+    expect(ctx.onVisual).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'spawnTreeOfLife', x: 300, y: 900 }),
+    );
+  });
+});
+
+const emitted = (ctx: SkillContext, type: string) =>
+  (ctx.onVisual as any).mock.calls.map((c: any[]) => c[0]).filter((e: any) => e.type === type);
+
+describe('Manual skill targeting — area/aim/line skills', () => {
+  it('taho_vendor (area) lobs the molotov at the tapped point', () => {
+    const h1 = createDummyHero('taho_vendor', 540, 1800);
+    const ctx = { ...createDummyContext([h1], [createDummyEnemy('e', 100, 100)]), targetX: 700, targetY: 400 };
+    applyHeroSkill('taho_vendor', h1, ctx);
+    expect(ctx.onVisual).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'spawnMolotovPatch', targetX: 700, targetY: 400 }),
+    );
+  });
+
+  it('fisherfolk (area) centers the net vortex on the tapped point', () => {
+    const h1 = createDummyHero('fisherfolk', 540, 1800);
+    const ctx = { ...createDummyContext([h1], [createDummyEnemy('e', 100, 100)]), targetX: 700, targetY: 400 };
+    applyHeroSkill('fisherfolk', h1, ctx);
+    expect(ctx.onVisual).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'spawnLambatVortex', x: 700, y: 400 }),
+    );
+  });
+
+  it('sorbetes_vendor (area) fans the 3 bombs around the tapped point', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5); // deterministic scatter (zero x-jitter)
+    const h1 = createDummyHero('sorbetes_vendor', 540, 1800);
+    const ctx = { ...createDummyContext([h1]), targetX: 600, targetY: 500 };
+    applyHeroSkill('sorbetes_vendor', h1, ctx);
+    const traps = emitted(ctx, 'spawnTrap');
+    expect(traps).toHaveLength(3);
+    // Center bomb (i=1): x = fanX (600), y = fanY - 0.5*80 = 460 with random()=0.5.
+    expect(traps).toContainEqual(expect.objectContaining({ x: 600, y: 460 }));
+    vi.restoreAllMocks();
+  });
+
+  it('jeepney_driver (aim) points the cone at the tapped direction', () => {
+    const h1 = createDummyHero('jeepney_driver', 540, 1800);
+    const up = createDummyEnemy('up', 540, 1700); // auto angle would be -PI/2
+    const ctx = { ...createDummyContext([h1], [up]), targetX: 1040, targetY: 1800 }; // straight right
+    applyHeroSkill('jeepney_driver', h1, ctx);
+    const cone = emitted(ctx, 'coinShrapnelCone')[0];
+    expect(cone.angle).toBeCloseTo(0, 5); // aimed right, not up at the enemy
+  });
+
+  it('security_guard (aim) points the flash cone at the tapped direction', () => {
+    const h1 = createDummyHero('security_guard', 540, 1800);
+    const up = createDummyEnemy('up', 540, 1700);
+    const ctx = { ...createDummyContext([h1], [up]), targetX: 1040, targetY: 1800 };
+    applyHeroSkill('security_guard', h1, ctx);
+    const cone = emitted(ctx, 'flashlightCone')[0];
+    expect(cone.angle).toBeCloseTo(0, 5);
+  });
+
+  it('fishball_vendor (line) lays the column toward the tapped direction', () => {
+    const h1 = createDummyHero('fishball_vendor', 540, 1800);
+    const ctx = { ...createDummyContext([h1]), targetX: 1040, targetY: 1800 }; // straight right
+    applyHeroSkill('fishball_vendor', h1, ctx);
+    const patches = emitted(ctx, 'spawnFirePatch');
+    // First patch is one spacing (360) to the RIGHT of the hero, same Y.
+    expect(patches[0].x).toBeCloseTo(900, 3);
+    expect(patches[0].y).toBeCloseTo(1800, 3);
+  });
+
+  it('delivery_rider (line) charges the riders toward the tapped direction', () => {
+    const h1 = createDummyHero('delivery_rider', 540, 1800);
+    const ctx = { ...createDummyContext([h1]), targetX: 1040, targetY: 1800 }; // straight right
+    applyHeroSkill('delivery_rider', h1, ctx);
+    const riders = emitted(ctx, 'spawnRider');
+    expect(riders).toHaveLength(3);
+    // Every rider's destination is 1500px to the right of its spawn (dirX=1).
+    for (const r of riders) {
+      expect(r.destX - r.x).toBeCloseTo(1500, 3);
+      expect(r.destY - r.y).toBeCloseTo(0, 3);
+    }
+  });
+});
+
+describe('Skill targetType data model', () => {
+  it('defaults to auto (undefined) for skills that self-target', () => {
+    expect(HERO_DEFINITIONS.eden.signatureSkill.targetType).toBeUndefined();
+  });
+
+  it('flags the retrofit starter set with the right modes', () => {
+    expect(HERO_DEFINITIONS.farmer.signatureSkill.targetType).toBe('area');
+    expect(HERO_DEFINITIONS.construction_worker.signatureSkill.targetType).toBe('summon');
+    expect(HERO_DEFINITIONS.call_center_agent.signatureSkill.targetType).toBe('unit');
+  });
+
+  it('flags the full interactive set (area/aim/line)', () => {
+    expect(HERO_DEFINITIONS.taho_vendor.signatureSkill.targetType).toBe('area');
+    expect(HERO_DEFINITIONS.fisherfolk.signatureSkill.targetType).toBe('area');
+    expect(HERO_DEFINITIONS.sorbetes_vendor.signatureSkill.targetType).toBe('area');
+    expect(HERO_DEFINITIONS.jeepney_driver.signatureSkill.targetType).toBe('aim');
+    expect(HERO_DEFINITIONS.security_guard.signatureSkill.targetType).toBe('aim');
+    expect(HERO_DEFINITIONS.fishball_vendor.signatureSkill.targetType).toBe('line');
+    expect(HERO_DEFINITIONS.delivery_rider.signatureSkill.targetType).toBe('line');
+  });
+
+  it('leaves self-buffs, heals, dust storm, globals, and non-spatial skills auto', () => {
+    for (const id of ['eden', 'student', 'nurse', 'street_sweeper', 'teacher',
+      'sales_lady', 'traffic_enforcer', 'electrician', 'baker', 'plumber'] as const) {
+      expect(HERO_DEFINITIONS[id].signatureSkill.targetType).toBeUndefined();
+    }
   });
 });
