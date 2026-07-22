@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import type { GameScene } from './GameScene';
 import { uiToGameEvents, beginRallyLoad } from '../core/GameEvents';
 import { type HeroId, HERO_DEFINITIONS } from '../data/heroes';
-import { type EnemyId, ENEMY_DEFINITIONS } from '../data/enemies';
+import { type EnemyId, ENEMY_DEFINITIONS, substituteSpritelessEnemy } from '../data/enemies';
 import { applyDrop } from './GameSceneDrops';
 import { spawnHero, spawnSandboxTarget } from './GameSceneSpawners';
 import { Enemy } from '../entities/Enemy';
@@ -264,7 +264,7 @@ export function setupInternalEvents(scene: GameScene): () => void {
       const offsetX = (Math.random() - 0.5) * 40;
       const offsetY = (Math.random() - 0.5) * 40;
       
-      const spawnId = source.definition.splitOnDeathEnemyId ?? 'grunt';
+      const spawnId = substituteSpritelessEnemy(source.definition.splitOnDeathEnemyId ?? 'grunt');
       const def = { ...ENEMY_DEFINITIONS[spawnId] }; 
       
       // Fallback name if it's the old shell_company behavior
@@ -328,7 +328,7 @@ export function setupInternalEvents(scene: GameScene): () => void {
   });
 
   scene.events.on('enemySummonShieldbearer', ({ source }: { source: Enemy }) => {
-    const enemy = new Enemy(scene, source.x + 40, source.y, ENEMY_DEFINITIONS['the_overpriced']);
+    const enemy = new Enemy(scene, source.x + 40, source.y, ENEMY_DEFINITIONS[substituteSpritelessEnemy('the_overpriced')]);
     scene.enemies.push(enemy);
   });
 
@@ -363,9 +363,10 @@ export function setupInternalEvents(scene: GameScene): () => void {
   });
 
   scene.events.on('enemySmuggleHp', ({ source }: { source: Enemy }) => {
-    const def = { ...ENEMY_DEFINITIONS['the_overpriced'] };
+    // Base on a sprited stand-in while the_overpriced has no sheet; stats below override it anyway.
+    const def = { ...ENEMY_DEFINITIONS[substituteSpritelessEnemy('the_overpriced')] };
     def.fakeHpPadding = 1000;
-    def.maxHp = 10; 
+    def.maxHp = 10;
     def.name = 'Smuggled Budget';
     def.color = 0x14b8a6;
     

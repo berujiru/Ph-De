@@ -1,4 +1,4 @@
-import { ENEMY_DEFINITIONS, enemySizeClass, type EnemyId } from './enemies';
+import { ENEMY_DEFINITIONS, enemySizeClass, substituteSpritelessEnemy, type EnemyId } from './enemies';
 import { gateEnemyForStage } from './enemyUnlocks';
 import { globalStageNumber } from './campaign';
 
@@ -179,7 +179,8 @@ export function buildWaveTable(
   const spawn = (enemyId: EnemyId, count: number, intervalMs: number): WaveEvent =>
     ({
       type: 'spawn',
-      enemyId: gateEnemyForStage(enemyId, act, stageIdx),
+      // Gate by campaign stage, then swap out any enemy lacking a sprite sheet.
+      enemyId: substituteSpritelessEnemy(gateEnemyForStage(enemyId, act, stageIdx)),
       count: isOpener ? Math.max(1, Math.round(count * OPENING_STAGE_COUNT_SCALE)) : count,
       intervalMs,
     });

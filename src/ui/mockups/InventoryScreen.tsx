@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useState } from 'react';
 import { theme } from '../theme';
 import { HERO_DEFINITIONS, type HeroDefinition, type HeroId } from '../../game/data/heroes';
-import { ENEMY_DEFINITIONS, type EnemyDefinition, type EnemyId } from '../../game/data/enemies';
+import { ENEMY_DEFINITIONS, isEnemyPlayable, type EnemyDefinition, type EnemyId } from '../../game/data/enemies';
 import { HopeCoinIcon, RallyPermitIcon, LockIcon, InfoIcon } from '../icons';
 import { BackButton } from '../components/BackButton';
 import { Embers, SoulsButton } from '../components/ApocalypseScenery';
@@ -36,9 +36,10 @@ interface InventoryScreenProps {
 
 type ArchiveTab = 'heroes' | 'codex';
 
-// Real anomalies only (drop the sandbox punching bag).
+// Real anomalies only (drop the sandbox punching bag, and — temporarily —
+// any enemy still lacking a sprite sheet; see SPRITELESS_ENEMY_FALLBACK).
 const CODEX_ENEMIES = Object.values(ENEMY_DEFINITIONS)
-  .filter((def) => def.id !== 'sandbox_target')
+  .filter((def) => def.id !== 'sandbox_target' && isEnemyPlayable(def.id))
   .sort((a, b) => {
     const tierA = enemyTier(a);
     const tierB = enemyTier(b);

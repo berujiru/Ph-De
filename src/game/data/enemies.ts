@@ -138,6 +138,42 @@ export function enemyHitRadius(def: EnemyDefinition): number {
   return UNIT_HIT_RADIUS[enemySizeClass(def)];
 }
 
+/**
+ * TEMPORARY (art pending): enemy types that have no battlefield sprite sheet
+ * loaded in GameScene yet. Until their art lands they are pulled from wave
+ * spawning, split/summon drops, and the Truth Codex. Anywhere one would spawn,
+ * it is substituted 1:1 with the same-role sprited stand-in below, so wave
+ * counts — and thus the voice-drop kill pool — stay identical (same doctrine as
+ * data/enemyUnlocks.ts gating). To re-enable an enemy once its sheet is wired
+ * in GameScene.preload, delete its entry here (and nothing else).
+ */
+export const SPRITELESS_ENEMY_FALLBACK: Partial<Record<EnemyId, EnemyId>> = {
+  the_overpriced: 'grunt',
+  tender_rigger: 'grunt',
+  shell_company: 'grunt',
+  kickback_courier: 'runner',
+  minion_nepotism: 'grunt',
+};
+
+/** Whether this enemy has a wired sprite sheet (i.e. may appear in-game / in the Codex). */
+export function isEnemyPlayable(id: EnemyId): boolean {
+  return !(id in SPRITELESS_ENEMY_FALLBACK);
+}
+
+/**
+ * Swap a spriteless enemy for its sprited stand-in, chaining until it lands on a
+ * playable id. Playable ids (and anything not in the map) pass through unchanged.
+ */
+export function substituteSpritelessEnemy(id: EnemyId): EnemyId {
+  let resolved = id;
+  const seen = new Set<EnemyId>();
+  while (resolved in SPRITELESS_ENEMY_FALLBACK && !seen.has(resolved)) {
+    seen.add(resolved);
+    resolved = SPRITELESS_ENEMY_FALLBACK[resolved]!;
+  }
+  return resolved;
+}
+
 export const ENEMY_DEFINITIONS: Record<EnemyId, EnemyDefinition> = {
   grunt: {
     id: 'grunt',
