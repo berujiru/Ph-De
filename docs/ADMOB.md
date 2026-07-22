@@ -39,7 +39,9 @@ Resolution logic lives in `src/adsConfig.ts` (`resolveRewardedAdConfig`).
 
 ## Native packaging (do when `android/`/`ios/` are generated)
 
-The native platform folders are not generated yet. When they are
+The native platform folders are not generated yet. See
+[`BUILD_ANDROID.md`](BUILD_ANDROID.md) for the full Android APK flow; the AdMob
+steps below are the ad-specific parts of it. When they are generated
 (`npm run cap:add:android` / `cap:add:ios`), complete these one-time steps — the
 web build and tests stay green without them.
 

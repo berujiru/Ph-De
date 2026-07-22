@@ -106,7 +106,8 @@ UI→game) — never reach into Phaser internals from React or vice versa.
 `ios/` and `android/` are intentionally not generated yet — this repo has no
 Xcode/Android SDK to build them against. `capacitor.config.ts` is in place;
 run `npm run cap:add:ios` / `npm run cap:add:android` locally when a native
-build is actually needed.
+build is actually needed. For the full Android APK export flow (scaffold, build,
+install, permissions), see [`docs/BUILD_ANDROID.md`](docs/BUILD_ANDROID.md).
 
 ## Tool-specific notes
 
